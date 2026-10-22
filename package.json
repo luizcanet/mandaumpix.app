@@ -1,0 +1,31 @@
+{
+  "name": "mandaumpix.app",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/luizcanet/mandaumpix.app#readme",
+  "bugs": {
+    "url": "https://github.com/luizcanet/mandaumpix.app/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luizcanet/mandaumpix.app.git"
+  },
+  "license": "ISC",
+  "author": "Luiz Henrique Canet Filho <me@luizca.net>",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@eslint/css": "^2.0.1",
+    "@eslint/js": "^10.0.1",
+    "@eslint/json": "^2.1.1",
+    "@eslint/markdown": "^8.0.3",
+    "eslint": "^10.13.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.13.0",
+    "prettier": "3.9.10"
+  }
+}
