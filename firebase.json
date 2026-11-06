@@ -6,8 +6,8 @@
       "**/.*",
       "**/node_modules/**",
       "docs/**",
-      "**/*.test.js",
-      "**/*.stories.js",
+      "src/**/*.test.js",
+      "src/**/*.stories.js",
       "eslint.config.js",
       "vitest.config.js",
       "package.json",
@@ -15,7 +15,7 @@
     ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "!/storybook/**",
         "destination": "/index.html"
       }
     ]

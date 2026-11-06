@@ -35,7 +35,7 @@ Configurado em [`.github/workflows/deploy-dev.yml`](../../.github/workflows/depl
 
 - **Job `deploy` (`Build e Deploy (Development)`)**:
   - Vinculado ao GitHub Environment `development` (`https://dev.mandaumpix.app`).
-  - Executa `npm ci`, validação de formatação (`npm run format:check`), análise estática (`npm run lint`), suíte de testes (`npm test`) e empacotamento de produção (`npm run build` gerando `dist/`).
+  - Executa `npm ci`, validação de formatação (`npm run format:check`), análise estática (`npm run lint`), suíte de testes (`npm test`), empacotamento de produção (`npm run build` gerando `dist/`) e build do catálogo de componentes (`npm run build-storybook -- -o dist/storybook`, acessível em `https://dev.mandaumpix.app/storybook`).
   - Publica os ativos no canal `live` do projeto `mandaumpix-app-dev` utilizando `FirebaseExtended/action-hosting-deploy@v0` autenticado via secret `FIREBASE_SERVICE_ACCOUNT_DEV`.
 
 ### 🛡️ Verificações Executadas no Workflow (`CI - Qualidade e Conformidade`)

@@ -50,6 +50,9 @@ jobs:
       - name: Gerar build de produção (JSPM)
         run: npm run build
 
+      - name: Gerar build do Storybook (dist/storybook)
+        run: npm run build-storybook -- -o dist/storybook
+
       - name: Deploy no Firebase Hosting (Development)
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
