@@ -24,7 +24,7 @@ export default {
     ariaLabel: {
       control: { type: "text" },
       description:
-        "Rótulo acessível (`aria-label`). Se vazio, o ícone é tratado como decorativo (`aria-hidden=\"true\"`).",
+        'Rótulo acessível (`aria-label`). Se vazio, o ícone é tratado como decorativo (`aria-hidden="true"`).',
     },
   },
   args: {
@@ -109,4 +109,3 @@ export const IconCatalog = {
     return grid;
   },
 };
-

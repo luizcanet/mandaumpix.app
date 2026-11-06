@@ -37,25 +37,25 @@ Extraídas diretamente de [`package.json`](../../package.json) e resolvidas via 
 
 Extraídas diretamente de [`package.json`](../../package.json):
 
-| Pacote                                                                           |   Versão   | Papel no Projeto                                                                                                 |
-| :------------------------------------------------------------------------------- | :--------: | :--------------------------------------------------------------------------------------------------------------- |
-| [`jspm`](https://jspm.org/)                                                      |  `^4.7.0`  | CLI para gerenciamento de Import Maps, `modulepreload`, integridade SRI, servidor dev (`serve`) e build.         |
-| [`@jspm/generator`](https://github.com/jspm/generator)                           | `^2.18.0`  | Motor programático para resolução de grafos de dependências ESM e injeção em HTML (`htmlInject`).                |
-| [`eslint`](https://eslint.org/)                                                  | `^10.13.0` | Motor central de análise estática (configurado via Flat Config em [`eslint.config.js`](../../eslint.config.js)). |
-| [`@eslint/js`](https://www.npmjs.com/package/@eslint/js)                         | `^10.0.1`  | Regras recomendadas oficiais do ESLint para JavaScript (`js/recommended`).                                       |
-| [`@eslint/css`](https://www.npmjs.com/package/@eslint/css)                       |  `^2.0.1`  | Linter oficial do ESLint para folhas de estilo CSS (`css/recommended`).                                          |
-| [`@eslint/json`](https://www.npmjs.com/package/@eslint/json)                     |  `^2.1.1`  | Validação sintática e boas práticas para arquivos `.json`, `.jsonc` e `.json5`.                                  |
-| [`@eslint/markdown`](https://www.npmjs.com/package/@eslint/markdown)             |  `^8.0.3`  | Linter oficial para documentos Markdown (`markdown/commonmark` + `markdown/recommended`).                        |
-| [`eslint-config-prettier`](https://www.npmjs.com/package/eslint-config-prettier) | `^10.1.8`  | Desativa regras do ESLint que possam conflitar com a formatação do Prettier.                                     |
-| [`globals`](https://www.npmjs.com/package/globals)                               | `^17.13.0` | Fornece o dicionário de variáveis globais do navegador (`globals.browser`).                                      |
-| [`prettier`](https://prettier.io/)                                               |  `3.9.10`  | Formatador opinativo de código para manter estilo consistente em todo o repositório.                             |
-| [`vitest`](https://vitest.dev/)                                                  |  `^5.1.0`  | Framework de testes unitários e de integração nativo para ES Modules ([`vitest.config.js`](../../vitest.config.js)). |
-| [`@vitest/coverage-v8`](https://vitest.dev/guide/coverage.html)                  |  `^5.1.0`  | Provedor de cobertura de código baseado no motor V8 (`text`, `lcov` e `html`).                                   |
-| [`jsdom`](https://github.com/jsdom/jsdom)                                        | `^31.0.0`  | Implementação em JavaScript dos padrões web (DOM e HTML) para testes de Web Components e APIs do navegador.      |
-| [`storybook`](https://storybook.js.org/)                                         | `^10.6.6`  | Ambiente isolado para desenvolvimento, catalogação e documentação interativa de componentes compartilhados.      |
-| [`@storybook/html-vite`](https://storybook.js.org/docs/get-started/frameworks/html-vite) | `^10.6.6` | Integração oficial do Storybook para HTML e Web Components nativos (`@modnes/custom-element`) sobre Vite. |
-| [`@storybook/addon-docs`](https://storybook.js.org/docs/writing-docs/autodocs)   | `^10.6.6`  | Geração automática de páginas de documentação (`autodocs`) e tabelas de propriedades/controles para componentes. |
-| [`@storybook/addon-a11y`](https://storybook.js.org/docs/writing-tests/accessibility-testing) | `^10.6.6` | Auditoria interativa de acessibilidade (WCAG / Axe) diretamente no painel de cada componente no Storybook. |
+| Pacote                                                                                       |   Versão   | Papel no Projeto                                                                                                     |
+| :------------------------------------------------------------------------------------------- | :--------: | :------------------------------------------------------------------------------------------------------------------- |
+| [`jspm`](https://jspm.org/)                                                                  |  `^4.7.0`  | CLI para gerenciamento de Import Maps, `modulepreload`, integridade SRI, servidor dev (`serve`) e build.             |
+| [`@jspm/generator`](https://github.com/jspm/generator)                                       | `^2.18.0`  | Motor programático para resolução de grafos de dependências ESM e injeção em HTML (`htmlInject`).                    |
+| [`eslint`](https://eslint.org/)                                                              | `^10.13.0` | Motor central de análise estática (configurado via Flat Config em [`eslint.config.js`](../../eslint.config.js)).     |
+| [`@eslint/js`](https://www.npmjs.com/package/@eslint/js)                                     | `^10.0.1`  | Regras recomendadas oficiais do ESLint para JavaScript (`js/recommended`).                                           |
+| [`@eslint/css`](https://www.npmjs.com/package/@eslint/css)                                   |  `^2.0.1`  | Linter oficial do ESLint para folhas de estilo CSS (`css/recommended`).                                              |
+| [`@eslint/json`](https://www.npmjs.com/package/@eslint/json)                                 |  `^2.1.1`  | Validação sintática e boas práticas para arquivos `.json`, `.jsonc` e `.json5`.                                      |
+| [`@eslint/markdown`](https://www.npmjs.com/package/@eslint/markdown)                         |  `^8.0.3`  | Linter oficial para documentos Markdown (`markdown/commonmark` + `markdown/recommended`).                            |
+| [`eslint-config-prettier`](https://www.npmjs.com/package/eslint-config-prettier)             | `^10.1.8`  | Desativa regras do ESLint que possam conflitar com a formatação do Prettier.                                         |
+| [`globals`](https://www.npmjs.com/package/globals)                                           | `^17.13.0` | Fornece o dicionário de variáveis globais do navegador (`globals.browser`).                                          |
+| [`prettier`](https://prettier.io/)                                                           |  `3.9.10`  | Formatador opinativo de código para manter estilo consistente em todo o repositório.                                 |
+| [`vitest`](https://vitest.dev/)                                                              |  `^5.1.0`  | Framework de testes unitários e de integração nativo para ES Modules ([`vitest.config.js`](../../vitest.config.js)). |
+| [`@vitest/coverage-v8`](https://vitest.dev/guide/coverage.html)                              |  `^5.1.0`  | Provedor de cobertura de código baseado no motor V8 (`text`, `lcov` e `html`).                                       |
+| [`jsdom`](https://github.com/jsdom/jsdom)                                                    | `^31.0.0`  | Implementação em JavaScript dos padrões web (DOM e HTML) para testes de Web Components e APIs do navegador.          |
+| [`storybook`](https://storybook.js.org/)                                                     | `^10.6.6`  | Ambiente isolado para desenvolvimento, catalogação e documentação interativa de componentes compartilhados.          |
+| [`@storybook/html-vite`](https://storybook.js.org/docs/get-started/frameworks/html-vite)     | `^10.6.6`  | Integração oficial do Storybook para HTML e Web Components nativos (`@modnes/custom-element`) sobre Vite.            |
+| [`@storybook/addon-docs`](https://storybook.js.org/docs/writing-docs/autodocs)               | `^10.6.6`  | Geração automática de páginas de documentação (`autodocs`) e tabelas de propriedades/controles para componentes.     |
+| [`@storybook/addon-a11y`](https://storybook.js.org/docs/writing-tests/accessibility-testing) | `^10.6.6`  | Auditoria interativa de acessibilidade (WCAG / Axe) diretamente no painel de cada componente no Storybook.           |
 
 ---
 

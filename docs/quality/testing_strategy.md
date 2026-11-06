@@ -26,6 +26,7 @@ Em [`package.json`](../../package.json), os scripts de teste estão definidos co
 ```
 
 A suíte de testes unitários valida:
+
 - [`src/main.test.js`](../../src/main.test.js): Metadados da aplicação, geração e parsing de cobranças PIX estáticas (com valor fixo e com valor aberto), inicialização do DOM (`bootstrapApp`) e reexportações do ecossistema `@modnes`.
 - [`src/presentation/components/vector-icon/vector-icon.test.js`](../../src/presentation/components/vector-icon/vector-icon.test.js): Registro do Custom Element `<vector-icon>`, renderização do símbolo SVG e atualização reativa de atributos (`name` e `sprite-path`).
 

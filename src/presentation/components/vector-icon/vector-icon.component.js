@@ -44,8 +44,7 @@ class VectorIcon extends CustomElement {
 
   connectedCallback() {
     this.name = this.getAttribute("name") || "";
-    this.spritePath =
-      this.getAttribute("sprite-path") || DEFAULT_SPRITE_PATH;
+    this.spritePath = this.getAttribute("sprite-path") || DEFAULT_SPRITE_PATH;
 
     this.render();
   }
@@ -70,4 +69,3 @@ if (!customElements.get("vector-icon")) {
 }
 
 export default VectorIcon;
-

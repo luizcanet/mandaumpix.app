@@ -1,0 +1,12 @@
+# Build & coverage outputs
+dist/
+coverage/
+storybook-static/
+jspm_packages/
+node_modules/
+
+# Lockfiles and JSPM auto-generated import maps
+package-lock.json
+importmap.js
+index.html
+
