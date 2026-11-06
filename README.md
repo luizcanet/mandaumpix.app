@@ -45,6 +45,9 @@ npm run importmap
 # Gerar build de produção (dist/)
 npm run build
 
+# Executar suíte de testes automatizados (Vitest)
+npm test
+
 # Executar verificação estática (ESLint)
 npm run lint
 ```

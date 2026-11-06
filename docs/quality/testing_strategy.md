@@ -8,16 +8,22 @@ Este documento descreve o estado atual dos testes no repositório e a estratégi
 
 ## 📊 Estado Atual no Repositório
 
-Em [`package.json`](../../package.json), o script de testes encontra-se definido com o placeholder padrão de inicialização do npm:
+O repositório utiliza o **Vitest** (`^5.1.0`) configurado em [`vitest.config.js`](../../vitest.config.js) com ambiente DOM simulado via **JSDOM** (`^31.0.0`) e cobertura de código nativa via **`@vitest/coverage-v8`** (`^5.1.0`).
+
+Em [`package.json`](../../package.json), os scripts de teste estão definidos como:
 
 ```json
 {
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "lint": "eslint ."
   }
 }
 ```
+
+A suíte inicial em [`src/main.test.js`](../../src/main.test.js) valida os metadados da aplicação, a geração e parsing de cobranças PIX estáticas (com valor fixo e com valor aberto), a inicialização do DOM (`bootstrapApp`) e as reexportações do ecossistema `@modnes`.
 
 ---
 

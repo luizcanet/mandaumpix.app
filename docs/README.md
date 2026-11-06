@@ -42,8 +42,8 @@ flowchart LR
 | :-------------------------------- | :------------------------------------------------------- | :------------------------------------------------------------------------- |
 | **Metadados e Manifesto**         | ✅ Configurado (`v1.0.0`, ES Modules `"type": "module"`) | [`package.json`](../package.json)                                          |
 | **Análise Estática e Formatação** | ✅ ESLint v10 (JS, JSON, CSS, Markdown) + Prettier v3    | [`eslint.config.js`](../eslint.config.js), [`.prettierrc`](../.prettierrc) |
-| **Módulos da Aplicação (PWA)**    | 🚧 Em fase de implementação inicial (`main: index.js`)   | [`package.json`](../package.json)                                          |
-| **Suíte de Testes Automatizados** | ⚠️ Script placeholder configurado                        | [`package.json`](../package.json)                                          |
+| **Módulos da Aplicação (PWA)**    | ✅ Entrypoint e funções base em [`src/main.js`](../src/main.js) | [`package.json`](../package.json), [`src/main.js`](../src/main.js)         |
+| **Suíte de Testes Automatizados** | ✅ Configurado (Vitest v5 + JSDOM + Coverage V8)         | [`vitest.config.js`](../vitest.config.js), [`src/main.test.js`](../src/main.test.js) |
 
 ---
 

@@ -49,6 +49,9 @@ Extraídas diretamente de [`package.json`](../../package.json):
 | [`eslint-config-prettier`](https://www.npmjs.com/package/eslint-config-prettier) | `^10.1.8`  | Desativa regras do ESLint que possam conflitar com a formatação do Prettier.                                     |
 | [`globals`](https://www.npmjs.com/package/globals)                               | `^17.13.0` | Fornece o dicionário de variáveis globais do navegador (`globals.browser`).                                      |
 | [`prettier`](https://prettier.io/)                                               |  `3.9.10`  | Formatador opinativo de código para manter estilo consistente em todo o repositório.                             |
+| [`vitest`](https://vitest.dev/)                                                  |  `^5.1.0`  | Framework de testes unitários e de integração nativo para ES Modules ([`vitest.config.js`](../../vitest.config.js)). |
+| [`@vitest/coverage-v8`](https://vitest.dev/guide/coverage.html)                  |  `^5.1.0`  | Provedor de cobertura de código baseado no motor V8 (`text`, `lcov` e `html`).                                   |
+| [`jsdom`](https://github.com/jsdom/jsdom)                                        | `^31.0.0`  | Implementação em JavaScript dos padrões web (DOM e HTML) para testes de Web Components e APIs do navegador.      |
 
 ---
 
