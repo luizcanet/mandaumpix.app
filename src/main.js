@@ -1,3 +1,10 @@
+import AccessController from "@modnes/access-controller";
+import CustomElement, { SetInjectable } from "@modnes/custom-element";
+import DataController, {
+  ArrayHandler,
+  DataHandler,
+} from "@modnes/data-controller";
+import Router from "@modnes/router";
 import { createStaticPix, hasError, isStaticPix, parsePix } from "pix-utils";
 import encodeQR from "qr";
 import { gifToPng, svgToPng } from "qr/dom.js";
@@ -84,6 +91,13 @@ if (typeof document !== "undefined") {
 }
 
 export {
+  AccessController,
+  ArrayHandler,
+  CustomElement,
+  DataController,
+  DataHandler,
+  Router,
+  SetInjectable,
   createStaticPix,
   encodeQR,
   gifToPng,

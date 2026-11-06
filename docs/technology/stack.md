@@ -22,10 +22,14 @@ Este documento detalha as tecnologias, padrões de plataforma e dependências co
 
 Extraídas diretamente de [`package.json`](../../package.json) e resolvidas via Import Maps em [`importmap.js`](../../importmap.js) e [`index.html`](../../index.html):
 
-| Pacote                                                 |  Versão  | Licença               | Papel no Projeto                                                                                                                            |
-| :----------------------------------------------------- | :------: | :-------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
-| [`pix-utils`](https://www.npmjs.com/package/pix-utils) | `^2.8.2` | `MIT`                 | Geração, parsing e validação de payloads PIX (padrão EMV® BR Code do Banco Central do Brasil), incluindo cálculo automático de CRC16.       |
-| [`qr`](https://www.npmjs.com/package/qr)               | `^0.7.2` | `(MIT OR Apache-2.0)` | Codificação e renderização ultra-leve e zero-dependency de QR Codes em SVG, GIF, Data URL e exportação para PNG no navegador (`qr/dom.js`). |
+| Pacote                                                                                 |  Versão  | Licença               | Papel no Projeto                                                                                                                            |
+| :------------------------------------------------------------------------------------- | :------: | :-------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`@modnes/access-controller`](https://www.npmjs.com/package/@modnes/access-controller) | `^1.0.0` | `MIT`                 | Controle de acesso e permissões baseado em regras, papéis (`roles`) e funções predicadas de validação.                                      |
+| [`@modnes/custom-element`](https://www.npmjs.com/package/@modnes/custom-element)       | `^1.1.0` | `MIT`                 | Criação de Web Components nativos (`CustomElement`) com templates, ciclo de vida e Injeção de Dependências (`SetInjectable`).               |
+| [`@modnes/data-controller`](https://www.npmjs.com/package/@modnes/data-controller)     | `^1.1.3` | `MIT`                 | Gerenciamento de estado reativo com `Proxy` (`DataHandler`, `ArrayHandler`) e _two-way data binding_ com DOM e formulários.                 |
+| [`@modnes/router`](https://www.npmjs.com/package/@modnes/router)                       | `^1.1.1` | `MIT`                 | Roteador SPA orientado a Web Components com suporte a parâmetros dinâmicos, _lazy loading_ de módulos ES e History API.                     |
+| [`pix-utils`](https://www.npmjs.com/package/pix-utils)                                 | `^2.8.2` | `MIT`                 | Geração, parsing e validação de payloads PIX (padrão EMV® BR Code do Banco Central do Brasil), incluindo cálculo automático de CRC16.       |
+| [`qr`](https://www.npmjs.com/package/qr)                                               | `^0.7.2` | `(MIT OR Apache-2.0)` | Codificação e renderização ultra-leve e zero-dependency de QR Codes em SVG, GIF, Data URL e exportação para PNG no navegador (`qr/dom.js`). |
 
 ---
 

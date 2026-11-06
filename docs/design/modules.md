@@ -28,15 +28,15 @@ mandaumpix.app/
 
 ### Papel dos Arquivos Principais
 
-| Arquivo                                      | Responsabilidade                                                                                                                                                                  |
-| :------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`index.html`](../../index.html)             | Casca HTML semântica da aplicação contendo `es-module-shims`, `<script type="importmap">`, `<link rel="modulepreload">` com hashes `integrity` (SRI) e carregamento de `main.js`. |
-| [`importmap.js`](../../importmap.js)         | Mapa de importação gerado pelo JSPM (`jspm install`) que resolve `mandaumpix.app`, `pix-utils`, `qr` e `qr/dom.js`.                                                               |
-| [`src/main.js`](../../src/main.js)           | Ponto de entrada principal ESM integrando `pix-utils` (`generatePixCharge`, `parsePixCharge`) e `qr` (`encodeQR`, `exportQrCodePng`).                                             |
-| [`package.json`](../../package.json)         | Define o pacote `mandaumpix.app` (`1.0.0`, licença `AGPL-3.0-only`), habilita ES Modules nativos, declara `"exports"`, `"dependencies"` (`pix-utils`, `qr`) e scripts JSPM.       |
-| [`LICENSE`](../../LICENSE)                   | Termos oficiais da licença de código aberto **GNU Affero General Public License v3.0** (`AGPL-3.0-only`).                                                                         |
-| [`eslint.config.js`](../../eslint.config.js) | Orquestra os plugins `@eslint/js`, `@eslint/json`, `@eslint/markdown`, `@eslint/css` e `eslint-config-prettier`, definindo variáveis globais de navegador (`globals.browser`).    |
-| [`.prettierrc`](../../.prettierrc)           | Ativa formatação padronizada do Prettier com configuração default (`{}`).                                                                                                         |
+| Arquivo                                      | Responsabilidade                                                                                                                                                                         |
+| :------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`index.html`](../../index.html)             | Casca HTML semântica da aplicação contendo `es-module-shims`, `<script type="importmap">`, `<link rel="modulepreload">` com hashes `integrity` (SRI) e carregamento de `main.js`.        |
+| [`importmap.js`](../../importmap.js)         | Mapa de importação gerado pelo JSPM (`jspm install`) que resolve `mandaumpix.app`, `@modnes/*`, `pix-utils`, `qr` e `qr/dom.js`.                                                         |
+| [`src/main.js`](../../src/main.js)           | Ponto de entrada principal ESM integrando o ecossistema `@modnes/*`, `pix-utils` (`generatePixCharge`, `parsePixCharge`) e `qr` (`encodeQR`, `exportQrCodePng`).                         |
+| [`package.json`](../../package.json)         | Define o pacote `mandaumpix.app` (`1.0.0`, licença `AGPL-3.0-only`), habilita ES Modules nativos, declara `"exports"`, `"dependencies"` (`@modnes/*`, `pix-utils`, `qr`) e scripts JSPM. |
+| [`LICENSE`](../../LICENSE)                   | Termos oficiais da licença de código aberto **GNU Affero General Public License v3.0** (`AGPL-3.0-only`).                                                                                |
+| [`eslint.config.js`](../../eslint.config.js) | Orquestra os plugins `@eslint/js`, `@eslint/json`, `@eslint/markdown`, `@eslint/css` e `eslint-config-prettier`, definindo variáveis globais de navegador (`globals.browser`).           |
+| [`.prettierrc`](../../.prettierrc)           | Ativa formatação padronizada do Prettier com configuração default (`{}`).                                                                                                                |
 
 ---
 

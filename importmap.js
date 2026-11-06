@@ -15,6 +15,10 @@
   },
   "scopes": {
     "./": {
+      "@modnes/access-controller": "https://ga.jspm.io/npm:@modnes/access-controller@1.0.0/access-controller.js",
+      "@modnes/custom-element": "https://ga.jspm.io/npm:@modnes/custom-element@1.1.0/custom-element.js",
+      "@modnes/data-controller": "https://ga.jspm.io/npm:@modnes/data-controller@1.1.3/data-controller.js",
+      "@modnes/router": "https://ga.jspm.io/npm:@modnes/router@1.1.1/router.js",
       "pix-utils": "https://ga.jspm.io/npm:pix-utils@2.8.2/dist/module/index.js",
       "qr": "https://ga.jspm.io/npm:qr@0.7.2/index.js",
       "qr/dom.js": "https://ga.jspm.io/npm:qr@0.7.2/dom.js"

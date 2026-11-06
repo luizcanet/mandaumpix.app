@@ -38,6 +38,10 @@
     "prettier": "3.9.10"
   },
   "dependencies": {
+    "@modnes/access-controller": "^1.0.0",
+    "@modnes/custom-element": "^1.1.0",
+    "@modnes/data-controller": "^1.1.3",
+    "@modnes/router": "^1.1.1",
     "pix-utils": "^2.8.2",
     "qr": "^0.7.2"
   }
