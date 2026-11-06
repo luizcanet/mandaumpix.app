@@ -18,7 +18,7 @@ Nele, o usuário pode cadastrar várias chaves de contas nas quais deseja recebe
 Toda a documentação viva de negócio, arquitetura, design, segurança e qualidade está estruturada no diretório [`docs/`](./docs/README.md):
 
 - 📖 **[Índice Geral da Documentação](./docs/README.md)**
-- 💼 **[Negócio](./docs/business/overview.md)** — [Proposta de Valor](./docs/business/overview.md), [Modelo de Domínio](./docs/business/domain_model.md) e [Fluxos de Trabalho](./docs/business/workflows.md)
+- 💼 **[Negócio](./docs/business/overview.md)** — [Proposta de Valor](./docs/business/overview.md), [Modelo de Domínio](./docs/business/domain_model.md), [Fluxos de Trabalho](./docs/business/workflows.md) e [Backlog do Produto](./docs/business/backlog.md)
 - 🏛️ **[Arquitetura](./docs/architecture/overview.md)** — [Visão Geral](./docs/architecture/overview.md), [Modelos C4](./docs/architecture/c4_models.md), [Integrações](./docs/architecture/integrations.md) e [ADRs](./docs/architecture/decisions/0001-record-architecture-decisions.md)
 - 🎨 **[Design](./docs/design/modules.md)** — [Módulos](./docs/design/modules.md), [Modelo de Dados](./docs/design/data_models.md), [Especificações e Contratos](./docs/design/api_specs.md), [Proposta de Interface (UI)](./docs/design/ui_proposal.md) e [Protótipo Navegável](./docs/design/ui_prototype.html)
 - 🚀 **[Implantação](./docs/deployment/pipeline.md)** — [Pipeline](./docs/deployment/pipeline.md) e [Infraestrutura](./docs/deployment/infrastructure.md)

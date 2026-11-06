@@ -1,0 +1,335 @@
+[Início](../README.md) > [Negócio](./overview.md) > **Backlog do Produto**
+
+# 📋 Backlog Completo de Desenvolvimento (`mandaumpix.app`)
+
+Este documento consolida o **Backlog do Produto e de Engenharia** do **Manda um PIX** (`mandaumpix.app`), estruturado em **Épicos**, **Histórias de Usuário / Tarefas Técnicas** e **Critérios de Aceite** rastreáveis às regras de negócio (`RN01` a `RN07`), à [Arquitetura em Camadas](../architecture/overview.md), ao [Design de Módulos](../design/modules.md) e à [Proposta de Interface (UI)](../design/ui_proposal.md).
+
+---
+
+## 📊 Visão Executiva e Progresso por Épico
+
+| ID        | Épico                                                                      | Regras / Escopo                                     | Progresso Atual | Status          |
+| :-------- | :------------------------------------------------------------------------- | :-------------------------------------------------- | :-------------: | :-------------- |
+| **EP-01** | Fundação, Ferramental, Identidade Visual e CI/CD (`dev`)                   | Infraestrutura base, ESM/JSPM, Qualidade, Storybook |     `6 / 6`     | ✅ Concluído    |
+| **EP-02** | Camada de Domínio e Casos de Uso (Clean Architecture)                      | `RN01`, `RN02`, `RN03`, `RN04`, `RN05`, `RN06`      |     `1 / 5`     | 🔄 Em andamento |
+| **EP-03** | Camada de Infraestrutura e Adaptadores Web APIs (Local-First)              | `RN01`, `RN05`, `RN06`, Offline/Service Worker      |     `0 / 4`     | ⏳ Pendente     |
+| **EP-04** | Casca da Aplicação, Roteamento SPA, Botão "Instalar" e Página "Sobre"      | `RN06`, `RN07`, `@modnes/router`, Layout Split-View |     `0 / 4`     | ⏳ Pendente     |
+| **EP-05** | Gestão de Chaves PIX na Interface (`<pix-key-*>`)                          | `RN01`, `RN02`, `<dialog class="key-dialog">`       |     `0 / 3`     | ⏳ Pendente     |
+| **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")              | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas    |     `0 / 3`     | ⏳ Pendente     |
+| **EP-07** | Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA) e Deploy `stg`/`prd` | Testes de Integração, Storybook a11y, Releases      |     `0 / 3`     | ⏳ Pendente     |
+
+---
+
+## 🗺️ Roadmap e Grafo de Dependências de Desenvolvimento
+
+```mermaid
+flowchart TD
+    EP01["✅ EP-01: Fundação, Identidade, JSPM, Testes & CI/CD (dev)"]
+    EP02["🔄 EP-02: Camada de Domínio & Casos de Uso<br/>(ChaveConta, CobrancaPix, Use Cases)"]
+    EP03["⏳ EP-03: Infraestrutura & Adaptadores Web APIs<br/>(LocalStorage, PWA Install, Clipboard/Share, SW)"]
+    EP04["⏳ EP-04: Casca Global, Roteador SPA (@modnes/router),<br/>Botão 'Instalar' (RN06) & Página 'Sobre' (RN07)"]
+    EP05["⏳ EP-05: Gestão de Chaves PIX na UI<br/>(Empty State, Seletor Radio Cards, Modal &lt;dialog&gt;)"]
+    EP06["⏳ EP-06: Geração e Distribuição 'Manda um PIX'<br/>(Formulário de Valor, QR Code SVG, Copiar/WhatsApp/PNG)"]
+    EP07["⏳ EP-07: Testes Integrados, Catálogo Storybook Completo<br/>& Pipelines CD (staging / production)"]
+
+    EP01 --> EP02
+    EP01 --> EP03
+    EP02 --> EP04
+    EP03 --> EP04
+    EP02 & EP03 & EP04 --> EP05
+    EP05 --> EP06
+    EP04 & EP06 --> EP07
+```
+
+---
+
+## 🧱 Detalhamento dos Épicos e Histórias de Usuário
+
+### 📦 Épico 01 — Fundação, Ferramental, Identidade Visual e CI/CD (`dev`)
+
+> **Objetivo**: Estabelecer a base arquitetural Zero-Build com ES Modules nativos e JSPM, licenciamento livre `AGPL-3.0-only`, linters multi-linguagem, testes unitários, ícones oficiais, Design Tokens, componente `<vector-icon>` e esteira de CI/CD para o ambiente `development`.
+
+| ID          | Item de Backlog                                                                  | Status       | Artefatos no Repositório                                                                                                                                                               |
+| :---------- | :------------------------------------------------------------------------------- | :----------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **US-01.1** | Configuração de ES Modules nativos, JSPM, Import Map W3C, `modulepreload` e SRI  | ✅ Concluído | [`package.json`](../../package.json), [`importmap.js`](../../importmap.js), [`index.html`](../../index.html)                                                                           |
+| **US-01.2** | Licenciamento GNU AGPL v3.0 (`AGPL-3.0-only`), ESLint v10 Flat Config e Prettier | ✅ Concluído | [`LICENSE`](../../LICENSE), [`eslint.config.js`](../../eslint.config.js), [`.prettierrc`](../../.prettierrc)                                                                           |
+| **US-01.3** | Configuração do Vitest + JSDOM + Cobertura V8                                    | ✅ Concluído | [`vitest.config.js`](../../vitest.config.js), [`src/main.test.js`](../../src/main.test.js)                                                                                             |
+| **US-01.4** | Criação do logotipo vetorial, ícones de instalação e `manifest.json`             | ✅ Concluído | [`src/assets/icons/`](../../src/assets/icons/icon.svg), [`manifest.json`](../../manifest.json)                                                                                         |
+| **US-01.5** | Design Tokens CSS, Reset, Storybook v10 e Web Component `<vector-icon>`          | ✅ Concluído | [`src/presentation/styles/tokens.css`](../../src/presentation/styles/tokens.css), [`vector-icon.component.js`](../../src/presentation/components/vector-icon/vector-icon.component.js) |
+| **US-01.6** | Workflows GitHub Actions de CI e CD automático para `dev.mandaumpix.app`         | ✅ Concluído | [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml), [`.github/workflows/deploy-dev.yml`](../../.github/workflows/deploy-dev.yml)                                             |
+
+---
+
+### 🧠 Épico 02 — Camada de Domínio e Casos de Uso (Clean Architecture)
+
+> **Objetivo**: Implementar as entidades puras de domínio, validações de regras de negócio (`RN01`–`RN07`) e casos de uso desacoplados de frameworks e do DOM, guiados por TDD.
+
+#### `US-02.1` — Funções Base de Geração e Parsing de Cobrança PIX (`✅ Concluído`)
+
+- **Descrição**: Implementar as funções puras de geração de payload BR Code (`generatePixCharge`), validação/parsing (`parsePixCharge`) e exportação gráfica (`exportQrCodePng`) integrando `pix-utils` e `qr`.
+- **Artefatos**: [`src/main.js`](../../src/main.js), [`src/main.test.js`](../../src/main.test.js).
+
+#### `US-02.2` — Entidade `ChaveConta` e Validador de Chaves PIX (`⏳ Pendente`)
+
+- **História**: Como **Recebedor**, quero que minhas chaves PIX (`CPF`, `CNPJ`, `EMAIL`, `TELEFONE`, `EVP`) e dados de titular/cidade sejam validados e normalizados no momento do cadastro para evitar a geração de códigos BR Code inválidos.
+- **Regras de Negócio**: `RN01` ([Modelo de Domínio](./domain_model.md)).
+- **Critérios de Aceite**:
+  - [ ] Criar módulo `src/domain/entities/pix-key.entity.js` representando [`ChaveConta`](../design/data_models.md) (`id`, `rotulo`, `tipo_chave`, `valor_chave`, `nome_recebedor`, `cidade_recebedor`, `criado_em`).
+  - [ ] Validar e normalizar formatos por tipo de chave:
+    - `CPF`: 11 dígitos numéricos (com validação de dígitos verificadores).
+    - `CNPJ`: 14 dígitos numéricos (com validação de dígitos verificadores).
+    - `EMAIL`: formato de e-mail válido (`<= 77` caracteres, padrão BACEN).
+    - `TELEFONE`: formato internacional E.164 (`+55DDD9XXXXXXXX`).
+    - `EVP`: UUID v4 (`36` caracteres com hifens).
+  - [ ] Normalizar `nome_recebedor` (remoção de acentos/caracteres especiais EMV e truncamento seguro em até `25` caracteres) e `cidade_recebedor` (até `15` caracteres).
+  - [ ] Cobertura de testes unitários (`src/domain/entities/pix-key.entity.test.js`) para todos os tipos válidos e cenários de erro.
+
+#### `US-02.3` — Entidade `CobrancaPix` e Caso de Uso `GeneratePixChargeUseCase` (`⏳ Pendente`)
+
+- **História**: Como **Recebedor**, quero gerar uma cobrança PIX a partir de uma chave selecionada informando opcionalmente um valor (ou mantendo o valor dinâmico/aberto) para obter simultaneamente o QR Code e o código PIX Copia e Cola.
+- **Regras de Negócio**: `RN02`, `RN03`, `RN04`.
+- **Critérios de Aceite**:
+  - [ ] Criar entidade `src/domain/entities/pix-charge.entity.js` ([`CobrancaPix`](../design/data_models.md)) e caso de uso `src/application/use-cases/generate-pix-charge.use-case.js`.
+  - [ ] Rejeitar a geração caso nenhuma `ChaveConta` válida seja fornecida (`RN02`).
+  - [ ] Quando `valor_opcional` for omitido, nulo ou `0`, definir `valor_dinamico = true` e omitir a tag EMV `54` (`RN03`).
+  - [ ] Quando `valor_opcional > 0`, definir `valor_dinamico = false` e incluir o montante com duas casas decimais na tag EMV `54` (`RN03`).
+  - [ ] Retornar simultaneamente o payload `chave_cobranca` (`brCode`) e a representação gráfica do `QR Code` (`RN04`).
+  - [ ] Testes unitários cobrindo valor fixo, valor aberto e ausência de chave.
+
+#### `US-02.4` — Casos de Uso de Gestão de Chaves de Contas (`⏳ Pendente`)
+
+- **História**: Como **Recebedor**, quero cadastrar várias chaves de contas, listar minhas chaves salvas, selecionar a chave ativa para cobrança e remover chaves antigas.
+- **Regras de Negócio**: `RN01`, `RN02`.
+- **Critérios de Aceite**:
+  - [ ] Implementar casos de uso em `src/application/use-cases/`:
+    - `save-pix-key.use-case.js` (cadastra nova chave e, se for a primeira, define-a automaticamente como selecionada).
+    - `list-pix-keys.use-case.js` (retorna a coleção de chaves e a chave atualmente selecionada).
+    - `delete-pix-key.use-case.js` (remove uma chave pelo `id` e reatribui a seleção caso a chave ativa tenha sido excluída).
+    - `select-pix-key.use-case.js` (altera a chave ativa para emissão da próxima cobrança).
+  - [ ] Testes unitários com repositório em memória (mock/fake).
+
+#### `US-02.5` — Casos de Uso de Distribuição da Cobrança e Instalação do PWA (`⏳ Pendente`)
+
+- **História**: Como **Recebedor**, quero copiar o código PIX Copia e Cola, compartilhá-lo no WhatsApp, salvar o QR Code como imagem PNG e instalar o aplicativo no meu dispositivo.
+- **Regras de Negócio**: `RN05`, `RN06`.
+- **Critérios de Aceite**:
+  - [ ] Implementar `distribute-pix-charge.use-case.js` orquestrando as portas de cópia (`copyChargeCode`), compartilhamento (`shareCharge`) e download de imagem (`downloadQrImage`) (`RN05`).
+  - [ ] Implementar `install-pwa.use-case.js` gerenciando o estado de disponibilidade de instalação (`canInstall`, `isInstalled`) e o disparo do prompt nativo (`triggerInstall`) (`RN06`).
+  - [ ] Testes unitários validando todos os fluxos e fallbacks.
+
+---
+
+### 🔌 Épico 03 — Camada de Infraestrutura e Adaptadores Web APIs (Local-First)
+
+> **Objetivo**: Implementar os adaptadores concretos de infraestrutura do navegador (Storage, Clipboard, Web Share / WhatsApp, Download PNG, Instalação PWA e Service Worker), mantendo 100% dos dados locais no dispositivo.
+
+#### `US-03.1` — Repositório Local de Chaves PIX (`LocalStoragePixKeyRepository`) (`⏳ Pendente`)
+
+- **História**: Como **Recebedor**, quero que minhas chaves cadastradas fiquem salvas no meu próprio navegador para não precisar redigitá-las a cada cobrança, sem que meus dados sejam enviados para servidores externos.
+- **Regras de Negócio**: `RN01` e [Conformidade e Privacidade](../security/compliance.md).
+- **Critérios de Aceite**:
+  - [ ] Implementar `src/infrastructure/storage/local-storage-pix-key.repository.js` persistindo a lista de `ChaveConta` e o `selectedKeyId` em `window.localStorage` sob namespace versionado (`mandaumpix:v1:keys` e `mandaumpix:v1:selected-key`).
+  - [ ] Integrar reatividade de estado com `@modnes/data-controller` (`DataHandler` / `ArrayHandler`) para sincronizar alterações com a camada de apresentação.
+  - [ ] Tratar falhas de parse JSON corrompido ou indisponibilidade de storage (`QuotaExceededError`) de forma resiliente.
+  - [ ] Testes unitários e de integração simulando `localStorage` no JSDOM.
+
+#### `US-03.2` — Adaptador de Instalação do PWA (`PwaInstallAdapter`) (`⏳ Pendente`)
+
+- **História**: Como **Recebedor** acessando pelo navegador sem ter o app instalado, quero que o sistema detecte automaticamente quando o PWA pode ser instalado e me permita instalá-lo com um clique no botão **"Instalar"**.
+- **Regras de Negócio**: `RN06` ([Especificações e Contratos](../design/api_specs.md)).
+- **Critérios de Aceite**:
+  - [ ] Implementar `src/infrastructure/pwa/pwa-install.adapter.js`.
+  - [ ] Detectar se o aplicativo já roda em modo instalado via `window.matchMedia('(display-mode: standalone)').matches` ou `navigator.standalone === true`.
+  - [ ] Capturar e armazenar o evento `beforeinstallprompt`, expondo estado reativo para exibir o botão destacado **"Instalar"** (`RN06`).
+  - [ ] Executar `deferredPrompt.prompt()` e aguardar `deferredPrompt.userChoice` quando acionado pelo usuário.
+  - [ ] Escutar o evento `appinstalled` para ocultar imediatamente o botão **"Instalar"**.
+  - [ ] Testes automatizados simulando eventos `beforeinstallprompt`, escolha `accepted`/`dismissed` e `appinstalled`.
+
+#### `US-03.3` — Adaptadores de Saída: Clipboard, Web Share (WhatsApp) e Download PNG (`⏳ Pendente`)
+
+- **História**: Como **Recebedor**, quero que os botões de **Copiar**, **Compartilhar** e **Salvar PNG** funcionem em smartphones e desktops utilizando os recursos nativos do meu sistema operacional.
+- **Regras de Negócio**: `RN05` ([Especificações e Contratos](../design/api_specs.md)).
+- **Critérios de Aceite**:
+  - [ ] Implementar `src/infrastructure/share/browser-share.adapter.js`:
+    - **Copiar**: utiliza `navigator.clipboard.writeText(brCode)`.
+    - **Compartilhar**: utiliza `navigator.share({ title, text, files })` quando suportado pelo navegador; caso contrário, abre URL de fallback `https://wa.me/?text=${encodeURIComponent(brCode)}` em nova aba segura (`noopener,noreferrer`).
+    - **Salvar PNG**: converte o SVG do QR Code em PNG (`512x512`) via [`exportQrCodePng`](../../src/main.js) e dispara download local com `<a download="mandaumpix-qrcode.png">`.
+  - [ ] Testes unitários com mocks de `navigator.clipboard`, `navigator.share`, `URL.createObjectURL` e âncora de download.
+
+#### `US-03.4` — Service Worker (`sw.js`) e Funcionamento Offline (`⏳ Pendente`)
+
+- **História**: Como **Recebedor**, quero abrir o **Manda um PIX** e gerar cobranças mesmo quando estiver em locais com sinal de internet instável ou sem conexão.
+- **Critérios de Aceite**:
+  - [ ] Implementar `sw.js` na raiz da aplicação com estratégia de cache para a casca HTML (`index.html`), estilos, ícones, `manifest.json` e módulos mapeados no Import Map.
+  - [ ] Registrar o Service Worker de forma segura no bootstrap da aplicação (`navigator.serviceWorker.register('./sw.js')`).
+  - [ ] Atualizar [`importmap` / build](../../package.json) e [`firebase.json`](../../firebase.json) caso necessário para servir `sw.js` com escopo raiz (`/`).
+
+---
+
+### 🏛️ Épico 04 — Casca da Aplicação, Roteamento SPA, Botão "Instalar" e Página "Sobre"
+
+> **Objetivo**: Construir a estrutura global da interface (`.app-root`, `<app-header>`, `.app-footer`), configurar as rotas `/` e `/sobre` com `@modnes/router` e entregar os requisitos completos do botão destacado **"Instalar"** (`RN06`) e da página **"Sobre"** (`RN07`).
+
+#### `US-04.1` — Casca Semântica Global e Layout Responsivo (Mobile-First & Desktop Split-View) (`⏳ Pendente`)
+
+- **História**: Como **Recebedor**, quero uma interface rápida, ergonômica para uso com uma mão no celular e organizada em duas colunas no computador.
+- **Referência Visual**: [Proposta de Interface (UI)](../design/ui_proposal.md) e [`docs/design/ui_prototype.html`](../design/ui_prototype.html).
+- **Critérios de Aceite**:
+  - [ ] Atualizar [`index.html`](../../index.html) e criar folhas de estilo modulares em `src/presentation/styles/` seguindo estritamente a metodologia **BEM** (`.app-root`, `.app-header`, `.app-main`, `.app-footer`, `.charge-page`).
+  - [ ] Implementar layout Mobile-First (`< 768px` em coluna única otimizada para polegar) e Desktop Split-View (`>= 768px` em `CSS Grid` de 2 colunas lado a lado).
+  - [ ] Incluir rodapé minimalista (`.app-footer`) com selo _"100% Local & Offline-Ready"_, link para `/sobre` e referência à licença `AGPL-3.0-only`.
+
+#### `US-04.2` — Componente `<app-header>` com Botão Destacado "Instalar" (`RN06`) e Atalho "Sobre" (`RN07`) (`⏳ Pendente`)
+
+- **História**: Como **Recebedor**, quero ver um botão destacado **"Instalar"** no topo do aplicativo caso ainda não o tenha instalado no meu aparelho, além de um botão de fácil acesso para a página **"Sobre"**.
+- **Regras de Negócio**: `RN06`, `RN07`.
+- **Critérios de Aceite**:
+  - [ ] Criar Web Component `src/presentation/components/app-header/app-header.component.js` estendendo `CustomElement` (`@modnes/custom-element`).
+  - [ ] Exibir logotipo vetorial, título **Manda um PIX**, botão destacado **`.app-header__install-btn`** (`#00d37f` com `<vector-icon name="download">`) e link **`.app-header__about-link`** (`<vector-icon name="circle-info">`).
+  - [ ] Renderizar `.app-header__install-btn` exclusivamente quando o PWA não estiver instalado e ocultá-lo imediatamente após a instalação (`RN06`).
+  - [ ] Criar testes unitários (`app-header.test.js`) e stories no Storybook (`app-header.stories.js` nos estados _Não Instalado / Com Botão Instalar_ e _Já Instalado_).
+
+#### `US-04.3` — Roteamento SPA (`@modnes/router`) e Injeção de Dependências (`SetInjectable`) (`⏳ Pendente`)
+
+- **História**: Como **Recebedor**, quero alternar instantaneamente entre a tela principal de cobrança (`/`) e a página institucional (`/sobre`) sem recarregamento de página.
+- **Critérios de Aceite**:
+  - [ ] Configurar `@modnes/router` no bootstrap da aplicação ([`src/main.js`](../../src/main.js)) mapeando a rota `/` para a visualização de cobrança e `/sobre` para `<about-page>`.
+  - [ ] Registrar controladores de estado e casos de uso via `SetInjectable` (`@modnes/custom-element`) para consumo desacoplado pelos componentes.
+  - [ ] Garantir funcionamento com `rewrites` de SPA já configurados em [`firebase.json`](../../firebase.json).
+
+#### `US-04.4` — Página Institucional `<about-page>` (`/sobre` — Autor e Projeto) (`⏳ Pendente`)
+
+- **História**: Como **Recebedor**, quero acessar facilmente uma página **"Sobre"** que explique o propósito do aplicativo e apresente as informações sobre o **autor** e o **projeto**.
+- **Regras de Negócio**: `RN07` ([Modelo de Domínio](./domain_model.md) e [Especificações e Contratos](../design/api_specs.md)).
+- **Critérios de Aceite**:
+  - [ ] Criar Web Component `src/presentation/pages/about-page/about-page.component.js` (bloco BEM `.about-page`).
+  - [ ] Apresentar seção **Sobre o Aplicativo** (propósito do **Manda um PIX**, geração gratuita sem abrir apps de banco, privacidade 100% local) e botão **"Início"** (`<vector-icon name="home">`) para retornar a `/`.
+  - [ ] Apresentar card **Sobre o Autor**: **Luiz Henrique Canet Filho**, e-mail `<me@luizca.net>` e GitHub [`@luizcanet`](https://github.com/luizcanet).
+  - [ ] Apresentar card **Sobre o Projeto e Licença**: domínio `mandaumpix.app` (`v1.0.0`), link oficial do código-fonte e issues ([`github.com/luizcanet/mandaumpix.app`](https://github.com/luizcanet/mandaumpix.app)) e licença **GNU Affero General Public License v3.0 (`AGPL-3.0-only`)**.
+  - [ ] Criar testes unitários (`about-page.test.js`) e story (`about-page.stories.js`).
+
+---
+
+### 🔑 Épico 05 — Gestão de Chaves PIX na Interface (`RN01`, `RN02`)
+
+> **Objetivo**: Implementar a experiência completa de cadastro, listagem, seleção e remoção de múltiplas chaves PIX diretamente na tela principal sem mudança de contexto.
+
+#### `US-05.1` — Componente `<pix-key-empty>` (Estado Inicial Sem Chaves) (`⏳ Pendente`)
+
+- **História**: Como **Recebedor** abrindo o aplicativo pela primeira vez, quero ver uma instrução clara de que minhas chaves ficam salvas apenas no meu aparelho e um botão evidente para cadastrar minha primeira chave PIX.
+- **Regras de Negócio**: `RN01`, `RN02`.
+- **Critérios de Aceite**:
+  - [ ] Criar Web Component `src/presentation/components/pix-key-empty/pix-key-empty.component.js` (bloco BEM `.key-empty-state`).
+  - [ ] Exibir ícone `<vector-icon name="key">`, mensagem explicativa de armazenamento 100% local e botão CTA **"Adicionar Minha Primeira Chave"** (`<vector-icon name="plus">`) que dispara a abertura do modal `<pix-key-dialog>`.
+  - [ ] Criar testes unitários e story no Storybook.
+
+#### `US-05.2` — Componente `<pix-key-selector>` (Lista de Radio Cards de Chaves) (`⏳ Pendente`)
+
+- **História**: Como **Recebedor** que possui várias contas bancárias, quero selecionar com um único toque qual chave PIX cadastrada receberá o pagamento ou excluir chaves que não uso mais.
+- **Regras de Negócio**: `RN01`, `RN02`.
+- **Critérios de Aceite**:
+  - [ ] Criar Web Component `src/presentation/components/pix-key-selector/pix-key-selector.component.js` (bloco BEM `.key-selector`).
+  - [ ] Renderizar cartões selecionáveis com semântica acessível (`role="radiogroup"`, `role="radio"`, `aria-checked`) e classe modificadora `.key-selector__card--selected`.
+  - [ ] Exibir em cada cartão: apelido/rótulo da conta, badge do tipo (`CPF`, `CNPJ`, `EMAIL`, `TELEFONE`, `EVP`), valor da chave em `--font-mono` e botão de exclusão (`<vector-icon name="trash">`) com área de toque mínima de `44x44px`.
+  - [ ] Exibir no cabeçalho da seção o botão **"+ Nova chave"** (`<vector-icon name="plus">`).
+  - [ ] Criar testes unitários e stories no Storybook (com 1 chave, múltiplas chaves e seleção ativa).
+
+#### `US-05.3` — Componente `<pix-key-dialog>` (Modal `<dialog>` de Cadastro de Chave) (`⏳ Pendente`)
+
+- **História**: Como **Recebedor**, quero cadastrar uma nova chave PIX em um modal rápido sem sair da tela de cobrança, informando o tipo de chave, a chave, um apelido para a conta e os dados de beneficiário.
+- **Regras de Negócio**: `RN01`.
+- **Critérios de Aceite**:
+  - [ ] Criar Web Component `src/presentation/components/pix-key-dialog/pix-key-dialog.component.js` (bloco BEM `.key-dialog`) utilizando o elemento semântico nativo `<dialog>`.
+  - [ ] Implementar pílulas seletoras de tipo (`CPF`, `CNPJ`, `E-mail`, `Celular`, `Aleatória EVP`) que ajustam dinamicamente o `placeholder` e a validação do input `valor_chave`.
+  - [ ] Incluir campos para `rotulo` (apelido da conta), `nome_recebedor` (`maxlength="25"`) e `cidade_recebedor` (`maxlength="15"`).
+  - [ ] Exibir feedback visual e acessível (`role="alert"`) em caso de chave inválida usando `<vector-icon name="circle-exclamation">`.
+  - [ ] Ao salvar com sucesso, fechar o `<dialog>`, persistir localmente e selecionar automaticamente a chave recém-criada.
+  - [ ] Criar testes unitários e story interativa no Storybook.
+
+---
+
+### ⚡ Épico 06 — Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")
+
+> **Objetivo**: Entregar o fluxo central em 3 toques (**Selecionar chave → Informar valor opcional → Clicar em "Manda um PIX"**) e o cartão de resultado com QR Code de alto contraste e ações de saída (`Copiar`, `WhatsApp`, `Salvar PNG`).
+
+#### `US-06.1` — Componente `<pix-charge-form>` (Valor Opcional + Botão "Manda um PIX") (`⏳ Pendente`)
+
+- **História**: Como **Recebedor**, quero informar opcionalmente o valor da cobrança (ou deixá-lo em aberto) e clicar no botão destacado **"Manda um PIX"** para gerar a cobrança instantaneamente.
+- **Regras de Negócio**: `RN02`, `RN03`, `RN04`.
+- **Critérios de Aceite**:
+  - [ ] Criar Web Component `src/presentation/components/pix-charge-form/pix-charge-form.component.js` (blocos BEM `.charge-form`, `.amount-field`, `.charge-cta`).
+  - [ ] Implementar campo monetário opcional (`inputmode="decimal"`) com botão de limpeza rápida (`<vector-icon name="xmark">`) e atalhos rápidos (`Valor aberto`, `R$ 25`, `R$ 50`).
+  - [ ] Atualizar reativamente a pílula de status entre _"Valor aberto (pagador define)"_ (quando vazio/`0`) e _"Valor fixo: R$ XX,XX"_ (quando `> 0`) (`RN03`).
+  - [ ] Implementar botão principal **"Manda um PIX"** (`.charge-cta`, `<vector-icon name="qrcode">`), desabilitando-o caso não haja nenhuma chave cadastrada/selecionada (`RN02`).
+  - [ ] Criar testes unitários e stories no Storybook.
+
+#### `US-06.2` — Componente `<pix-charge-result>` (Palco QR Code e PIX Copia e Cola) (`⏳ Pendente`)
+
+- **História**: Como **Recebedor**, quero visualizar na tela o QR Code nítido de alto contraste junto com o código PIX Copia e Cola assim que clicar em **"Manda um PIX"**.
+- **Regras de Negócio**: `RN04`.
+- **Critérios de Aceite**:
+  - [ ] Criar Web Component `src/presentation/components/pix-charge-result/pix-charge-result.component.js` (bloco BEM `.charge-result`).
+  - [ ] Exibir resumo da cobrança (rótulo da chave selecionada, nome/cidade do recebedor e badge com o valor formatado em BRL ou _"Valor Aberto"_).
+  - [ ] Renderizar o SVG vetorial do QR Code dentro do palco de superfície clara (`.charge-result__qr-stage`, fundo `#ffffff` e moldura `#0b1834`) garantindo contraste óptico para leitura por câmeras bancárias.
+  - [ ] Exibir o payload EMV (`brCode`) em caixa monoespaçada (`.charge-result__brcode`) selecionável.
+  - [ ] Criar testes unitários e stories no Storybook (estados _Aguardando Geração_, _Cobrança com Valor Fixo_ e _Cobrança com Valor Aberto_).
+
+#### `US-06.3` — Ações de Distribuição da Cobrança: Copiar, Compartilhar (WhatsApp) e Salvar PNG (`⏳ Pendente`)
+
+- **História**: Como **Recebedor**, quero copiar a chave de cobrança com um toque, compartilhá-la pelo WhatsApp ou baixar a imagem PNG do QR Code no meu dispositivo.
+- **Regras de Negócio**: `RN05`.
+- **Critérios de Aceite**:
+  - [ ] Integrar no `<pix-charge-result>` a grade tripla de botões (`.charge-result__actions`):
+    1. **Copiar (`.charge-result__btn--copy`)**: copia o `brCode`, alterna o ícone `<vector-icon name="copy">` para `<vector-icon name="check">` com rótulo _"Copiado!"_ e anuncia em região `aria-live="polite"`.
+    2. **WhatsApp / Compartilhar (`.charge-result__btn--share`)**: aciona `<vector-icon name="share">` invocando `navigator.share` ou fallback direto para o WhatsApp (`https://wa.me/?text=...`).
+    3. **Salvar PNG (`.charge-result__btn--download`)**: aciona `<vector-icon name="download">` gerando e baixando localmente o arquivo `mandaumpix-qrcode.png`.
+  - [ ] Criar testes unitários validando o acionamento de cada ação e o feedback visual de cópia.
+
+---
+
+### 🧪 Épico 07 — Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA) e Deploy `stg` / `prd`
+
+> **Objetivo**: Garantir cobertura de testes de integração de ponta a ponta, conformidade de acessibilidade WCAG 2.2 AA no Storybook e automação completa de deploy para os ambientes `staging` e `production`.
+
+#### `US-07.1` — Catálogo Completo no Storybook e Auditoria `@storybook/addon-a11y` (`⏳ Pendente`)
+
+- **História**: Como **Mantenedor**, quero que todos os Web Components possuam documentação interativa (`autodocs`) e passem sem violações nos testes de acessibilidade do Storybook (`@storybook/addon-a11y`).
+- **Critérios de Aceite**:
+  - [ ] Garantir stories publicadas para `<vector-icon>`, `<app-header>`, `<pix-key-empty>`, `<pix-key-selector>`, `<pix-key-dialog>`, `<pix-charge-form>`, `<pix-charge-result>` e `<about-page>`.
+  - [ ] Validar contraste de cores, navegação por teclado (`Tab`, `Enter`, `Space`, `Esc`), alvos de toque `>= 44x44px` e atributos ARIA sem erros no `npm run build-storybook`.
+
+#### `US-07.2` — Suíte de Testes de Integração das Jornadas Completas (Vitest + JSDOM) (`⏳ Pendente`)
+
+- **História**: Como **Mantenedor**, quero testes automatizados que exercitem as jornadas completas do usuário de ponta a ponta para prevenir regressões.
+- **Critérios de Aceite**:
+  - [ ] Teste de integração da **Jornada Principal**: primeiro acesso (Empty State) → cadastro de chave no `<dialog>` → seleção de chave → geração de cobrança com valor fixo e com valor aberto → cópia, compartilhamento e download.
+  - [ ] Teste de integração da **Jornada de Instalação (`RN06`)**: exibição do botão **"Instalar"** quando não instalado → disparo do prompt → ocultação após `appinstalled`.
+  - [ ] Teste de integração da **Jornada Institucional (`RN07`)**: clique no atalho **"Sobre"** → renderização da rota `/sobre` com dados do autor (**Luiz Henrique Canet Filho** — `<me@luizca.net>`) e do projeto (`AGPL-3.0-only`) → retorno à tela inicial (`/`).
+  - [ ] Sincronizar `npm run importmap`, `npm run lint`, `npm run format:check`, `npm run test:coverage` e `npm run build`.
+
+#### `US-07.3` — Workflows de Entrega Contínua (CD) para `staging` e `production` (`⏳ Pendente`)
+
+- **História**: Como **Mantenedor**, quero pipelines automatizados no GitHub Actions para promover releases homologadas para `stg.mandaumpix.app` (`mandaumpix-app-stg`) e `mandaumpix.app` (`mandaumpix-app-prd`).
+- **Referência**: [Pipeline de Implantação](../deployment/pipeline.md) e [ADR 0003](../architecture/decisions/0003-hospedagem-firebase-hosting-e-dominio-name-com.md).
+- **Critérios de Aceite**:
+  - [ ] Criar workflow `.github/workflows/deploy-stg.yml` para deploy no projeto Firebase `mandaumpix-app-stg` (`https://stg.mandaumpix.app`).
+  - [ ] Criar workflow `.github/workflows/deploy-prd.yml` (disparado em `push` na branch `main` / tags de release) para deploy no projeto Firebase `mandaumpix-app-prd` (`https://mandaumpix.app`).
+  - [ ] Atualizar a matriz de status em [`docs/deployment/pipeline.md`](../deployment/pipeline.md).
+
+---
+
+## 🔗 Matriz de Rastreabilidade (Regras de Negócio × Backlog)
+
+| Regra de Negócio | Descrição Resumida                                                                    | Histórias Vinculadas no Backlog                                  |
+| :--------------: | :------------------------------------------------------------------------------------ | :--------------------------------------------------------------- |
+|     **RN01**     | Cadastro e persistência local de múltiplas chaves PIX de recebimento                  | `US-02.2`, `US-02.4`, `US-03.1`, `US-05.1`, `US-05.2`, `US-05.3` |
+|     **RN02**     | Seleção obrigatória de uma chave cadastrada para emitir cobrança                      | `US-02.3`, `US-02.4`, `US-05.2`, `US-06.1`                       |
+|     **RN03**     | Valor monetário opcional (valor fixo quando informado; dinâmico/aberto se omitido)    | `US-02.1`, `US-02.3`, `US-06.1`, `US-06.2`                       |
+|     **RN04**     | Geração simultânea de QR Code e chave de cobrança (PIX Copia e Cola) ao clicar        | `US-02.1`, `US-02.3`, `US-06.1`, `US-06.2`                       |
+|     **RN05**     | Opções de saída: Copiar, Compartilhar (WhatsApp) e Salvar Imagem PNG localmente       | `US-02.1`, `US-02.5`, `US-03.3`, `US-06.3`                       |
+|     **RN06**     | Exibição destacada do botão **"Instalar"** quando o PWA ainda não está instalado      | `US-02.5`, `US-03.2`, `US-04.2`, `US-07.2`                       |
+|     **RN07**     | Acesso fácil à página **"Sobre"** com informações sobre o aplicativo, autor e projeto | `US-04.2`, `US-04.3`, `US-04.4`, `US-07.2`                       |
+
+---
+
+⬅️ **Anterior**: [Fluxos de Trabalho e Jornadas](./workflows.md) | ➡️ **Próximo**: [Arquitetura do Sistema](../architecture/overview.md)

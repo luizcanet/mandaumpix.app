@@ -76,4 +76,4 @@ flowchart TD
 
 ---
 
-⬅️ **Anterior**: [Fluxos de Trabalho](../business/workflows.md) | ➡️ **Próximo**: [Modelos C4](./c4_models.md)
+⬅️ **Anterior**: [Backlog do Produto](../business/backlog.md) | ➡️ **Próximo**: [Modelos C4](./c4_models.md)

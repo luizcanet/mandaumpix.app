@@ -141,4 +141,4 @@ stateDiagram-v2
 
 ---
 
-⬅️ **Anterior**: [Modelo de Domínio](./domain_model.md) | ➡️ **Próximo**: [Arquitetura do Sistema](../architecture/overview.md)
+⬅️ **Anterior**: [Modelo de Domínio](./domain_model.md) | ➡️ **Próximo**: [Backlog do Produto](./backlog.md)
