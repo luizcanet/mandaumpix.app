@@ -51,8 +51,9 @@ npm test
 # Iniciar o Storybook para desenvolvimento de componentes compartilhados (http://localhost:6006)
 npm run storybook
 
-# Executar verificação estática (ESLint)
+# Executar verificação estática (ESLint) e checagem de formatação (Prettier)
 npm run lint
+npm run format:check
 ```
 
 ---

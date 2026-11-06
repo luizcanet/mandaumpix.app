@@ -12,7 +12,7 @@ O **Manda um PIX** conta com uma suíte moderna de análise estática multi-ling
 flowchart LR
     ESLint["ESLint v10<br/>(eslint.config.js)"] --> JS["JavaScript (.js, .mjs, .cjs)<br/>@eslint/js + globals.browser"]
     ESLint --> JSON["JSON (.json, .jsonc, .json5)<br/>@eslint/json (json/recommended)"]
-    ESLint --> MD["Markdown (.md)<br/>@eslint/markdown (commonmark)"]
+    ESLint --> MD["Markdown (.md)<br/>@eslint/markdown (gfm)"]
     ESLint --> CSS["Folhas de Estilo (.css)<br/>@eslint/css (css/recommended)"]
     ESLint --> Prettier["Prettier Integration<br/>eslint-config-prettier"]
 ```
@@ -21,14 +21,14 @@ flowchart LR
 
 ## 📋 Regras por Tipo de Arquivo
 
-| Extensões Alvo      | Plugin / Linguagem                         | Configuração Base      | Observações                                                                                                       |
-| :------------------ | :----------------------------------------- | :--------------------- | :---------------------------------------------------------------------------------------------------------------- |
-| `**/*.{js,mjs,cjs}` | `@eslint/js`                               | `js/recommended`       | Habilita `globals.browser` para permitir APIs nativas do navegador (`window`, `document`, `navigator`, etc.).     |
-| `**/*.json`         | `@eslint/json` (`json/json`)               | `json/recommended`     | Verifica chaves duplicadas, chaves vazias (`json/no-empty-keys`) e sintaxe JSON estrita.                          |
-| `**/*.jsonc`        | `@eslint/json` (`json/jsonc`)              | `json/recommended`     | Suporta JSON com comentários.                                                                                     |
-| `**/*.json5`        | `@eslint/json` (`json/json5`)              | `json/recommended`     | Suporta especificação JSON5.                                                                                      |
-| `**/*.md`           | `@eslint/markdown` (`markdown/commonmark`) | `markdown/recommended` | Audita cabeçalhos, blocos de código, links e estrutura de todos os arquivos Markdown do repositório e de `docs/`. |
-| `**/*.css`          | `@eslint/css` (`css/css`)                  | `css/recommended`      | Valida propriedades, seletores e sintaxe CSS.                                                                     |
+| Extensões Alvo      | Plugin / Linguagem                  | Configuração Base      | Observações                                                                                                       |
+| :------------------ | :---------------------------------- | :--------------------- | :---------------------------------------------------------------------------------------------------------------- |
+| `**/*.{js,mjs,cjs}` | `@eslint/js`                        | `js/recommended`       | Habilita `globals.browser` para permitir APIs nativas do navegador (`window`, `document`, `navigator`, etc.).     |
+| `**/*.json`         | `@eslint/json` (`json/json`)        | `json/recommended`     | Verifica chaves duplicadas, chaves vazias (`json/no-empty-keys`) e sintaxe JSON estrita.                          |
+| `**/*.jsonc`        | `@eslint/json` (`json/jsonc`)       | `json/recommended`     | Suporta JSON com comentários.                                                                                     |
+| `**/*.json5`        | `@eslint/json` (`json/json5`)       | `json/recommended`     | Suporta especificação JSON5.                                                                                      |
+| `**/*.md`           | `@eslint/markdown` (`markdown/gfm`) | `markdown/recommended` | Audita cabeçalhos, blocos de código, links e estrutura de todos os arquivos Markdown do repositório e de `docs/`. |
+| `**/*.css`          | `@eslint/css` (`css/css`)           | `css/recommended`      | Valida propriedades, seletores e sintaxe CSS.                                                                     |
 
 ---
 

@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-import VectorIcon, {
-  DEFAULT_SPRITE_PATH,
-} from "./vector-icon.component.js";
+import VectorIcon, { DEFAULT_SPRITE_PATH } from "./vector-icon.component.js";
 
 describe("VectorIcon Web Component", () => {
   it("registers the <vector-icon> custom element", () => {
@@ -55,4 +53,3 @@ describe("VectorIcon Web Component", () => {
     element.remove();
   });
 });
-

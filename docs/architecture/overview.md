@@ -64,6 +64,7 @@ flowchart TD
 - [Registros de Decisão Arquitetural (ADRs)](./decisions/0001-record-architecture-decisions.md)
   - [ADR 0001: Registro de Decisões Arquiteturais](./decisions/0001-record-architecture-decisions.md)
   - [ADR 0002: Arquitetura PWA Client-Side com ES Modules e Linting Multi-Linguagem](./decisions/0002-arquitetura-pwa-client-side-es-modules.md)
+  - [ADR 0003: Hospedagem em Firebase Hosting Multi-Ambiente e Domínio no Name.com](./decisions/0003-hospedagem-firebase-hosting-e-dominio-name-com.md)
 
 ---
 

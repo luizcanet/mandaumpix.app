@@ -54,4 +54,4 @@ Escolhemos a **Opção 1**, conforme evidenciado na configuração de [`package.
 
 ---
 
-⬅️ **Anterior**: [ADR 0001](./0001-record-architecture-decisions.md) | ➡️ **Próximo**: [Design e Módulos](../../design/modules.md)
+⬅️ **Anterior**: [ADR 0001](./0001-record-architecture-decisions.md) | ➡️ **Próximo**: [ADR 0003: Hospedagem em Firebase Hosting Multi-Ambiente e Domínio no Name.com](./0003-hospedagem-firebase-hosting-e-dominio-name-com.md)

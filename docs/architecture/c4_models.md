@@ -35,7 +35,7 @@ flowchart TD
 
 ## 2. Nível 2 — Diagrama de Contêineres
 
-Por se tratar de um **PWA Client-Side**, os contêineres de execução residem no navegador do dispositivo do usuário, apoiados por hospedagem estática para distribuição dos artefatos web.
+Por se tratar de um **PWA Client-Side**, os contêineres de execução residem no navegador do dispositivo do usuário, apoiados pelo **Firebase Hosting** (`mandaumpix-app-dev`, `mandaumpix-app-stg` e `mandaumpix-app-prd`) para distribuição dos artefatos web e pelo **Name.com** para registro do domínio `mandaumpix.app` e fornecimento do certificado SSL/TLS.
 
 ```mermaid
 flowchart TD
@@ -47,10 +47,12 @@ flowchart TD
         LocalStore[("🗄️ Armazenamento Local do Navegador<br/>(IndexedDB / Web Storage)<br/>Chaves PIX cadastradas pelo usuário")]
     end
 
-    CDN["☁️ Servidor / CDN de Hospedagem Estática<br/>Entrega pacotes HTML, CSS, JS e Manifesto PWA"]
+    DNS["🌐 Name.com (DNS & Certificado SSL/TLS)<br/>Domínios: mandaumpix.app, stg.mandaumpix.app, dev.mandaumpix.app"]
+    CDN["☁️ Firebase Hosting (CDN Estática)<br/>Projetos: mandaumpix-app-prd, mandaumpix-app-stg, mandaumpix-app-dev"]
     NativeAPIs["🔌 APIs Nativas do Sistema / Navegador<br/>Clipboard, Web Share (WhatsApp), Download de Imagem"]
 
     User -->|"Interage com"| PWAApp
+    DNS -.->|"Resolução DNS & Certificado TLS"| CDN
     CDN -->|"Carrega ativos via HTTPS"| SW
     SW -->|"Serve ativos cacheados"| PWAApp
     PWAApp -->|"Lê e grava chaves cadastradas"| LocalStore
