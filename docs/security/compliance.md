@@ -6,11 +6,11 @@
 
 Como chaves PIX frequentemente correspondem a dados pessoais (CPF, número de telefone celular ou endereço de e-mail), o **Manda um PIX** adota o princípio de **Privacidade por Design (_Privacy by Design_)**:
 
-| Aspecto                                      | Implementação / Diretriz Arquitetural                                                                                                                                                       |
-| :------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Armazenamento de Dados**                   | **100% Local no Dispositivo**: As chaves cadastradas pelo usuário permanecem no armazenamento do navegador do dispositivo, sem coleta em banco de dados centralizado.                       |
-| **Tráfego de Rede**                          | **HTTPS Estrito**: Carregamento do PWA protegido por TLS. A geração do QR Code e da chave de cobrança ocorre em memória no cliente, sem envio dos valores ou chaves para APIs de terceiros. |
-| **Compartilhamento Controlado pelo Usuário** | O envio da chave de cobrança ou imagem para aplicativos como o **WhatsApp** ocorre somente mediante ação explícita do usuário nos botões de compartilhar ou copiar.                         |
+| Aspecto                                      | Implementação / Diretriz Arquitetural                                                                                                                                                                                                                                                                                                               |
+| :------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Armazenamento de Dados**                   | **100% Local no Dispositivo**: As chaves cadastradas pelo usuário permanecem no armazenamento do navegador do dispositivo, sem coleta em banco de dados centralizado.                                                                                                                                                                               |
+| **Tráfego de Rede**                          | **HTTPS Estrito (`mandaumpix.app`)**: Domínio registrado e certificado SSL/TLS fornecido pelo **Name.com**, com entrega via **Firebase Hosting** (`dev.mandaumpix.app`, `stg.mandaumpix.app` e `mandaumpix.app`). A geração do QR Code e da chave de cobrança ocorre em memória no cliente, sem envio dos valores ou chaves para APIs de terceiros. |
+| **Compartilhamento Controlado pelo Usuário** | O envio da chave de cobrança ou imagem para aplicativos como o **WhatsApp** ocorre somente mediante ação explícita do usuário nos botões de compartilhar ou copiar.                                                                                                                                                                                 |
 
 ---
 

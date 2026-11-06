@@ -85,4 +85,4 @@ flowchart TD
 
 ---
 
-⬅️ **Anterior**: [ADR 0002](../architecture/decisions/0002-arquitetura-pwa-client-side-es-modules.md) | ➡️ **Próximo**: [Modelo de Dados](./data_models.md)
+⬅️ **Anterior**: [ADR 0003](../architecture/decisions/0003-hospedagem-firebase-hosting-e-dominio-name-com.md) | ➡️ **Próximo**: [Modelo de Dados](./data_models.md)

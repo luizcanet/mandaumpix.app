@@ -16,7 +16,18 @@ flowchart LR
     PR --> Qual["Job: Qualidade, Testes e Build<br/>(Prettier, ESLint, Vitest + Coverage, JSPM Build, Storybook)"]
     Comp --> Merge["Aprovação e Merge"]
     Qual --> Merge
+    Merge --> Deploy["Implantação Firebase Hosting<br/>dev / stg / prd"]
 ```
+
+### 🌍 Promoção entre Ambientes (Firebase Hosting)
+
+A entrega contínua direciona os artefatos estáticos gerados pelo build (`dist/`) para três ambientes isolados no **Firebase Hosting**, sob o domínio `mandaumpix.app` registrado e certificado no **Name.com** (detalhes em [Infraestrutura e Topologia](./infrastructure.md)):
+
+| Ambiente      | Sigla | Domínio de Destino   | Projeto no Firebase  |
+| :------------ | :---: | :------------------- | :------------------- |
+| `development` | `dev` | `dev.mandaumpix.app` | `mandaumpix-app-dev` |
+| `staging`     | `stg` | `stg.mandaumpix.app` | `mandaumpix-app-stg` |
+| `production`  | `prd` | `mandaumpix.app`     | `mandaumpix-app-prd` |
 
 ### 🛡️ Verificações Executadas no Workflow (`CI - Qualidade e Conformidade`)
 

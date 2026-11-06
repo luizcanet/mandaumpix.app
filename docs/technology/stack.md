@@ -14,6 +14,8 @@ Este documento detalha as tecnologias, padrões de plataforma e dependências co
 | **Sistema de Módulos**      | ECMAScript Modules (ESM)        | Nativo (`"type": "module"`, `exports`)    | Padrão oficial da linguagem JavaScript, suportado nativamente pelos navegadores modernos e pelo Node.js.                                     |
 | **Gerenciador Import Maps** | JSPM & W3C Import Maps          | `jspm` `^4.7.0` / `@jspm/generator`       | Resolução nativa de módulos ES, injeção de `<script type="importmap">`, `modulepreload`, `es-module-shims` e Subresource Integrity (`SRI`).  |
 | **Ambiente de Ferramental** | Node.js & npm                   | Node `v24.x` / npm `v11.x`                | Execução de linters, formatadores, geração de Import Maps e servidor de desenvolvimento local.                                               |
+| **Hospedagem & CDN**        | Firebase Hosting                | `mandaumpix-app-{dev,stg,prd}`            | Hospedagem estática global de baixa latência segregada em três projetos (`development`, `staging` e `production`).                           |
+| **Domínio & Certificado**   | Name.com                        | `mandaumpix.app` (SSL/TLS)                | Registro do domínio `.app`, gestão de DNS (`dev`, `stg`, `prd`) e fornecimento do certificado digital SSL/TLS.                               |
 | **Licença**                 | GNU AGPL v3.0                   | `AGPL-3.0-only`                           | Licença de código aberto copyleft forte de rede (mais restritiva da OSI e 100% compatível com as licenças `MIT` e `Apache-2.0` dos módulos). |
 
 ---
@@ -45,7 +47,7 @@ Extraídas diretamente de [`package.json`](../../package.json):
 | [`@eslint/js`](https://www.npmjs.com/package/@eslint/js)                                     | `^10.0.1`  | Regras recomendadas oficiais do ESLint para JavaScript (`js/recommended`).                                           |
 | [`@eslint/css`](https://www.npmjs.com/package/@eslint/css)                                   |  `^2.0.1`  | Linter oficial do ESLint para folhas de estilo CSS (`css/recommended`).                                              |
 | [`@eslint/json`](https://www.npmjs.com/package/@eslint/json)                                 |  `^2.1.1`  | Validação sintática e boas práticas para arquivos `.json`, `.jsonc` e `.json5`.                                      |
-| [`@eslint/markdown`](https://www.npmjs.com/package/@eslint/markdown)                         |  `^8.0.3`  | Linter oficial para documentos Markdown (`markdown/commonmark` + `markdown/recommended`).                            |
+| [`@eslint/markdown`](https://www.npmjs.com/package/@eslint/markdown)                         |  `^8.0.3`  | Linter oficial para documentos Markdown (`markdown/gfm` + `markdown/recommended`).                                   |
 | [`eslint-config-prettier`](https://www.npmjs.com/package/eslint-config-prettier)             | `^10.1.8`  | Desativa regras do ESLint que possam conflitar com a formatação do Prettier.                                         |
 | [`globals`](https://www.npmjs.com/package/globals)                                           | `^17.13.0` | Fornece o dicionário de variáveis globais do navegador (`globals.browser`).                                          |
 | [`prettier`](https://prettier.io/)                                                           |  `3.9.10`  | Formatador opinativo de código para manter estilo consistente em todo o repositório.                                 |

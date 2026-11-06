@@ -44,6 +44,7 @@ flowchart LR
 | **Análise Estática e Formatação** | ✅ ESLint v10 (JS, JSON, CSS, Markdown) + Prettier v3           | [`eslint.config.js`](../eslint.config.js), [`.prettierrc`](../.prettierrc)           |
 | **Módulos da Aplicação (PWA)**    | ✅ Entrypoint e funções base em [`src/main.js`](../src/main.js) | [`package.json`](../package.json), [`src/main.js`](../src/main.js)                   |
 | **Suíte de Testes Automatizados** | ✅ Configurado (Vitest v5 + JSDOM + Coverage V8)                | [`vitest.config.js`](../vitest.config.js), [`src/main.test.js`](../src/main.test.js) |
+| **Hospedagem e Domínio**          | ✅ Definido (Firebase Hosting `dev`/`stg`/`prd` + Name.com TLS) | [`docs/deployment/infrastructure.md`](./deployment/infrastructure.md)                |
 
 ---
 
