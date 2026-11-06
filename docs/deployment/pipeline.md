@@ -8,26 +8,35 @@ Este documento descreve o fluxo de verificação contínua (CI) e entrega do **M
 
 ## 🔄 Fluxo de Controle de Versão e Qualidade (GitHub Actions)
 
-O repositório opera com o modelo de branches Git (`main` e `develop`) e possui integração contínua automatizada via **GitHub Actions** configurada em [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml).
+O repositório opera com o modelo de branches Git (`main` e `develop`) e possui esteiras de Integração Contínua (CI) e Entrega Contínua (CD) automatizadas via **GitHub Actions** configuradas em [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) e [`.github/workflows/deploy-dev.yml`](../../.github/workflows/deploy-dev.yml).
 
 ```mermaid
 flowchart LR
     PR["Pull Request / Push<br/>(develop -> main)"] --> Comp["Job: Conformidade e Segurança<br/>(Conventional Commits, AGPL-3.0, SRI, npm audit)"]
     PR --> Qual["Job: Qualidade, Testes e Build<br/>(Prettier, ESLint, Vitest + Coverage, JSPM Build, Storybook)"]
-    Comp --> Merge["Aprovação e Merge"]
+    Comp --> Merge["Aprovação e Merge<br/>(push em develop)"]
     Qual --> Merge
-    Merge --> Deploy["Implantação Firebase Hosting<br/>dev / stg / prd"]
+    Merge --> DeployDev["Workflow: CD - Deploy Development<br/>(mandaumpix-app-dev / dev.mandaumpix.app)"]
 ```
 
 ### 🌍 Promoção entre Ambientes (Firebase Hosting)
 
-A entrega contínua direciona os artefatos estáticos gerados pelo build (`dist/`) para três ambientes isolados no **Firebase Hosting**, sob o domínio `mandaumpix.app` registrado e certificado no **Name.com** (detalhes em [Infraestrutura e Topologia](./infrastructure.md)):
+A entrega contínua direciona os artefatos estáticos gerados pelo build (`dist/`), mapeados via [`firebase.json`](../../firebase.json) e [`.firebaserc`](../../.firebaserc), para três ambientes isolados no **Firebase Hosting**, sob o domínio `mandaumpix.app` registrado e certificado no **Name.com** (detalhes em [Infraestrutura e Topologia](./infrastructure.md)):
 
-| Ambiente      | Sigla | Domínio de Destino   | Projeto no Firebase  |
-| :------------ | :---: | :------------------- | :------------------- |
-| `development` | `dev` | `dev.mandaumpix.app` | `mandaumpix-app-dev` |
-| `staging`     | `stg` | `stg.mandaumpix.app` | `mandaumpix-app-stg` |
-| `production`  | `prd` | `mandaumpix.app`     | `mandaumpix-app-prd` |
+| Ambiente      | Sigla | Domínio de Destino   | Projeto no Firebase  | Workflow de Automação                                                        |
+| :------------ | :---: | :------------------- | :------------------- | :--------------------------------------------------------------------------- |
+| `development` | `dev` | `dev.mandaumpix.app` | `mandaumpix-app-dev` | [`.github/workflows/deploy-dev.yml`](../../.github/workflows/deploy-dev.yml) |
+| `staging`     | `stg` | `stg.mandaumpix.app` | `mandaumpix-app-stg` | Planejado                                                                    |
+| `production`  | `prd` | `mandaumpix.app`     | `mandaumpix-app-prd` | Planejado                                                                    |
+
+### 🚢 Implantação Automatizada em Development (`CD - Deploy Development`)
+
+Configurado em [`.github/workflows/deploy-dev.yml`](../../.github/workflows/deploy-dev.yml), o workflow é disparado automaticamente em eventos de `push` na branch `develop` (como após o merge de um Pull Request) ou manualmente via `workflow_dispatch`:
+
+- **Job `deploy` (`Build e Deploy (Development)`)**:
+  - Vinculado ao GitHub Environment `development` (`https://dev.mandaumpix.app`).
+  - Executa `npm ci`, validação de formatação (`npm run format:check`), análise estática (`npm run lint`), suíte de testes (`npm test`) e empacotamento de produção (`npm run build` gerando `dist/`).
+  - Publica os ativos no canal `live` do projeto `mandaumpix-app-dev` utilizando `FirebaseExtended/action-hosting-deploy@v0` autenticado via secret `FIREBASE_SERVICE_ACCOUNT_DEV`.
 
 ### 🛡️ Verificações Executadas no Workflow (`CI - Qualidade e Conformidade`)
 
