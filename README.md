@@ -1,6 +1,6 @@
 # 📱 Manda um PIX (`mandaumpix.app`)
 
-**Manda um PIX** é um aplicativo web progressivo (**PWA**) gratuito que facilita a geração de cobranças via **PIX** sem a necessidade de ficar abrindo aplicativos de banco.
+**Manda um PIX** é um aplicativo web progressivo (**PWA**) gratuito que facilita a geração de cobranças via **PIX** sem a necessidade de ficar abrindo aplicativos de banco. Para usuários que ainda não instalaram o aplicativo no dispositivo, a interface apresenta de forma destacada um botão **"Instalar"**, permitindo adicioná-lo rapidamente à tela inicial ou área de trabalho.
 
 Nele, o usuário pode cadastrar várias chaves de contas nas quais deseja receber. Para gerar uma cobrança, basta:
 

@@ -17,6 +17,7 @@ Este documento estabelece o vocabulário padronizado (**Linguagem Ubíqua**) e a
 | **Ação "Manda um PIX"**                  | Gatilho principal da interface que processa os dados selecionados (chave + valor opcional) e gera o QR Code e a chave de cobrança.                                                |
 | **Chave de Cobrança (PIX Copia e Cola)** | Código textual padronizado (payload EMV® / BR Code) gerado junto ao QR Code, que pode ser copiado para a área de transferência ou enviado por mensagem para pagamento sem câmera. |
 | **QR Code de Cobrança**                  | Representação gráfica bidimensional da cobrança gerada na tela, passível de leitura óptica imediata ou download como arquivo de imagem local.                                     |
+| **Botão "Instalar"**                     | Elemento de interface apresentado de forma destacada exclusivamente para usuários que ainda não instalaram o aplicativo (PWA) no dispositivo, acionando a instalação local.       |
 
 ---
 
@@ -48,6 +49,11 @@ Este documento estabelece o vocabulário padronizado (**Linguagem Ubíqua**) e a
   2. **Compartilhar**: Envia os dados da cobrança para aplicativos externos (como o **WhatsApp**).
   3. **Salvar Imagem**: Faz o download/salvamento local da imagem do QR Code gerado no dispositivo do usuário.
 
+### RN06 — Exibição Destacada do Botão "Instalar" para Aplicativo Não Instalado
+
+- O aplicativo deve apresentar de forma destacada um botão **"Instalar"** para usuários que ainda não instalaram o aplicativo no dispositivo.
+- Quando o aplicativo já estiver instalado no dispositivo (ou após a conclusão da instalação pelo usuário), o botão **"Instalar"** não deve ser exibido.
+
 ---
 
 ## 🧩 Diagrama Conceitual de Domínio
@@ -55,6 +61,7 @@ Este documento estabelece o vocabulário padronizado (**Linguagem Ubíqua**) e a
 ```mermaid
 classDiagram
     class Usuario {
+        +instalarAplicativo()
         +gerenciarChaves()
         +gerarCobranca()
     }

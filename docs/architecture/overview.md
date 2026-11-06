@@ -12,10 +12,10 @@ O **Manda um PIX** (`mandaumpix.app`) é concebido como uma aplicação **Progre
    - O cadastro de chaves de contas, a montagem da chave de cobrança PIX (padrão EMV® BR Code) e a renderização da imagem do QR Code acontecem integralmente no dispositivo do usuário.
    - Não há necessidade de intermediar credenciais bancárias nem reter chaves PIX em servidores remotos para gerar cobranças estáticas/dinâmicas no padrão PIX Copia e Cola.
 2. **Capacidades de PWA (Progressive Web App)**:
-   - Instalável em dispositivos móveis e desktops.
+   - Instalável em dispositivos móveis e desktops, apresentando de forma destacada um botão **"Instalar"** para usuários que ainda não instalaram o aplicativo no dispositivo.
    - Operação rápida e resiliente mesmo em conexões instáveis, uma vez que a geração do QR Code e da chave de cobrança é matemática e determinística no cliente.
 3. **Integração Nativa com a Plataforma Web**:
-   - Uso de APIs padronizadas do navegador (Armazenamento Local, Clipboard API, Web Share API / Deep Links para WhatsApp, Canvas/Blob Download).
+   - Uso de APIs padronizadas do navegador (Instalação PWA via `BeforeInstallPromptEvent` e `matchMedia('(display-mode: standalone)')`, Armazenamento Local, Clipboard API, Web Share API / Deep Links para WhatsApp, Canvas/Blob Download).
 4. **Padronização e Qualidade Multi-Linguagem**:
    - Código-fonte JavaScript, folhas de estilo CSS, arquivos de configuração JSON e documentação Markdown são verificados estaticamente por uma configuração unificada no [`eslint.config.js`](../../eslint.config.js) combinada ao [`prettier`](../../package.json).
 
@@ -26,11 +26,12 @@ O **Manda um PIX** (`mandaumpix.app`) é concebido como uma aplicação **Progre
 ```mermaid
 flowchart TD
     subgraph UI["Camada de Apresentação (PWA UI)"]
-        Views["Telas & Componentes<br/>(Cadastro de Chaves, Seletor, Gerador QR Code)"]
+        Views["Telas & Componentes<br/>(Botão 'Instalar', Cadastro de Chaves, Seletor, Gerador QR Code)"]
         PWAAssets["Web App Manifest & Service Worker"]
     end
 
     subgraph AppLayer["Camada de Aplicação (Casos de Uso)"]
+        UC0["Instalar Aplicativo no Dispositivo"]
         UC1["Gerenciar Chaves de Contas"]
         UC2["Gerar Cobrança ('Manda um PIX')"]
         UC3["Distribuir Cobrança (Copiar, Compartilhar, Salvar)"]
@@ -42,12 +43,14 @@ flowchart TD
     end
 
     subgraph Infra["Camada de Infraestrutura (Browser Web APIs)"]
+        PWAInstall["API de Instalação PWA (beforeinstallprompt / appinstalled)"]
         Storage["Persistência Local (LocalStorage / IndexedDB)"]
         QRGen["Renderizador Gráfico de QR Code (Canvas / SVG / Blob)"]
         ShareClip["Clipboard API / Web Share API / Download Anchor"]
     end
 
-    Views --> UC1 & UC2 & UC3
+    Views --> UC0 & UC1 & UC2 & UC3
+    UC0 --> PWAInstall
     UC1 --> EntKey
     UC2 --> EntCharge
     UC1 --> Storage

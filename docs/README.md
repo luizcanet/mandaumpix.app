@@ -2,7 +2,7 @@
 
 > Visão executiva e central de navegação técnica e de negócio da aplicação **Manda um PIX**.
 
-O **Manda um PIX** (`mandaumpix.app`) é um Progressive Web App (PWA) gratuito que facilita a geração rápida de cobranças via PIX sem a necessidade de abrir aplicativos bancários. O usuário pode cadastrar múltiplas chaves PIX de recebimento, selecionar uma chave, informar opcionalmente um valor (ou mantê-lo aberto/dinâmico) e acionar **"Manda um PIX"** para gerar o **QR Code** e o código **PIX Copia e Cola** para cópia, compartilhamento (ex.: WhatsApp) ou download local da imagem.
+O **Manda um PIX** (`mandaumpix.app`) é um Progressive Web App (PWA) gratuito que facilita a geração rápida de cobranças via PIX sem a necessidade de abrir aplicativos bancários. Para usuários que ainda não instalaram o aplicativo no dispositivo, um botão **"Instalar"** é apresentado de forma destacada. O usuário pode cadastrar múltiplas chaves PIX de recebimento, selecionar uma chave, informar opcionalmente um valor (ou mantê-lo aberto/dinâmico) e acionar **"Manda um PIX"** para gerar o **QR Code** e o código **PIX Copia e Cola** para cópia, compartilhamento (ex.: WhatsApp) ou download local da imagem.
 
 ---
 
@@ -26,6 +26,7 @@ O **Manda um PIX** (`mandaumpix.app`) é um Progressive Web App (PWA) gratuito q
 ```mermaid
 flowchart LR
     User["👤 Usuário Recebedor"] --> PWA["📱 Manda um PIX (PWA)"]
+    PWA -.->|"Se ainda não instalado"| Install["⬇️ Botão Destacado: Instalar"]
     PWA --> Keys["🔑 Seleção de Chave PIX<br/>+ Valor Opcional"]
     Keys --> Action["⚡ Ação: Manda um PIX"]
     Action --> QR["📷 QR Code na Tela<br/>+ Código de Cobrança"]

@@ -66,7 +66,36 @@ sequenceDiagram
 
 ---
 
-## 3. Máquina de Estados de uma Cobrança na Sessão
+## 3. Fluxo de Instalação do Aplicativo no Dispositivo (Botão "Instalar")
+
+Para usuários que acessam o aplicativo pelo navegador e ainda não o instalaram no dispositivo, a interface apresenta de forma destacada o botão **"Instalar"**.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuário Recebedor
+    participant App as Manda um PIX (PWA)
+    participant Browser as Navegador / Sistema Operacional
+
+    U->>App: Acessa o aplicativo no dispositivo
+    App->>Browser: Verifica se o PWA já está instalado ou apto para instalação
+    alt Aplicativo ainda não instalado no dispositivo
+        Browser-->>App: Disponibiliza gatilho de instalação (ex: beforeinstallprompt)
+        App-->>U: Apresenta de forma destacada o botão "Instalar"
+        U->>App: Clica no botão destacado "Instalar"
+        App->>Browser: Aciona o prompt nativo de instalação no dispositivo
+        Browser-->>U: Solicita confirmação de instalação
+        U->>Browser: Confirma instalação
+        Browser-->>App: Notifica conclusão da instalação (appinstalled)
+        App-->>U: Oculta o botão "Instalar"
+    else Aplicativo já instalado no dispositivo (modo standalone)
+        App-->>U: Não exibe o botão "Instalar"
+    end
+```
+
+---
+
+## 4. Máquina de Estados de uma Cobrança na Sessão
 
 ```mermaid
 stateDiagram-v2

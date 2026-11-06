@@ -68,12 +68,14 @@ Decomposição lógica dos módulos internos planejados para a aplicação no cl
 ```mermaid
 flowchart TD
     subgraph UI["Componentes de Interface"]
+        InstallPromptUI["Botão Destacado 'Instalar' UI<br/>Exibido para usuários que ainda não instalaram o app"]
         KeyManagerUI["Gerenciador de Chaves UI<br/>Cadastro, listagem e exclusão de chaves"]
         ChargeFormUI["Formulário de Cobrança UI<br/>Seleção de chave, valor opcional e botão 'Manda um PIX'"]
         ResultViewUI["Painel de Resultado UI<br/>Exibição do QR Code e ações de distribuição"]
     end
 
     subgraph Core["Módulos de Domínio e Serviços"]
+        InstallController["Controlador de Instalação PWA<br/>Detecção de instalação e acionamento do prompt"]
         KeyService["Serviço de Chaves de Conta<br/>Validação e gestão de chaves PIX"]
         PixPayloadBuilder["Construtor de Payload PIX<br/>Formatação da chave de cobrança ( fixo ou dinâmico)"]
         QRCodeRenderer["Renderizador de QR Code<br/>Geração da matriz gráfica e exportação em imagem"]
@@ -81,10 +83,13 @@ flowchart TD
     end
 
     subgraph Adapters["Adaptadores do Navegador"]
+        InstallAdapter["PWA Install Prompt Adapter"]
         StorageAdapter["Storage Adapter"]
         BrowserShareAdapter["Clipboard & Web Share Adapter"]
     end
 
+    InstallPromptUI --> InstallController
+    InstallController --> InstallAdapter
     KeyManagerUI --> KeyService
     ChargeFormUI --> KeyService
     ChargeFormUI --> PixPayloadBuilder

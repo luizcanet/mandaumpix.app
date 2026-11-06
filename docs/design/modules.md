@@ -58,27 +58,32 @@ mandaumpix.app/
 
 ## 🧩 Decomposição Funcional dos Módulos de Domínio (PWA)
 
-Para atender aos requisitos funcionais do **Manda um PIX**, o design funcional do aplicativo divide-se em quatro responsabilidades coesas:
+Para atender aos requisitos funcionais do **Manda um PIX**, o design funcional do aplicativo divide-se em cinco responsabilidades coesas:
 
 ```mermaid
 flowchart TD
-    Entry["src/main.js<br/>(Ponto de Entrada ESM)"] --> KeyMod["Módulo de Chaves de Conta<br/>Cadastro, listagem e seleção de chaves PIX"]
+    Entry["src/main.js<br/>(Ponto de Entrada ESM)"] --> InstallMod["Módulo de Instalação do PWA<br/>Exibição destacada do botão 'Instalar' se não instalado"]
+    Entry --> KeyMod["Módulo de Chaves de Conta<br/>Cadastro, listagem e seleção de chaves PIX"]
     Entry --> ChargeMod["Módulo Gerador de Cobrança<br/>Cálculo de payload PIX (com ou sem valor)"]
     Entry --> QRMod["Módulo de QR Code<br/>Renderização em tela e exportação de imagem"]
     Entry --> ShareMod["Módulo de Compartilhamento<br/>Cópia, envio via WhatsApp e download local"]
 ```
 
-1. **Módulo de Chaves de Conta**:
+1. **Módulo de Instalação do Aplicativo (Botão "Instalar")**:
+   - Verifica se o aplicativo já foi instalado no dispositivo do usuário (ex.: execução em modo `standalone` ou evento `appinstalled`).
+   - Apresenta de forma destacada um botão **"Instalar"** para usuários que ainda não instalaram o aplicativo no dispositivo.
+   - Dispara o fluxo nativo de instalação quando o usuário aciona o botão **"Instalar"** e oculta o botão após a instalação.
+2. **Módulo de Chaves de Conta**:
    - Cadastro de múltiplas chaves nas quais o usuário deseja receber.
    - Persistência e recuperação local das chaves para seleção rápida.
-2. **Módulo Gerador de Cobrança ("Manda um PIX")**:
+3. **Módulo Gerador de Cobrança ("Manda um PIX")**:
    - Recebe a chave selecionada e o valor opcional.
    - Caso o valor não seja informado, configura a cobrança como valor dinâmico/aberto.
    - Gera a chave de cobrança (PIX Copia e Cola).
-3. **Módulo de Renderização de QR Code**:
+4. **Módulo de Renderização de QR Code**:
    - Transforma a chave de cobrança em um QR Code visível na tela.
    - Exporta o gráfico gerado em formato de imagem para salvamento local.
-4. **Módulo de Compartilhamento e Saída**:
+5. **Módulo de Compartilhamento e Saída**:
    - Cópia da chave de cobrança para a área de transferência.
    - Compartilhamento externo (ex.: WhatsApp).
    - Download local da imagem do QR Code.

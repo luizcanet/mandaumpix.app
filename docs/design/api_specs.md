@@ -50,4 +50,15 @@ Após a geração da cobrança, o usuário dispõe de três contratos de saída:
 
 ---
 
+## 3. Contrato de Instalação do Aplicativo (Botão Destacado "Instalar")
+
+Para usuários que ainda não instalaram o aplicativo no dispositivo, a interface apresenta um botão destacado **"Instalar"**:
+
+- **Condição de Exibição**: O aplicativo não está em execução no modo instalado (`window.matchMedia('(display-mode: standalone)').matches === false` e `navigator.standalone !== true`) e o dispositivo sinaliza disponibilidade de instalação (ex.: captura do evento `beforeinstallprompt`).
+- **Ação do Usuário**: Clique no botão destacado **"Instalar"**.
+- **Interface**: Invocação de `deferredPrompt.prompt()` e aguardo de `deferredPrompt.userChoice`, além da escuta do evento `window.addEventListener('appinstalled', ...)`.
+- **Resultado Esperado**: Exibição do diálogo nativo de instalação do sistema operacional/navegador e ocultação imediata do botão **"Instalar"** assim que o aplicativo for instalado no dispositivo.
+
+---
+
 ⬅️ **Anterior**: [Modelo de Dados](./data_models.md) | ➡️ **Próximo**: [Pipeline de Implantação](../deployment/pipeline.md)
