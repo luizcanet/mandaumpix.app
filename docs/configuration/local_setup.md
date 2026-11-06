@@ -29,7 +29,25 @@ cd mandaumpix.app
 npm install
 ```
 
-### 3. Executar a Verificação Estática (Linter)
+### 3. Iniciar o Servidor de Desenvolvimento (JSPM)
+
+Para iniciar o servidor local nativo com suporte a ES Modules e Import Maps (porta padrão `5776`):
+
+```bash
+npm start
+# ou com live-reload / watch:
+npm run serve
+```
+
+### 4. Atualizar Import Maps e Preloads
+
+Sempre que novas dependências ou pontos de entrada forem adicionados, atualize o `importmap.js` e injete o Import Map com `modulepreload` e integridade SRI no `index.html`:
+
+```bash
+npm run importmap
+```
+
+### 5. Executar a Verificação Estática (Linter)
 
 Para validar arquivos JavaScript, CSS, JSON e Markdown:
 

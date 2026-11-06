@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Aplicativo web progressivo (PWA) gratuito que facilita a geração de cobranças via PIX."
+    />
+    <title>Manda um PIX</title>
+    <script async src="https://ga.jspm.io/npm:es-module-shims@2.8.4/dist/es-module-shims.js" crossorigin="anonymous" integrity="sha384-0bdb7F9U10QF2R23CYCgvGdsStkMEEjDOVhWxFXpTlArSrMLKtrnsYtk21d8cBUc"></script>
+    <script type="importmap">
+    {
+      "imports": {
+        "mandaumpix.app": "./src/main.js"
+      },
+      "integrity": {
+        "./src/main.js": "sha384-wwNkiLV69g/2ruMgNbYWevEEIQqs3DOTbXEXk9L3JzGri0Usr7O/HQmKVU7gZL1t"
+      }
+    }
+    </script>
+    <link rel="modulepreload" href="./src/main.js" integrity="sha384-wwNkiLV69g/2ruMgNbYWevEEIQqs3DOTbXEXk9L3JzGri0Usr7O/HQmKVU7gZL1t" />
+    <script type="module" src="./src/main.js"></script>
+  </head>
+  <body>
+    <main id="app" class="app-root">
+      <header class="app-root__header">
+        <h1 class="app-root__title">Manda um PIX</h1>
+        <p class="app-root__subtitle">
+          Gere cobranças via PIX com QR Code e PIX Copia e Cola diretamente no navegador.
+        </p>
+      </header>
+    </main>
+  </body>
+</html>

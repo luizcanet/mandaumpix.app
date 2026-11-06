@@ -1,7 +1,7 @@
 {
   "name": "mandaumpix.app",
   "version": "1.0.0",
-  "description": "",
+  "description": "Aplicativo web progressivo (PWA) gratuito que facilita a geração de cobranças via PIX.",
   "homepage": "https://github.com/luizcanet/mandaumpix.app#readme",
   "bugs": {
     "url": "https://github.com/luizcanet/mandaumpix.app/issues"
@@ -13,8 +13,15 @@
   "license": "ISC",
   "author": "Luiz Henrique Canet Filho <me@luizca.net>",
   "type": "module",
-  "main": "index.js",
+  "main": "src/main.js",
+  "exports": {
+    ".": "./src/main.js"
+  },
   "scripts": {
+    "start": "jspm serve",
+    "serve": "jspm serve --watch",
+    "importmap": "jspm install && jspm install -o index.html --preload --integrity",
+    "build": "jspm build -o dist",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint ."
   },
@@ -23,9 +30,11 @@
     "@eslint/js": "^10.0.1",
     "@eslint/json": "^2.1.1",
     "@eslint/markdown": "^8.0.3",
+    "@jspm/generator": "^2.18.0",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.13.0",
+    "jspm": "^4.7.0",
     "prettier": "3.9.10"
   }
 }

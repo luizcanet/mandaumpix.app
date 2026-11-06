@@ -36,6 +36,15 @@ Toda a documentação viva de negócio, arquitetura, design, segurança e qualid
 # Instalar dependências
 npm install
 
+# Iniciar servidor de desenvolvimento local com JSPM (http://localhost:5776)
+npm start
+
+# Atualizar Import Maps, preloads e hashes SRI (importmap.js e index.html)
+npm run importmap
+
+# Gerar build de produção (dist/)
+npm run build
+
 # Executar verificação estática (ESLint)
 npm run lint
 ```

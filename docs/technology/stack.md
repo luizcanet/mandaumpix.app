@@ -8,12 +8,13 @@ Este documento detalha as tecnologias, padrões de plataforma e dependências co
 
 ## 💻 Matriz Tecnológica Principal
 
-| Camada                      | Tecnologia / Padrão             | Versão / Especificação                    | Justificativa                                                                                            |
-| :-------------------------- | :------------------------------ | :---------------------------------------- | :------------------------------------------------------------------------------------------------------- |
-| **Plataforma Alvo**         | Web / PWA (Progressive Web App) | HTML5, CSS3, Web APIs (`globals.browser`) | Acesso universal, gratuito, instalável e sem necessidade de publicação em lojas proprietárias.           |
-| **Sistema de Módulos**      | ECMAScript Modules (ESM)        | Nativo (`"type": "module"`)               | Padrão oficial da linguagem JavaScript, suportado nativamente pelos navegadores modernos e pelo Node.js. |
-| **Ambiente de Ferramental** | Node.js & npm                   | Node `v24.x` / npm `v11.x`                | Execução de linters, formatadores e scripts de desenvolvimento.                                          |
-| **Licença**                 | ISC                             | `ISC`                                     | Licença de código aberto permissiva e simplificada.                                                      |
+| Camada                      | Tecnologia / Padrão             | Versão / Especificação                    | Justificativa                                                                                                                               |
+| :-------------------------- | :------------------------------ | :---------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Plataforma Alvo**         | Web / PWA (Progressive Web App) | HTML5, CSS3, Web APIs (`globals.browser`) | Acesso universal, gratuito, instalável e sem necessidade de publicação em lojas proprietárias.                                              |
+| **Sistema de Módulos**      | ECMAScript Modules (ESM)        | Nativo (`"type": "module"`, `exports`)    | Padrão oficial da linguagem JavaScript, suportado nativamente pelos navegadores modernos e pelo Node.js.                                    |
+| **Gerenciador Import Maps** | JSPM & W3C Import Maps          | `jspm` `^4.7.0` / `@jspm/generator`       | Resolução nativa de módulos ES, injeção de `<script type="importmap">`, `modulepreload`, `es-module-shims` e Subresource Integrity (`SRI`). |
+| **Ambiente de Ferramental** | Node.js & npm                   | Node `v24.x` / npm `v11.x`                | Execução de linters, formatadores, geração de Import Maps e servidor de desenvolvimento local.                                              |
+| **Licença**                 | ISC                             | `ISC`                                     | Licença de código aberto permissiva e simplificada.                                                                                         |
 
 ---
 
@@ -23,6 +24,8 @@ Extraídas diretamente de [`package.json`](../../package.json):
 
 | Pacote                                                                           |   Versão   | Papel no Projeto                                                                                                 |
 | :------------------------------------------------------------------------------- | :--------: | :--------------------------------------------------------------------------------------------------------------- |
+| [`jspm`](https://jspm.org/)                                                      |  `^4.7.0`  | CLI para gerenciamento de Import Maps, `modulepreload`, integridade SRI, servidor dev (`serve`) e build.         |
+| [`@jspm/generator`](https://github.com/jspm/generator)                           | `^2.18.0`  | Motor programático para resolução de grafos de dependências ESM e injeção em HTML (`htmlInject`).                |
 | [`eslint`](https://eslint.org/)                                                  | `^10.13.0` | Motor central de análise estática (configurado via Flat Config em [`eslint.config.js`](../../eslint.config.js)). |
 | [`@eslint/js`](https://www.npmjs.com/package/@eslint/js)                         | `^10.0.1`  | Regras recomendadas oficiais do ESLint para JavaScript (`js/recommended`).                                       |
 | [`@eslint/css`](https://www.npmjs.com/package/@eslint/css)                       |  `^2.0.1`  | Linter oficial do ESLint para folhas de estilo CSS (`css/recommended`).                                          |
