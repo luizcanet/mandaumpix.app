@@ -14,8 +14,11 @@ O repositório conta com a fundação de módulos ES nativos gerenciados pelo **
 mandaumpix.app/
 ├── docs/                  # Documentação viva técnica e de negócio
 ├── src/
+│   ├── assets/
+│   │   └── icons/         # Logotipo vetorial (icon.svg) e ícones PNG do PWA (192x192, 512x512, maskable, apple-touch-icon)
 │   └── main.js            # Ponto de entrada ESM da aplicação cliente
-├── index.html             # Casca HTML5 com Import Map W3C, es-module-shims, modulepreload e SRI
+├── index.html             # Casca HTML5 com Import Map W3C, es-module-shims, modulepreload, SRI e links de ícones/manifest
+├── manifest.json          # Web App Manifest W3C com paleta azul/verde e ícones do aplicativo
 ├── importmap.js           # Script de injeção de Import Map gerenciado pelo JSPM
 ├── eslint.config.js       # Configuração Flat Config do ESLint v10 (JS, JSON, CSS, MD)
 ├── package.json           # Manifesto do projeto, exports, scripts JSPM e devDependencies
@@ -30,7 +33,9 @@ mandaumpix.app/
 
 | Arquivo                                      | Responsabilidade                                                                                                                                                                         |
 | :------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`index.html`](../../index.html)             | Casca HTML semântica da aplicação contendo `es-module-shims`, `<script type="importmap">`, `<link rel="modulepreload">` com hashes `integrity` (SRI) e carregamento de `main.js`.        |
+| [`index.html`](../../index.html)             | Casca HTML semântica da aplicação contendo `es-module-shims`, `<script type="importmap">`, `<link rel="modulepreload">` com hashes `integrity` (SRI), ícones e carregamento de `main.js`. |
+| [`manifest.json`](../../manifest.json)       | Web App Manifest W3C para instalação do PWA, declarando cores de tema (`#0b1834` / `#060d1e`) e ícones vetoriais e rasterizados (`any` e `maskable`).                                    |
+| [`src/assets/icons/`](../../src/assets/icons/icon.svg) | Logotipo oficial em formato vetorial (`icon.svg`) e ícones de aplicativo (`icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png`) nas cores azul e verde. |
 | [`importmap.js`](../../importmap.js)         | Mapa de importação gerado pelo JSPM (`jspm install`) que resolve `mandaumpix.app`, `@modnes/*`, `pix-utils`, `qr` e `qr/dom.js`.                                                         |
 | [`src/main.js`](../../src/main.js)           | Ponto de entrada principal ESM integrando o ecossistema `@modnes/*`, `pix-utils` (`generatePixCharge`, `parsePixCharge`) e `qr` (`encodeQR`, `exportQrCodePng`).                         |
 | [`package.json`](../../package.json)         | Define o pacote `mandaumpix.app` (`1.0.0`, licença `AGPL-3.0-only`), habilita ES Modules nativos, declara `"exports"`, `"dependencies"` (`@modnes/*`, `pix-utils`, `qr`) e scripts JSPM. |

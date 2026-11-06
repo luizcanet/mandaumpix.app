@@ -7,7 +7,12 @@
       name="description"
       content="Aplicativo web progressivo (PWA) gratuito que facilita a geração de cobranças via PIX."
     />
+    <meta name="theme-color" content="#0b1834" />
     <title>Manda um PIX</title>
+    <link rel="icon" type="image/svg+xml" href="./src/assets/icons/icon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./src/assets/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./src/assets/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
     <script async src="https://ga.jspm.io/npm:es-module-shims@2.8.4/dist/es-module-shims.js" crossorigin="anonymous" integrity="sha384-0bdb7F9U10QF2R23CYCgvGdsStkMEEjDOVhWxFXpTlArSrMLKtrnsYtk21d8cBUc"></script>
     <script type="importmap">
     {
@@ -208,6 +213,13 @@
   <body>
     <main id="app" class="app-root">
       <header class="app-root__header">
+        <img
+          class="app-root__logo"
+          src="./src/assets/icons/icon.svg"
+          alt="Logotipo do Manda um PIX"
+          width="64"
+          height="64"
+        />
         <h1 class="app-root__title">Manda um PIX</h1>
         <p class="app-root__subtitle">
           Gere cobranças via PIX com QR Code e PIX Copia e Cola diretamente no navegador.
