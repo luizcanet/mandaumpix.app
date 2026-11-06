@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/luizcanet/mandaumpix.app.git"
   },
-  "license": "ISC",
+  "license": "AGPL-3.0-only",
   "author": "Luiz Henrique Canet Filho <me@luizca.net>",
   "type": "module",
   "main": "src/main.js",
@@ -36,5 +36,9 @@
     "globals": "^17.13.0",
     "jspm": "^4.7.0",
     "prettier": "3.9.10"
+  },
+  "dependencies": {
+    "pix-utils": "^2.8.2",
+    "qr": "^0.7.2"
   }
 }

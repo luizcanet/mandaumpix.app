@@ -8,17 +8,28 @@ Este documento detalha as tecnologias, padrões de plataforma e dependências co
 
 ## 💻 Matriz Tecnológica Principal
 
-| Camada                      | Tecnologia / Padrão             | Versão / Especificação                    | Justificativa                                                                                                                               |
-| :-------------------------- | :------------------------------ | :---------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Plataforma Alvo**         | Web / PWA (Progressive Web App) | HTML5, CSS3, Web APIs (`globals.browser`) | Acesso universal, gratuito, instalável e sem necessidade de publicação em lojas proprietárias.                                              |
-| **Sistema de Módulos**      | ECMAScript Modules (ESM)        | Nativo (`"type": "module"`, `exports`)    | Padrão oficial da linguagem JavaScript, suportado nativamente pelos navegadores modernos e pelo Node.js.                                    |
-| **Gerenciador Import Maps** | JSPM & W3C Import Maps          | `jspm` `^4.7.0` / `@jspm/generator`       | Resolução nativa de módulos ES, injeção de `<script type="importmap">`, `modulepreload`, `es-module-shims` e Subresource Integrity (`SRI`). |
-| **Ambiente de Ferramental** | Node.js & npm                   | Node `v24.x` / npm `v11.x`                | Execução de linters, formatadores, geração de Import Maps e servidor de desenvolvimento local.                                              |
-| **Licença**                 | ISC                             | `ISC`                                     | Licença de código aberto permissiva e simplificada.                                                                                         |
+| Camada                      | Tecnologia / Padrão             | Versão / Especificação                    | Justificativa                                                                                                                                |
+| :-------------------------- | :------------------------------ | :---------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Plataforma Alvo**         | Web / PWA (Progressive Web App) | HTML5, CSS3, Web APIs (`globals.browser`) | Acesso universal, gratuito, instalável e sem necessidade de publicação em lojas proprietárias.                                               |
+| **Sistema de Módulos**      | ECMAScript Modules (ESM)        | Nativo (`"type": "module"`, `exports`)    | Padrão oficial da linguagem JavaScript, suportado nativamente pelos navegadores modernos e pelo Node.js.                                     |
+| **Gerenciador Import Maps** | JSPM & W3C Import Maps          | `jspm` `^4.7.0` / `@jspm/generator`       | Resolução nativa de módulos ES, injeção de `<script type="importmap">`, `modulepreload`, `es-module-shims` e Subresource Integrity (`SRI`).  |
+| **Ambiente de Ferramental** | Node.js & npm                   | Node `v24.x` / npm `v11.x`                | Execução de linters, formatadores, geração de Import Maps e servidor de desenvolvimento local.                                               |
+| **Licença**                 | GNU AGPL v3.0                   | `AGPL-3.0-only`                           | Licença de código aberto copyleft forte de rede (mais restritiva da OSI e 100% compatível com as licenças `MIT` e `Apache-2.0` dos módulos). |
 
 ---
 
-## 📦 Dependências de Desenvolvimento (`devDependencies`)
+## 📦 Dependências de Produção (`dependencies`)
+
+Extraídas diretamente de [`package.json`](../../package.json) e resolvidas via Import Maps em [`importmap.js`](../../importmap.js) e [`index.html`](../../index.html):
+
+| Pacote                                                 |  Versão  | Licença               | Papel no Projeto                                                                                                                            |
+| :----------------------------------------------------- | :------: | :-------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`pix-utils`](https://www.npmjs.com/package/pix-utils) | `^2.8.2` | `MIT`                 | Geração, parsing e validação de payloads PIX (padrão EMV® BR Code do Banco Central do Brasil), incluindo cálculo automático de CRC16.       |
+| [`qr`](https://www.npmjs.com/package/qr)               | `^0.7.2` | `(MIT OR Apache-2.0)` | Codificação e renderização ultra-leve e zero-dependency de QR Codes em SVG, GIF, Data URL e exportação para PNG no navegador (`qr/dom.js`). |
+
+---
+
+## 🛠️ Dependências de Desenvolvimento (`devDependencies`)
 
 Extraídas diretamente de [`package.json`](../../package.json):
 
@@ -34,8 +45,6 @@ Extraídas diretamente de [`package.json`](../../package.json):
 | [`eslint-config-prettier`](https://www.npmjs.com/package/eslint-config-prettier) | `^10.1.8`  | Desativa regras do ESLint que possam conflitar com a formatação do Prettier.                                     |
 | [`globals`](https://www.npmjs.com/package/globals)                               | `^17.13.0` | Fornece o dicionário de variáveis globais do navegador (`globals.browser`).                                      |
 | [`prettier`](https://prettier.io/)                                               |  `3.9.10`  | Formatador opinativo de código para manter estilo consistente em todo o repositório.                             |
-
-> **Dependências de Produção (`dependencies`)**: Atualmente o projeto não possui dependências externas de runtime em `dependencies`, priorizando uma base enxuta e nativa (Vanilla JS / Web Standards).
 
 ---
 

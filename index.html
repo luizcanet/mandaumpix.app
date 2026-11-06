@@ -14,12 +14,183 @@
       "imports": {
         "mandaumpix.app": "./src/main.js"
       },
+      "scopes": {
+        "./": {
+          "pix-utils": "https://ga.jspm.io/npm:pix-utils@2.8.2/dist/module/index.js",
+          "qr": "https://ga.jspm.io/npm:qr@0.7.2/index.js",
+          "qr/dom.js": "https://ga.jspm.io/npm:qr@0.7.2/dom.js"
+        },
+        "https://ga.jspm.io/npm:axios@1.21.0/": {
+          "#lib/adapters/http.js": "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/null.js",
+          "#lib/platform/node/classes/Buffer.js": "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/null.js",
+          "#lib/platform/node/classes/FormData.js": "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/null.js",
+          "#lib/platform/node/index.js": "https://ga.jspm.io/npm:axios@1.21.0/lib/platform/browser/index.js"
+        },
+        "https://ga.jspm.io/npm:fast-text-encoding@1.0.6/": {
+          "buffer": "https://ga.jspm.io/npm:@jspm/core@2.1.0/nodelibs/browser/buffer.js"
+        },
+        "https://ga.jspm.io/npm:pix-utils@2.8.2/": {
+          "axios": "https://ga.jspm.io/npm:axios@1.21.0/index.js",
+          "buffer": "https://ga.jspm.io/npm:@jspm/core@2.1.0/nodelibs/browser/buffer.js",
+          "fast-text-encoding": "https://ga.jspm.io/npm:fast-text-encoding@1.0.6/text.min.js",
+          "qrcode": "https://ga.jspm.io/npm:qrcode@1.5.4/lib/browser.js"
+        },
+        "https://ga.jspm.io/npm:qrcode@1.5.4/": {
+          "dijkstrajs": "https://ga.jspm.io/npm:dijkstrajs@1.0.3/dijkstra.js"
+        }
+      },
       "integrity": {
-        "./src/main.js": "sha384-wwNkiLV69g/2ruMgNbYWevEEIQqs3DOTbXEXk9L3JzGri0Usr7O/HQmKVU7gZL1t"
+        "./src/main.js": "sha384-gMRvCjKr9kGTIwbs5oKPf5ArbmMwUQ9auwTzjV44F9OHcWaKbmxBtRQhHhklBpGs",
+        "https://ga.jspm.io/npm:@jspm/core@2.1.0/_/C7GZrc4O.js": "sha384-7BA1wTGX6TfnX1PVEYnKzX6AlyrTpyBK6+SCzPv/XcooYQix+LK8svULqStqIzsh",
+        "https://ga.jspm.io/npm:@jspm/core@2.1.0/nodelibs/browser/buffer.js": "sha384-U3TD1RLqK9oLHfATmMNq4eS89TD8PaoauwqwUBNNdXhrybKIiWe0jY94gMzMMq2m",
+        "https://ga.jspm.io/npm:axios@1.21.0/_/BO16OtGQ.js": "sha384-NqaFjW6nE1S5NgGPhnYVTK9l2IbE1xOkq0p+jgnn20vmpIkfLBhSMFe6vTEpr1h6",
+        "https://ga.jspm.io/npm:axios@1.21.0/index.js": "sha384-0uyGUkhg6smALK4rguE5o2QGKg15/djPIF8z3HfNER0oPC3QC8kffZxtDhR0RTCk",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/adapters/adapters.js": "sha384-ZuwRIUQK7UzRnNMmthoC801l8Q5Y/3RkRYMihpYtT/nrkxlTpT9R2TBi6c413tB9",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/adapters/fetch.js": "sha384-eUA24Kpcwv1iF0I7qh1+NATAGtEC8gHWGSe4pL4bf0BcKYa1H4eM73rIJjdmL3IS",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/adapters/xhr.js": "sha384-Uvw8BbsDdwy3WkGClN32LNyi+hOUObqmfKhp5hWQvtbeTac5aDwlBTeYre5LARrV",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/axios.js": "sha384-m0Glm8wzgAFqn5wGyfGDI1KWCxAZv1IvUPr1e5a1CbWw2vNQ5xnvFzZAqThUOA9z",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/cancel/CancelToken.js": "sha384-/MJtEHt9a8xBX/pD5TqhK9DITRS0KDKOK8yogLLEWKowphayo62bndWQfrtfeRkL",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/cancel/CanceledError.js": "sha384-Vhouk5OOd/fk9ft8FPLLtMt2JCjhIr41Y0cRvCK4KYWKdaJWW8e2Z+f0KdciMkCz",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/cancel/isCancel.js": "sha384-HJf+l+MfjmSpDGjLV/ajqGW1YiZwi3cnHAyRZ8AfsBgvIFtyz0OUhR/ZuS6cOdcU",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/core/Axios.js": "sha384-f6IPrbRiUzRsjjDqNAInpNEf9BJG24dlCiaYcd7p0yPGwsIDP+XoNBv9ruSTIZEM",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/core/AxiosError.js": "sha384-HO71nhXrjFZ7s8vmj0a4fKELDQIfi4TS/RijjGlDChRVeA5Bjllrcn0NjKs4GR7V",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/core/AxiosHeaders.js": "sha384-SOV4OG+RRBblPODcF4FCWKOdrfn8ixj7aETNMFihscjkhAuBCmzfOq+0xVHIxA6j",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/core/InterceptorManager.js": "sha384-Nce+vllNrloQc84mVoG3yzR8ymuG/cVMNsPc5siCiWXt+nR/JX/PjAYDYS9slWPv",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/core/assertParamsAcyclic.js": "sha384-PW237sWeBMI1HzkhpkWR2luhS4vi5Whe/DIS09t5/fMBwp/Fu4ZWkBKEnik5AP32",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/core/buildFullPath.js": "sha384-aXQ9Y7l8f4F4Sik+VOpRyrdKHxg+HB8uFbi3UtZAySsoVQaimhTjTBvmLwA9bVno",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/core/createMultipartBody.js": "sha384-EWWqG0zxtgzcaIGqRC7fs/A+qSpuroKsOqZkcADPK5cDPWK1qklnC1ll+6swdmqJ",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/core/dispatchRequest.js": "sha384-pa6rDode/l4xzSYSfjZ98xJpdBHbr6fLeBXhKB+k9G8nDVXTQEzOg3alZmVzs7vJ",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/core/mergeConfig.js": "sha384-kkosJZbh/aeDZmAeq+qSE7SdmUsxV31k2e61ynITJLRXcCstAtOvXVJ2YF0lXI5v",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/core/methodList.js": "sha384-JpF+fVrenQEtGj3IvSdXw9LjX4g2OqkF99Cqh8yPrwgwVK16oh8QqX4aD0tFY548",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/core/setFormDataHeaders.js": "sha384-IxytQhSkLtRGu/FRWBm8UJ3dEsAuCzqSkpEFiMdyxyPx4TwUQ43dvQkAlP1VKi28",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/core/settle.js": "sha384-bE1wMVdxJ2FXHPHtRH0Et+zA8usO1Lnmp/2Q7yR76FmadHBlXvsFF5GswXsGmsDw",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/core/transformData.js": "sha384-+FbFcTCtGd/oPAazfm8trCSKafCIts6invVztq2Nob3trurVrkFu6MjxWo21XN7D",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/defaults/index.js": "sha384-9dhlSbwrB3RFcy5heaZYKeO0RQ1Tt0fhEYYZdAzpOWYOP07/PA61eusb+z56gUAc",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/defaults/transitional.js": "sha384-RJ/LH7yY+fk0KCPGr1lfML5Q4PB4blzK//ff2picFFVfYd33A4R3xBnlwwEex8y3",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/env/data.js": "sha384-gF3goUTfU1LT+Xpa76dP+TcqJs5oGSpdgeTvphewJ3U64DKOb6nLYbrRwpPzJcCd",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/AxiosURLSearchParams.js": "sha384-mvO8/o2xPIkuU8GW4exjw01nUjXw4qiJ6omKaAsTdZlCukXskAA8q4dSjnJ8jEDF",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/HttpStatusCode.js": "sha384-DH25dcyaX4Rj3WZmaX7qR2+1DoyPN9TiT0Uyq0ovfNnXyXi8cBE3vFOFzW1SRVGE",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/bind.js": "sha384-j61Fb78NaqcGdXNtC2R2ohaPlcHp/P5ty2KiO+c/pn17+FiqDTZv8HEiWTHdfkSt",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/buildURL.js": "sha384-+4691XMQuoeQCF3NGmKYuz7GdvjPKhpe2SNp2cMQxC/r9dBQj+qnuvQ9IsuH65o8",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/combineURLs.js": "sha384-utZmbYWSxHOAmYpZg5+kXbhbL5AMktDAKfXenjhz3z6Au/O8Kg2RQKB85Mf1nh3G",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/composeSignals.js": "sha384-olp6qFBRYTlf9XrpI8XBhgitZshM+7KlpzIuBr5pTH4eQ40KQ1G4RMw1vCO4ktYK",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/cookies.js": "sha384-egDLf+0f1zJ0kWSS0nzlTG1phKvHY1EBMGnRI2trLpabAJPwI5YCEnaSj8xhD6B4",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/estimateDataURLDecodedBytes.js": "sha384-CUqU/ywyYbaW5F2YjHKMbBYcAdmlAuawfoDx+hNhsioixVthMvuqNohwhnx21nlu",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/formDataToBlob.js": "sha384-8u6ZFjziMSYr1kMfAX+FKGpSSfHbcGlIpaE89bvA8j/fd+IOABgERP2gazIsoD60",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/formDataToJSON.js": "sha384-6VqgvoUxBkMb/wvonVilo7dz3/CzVQ4Te+/jOJV9wdKSBscY16vtDQQPyq+Nd4l7",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/isAbsoluteURL.js": "sha384-68LuFNg9yqFJlNZCgQhZF0D0+46wAD1m0uc6sX/zloCG0+lZHb9jCgujzw9mQtPh",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/isAxiosError.js": "sha384-j5036mGizibqXuOOAMBWUIYG/ZLPTumxbJFlwdfV3QEHkq2qzrUcR/pCrqjdG/7H",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/isURLSameOrigin.js": "sha384-o4lTksxUomfZiCYS3/oCvTi40by0CAEHGJHnwxiygSodfTuZUAMj/TTDvrHt6Zx5",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/normalizeURLForProtocolCheck.js": "sha384-hIIF3YPBHwVsVBCHsN4iBwcVdnkr2lVsqtpCrIwgEAiPHPkycZuKsGDSvBIk6kd2",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/null.js": "sha384-reBWtFIAMXGgjvK+it+VoLlXFV+Pe4gQtqeDfs/AyBrxysh9HIQCFb4Kx0iocOyM",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/parseHeaders.js": "sha384-nPfmyUvg0V1KXW9ukfdlOU+t4j6N1+jd6GXATTF4LJ9uIRgE2NCT6UhYATXD+VU5",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/parseProtocol.js": "sha384-xPoSMtFbHzoQiTMMmZab/Wxg929kB0yMn6O/+/lxvcoMBQm9Sd2OYYOA4qVxcLtv",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/progressEventReducer.js": "sha384-aOutwI7eh/bcZPhGoZpNC1L3BrAF6nido8bddvYDxVH+6quN4B6f8rd0z6pO/tVm",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/resolveConfig.js": "sha384-OTi3xLHYVszrNTGCGrtdJRJpeu69JI4tBeUHYPu8eyQnukygqAKjKArMOosaBzNI",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/sanitizeHeaderValue.js": "sha384-sSHQiblv97h690gWCOJ0u4+JxGCMNqmOW9VM1rl2G7rmJYzbuL1yXzOym71ctDGx",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/speedometer.js": "sha384-lHXwNngpXUDf4PuPvvYTeiGsflMbg/TSPoimeLhRAuklWy8k9KQbreTgYZMfTl87",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/spread.js": "sha384-4RsUI1Ei1nEiaPRmYHjqTs0ccL+5fxYpALzvXhw+0qidldNFyZmDSH6Vs38cYQGP",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/throttle.js": "sha384-D32YLjWPwZP/iGZ3bu/GxfKDQ51B+lE9Shz5s6+j6eWUzlWI2Du+C7U6/RIeWP46",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/toFormData.js": "sha384-5dX3yIGTpFxjsivqvCB2xAG3h7OhuvrL5z4+fqkhJjzhROW5qLIIyTFONWWeyctI",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/toURLEncodedForm.js": "sha384-E6BXdQ0ewx452KRBBwFSGl9skW61X5X/DYyYcUul964CwvAhJL5mI9JifTOy4KP+",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/trackStream.js": "sha384-OP1nDfeo9hagYTeVJN+DQ8pUHOK/0BLCIf2gLtRo30uOqDYwxV3AyaoKRq7qyP49",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/validator.js": "sha384-Kgm+68yMvJRe9/pAT6HVJ+wxugBivrQwjOLCxvXOHOMLG+VZDLg0wBE25SXUYp1B",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/platform/browser/classes/Blob.js": "sha384-2p+gkhxfIctlJT+v4zxSvpk1kVChmek4bZeGLVoy+ndKOcc07BKvqMBJXlsv+ei5",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/platform/browser/classes/FormData.js": "sha384-VCJUgtAuoks61cC+vQhWLI6tWPr8DpsDt2wKfCKO8JrR/lO/lWiPtNRkgBI/+c1R",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/platform/browser/classes/URLSearchParams.js": "sha384-/7IB63EMdNX76BWQoihePlAcDXeOG6iVu/2qm2fzjTNRg0UH8sk+TGsT/HLXRIFS",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/platform/browser/index.js": "sha384-RDCNU4wNC6l8Kl6GqxcdbPqDCRJ6miNI1JJmzaluE9WleSEWS7+8Ez24sutU19jz",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/platform/index.js": "sha384-f2Rd4d7gJqUve1w1cuqMlEo++vSCnMz7NGoIBCcJ5/pjNfTH9aaeX7F1nvV/RxYb",
+        "https://ga.jspm.io/npm:axios@1.21.0/lib/utils.js": "sha384-/yaQwiVztSMZN5VgSG+Y2rX2Pzhhamez/QW2d+oyNYCX6f/eZ2puPj3V8iXqYuro",
+        "https://ga.jspm.io/npm:dijkstrajs@1.0.3/dijkstra.js": "sha384-l9XxcXMofv32xMlk0C0EPWbWu4xoAGNVlXMj4tPP/YudG1P8kOx6YzdgeJflIoXR",
+        "https://ga.jspm.io/npm:fast-text-encoding@1.0.6/text.min.js": "sha384-nOOKrarXHtEVI3pNIMThIdVfLsS54fVJBpmCnPCVFqoGfJXaBS1O3PDEidAXoxs0",
+        "https://ga.jspm.io/npm:pix-utils@2.8.2/dist/module/index.js": "sha384-AlH1PrA1IKx++Ph8Ql+sdHe+KyJ/TNIZAVOxj0vX4Si0HBAE8nJB/sCA0j3tIvue",
+        "https://ga.jspm.io/npm:qr@0.7.2/decode.js": "sha384-fJBDKb+4Ke3Kde6qmyU25O0FPIYaRu7zW6RobgDslUq4pj/XgVwYFAVRQsAu83y/",
+        "https://ga.jspm.io/npm:qr@0.7.2/dom.js": "sha384-3K/B02+U6PfJ8kZtClH5GF/QKpBTPxQFkZR9826DD2lhcYdaHFESRUhnOJJu9dQD",
+        "https://ga.jspm.io/npm:qr@0.7.2/index.js": "sha384-RrH3O19ucsc594GHUWDX6amr8oPFBQMo+WNu24b8H+wZ34ZRzP59fmLk8nC5Ab8w",
+        "https://ga.jspm.io/npm:qrcode@1.5.4/_/2AAMrt5E.js": "sha384-Pvuf2kiU0FHdOBYAT0c2esfFaAaccIXSgypWVkve+F9cqOniChtDJxnqkzQgFBMS",
+        "https://ga.jspm.io/npm:qrcode@1.5.4/_/CW_4Mx12.js": "sha384-Cu3fo8/6OkRgxYt+kZ3kfa0BXlR11Ao0y5z3hsxO7IBa3lr6Wb72pngYDPcwMzXr",
+        "https://ga.jspm.io/npm:qrcode@1.5.4/lib/browser.js": "sha384-bnW9LdbCRzG9CrSvcAtGA2fktVmDs5zqtrs2VE7OaTK0mGvEOQ/4y1T0Z1m9sLiR",
+        "https://ga.jspm.io/npm:qrcode@1.5.4/lib/core/qrcode.js": "sha384-vXbA3SRMQjQKgdf4I0rJkBX2qAEOMIW6+VzlfJZurxXJnVn8TPO1VC3pDXSQFiIy",
+        "https://ga.jspm.io/npm:qrcode@1.5.4/lib/renderer/canvas.js": "sha384-0Ejrzbyy4QOTIwjZDsu/fGtnvog/ISYmC80Jo0PKhtqz5fJCcPel7wUrXRktuYiH",
+        "https://ga.jspm.io/npm:qrcode@1.5.4/lib/renderer/svg-tag.js": "sha384-GrO0nnTWPLIWTifdZw8hkIRaUhqH7CskmZZNJwN/vxrB1burl7FFH2IOIPWBOho/",
+        "https://ga.jspm.io/npm:qrcode@1.5.4/lib/renderer/utils.js": "sha384-KiqOAF/JukOvvPO3U0XFYsMYf6wtRBR6qdUCqah+3y86e6FVNcYUuwayz06GVwh2"
       }
     }
     </script>
-    <link rel="modulepreload" href="./src/main.js" integrity="sha384-wwNkiLV69g/2ruMgNbYWevEEIQqs3DOTbXEXk9L3JzGri0Usr7O/HQmKVU7gZL1t" />
+    <link rel="modulepreload" href="./src/main.js" integrity="sha384-gMRvCjKr9kGTIwbs5oKPf5ArbmMwUQ9auwTzjV44F9OHcWaKbmxBtRQhHhklBpGs" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:@jspm/core@2.1.0/_/C7GZrc4O.js" integrity="sha384-7BA1wTGX6TfnX1PVEYnKzX6AlyrTpyBK6+SCzPv/XcooYQix+LK8svULqStqIzsh" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:@jspm/core@2.1.0/nodelibs/browser/buffer.js" integrity="sha384-U3TD1RLqK9oLHfATmMNq4eS89TD8PaoauwqwUBNNdXhrybKIiWe0jY94gMzMMq2m" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/_/BO16OtGQ.js" integrity="sha384-NqaFjW6nE1S5NgGPhnYVTK9l2IbE1xOkq0p+jgnn20vmpIkfLBhSMFe6vTEpr1h6" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/index.js" integrity="sha384-0uyGUkhg6smALK4rguE5o2QGKg15/djPIF8z3HfNER0oPC3QC8kffZxtDhR0RTCk" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/adapters/adapters.js" integrity="sha384-ZuwRIUQK7UzRnNMmthoC801l8Q5Y/3RkRYMihpYtT/nrkxlTpT9R2TBi6c413tB9" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/adapters/fetch.js" integrity="sha384-eUA24Kpcwv1iF0I7qh1+NATAGtEC8gHWGSe4pL4bf0BcKYa1H4eM73rIJjdmL3IS" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/adapters/xhr.js" integrity="sha384-Uvw8BbsDdwy3WkGClN32LNyi+hOUObqmfKhp5hWQvtbeTac5aDwlBTeYre5LARrV" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/axios.js" integrity="sha384-m0Glm8wzgAFqn5wGyfGDI1KWCxAZv1IvUPr1e5a1CbWw2vNQ5xnvFzZAqThUOA9z" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/cancel/CancelToken.js" integrity="sha384-/MJtEHt9a8xBX/pD5TqhK9DITRS0KDKOK8yogLLEWKowphayo62bndWQfrtfeRkL" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/cancel/CanceledError.js" integrity="sha384-Vhouk5OOd/fk9ft8FPLLtMt2JCjhIr41Y0cRvCK4KYWKdaJWW8e2Z+f0KdciMkCz" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/cancel/isCancel.js" integrity="sha384-HJf+l+MfjmSpDGjLV/ajqGW1YiZwi3cnHAyRZ8AfsBgvIFtyz0OUhR/ZuS6cOdcU" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/core/Axios.js" integrity="sha384-f6IPrbRiUzRsjjDqNAInpNEf9BJG24dlCiaYcd7p0yPGwsIDP+XoNBv9ruSTIZEM" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/core/AxiosError.js" integrity="sha384-HO71nhXrjFZ7s8vmj0a4fKELDQIfi4TS/RijjGlDChRVeA5Bjllrcn0NjKs4GR7V" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/core/AxiosHeaders.js" integrity="sha384-SOV4OG+RRBblPODcF4FCWKOdrfn8ixj7aETNMFihscjkhAuBCmzfOq+0xVHIxA6j" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/core/InterceptorManager.js" integrity="sha384-Nce+vllNrloQc84mVoG3yzR8ymuG/cVMNsPc5siCiWXt+nR/JX/PjAYDYS9slWPv" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/core/assertParamsAcyclic.js" integrity="sha384-PW237sWeBMI1HzkhpkWR2luhS4vi5Whe/DIS09t5/fMBwp/Fu4ZWkBKEnik5AP32" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/core/buildFullPath.js" integrity="sha384-aXQ9Y7l8f4F4Sik+VOpRyrdKHxg+HB8uFbi3UtZAySsoVQaimhTjTBvmLwA9bVno" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/core/createMultipartBody.js" integrity="sha384-EWWqG0zxtgzcaIGqRC7fs/A+qSpuroKsOqZkcADPK5cDPWK1qklnC1ll+6swdmqJ" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/core/dispatchRequest.js" integrity="sha384-pa6rDode/l4xzSYSfjZ98xJpdBHbr6fLeBXhKB+k9G8nDVXTQEzOg3alZmVzs7vJ" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/core/mergeConfig.js" integrity="sha384-kkosJZbh/aeDZmAeq+qSE7SdmUsxV31k2e61ynITJLRXcCstAtOvXVJ2YF0lXI5v" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/core/methodList.js" integrity="sha384-JpF+fVrenQEtGj3IvSdXw9LjX4g2OqkF99Cqh8yPrwgwVK16oh8QqX4aD0tFY548" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/core/setFormDataHeaders.js" integrity="sha384-IxytQhSkLtRGu/FRWBm8UJ3dEsAuCzqSkpEFiMdyxyPx4TwUQ43dvQkAlP1VKi28" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/core/settle.js" integrity="sha384-bE1wMVdxJ2FXHPHtRH0Et+zA8usO1Lnmp/2Q7yR76FmadHBlXvsFF5GswXsGmsDw" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/core/transformData.js" integrity="sha384-+FbFcTCtGd/oPAazfm8trCSKafCIts6invVztq2Nob3trurVrkFu6MjxWo21XN7D" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/defaults/index.js" integrity="sha384-9dhlSbwrB3RFcy5heaZYKeO0RQ1Tt0fhEYYZdAzpOWYOP07/PA61eusb+z56gUAc" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/defaults/transitional.js" integrity="sha384-RJ/LH7yY+fk0KCPGr1lfML5Q4PB4blzK//ff2picFFVfYd33A4R3xBnlwwEex8y3" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/env/data.js" integrity="sha384-gF3goUTfU1LT+Xpa76dP+TcqJs5oGSpdgeTvphewJ3U64DKOb6nLYbrRwpPzJcCd" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/AxiosURLSearchParams.js" integrity="sha384-mvO8/o2xPIkuU8GW4exjw01nUjXw4qiJ6omKaAsTdZlCukXskAA8q4dSjnJ8jEDF" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/HttpStatusCode.js" integrity="sha384-DH25dcyaX4Rj3WZmaX7qR2+1DoyPN9TiT0Uyq0ovfNnXyXi8cBE3vFOFzW1SRVGE" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/bind.js" integrity="sha384-j61Fb78NaqcGdXNtC2R2ohaPlcHp/P5ty2KiO+c/pn17+FiqDTZv8HEiWTHdfkSt" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/buildURL.js" integrity="sha384-+4691XMQuoeQCF3NGmKYuz7GdvjPKhpe2SNp2cMQxC/r9dBQj+qnuvQ9IsuH65o8" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/combineURLs.js" integrity="sha384-utZmbYWSxHOAmYpZg5+kXbhbL5AMktDAKfXenjhz3z6Au/O8Kg2RQKB85Mf1nh3G" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/composeSignals.js" integrity="sha384-olp6qFBRYTlf9XrpI8XBhgitZshM+7KlpzIuBr5pTH4eQ40KQ1G4RMw1vCO4ktYK" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/cookies.js" integrity="sha384-egDLf+0f1zJ0kWSS0nzlTG1phKvHY1EBMGnRI2trLpabAJPwI5YCEnaSj8xhD6B4" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/estimateDataURLDecodedBytes.js" integrity="sha384-CUqU/ywyYbaW5F2YjHKMbBYcAdmlAuawfoDx+hNhsioixVthMvuqNohwhnx21nlu" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/formDataToBlob.js" integrity="sha384-8u6ZFjziMSYr1kMfAX+FKGpSSfHbcGlIpaE89bvA8j/fd+IOABgERP2gazIsoD60" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/formDataToJSON.js" integrity="sha384-6VqgvoUxBkMb/wvonVilo7dz3/CzVQ4Te+/jOJV9wdKSBscY16vtDQQPyq+Nd4l7" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/isAbsoluteURL.js" integrity="sha384-68LuFNg9yqFJlNZCgQhZF0D0+46wAD1m0uc6sX/zloCG0+lZHb9jCgujzw9mQtPh" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/isAxiosError.js" integrity="sha384-j5036mGizibqXuOOAMBWUIYG/ZLPTumxbJFlwdfV3QEHkq2qzrUcR/pCrqjdG/7H" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/isURLSameOrigin.js" integrity="sha384-o4lTksxUomfZiCYS3/oCvTi40by0CAEHGJHnwxiygSodfTuZUAMj/TTDvrHt6Zx5" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/normalizeURLForProtocolCheck.js" integrity="sha384-hIIF3YPBHwVsVBCHsN4iBwcVdnkr2lVsqtpCrIwgEAiPHPkycZuKsGDSvBIk6kd2" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/null.js" integrity="sha384-reBWtFIAMXGgjvK+it+VoLlXFV+Pe4gQtqeDfs/AyBrxysh9HIQCFb4Kx0iocOyM" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/parseHeaders.js" integrity="sha384-nPfmyUvg0V1KXW9ukfdlOU+t4j6N1+jd6GXATTF4LJ9uIRgE2NCT6UhYATXD+VU5" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/parseProtocol.js" integrity="sha384-xPoSMtFbHzoQiTMMmZab/Wxg929kB0yMn6O/+/lxvcoMBQm9Sd2OYYOA4qVxcLtv" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/progressEventReducer.js" integrity="sha384-aOutwI7eh/bcZPhGoZpNC1L3BrAF6nido8bddvYDxVH+6quN4B6f8rd0z6pO/tVm" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/resolveConfig.js" integrity="sha384-OTi3xLHYVszrNTGCGrtdJRJpeu69JI4tBeUHYPu8eyQnukygqAKjKArMOosaBzNI" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/sanitizeHeaderValue.js" integrity="sha384-sSHQiblv97h690gWCOJ0u4+JxGCMNqmOW9VM1rl2G7rmJYzbuL1yXzOym71ctDGx" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/speedometer.js" integrity="sha384-lHXwNngpXUDf4PuPvvYTeiGsflMbg/TSPoimeLhRAuklWy8k9KQbreTgYZMfTl87" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/spread.js" integrity="sha384-4RsUI1Ei1nEiaPRmYHjqTs0ccL+5fxYpALzvXhw+0qidldNFyZmDSH6Vs38cYQGP" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/throttle.js" integrity="sha384-D32YLjWPwZP/iGZ3bu/GxfKDQ51B+lE9Shz5s6+j6eWUzlWI2Du+C7U6/RIeWP46" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/toFormData.js" integrity="sha384-5dX3yIGTpFxjsivqvCB2xAG3h7OhuvrL5z4+fqkhJjzhROW5qLIIyTFONWWeyctI" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/toURLEncodedForm.js" integrity="sha384-E6BXdQ0ewx452KRBBwFSGl9skW61X5X/DYyYcUul964CwvAhJL5mI9JifTOy4KP+" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/trackStream.js" integrity="sha384-OP1nDfeo9hagYTeVJN+DQ8pUHOK/0BLCIf2gLtRo30uOqDYwxV3AyaoKRq7qyP49" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/helpers/validator.js" integrity="sha384-Kgm+68yMvJRe9/pAT6HVJ+wxugBivrQwjOLCxvXOHOMLG+VZDLg0wBE25SXUYp1B" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/platform/browser/classes/Blob.js" integrity="sha384-2p+gkhxfIctlJT+v4zxSvpk1kVChmek4bZeGLVoy+ndKOcc07BKvqMBJXlsv+ei5" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/platform/browser/classes/FormData.js" integrity="sha384-VCJUgtAuoks61cC+vQhWLI6tWPr8DpsDt2wKfCKO8JrR/lO/lWiPtNRkgBI/+c1R" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/platform/browser/classes/URLSearchParams.js" integrity="sha384-/7IB63EMdNX76BWQoihePlAcDXeOG6iVu/2qm2fzjTNRg0UH8sk+TGsT/HLXRIFS" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/platform/browser/index.js" integrity="sha384-RDCNU4wNC6l8Kl6GqxcdbPqDCRJ6miNI1JJmzaluE9WleSEWS7+8Ez24sutU19jz" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/platform/index.js" integrity="sha384-f2Rd4d7gJqUve1w1cuqMlEo++vSCnMz7NGoIBCcJ5/pjNfTH9aaeX7F1nvV/RxYb" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:axios@1.21.0/lib/utils.js" integrity="sha384-/yaQwiVztSMZN5VgSG+Y2rX2Pzhhamez/QW2d+oyNYCX6f/eZ2puPj3V8iXqYuro" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:dijkstrajs@1.0.3/dijkstra.js" integrity="sha384-l9XxcXMofv32xMlk0C0EPWbWu4xoAGNVlXMj4tPP/YudG1P8kOx6YzdgeJflIoXR" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:fast-text-encoding@1.0.6/text.min.js" integrity="sha384-nOOKrarXHtEVI3pNIMThIdVfLsS54fVJBpmCnPCVFqoGfJXaBS1O3PDEidAXoxs0" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:pix-utils@2.8.2/dist/module/index.js" integrity="sha384-AlH1PrA1IKx++Ph8Ql+sdHe+KyJ/TNIZAVOxj0vX4Si0HBAE8nJB/sCA0j3tIvue" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:qr@0.7.2/decode.js" integrity="sha384-fJBDKb+4Ke3Kde6qmyU25O0FPIYaRu7zW6RobgDslUq4pj/XgVwYFAVRQsAu83y/" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:qr@0.7.2/dom.js" integrity="sha384-3K/B02+U6PfJ8kZtClH5GF/QKpBTPxQFkZR9826DD2lhcYdaHFESRUhnOJJu9dQD" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:qr@0.7.2/index.js" integrity="sha384-RrH3O19ucsc594GHUWDX6amr8oPFBQMo+WNu24b8H+wZ34ZRzP59fmLk8nC5Ab8w" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:qrcode@1.5.4/_/2AAMrt5E.js" integrity="sha384-Pvuf2kiU0FHdOBYAT0c2esfFaAaccIXSgypWVkve+F9cqOniChtDJxnqkzQgFBMS" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:qrcode@1.5.4/_/CW_4Mx12.js" integrity="sha384-Cu3fo8/6OkRgxYt+kZ3kfa0BXlR11Ao0y5z3hsxO7IBa3lr6Wb72pngYDPcwMzXr" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:qrcode@1.5.4/lib/browser.js" integrity="sha384-bnW9LdbCRzG9CrSvcAtGA2fktVmDs5zqtrs2VE7OaTK0mGvEOQ/4y1T0Z1m9sLiR" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:qrcode@1.5.4/lib/core/qrcode.js" integrity="sha384-vXbA3SRMQjQKgdf4I0rJkBX2qAEOMIW6+VzlfJZurxXJnVn8TPO1VC3pDXSQFiIy" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:qrcode@1.5.4/lib/renderer/canvas.js" integrity="sha384-0Ejrzbyy4QOTIwjZDsu/fGtnvog/ISYmC80Jo0PKhtqz5fJCcPel7wUrXRktuYiH" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:qrcode@1.5.4/lib/renderer/svg-tag.js" integrity="sha384-GrO0nnTWPLIWTifdZw8hkIRaUhqH7CskmZZNJwN/vxrB1burl7FFH2IOIPWBOho/" />
+    <link rel="modulepreload" href="https://ga.jspm.io/npm:qrcode@1.5.4/lib/renderer/utils.js" integrity="sha384-KiqOAF/JukOvvPO3U0XFYsMYf6wtRBR6qdUCqah+3y86e6FVNcYUuwayz06GVwh2" />
     <script type="module" src="./src/main.js"></script>
   </head>
   <body>

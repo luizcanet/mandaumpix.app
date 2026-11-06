@@ -53,4 +53,4 @@ npm run lint
 
 ## 📄 Licença
 
-Distribuído sob a licença **ISC**. Veja [`package.json`](./package.json) para mais informações.
+Distribuído sob a licença **GNU Affero General Public License v3.0 (`AGPL-3.0-only`)**. Veja [`LICENSE`](./LICENSE) e [`package.json`](./package.json) para mais informações.
