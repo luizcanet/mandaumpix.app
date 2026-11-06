@@ -160,4 +160,3 @@ jobs:
 
       - name: Validar build do catálogo de componentes (Storybook)
         run: npm run build-storybook
-
