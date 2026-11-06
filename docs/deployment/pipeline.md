@@ -75,4 +75,4 @@ O workflow é disparado automaticamente em eventos de `pull_request` (`opened`, 
 
 ---
 
-⬅️ **Anterior**: [Especificações e Contratos](../design/api_specs.md) | ➡️ **Próximo**: [Infraestrutura e Topologia](./infrastructure.md)
+⬅️ **Anterior**: [Proposta de Interface (UI)](../design/ui_proposal.md) | ➡️ **Próximo**: [Infraestrutura e Topologia](./infrastructure.md)

@@ -79,4 +79,4 @@ O aplicativo deve oferecer um acesso fácil na interface principal para uma pág
 
 ---
 
-⬅️ **Anterior**: [Modelo de Dados](./data_models.md) | ➡️ **Próximo**: [Pipeline de Implantação](../deployment/pipeline.md)
+⬅️ **Anterior**: [Modelo de Dados](./data_models.md) | ➡️ **Próximo**: [Proposta de Interface (UI)](./ui_proposal.md)

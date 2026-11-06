@@ -58,7 +58,7 @@ mandaumpix.app/
 
 ## 🧩 Decomposição Funcional dos Módulos de Domínio (PWA)
 
-Para atender aos requisitos funcionais do **Manda um PIX**, o design funcional do aplicativo divide-se em seis responsabilidades coesas:
+Para atender aos requisitos funcionais do **Manda um PIX**, o design funcional do aplicativo divide-se em seis responsabilidades coesas (cujo layout visual, fluxo em 3 toques, modal `<dialog>` de chaves e mapeamento de Web Components e classes BEM estão detalhados na [Proposta de Interface (UI)](./ui_proposal.md)):
 
 ```mermaid
 flowchart TD
