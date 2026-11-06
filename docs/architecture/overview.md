@@ -26,7 +26,7 @@ O **Manda um PIX** (`mandaumpix.app`) é concebido como uma aplicação **Progre
 ```mermaid
 flowchart TD
     subgraph UI["Camada de Apresentação (PWA UI)"]
-        Views["Telas & Componentes<br/>(Botão 'Instalar', Cadastro de Chaves, Seletor, Gerador QR Code)"]
+        Views["Telas & Componentes<br/>(Botão 'Instalar', Página 'Sobre', Cadastro de Chaves, Seletor, Gerador QR Code)"]
         PWAAssets["Web App Manifest & Service Worker"]
     end
 
@@ -35,11 +35,13 @@ flowchart TD
         UC1["Gerenciar Chaves de Contas"]
         UC2["Gerar Cobrança ('Manda um PIX')"]
         UC3["Distribuir Cobrança (Copiar, Compartilhar, Salvar)"]
+        UC4["Consultar Página Sobre (Autor e Projeto)"]
     end
 
     subgraph Domain["Camada de Domínio"]
         EntKey["Chave de Conta PIX"]
         EntCharge["Cobrança PIX & Payload BR Code"]
+        EntAbout["Metadados Institucionais (Autor e Projeto)"]
     end
 
     subgraph Infra["Camada de Infraestrutura (Browser Web APIs)"]
@@ -47,15 +49,18 @@ flowchart TD
         Storage["Persistência Local (LocalStorage / IndexedDB)"]
         QRGen["Renderizador Gráfico de QR Code (Canvas / SVG / Blob)"]
         ShareClip["Clipboard API / Web Share API / Download Anchor"]
+        RouterInfra["History API / Roteador SPA (@modnes/router)"]
     end
 
-    Views --> UC0 & UC1 & UC2 & UC3
+    Views --> UC0 & UC1 & UC2 & UC3 & UC4
     UC0 --> PWAInstall
     UC1 --> EntKey
     UC2 --> EntCharge
+    UC4 --> EntAbout
     UC1 --> Storage
     UC2 --> QRGen
     UC3 --> ShareClip
+    UC4 --> RouterInfra
 ```
 
 ---

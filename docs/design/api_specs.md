@@ -61,4 +61,22 @@ Para usuários que ainda não instalaram o aplicativo no dispositivo, a interfac
 
 ---
 
+## 4. Contrato de Navegação e Conteúdo da Página "Sobre" (Autor e Projeto)
+
+O aplicativo deve oferecer um acesso fácil na interface principal para uma página que fale sobre o aplicativo, contendo informações sobre o **autor** e o **projeto** (alinhado também à seção _Appropriate Legal Notices_ da licença [`LICENSE`](../../LICENSE)):
+
+- **Gatilho de Acesso**: Link ou botão de fácil acesso presente na navegação/cabeçalho ou rodapé da interface (ex.: rota SPA `/sobre` gerenciada pelo `@modnes/router`).
+- **Conteúdo Obrigatório Exibido**:
+  - **Sobre o Aplicativo**: Explicação do objetivo do **Manda um PIX** (facilitar a geração rápida e gratuita de cobranças via PIX sem precisar abrir aplicativos de banco, com privacidade 100% local).
+  - **Sobre o Projeto**:
+    - Nome e domínio: **Manda um PIX** (`mandaumpix.app`) — Versão `1.0.0`.
+    - Licença de Software Livre: **GNU Affero General Public License v3.0 (`AGPL-3.0-only`)**.
+    - Código-fonte e Issues: [`https://github.com/luizcanet/mandaumpix.app`](https://github.com/luizcanet/mandaumpix.app).
+  - **Sobre o Autor**:
+    - Nome: **Luiz Henrique Canet Filho**.
+    - Contato / E-mail: `me@luizca.net`.
+    - Perfil GitHub: [`@luizcanet`](https://github.com/luizcanet).
+
+---
+
 ⬅️ **Anterior**: [Modelo de Dados](./data_models.md) | ➡️ **Próximo**: [Pipeline de Implantação](../deployment/pipeline.md)

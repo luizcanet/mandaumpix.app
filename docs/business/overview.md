@@ -22,6 +22,7 @@ Abrir aplicativos de banco em dispositivos móveis ou públicos frequentemente e
    - Compartilhamento direto com aplicativos externos de mensagens (como **WhatsApp**).
    - Opção de **salvar a imagem do QR Code localmente** no dispositivo para envio posterior ou impressão.
 6. **Acesso Gratuito, Multiplataforma e Instalação Destacada**: Distribuído como PWA gratuito, acessível diretamente pelo navegador e instalável na tela inicial do dispositivo. Para usuários que ainda não instalaram o aplicativo no dispositivo, a interface apresenta de forma destacada o botão **"Instalar"**, incentivando e simplificando a instalação nativa.
+7. **Transparência e Acesso Fácil às Informações do Autor e do Projeto**: Disponibiliza na interface um acesso fácil a uma página dedicada que apresenta o aplicativo e exibe informações detalhadas sobre o **autor** (**Luiz Henrique Canet Filho** — `<me@luizca.net>`) e sobre o **projeto** (**Manda um PIX** — `mandaumpix.app`, propósito, repositório oficial e licença livre `AGPL-3.0-only`).
 
 ---
 
@@ -41,6 +42,7 @@ O aplicativo visa atender **exclusivamente ao Recebedor** — não há interface
 ```mermaid
 flowchart LR
     I["0. Botão Destacado 'Instalar'<br/>(Exibido se app não instalado)"] -.-> A["1. Cadastrar Chaves PIX<br/>(Várias contas de destino)"]
+    Ab["ℹ️ Acesso Fácil: Página 'Sobre'<br/>(Informações do Autor e do Projeto)"] -.-> A
     A --> B["2. Selecionar Chave<br/>Cadastrada"]
     B --> C["3. Informar Valor (Opcional)<br/>ou deixar Valor Dinâmico"]
     C --> D["4. Clicar em<br/>'Manda um PIX'"]

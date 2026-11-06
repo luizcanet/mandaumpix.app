@@ -69,6 +69,7 @@ Decomposição lógica dos módulos internos planejados para a aplicação no cl
 flowchart TD
     subgraph UI["Componentes de Interface"]
         InstallPromptUI["Botão Destacado 'Instalar' UI<br/>Exibido para usuários que ainda não instalaram o app"]
+        AboutPageUI["Página 'Sobre' UI<br/>Acesso fácil com informações sobre o aplicativo, autor e projeto"]
         KeyManagerUI["Gerenciador de Chaves UI<br/>Cadastro, listagem e exclusão de chaves"]
         ChargeFormUI["Formulário de Cobrança UI<br/>Seleção de chave, valor opcional e botão 'Manda um PIX'"]
         ResultViewUI["Painel de Resultado UI<br/>Exibição do QR Code e ações de distribuição"]
@@ -76,6 +77,7 @@ flowchart TD
 
     subgraph Core["Módulos de Domínio e Serviços"]
         InstallController["Controlador de Instalação PWA<br/>Detecção de instalação e acionamento do prompt"]
+        AppRouter["Roteador SPA (@modnes/router)<br/>Navegação fluida para a página 'Sobre' e telas do app"]
         KeyService["Serviço de Chaves de Conta<br/>Validação e gestão de chaves PIX"]
         PixPayloadBuilder["Construtor de Payload PIX<br/>Formatação da chave de cobrança ( fixo ou dinâmico)"]
         QRCodeRenderer["Renderizador de QR Code<br/>Geração da matriz gráfica e exportação em imagem"]
@@ -90,6 +92,7 @@ flowchart TD
 
     InstallPromptUI --> InstallController
     InstallController --> InstallAdapter
+    AppRouter --> AboutPageUI
     KeyManagerUI --> KeyService
     ChargeFormUI --> KeyService
     ChargeFormUI --> PixPayloadBuilder

@@ -95,7 +95,32 @@ sequenceDiagram
 
 ---
 
-## 4. Máquina de Estados de uma Cobrança na Sessão
+## 4. Fluxo de Acesso à Página Sobre o Aplicativo (Autor e Projeto)
+
+O aplicativo disponibiliza um ponto de acesso fácil na interface para que o usuário consulte a página **"Sobre"**, contendo a explicação sobre o aplicativo, as informações sobre o **autor** e os detalhes do **projeto**.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuário Recebedor
+    participant App as Manda um PIX (PWA)
+    participant Router as Roteador SPA (@modnes/router)
+    participant About as Página "Sobre" (Autor & Projeto)
+
+    U->>App: Aciona o atalho de fácil acesso "Sobre" na interface
+    App->>Router: Navega para a rota da página "Sobre" (ex: /sobre)
+    Router->>About: Renderiza a página "Sobre"
+    About-->>U: Apresenta descrição do aplicativo, dados do Autor (Luiz Henrique Canet Filho) e informações do Projeto (repositório e licença AGPL-3.0-only)
+    opt Retorno à geração de cobrança
+        U->>About: Aciona opção de voltar ao início
+        About->>Router: Navega para a tela principal (/)
+        Router-->>U: Exibe tela principal de seleção de chaves e cobrança
+    end
+```
+
+---
+
+## 5. Máquina de Estados de uma Cobrança na Sessão
 
 ```mermaid
 stateDiagram-v2

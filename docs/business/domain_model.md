@@ -8,16 +8,17 @@ Este documento estabelece o vocabulário padronizado (**Linguagem Ubíqua**) e a
 
 ## 🗣️ Glossário (Linguagem Ubíqua)
 
-| Termo                                    | Definição no Contexto do Manda um PIX                                                                                                                                             |
-| :--------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Chave de Conta (Chave PIX)**           | Identificador vinculado a uma conta bancária ou de pagamento (CPF, CNPJ, E-mail, Telefone celular ou Chave Aleatória EVP) cadastrado pelo usuário para receber transferências.    |
-| **Cobrança PIX**                         | Solicitação de pagamento gerada a partir de uma chave cadastrada e, opcionalmente, um valor monetário.                                                                            |
-| **Valor Definido (Fixo)**                | Quantia monetária explícita informada pelo Recebedor antes de gerar a cobrança.                                                                                                   |
-| **Valor Dinâmico (Aberto)**              | Modalidade em que nenhum valor é preenchido pelo Recebedor na geração da cobrança, mantendo o valor em aberto no QR Code e na chave de cobrança gerada.                           |
-| **Ação "Manda um PIX"**                  | Gatilho principal da interface que processa os dados selecionados (chave + valor opcional) e gera o QR Code e a chave de cobrança.                                                |
-| **Chave de Cobrança (PIX Copia e Cola)** | Código textual padronizado (payload EMV® / BR Code) gerado junto ao QR Code, que pode ser copiado para a área de transferência ou enviado por mensagem para pagamento sem câmera. |
-| **QR Code de Cobrança**                  | Representação gráfica bidimensional da cobrança gerada na tela, passível de leitura óptica imediata ou download como arquivo de imagem local.                                     |
-| **Botão "Instalar"**                     | Elemento de interface apresentado de forma destacada exclusivamente para usuários que ainda não instalaram o aplicativo (PWA) no dispositivo, acionando a instalação local.       |
+| Termo                                    | Definição no Contexto do Manda um PIX                                                                                                                                               |
+| :--------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Chave de Conta (Chave PIX)**           | Identificador vinculado a uma conta bancária ou de pagamento (CPF, CNPJ, E-mail, Telefone celular ou Chave Aleatória EVP) cadastrado pelo usuário para receber transferências.      |
+| **Cobrança PIX**                         | Solicitação de pagamento gerada a partir de uma chave cadastrada e, opcionalmente, um valor monetário.                                                                              |
+| **Valor Definido (Fixo)**                | Quantia monetária explícita informada pelo Recebedor antes de gerar a cobrança.                                                                                                     |
+| **Valor Dinâmico (Aberto)**              | Modalidade em que nenhum valor é preenchido pelo Recebedor na geração da cobrança, mantendo o valor em aberto no QR Code e na chave de cobrança gerada.                             |
+| **Ação "Manda um PIX"**                  | Gatilho principal da interface que processa os dados selecionados (chave + valor opcional) e gera o QR Code e a chave de cobrança.                                                  |
+| **Chave de Cobrança (PIX Copia e Cola)** | Código textual padronizado (payload EMV® / BR Code) gerado junto ao QR Code, que pode ser copiado para a área de transferência ou enviado por mensagem para pagamento sem câmera.   |
+| **QR Code de Cobrança**                  | Representação gráfica bidimensional da cobrança gerada na tela, passível de leitura óptica imediata ou download como arquivo de imagem local.                                       |
+| **Botão "Instalar"**                     | Elemento de interface apresentado de forma destacada exclusivamente para usuários que ainda não instalaram o aplicativo (PWA) no dispositivo, acionando a instalação local.         |
+| **Página "Sobre"**                       | Página de fácil acesso no aplicativo que fala sobre o aplicativo e apresenta informações sobre o **autor** (**Luiz Henrique Canet Filho** `<me@luizca.net>`) e sobre o **projeto**. |
 
 ---
 
@@ -54,6 +55,13 @@ Este documento estabelece o vocabulário padronizado (**Linguagem Ubíqua**) e a
 - O aplicativo deve apresentar de forma destacada um botão **"Instalar"** para usuários que ainda não instalaram o aplicativo no dispositivo.
 - Quando o aplicativo já estiver instalado no dispositivo (ou após a conclusão da instalação pelo usuário), o botão **"Instalar"** não deve ser exibido.
 
+### RN07 — Acesso Fácil à Página Sobre o Aplicativo (Autor e Projeto)
+
+- O aplicativo deve apresentar na interface um acesso fácil e direto a uma página que fale sobre o aplicativo (**Página "Sobre"**).
+- A página deve conter informações claras sobre:
+  1. **O Aplicativo e o Projeto**: Descrição e propósito do **Manda um PIX** (`mandaumpix.app`), versão, natureza gratuita/PWA, código aberto sob licença **GNU AGPL v3.0 (`AGPL-3.0-only`)** e links do repositório oficial ([`github.com/luizcanet/mandaumpix.app`](https://github.com/luizcanet/mandaumpix.app)).
+  2. **O Autor**: Identificação e contato do criador e mantenedor do projeto, **Luiz Henrique Canet Filho** (`<me@luizca.net>`).
+
 ---
 
 ## 🧩 Diagrama Conceitual de Domínio
@@ -62,6 +70,7 @@ Este documento estabelece o vocabulário padronizado (**Linguagem Ubíqua**) e a
 classDiagram
     class Usuario {
         +instalarAplicativo()
+        +consultarPaginaSobre()
         +gerenciarChaves()
         +gerarCobranca()
     }
