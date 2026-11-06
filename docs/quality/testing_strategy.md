@@ -18,12 +18,18 @@ Em [`package.json`](../../package.json), os scripts de teste estão definidos co
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "storybook": "storybook dev -p 6006 --no-open",
+    "build-storybook": "storybook build -o storybook-static",
     "lint": "eslint ."
   }
 }
 ```
 
-A suíte inicial em [`src/main.test.js`](../../src/main.test.js) valida os metadados da aplicação, a geração e parsing de cobranças PIX estáticas (com valor fixo e com valor aberto), a inicialização do DOM (`bootstrapApp`) e as reexportações do ecossistema `@modnes`.
+A suíte de testes unitários valida:
+- [`src/main.test.js`](../../src/main.test.js): Metadados da aplicação, geração e parsing de cobranças PIX estáticas (com valor fixo e com valor aberto), inicialização do DOM (`bootstrapApp`) e reexportações do ecossistema `@modnes`.
+- [`src/presentation/components/vector-icon/vector-icon.test.js`](../../src/presentation/components/vector-icon/vector-icon.test.js): Registro do Custom Element `<vector-icon>`, renderização do símbolo SVG e atualização reativa de atributos (`name` e `sprite-path`).
+
+Para o desenvolvimento isolado, inspeção visual e validação de acessibilidade de Web Components compartilhados, o projeto utiliza o **Storybook v10** (`@storybook/html-vite`, `@storybook/addon-docs` e `@storybook/addon-a11y`) configurado em [`.storybook/main.js`](../../.storybook/main.js) e [`.storybook/preview.js`](../../.storybook/preview.js).
 
 ---
 

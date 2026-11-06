@@ -12,16 +12,24 @@ O repositório conta com a fundação de módulos ES nativos gerenciados pelo **
 
 ```text
 mandaumpix.app/
+├── .storybook/            # Configuração do Storybook (@storybook/html-vite, addons docs & a11y)
+│   ├── main.js            # Descoberta de stories, framework e diretórios estáticos
+│   └── preview.js         # Tokens globais, reset CSS, VectorIcon e backgrounds da marca
 ├── docs/                  # Documentação viva técnica e de negócio
 ├── src/
 │   ├── assets/
 │   │   └── icons/         # Logotipo vetorial (icon.svg) e ícones PNG do PWA (192x192, 512x512, maskable, apple-touch-icon)
+│   ├── presentation/
+│   │   ├── components/
+│   │   │   └── vector-icon/ # Web Component compartilhado <vector-icon> (VectorIcon, sprite icon.svg, CSS, stories e testes)
+│   │   └── styles/        # Design tokens (:root) e reset CSS moderno
 │   └── main.js            # Ponto de entrada ESM da aplicação cliente
 ├── index.html             # Casca HTML5 com Import Map W3C, es-module-shims, modulepreload, SRI e links de ícones/manifest
 ├── manifest.json          # Web App Manifest W3C com paleta azul/verde e ícones do aplicativo
 ├── importmap.js           # Script de injeção de Import Map gerenciado pelo JSPM
 ├── eslint.config.js       # Configuração Flat Config do ESLint v10 (JS, JSON, CSS, MD)
-├── package.json           # Manifesto do projeto, exports, scripts JSPM e devDependencies
+├── vitest.config.js       # Configuração do Vitest (JSDOM e cobertura V8)
+├── package.json           # Manifesto do projeto, exports, scripts JSPM/Vitest/Storybook e devDependencies
 ├── package-lock.json      # Lockfile determinístico da árvore de pacotes npm
 ├── LICENSE                # Texto integral da licença GNU Affero General Public License v3.0 (AGPL-3.0-only)
 ├── .prettierrc            # Configuração do formatador Prettier
@@ -36,6 +44,9 @@ mandaumpix.app/
 | [`index.html`](../../index.html)             | Casca HTML semântica da aplicação contendo `es-module-shims`, `<script type="importmap">`, `<link rel="modulepreload">` com hashes `integrity` (SRI), ícones e carregamento de `main.js`. |
 | [`manifest.json`](../../manifest.json)       | Web App Manifest W3C para instalação do PWA, declarando cores de tema (`#0b1834` / `#060d1e`) e ícones vetoriais e rasterizados (`any` e `maskable`).                                    |
 | [`src/assets/icons/`](../../src/assets/icons/icon.svg) | Logotipo oficial em formato vetorial (`icon.svg`) e ícones de aplicativo (`icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png`) nas cores azul e verde. |
+| [`.storybook/`](../../.storybook/main.js)    | Configuração do Storybook v10 (`@storybook/html-vite`) com addons de documentação automática (`@storybook/addon-docs`) e acessibilidade (`@storybook/addon-a11y`).                       |
+| [`src/presentation/components/vector-icon/`](../../src/presentation/components/vector-icon/vector-icon.component.js) | Web Component compartilhado `<vector-icon>` construído sobre `@modnes/custom-element`, sprite SVG centralizado (`icon.svg`), estilização fluida (`1em` + `currentColor`) e stories no Storybook. |
+| [`src/presentation/styles/`](../../src/presentation/styles/tokens.css) | Design Tokens globais (`tokens.css`) com paleta da marca (`#0b1834`, `#00d37f`), tipografia, espaçamentos e reset CSS (`reset.css`). |
 | [`importmap.js`](../../importmap.js)         | Mapa de importação gerado pelo JSPM (`jspm install`) que resolve `mandaumpix.app`, `@modnes/*`, `pix-utils`, `qr` e `qr/dom.js`.                                                         |
 | [`src/main.js`](../../src/main.js)           | Ponto de entrada principal ESM integrando o ecossistema `@modnes/*`, `pix-utils` (`generatePixCharge`, `parsePixCharge`) e `qr` (`encodeQR`, `exportQrCodePng`).                         |
 | [`package.json`](../../package.json)         | Define o pacote `mandaumpix.app` (`1.0.0`, licença `AGPL-3.0-only`), habilita ES Modules nativos, declara `"exports"`, `"dependencies"` (`@modnes/*`, `pix-utils`, `qr`) e scripts JSPM. |

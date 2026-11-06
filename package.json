@@ -25,6 +25,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "storybook": "storybook dev -p 6006 --no-open",
+    "build-storybook": "storybook build -o storybook-static",
     "lint": "eslint ."
   },
   "devDependencies": {
@@ -33,6 +35,9 @@
     "@eslint/json": "^2.1.1",
     "@eslint/markdown": "^8.0.3",
     "@jspm/generator": "^2.18.0",
+    "@storybook/addon-a11y": "^10.6.6",
+    "@storybook/addon-docs": "^10.6.6",
+    "@storybook/html-vite": "^10.6.6",
     "@vitest/coverage-v8": "^5.1.0",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
@@ -40,6 +45,7 @@
     "jsdom": "^31.0.0",
     "jspm": "^4.7.0",
     "prettier": "3.9.10",
+    "storybook": "^10.6.6",
     "vitest": "^5.1.0"
   },
   "dependencies": {

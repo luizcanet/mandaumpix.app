@@ -48,6 +48,9 @@ npm run build
 # Executar suíte de testes automatizados (Vitest)
 npm test
 
+# Iniciar o Storybook para desenvolvimento de componentes compartilhados (http://localhost:6006)
+npm run storybook
+
 # Executar verificação estática (ESLint)
 npm run lint
 ```

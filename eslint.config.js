@@ -7,6 +7,14 @@ import { defineConfig } from "eslint/config";
 import prettier from "eslint-config-prettier";
 
 export default defineConfig([
+  {
+    ignores: [
+      "dist/**",
+      "coverage/**",
+      "storybook-static/**",
+      "package-lock.json",
+    ],
+  },
   { files: ["**/*.{js,mjs,cjs}"], plugins: { js }, extends: ["js/recommended"], languageOptions: { globals: globals.browser } },
   { files: ["**/*.json"], plugins: { json }, language: "json/json", extends: ["json/recommended"] },
   { files: ["**/*.jsonc"], plugins: { json }, language: "json/jsonc", extends: ["json/recommended"] },

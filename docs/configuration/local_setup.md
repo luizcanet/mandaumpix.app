@@ -47,7 +47,21 @@ Sempre que novas dependências ou pontos de entrada forem adicionados, atualize 
 npm run importmap
 ```
 
-### 5. Executar a Verificação Estática (Linter)
+### 5. Desenvolver Componentes Compartilhados com Storybook
+
+Para iniciar o ambiente interativo do **Storybook** (porta padrão `6006`) com suporte a Web Components (`@modnes/custom-element`), documentação automática e auditoria de acessibilidade:
+
+```bash
+npm run storybook
+```
+
+Para gerar o catálogo estático do Storybook (`storybook-static/`):
+
+```bash
+npm run build-storybook
+```
+
+### 6. Executar a Verificação Estática (Linter)
 
 Para validar arquivos JavaScript, CSS, JSON e Markdown:
 

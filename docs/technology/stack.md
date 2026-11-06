@@ -52,6 +52,10 @@ Extraídas diretamente de [`package.json`](../../package.json):
 | [`vitest`](https://vitest.dev/)                                                  |  `^5.1.0`  | Framework de testes unitários e de integração nativo para ES Modules ([`vitest.config.js`](../../vitest.config.js)). |
 | [`@vitest/coverage-v8`](https://vitest.dev/guide/coverage.html)                  |  `^5.1.0`  | Provedor de cobertura de código baseado no motor V8 (`text`, `lcov` e `html`).                                   |
 | [`jsdom`](https://github.com/jsdom/jsdom)                                        | `^31.0.0`  | Implementação em JavaScript dos padrões web (DOM e HTML) para testes de Web Components e APIs do navegador.      |
+| [`storybook`](https://storybook.js.org/)                                         | `^10.6.6`  | Ambiente isolado para desenvolvimento, catalogação e documentação interativa de componentes compartilhados.      |
+| [`@storybook/html-vite`](https://storybook.js.org/docs/get-started/frameworks/html-vite) | `^10.6.6` | Integração oficial do Storybook para HTML e Web Components nativos (`@modnes/custom-element`) sobre Vite. |
+| [`@storybook/addon-docs`](https://storybook.js.org/docs/writing-docs/autodocs)   | `^10.6.6`  | Geração automática de páginas de documentação (`autodocs`) e tabelas de propriedades/controles para componentes. |
+| [`@storybook/addon-a11y`](https://storybook.js.org/docs/writing-tests/accessibility-testing) | `^10.6.6` | Auditoria interativa de acessibilidade (WCAG / Axe) diretamente no painel de cada componente no Storybook. |
 
 ---
 
