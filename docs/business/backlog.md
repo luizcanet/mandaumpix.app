@@ -69,20 +69,32 @@ flowchart TD
 - **Descrição**: Implementar as funções puras de geração de payload BR Code (`generatePixCharge`), validação/parsing (`parsePixCharge`) e exportação gráfica (`exportQrCodePng`) integrando `pix-utils` e `qr`.
 - **Artefatos**: [`src/main.js`](../../src/main.js), [`src/main.test.js`](../../src/main.test.js).
 
-#### `US-02.2` — Entidade `ChaveConta` e Validador de Chaves PIX (`⏳ Pendente`)
+#### `US-02.2` — Entidade `ChaveConta` e Validador de Chaves PIX (`⏳ Pendente` · `3 Story Points`)
 
-- **História**: Como **Recebedor**, quero que minhas chaves PIX (`CPF`, `CNPJ`, `EMAIL`, `TELEFONE`, `EVP`) e dados de titular/cidade sejam validados e normalizados no momento do cadastro para evitar a geração de códigos BR Code inválidos.
-- **Regras de Negócio**: `RN01` ([Modelo de Domínio](./domain_model.md)).
-- **Critérios de Aceite**:
-  - [ ] Criar módulo `src/domain/entities/pix-key.entity.js` representando [`ChaveConta`](../design/data_models.md) (`id`, `rotulo`, `tipo_chave`, `valor_chave`, `nome_recebedor`, `cidade_recebedor`, `criado_em`).
-  - [ ] Validar e normalizar formatos por tipo de chave:
-    - `CPF`: 11 dígitos numéricos (com validação de dígitos verificadores).
-    - `CNPJ`: 14 dígitos numéricos (com validação de dígitos verificadores).
-    - `EMAIL`: formato de e-mail válido (`<= 77` caracteres, padrão BACEN).
-    - `TELEFONE`: formato internacional E.164 (`+55DDD9XXXXXXXX`).
-    - `EVP`: UUID v4 (`36` caracteres com hifens).
-  - [ ] Normalizar `nome_recebedor` (remoção de acentos/caracteres especiais EMV e truncamento seguro em até `25` caracteres) e `cidade_recebedor` (até `15` caracteres).
-  - [ ] Cobertura de testes unitários (`src/domain/entities/pix-key.entity.test.js`) para todos os tipos válidos e cenários de erro.
+- **História (Narrativa Canônica)**:
+  > **Como** **Recebedor** que cadastra contas no Manda um PIX,
+  > **Quero** que minhas chaves PIX (`CPF`, `CNPJ`, `EMAIL`, `TELEFONE`, `EVP`) e os dados do titular (`nome_recebedor`, `cidade_recebedor`, `rotulo`) sejam validados e normalizados segundo o padrão EMV® / BR Code do Banco Central no momento do cadastro,
+  > **Para que** apenas chaves íntegras sejam salvas no dispositivo e eu evite a geração de códigos BR Code inválidos ou rejeitados pelos aplicativos bancários.
+- **Regras de Negócio e Invariantes**: `RN01` ([Modelo de Domínio](./domain_model.md), [Modelo de Dados](../design/data_models.md) e [Especificações EMV](../design/api_specs.md)).
+  - **INV-01 (`CPF`)**: Sanitização de máscara (`[^\d]`), 11 dígitos numéricos, rejeição de dígitos repetidos (`000...` a `999...`) e validação dos 2 dígitos verificadores (Módulo 11).
+  - **INV-02 (`CNPJ`)**: Sanitização de máscara (`[^\d]`), 14 dígitos numéricos, rejeição de dígitos repetidos e validação dos 2 dígitos verificadores (Módulo 11).
+  - **INV-03 (`EMAIL`)**: Normalização `trim()` + `toLowerCase()`, formato de e-mail válido e comprimento máximo `<= 77` caracteres (limite DICT/BACEN).
+  - **INV-04 (`TELEFONE`)**: Normalização para padrão internacional E.164 (`+55DDD9XXXXXXXX`, 14 caracteres totais com DDD válido `11..99` e nono dígito `9`).
+  - **INV-05 (`EVP`)**: Normalização `trim()` + `toLowerCase()` e validação estrita de UUID v4 (`36` caracteres hifenizados).
+  - **INV-06 (`nome_recebedor` — Tag EMV `59`)**: Obrigatório; remoção de acentos (`NFD`) e caracteres não-ASCII, conversão para `UPPERCASE`, colapso de espaços e truncamento seguro em até `25` caracteres.
+  - **INV-07 (`cidade_recebedor` — Tag EMV `60`)**: Obrigatório; remoção de acentos (`NFD`) e caracteres não-ASCII, conversão para `UPPERCASE`, colapso de espaços e truncamento seguro em até `15` caracteres.
+  - **INV-08 (Identidade & Imutabilidade)**: Geração automática de `id` (`crypto.randomUUID()`), `criado_em` (ISO-8601), normalização de `rotulo` (com fallback amigável por tipo) e congelamento da instância (`Object.freeze`).
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (CPF e CNPJ com máscara)**: Dado um CPF (`123.456.789-09`) ou CNPJ (`11.222.333/0001-81`) válido com pontuação, quando `ChaveConta.create()` for invocado, então `valor_chave` deve ser normalizado apenas com dígitos (`12345678909` / `11222333000181`) e a instância imutável criada com sucesso.
+  - **Cenário 02 (E-mail, Telefone e EVP válidos)**: Dado um e-mail (`<= 77` chars), telefone celular brasileiro ou chave EVP UUID v4 válidos, quando `ChaveConta.create()` for invocado, então `valor_chave` deve ser normalizado (`lowercase` para e-mail/EVP e `+55DDD9XXXXXXXX` para telefone).
+  - **Cenário 03 (Normalização EMV de Titular e Cidade)**: Dado `nome_recebedor` `"João da Silva Júnior & Cia Ltda"` (`31` chars com acentos/símbolos) e `cidade_recebedor` `"São José dos Campos"` (`19` chars), quando a entidade for criada, então `nome_recebedor` deve resultar em `"JOAO DA SILVA JUNIOR CIA"` (`<= 25` chars) e `cidade_recebedor` em `"SAO JOSE DOS CA"` (`<= 15` chars).
+  - **Cenário 04 (Rejeição de Chaves Inválidas)**: Dado um `tipo_chave` desconhecido ou um `valor_chave` inválido (CPF/CNPJ com DV incorreto ou dígitos repetidos, e-mail `> 77` chars, telefone fora do padrão móvel nacional ou UUID malformado), quando a criação for acionada, então deve lançar `PixKeyValidationError` indicando o motivo da falha.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-02.2.1 (Domínio / Erros & Constantes)**: Criar `src/domain/errors/pix-key-validation.error.js` (ou exportar `PixKeyValidationError` e enum `PIX_KEY_TYPES` em `src/domain/entities/pix-key.entity.js`) definindo códigos e mensagens padronizadas de erro de domínio.
+  - [ ] **TASK-02.2.2 (TDD / Validadores de Chave PIX)**: Criar testes unitários e implementar funções puras de validação e sanitização para `CPF`, `CNPJ`, `EMAIL`, `TELEFONE` e `EVP` em `src/domain/validators/pix-key.validator.js` (ou módulo coeso reexportado pela entidade).
+  - [ ] **TASK-02.2.3 (TDD / Normalizadores EMV)**: Criar testes unitários e implementar normalizadores `normalizeMerchantName` (`<= 25` chars) e `normalizeMerchantCity` (`<= 15` chars) compatíveis com EMV® QRCPS-MPM e `pix-utils`.
+  - [ ] **TASK-02.2.4 (TDD / Entidade `ChaveConta`)**: Implementar a classe/fábrica imutável `ChaveConta` (`PixKeyEntity`) em `src/domain/entities/pix-key.entity.js` (`id`, `rotulo`, `tipo_chave`, `valor_chave`, `nome_recebedor`, `cidade_recebedor`, `criado_em`, `toJSON()`) com suíte completa em `src/domain/entities/pix-key.entity.test.js` (`100%` de cobertura nas regras).
+  - [ ] **TASK-02.2.5 (Integração & Exportação)**: Reexportar `ChaveConta` / `PixKeyValidationError` em [`src/main.js`](../../src/main.js) e validar pipeline de qualidade (`npm run lint`, `npm run format:check`, `npm run test:coverage`).
 
 #### `US-02.3` — Entidade `CobrancaPix` e Caso de Uso `GeneratePixChargeUseCase` (`⏳ Pendente`)
 
