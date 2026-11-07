@@ -166,4 +166,3 @@ describe("list-pix-keys.use-case.js — ListPixKeysUseCase (TASK-02.4.2)", () =>
     });
   });
 });
-
