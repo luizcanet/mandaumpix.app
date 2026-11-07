@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
+import { generatePixCharge } from "../../main.js";
+import { ChaveConta, PIX_KEY_TYPES } from "./pix-key.entity.js";
 import {
+  CobrancaPix,
   DEFAULT_PIX_CHARGE_TXID,
   MAX_PIX_CHARGE_ADDITIONAL_INFO_LENGTH,
   MAX_PIX_CHARGE_AMOUNT,
   MAX_PIX_CHARGE_TXID_LENGTH,
   PIX_CHARGE_ERROR_CODES,
+  PixChargeEntity,
   PixChargeValidationError,
   normalizeAdditionalInfo,
   normalizeTransactionAmount,
@@ -229,6 +233,259 @@ describe("pix-charge.entity.js — Domain Constants, Errors & Sanitizers (TASK-0
           }),
         );
       },
+    );
+  });
+});
+
+describe("pix-charge.entity.js — Immutable CobrancaPix Entity (TASK-02.3.2)", () => {
+  const samplePixKey = ChaveConta.create({
+    id: "key-email-01",
+    rotulo: "Conta Principal",
+    tipo_chave: PIX_KEY_TYPES.EMAIL,
+    valor_chave: "eu@luizca.net",
+    nome_recebedor: "Luiz Henrique Canet Filho",
+    cidade_recebedor: "Brasília",
+    criado_em: "2026-11-07T16:00:00.000Z",
+  });
+
+  const sampleGenerated = generatePixCharge({
+    pixKey: samplePixKey.valor_chave,
+    merchantName: samplePixKey.nome_recebedor,
+    merchantCity: samplePixKey.cidade_recebedor,
+    transactionAmount: 42.5,
+  });
+
+  it("should alias PixChargeEntity to CobrancaPix", () => {
+    expect(PixChargeEntity).toBe(CobrancaPix);
+  });
+
+  it("should create an immutable CobrancaPix with a fixed amount (RN02, RN03, RN04)", () => {
+    // Arrange
+    const props = {
+      chave_conta: samplePixKey,
+      valor_opcional: "R$ 42,50",
+      txid: "PEDIDO42",
+      info_adicional: "Serviço prestado",
+      chave_cobranca: sampleGenerated.brCode,
+      imagem_qrcode: {
+        svg: sampleGenerated.qrSvg,
+        dataUrl: sampleGenerated.qrDataUrl,
+        gifBytes: sampleGenerated.qrGifBytes,
+      },
+      gerado_em: "2026-11-07T16:30:00.000Z",
+    };
+
+    // Act
+    const charge = CobrancaPix.create(props);
+
+    // Assert
+    expect(charge).toBeInstanceOf(CobrancaPix);
+    expect(Object.isFrozen(charge)).toBe(true);
+    expect(Object.isFrozen(charge.imagem_qrcode)).toBe(true);
+    expect(charge.id_chave_conta).toBe("key-email-01");
+    expect(charge.chave_conta).toBe(samplePixKey);
+    expect(charge.valor_opcional).toBe(42.5);
+    expect(charge.valor_dinamico).toBe(false);
+    expect(charge.txid).toBe("PEDIDO42");
+    expect(charge.info_adicional).toBe("Servico prestado");
+    expect(charge.chave_cobranca).toBe(sampleGenerated.brCode);
+    expect(charge.imagem_qrcode).toEqual({
+      svg: sampleGenerated.qrSvg,
+      dataUrl: sampleGenerated.qrDataUrl,
+      gifBytes: sampleGenerated.qrGifBytes,
+    });
+    expect(charge.gerado_em).toBe("2026-11-07T16:30:00.000Z");
+
+    expect(() => {
+      charge.valor_opcional = 100;
+    }).toThrow(TypeError);
+    expect(() => {
+      charge.imagem_qrcode.svg = "<svg></svg>";
+    }).toThrow(TypeError);
+  });
+
+  it("should create a CobrancaPix with dynamic/open amount when valor_opcional is omitted or 0 (RN03)", () => {
+    // Arrange
+    const openGenerated = generatePixCharge({
+      pixKey: samplePixKey.valor_chave,
+      merchantName: samplePixKey.nome_recebedor,
+      merchantCity: samplePixKey.cidade_recebedor,
+      transactionAmount: 0,
+    });
+
+    // Act
+    const charge = CobrancaPix.create({
+      chaveConta: samplePixKey.toJSON(),
+      brCode: openGenerated.brCode,
+      qrSvg: openGenerated.qrSvg,
+      qrDataUrl: openGenerated.qrDataUrl,
+    });
+
+    // Assert
+    expect(charge.id_chave_conta).toBe("key-email-01");
+    expect(charge.chave_conta).toBeInstanceOf(ChaveConta);
+    expect(charge.valor_opcional).toBeNull();
+    expect(charge.valor_dinamico).toBe(true);
+    expect(charge.txid).toBe("***");
+    expect(charge.info_adicional).toBeNull();
+    expect(charge.chave_cobranca).toBe(openGenerated.brCode);
+    expect(charge.imagem_qrcode).toEqual({
+      svg: openGenerated.qrSvg,
+      dataUrl: openGenerated.qrDataUrl,
+      gifBytes: null,
+    });
+    expect(Number.isNaN(Date.parse(charge.gerado_em))).toBe(false);
+  });
+
+  it("should fallback to current ISO timestamp when gerado_em is invalid or empty, and support round-trip JSON serialization", () => {
+    // Arrange & Act
+    const charge = new CobrancaPix({
+      chave_conta: samplePixKey,
+      transactionAmount: 15,
+      infoAdicional: "Teste",
+      chave_cobranca: sampleGenerated.brCode,
+      imagemQrCode: {
+        svg: sampleGenerated.qrSvg,
+        dataUrl: sampleGenerated.qrDataUrl,
+        gifBytes: sampleGenerated.qrGifBytes,
+      },
+      gerado_em: "invalid-timestamp",
+    });
+
+    const json = charge.toJSON();
+    const rehydrated = CobrancaPix.fromJSON(json);
+
+    // Assert
+    expect(Number.isNaN(Date.parse(charge.gerado_em))).toBe(false);
+    expect(rehydrated).toBeInstanceOf(CobrancaPix);
+    expect(rehydrated.toJSON()).toEqual(json);
+    expect(rehydrated).not.toBe(charge);
+  });
+
+  it.each([[undefined], [null], [""], [123], [true]])(
+    "should throw PixChargeValidationError (MISSING_PIX_KEY) when chave_conta is %p (RN02)",
+    (missingKey) => {
+      expect(
+        () =>
+          new CobrancaPix({
+            chave_conta: missingKey,
+            chave_cobranca: sampleGenerated.brCode,
+            imagem_qrcode: {
+              svg: sampleGenerated.qrSvg,
+              dataUrl: sampleGenerated.qrDataUrl,
+            },
+          }),
+      ).toThrowError(
+        expect.objectContaining({
+          name: "PixChargeValidationError",
+          code: PIX_CHARGE_ERROR_CODES.MISSING_PIX_KEY,
+          field: "chave_conta",
+        }),
+      );
+    },
+  );
+
+  it("should throw PixChargeValidationError (INVALID_PIX_KEY) when plain chave_conta object fails ChaveConta validation", () => {
+    expect(() =>
+      CobrancaPix.create({
+        chave_conta: {
+          tipo_chave: "CPF",
+          valor_chave: "000.000.000-00",
+          nome_recebedor: "Fulano",
+          cidade_recebedor: "Brasilia",
+        },
+        chave_cobranca: sampleGenerated.brCode,
+        imagem_qrcode: {
+          svg: sampleGenerated.qrSvg,
+          dataUrl: sampleGenerated.qrDataUrl,
+        },
+      }),
+    ).toThrowError(
+      expect.objectContaining({
+        name: "PixChargeValidationError",
+        code: PIX_CHARGE_ERROR_CODES.INVALID_PIX_KEY,
+        field: "chave_conta",
+      }),
+    );
+  });
+
+  it.each([
+    [undefined],
+    [null],
+    [""],
+    ["   "],
+    ["INVALID_BR_CODE"],
+    ["00020126350014br.gov.bcb.pix6304ZZZZ"],
+    [12345],
+  ])(
+    "should throw PixChargeValidationError (INVALID_BR_CODE) when chave_cobranca is %p (RN04)",
+    (invalidBrCode) => {
+      expect(() =>
+        CobrancaPix.create({
+          chave_conta: samplePixKey,
+          chave_cobranca: invalidBrCode,
+          imagem_qrcode: {
+            svg: sampleGenerated.qrSvg,
+            dataUrl: sampleGenerated.qrDataUrl,
+          },
+        }),
+      ).toThrowError(
+        expect.objectContaining({
+          name: "PixChargeValidationError",
+          code: PIX_CHARGE_ERROR_CODES.INVALID_BR_CODE,
+          field: "chave_cobranca",
+        }),
+      );
+    },
+  );
+
+  it.each([
+    [undefined],
+    [null],
+    ["not-an-object"],
+    [{}],
+    [{ svg: "", dataUrl: sampleGenerated.qrDataUrl }],
+    [{ svg: "<div>not svg</div>", dataUrl: sampleGenerated.qrDataUrl }],
+    [{ svg: sampleGenerated.qrSvg, dataUrl: "" }],
+    [{ svg: sampleGenerated.qrSvg, dataUrl: "https://example.com/qr.png" }],
+    [
+      {
+        svg: sampleGenerated.qrSvg,
+        dataUrl: sampleGenerated.qrDataUrl,
+        gifBytes: "invalid-bytes",
+      },
+    ],
+  ])(
+    "should throw PixChargeValidationError (INVALID_QR_CODE) when imagem_qrcode is %p (RN04)",
+    (invalidQrCode) => {
+      expect(() =>
+        CobrancaPix.create({
+          chave_conta: samplePixKey,
+          chave_cobranca: sampleGenerated.brCode,
+          imagem_qrcode: invalidQrCode,
+        }),
+      ).toThrowError(
+        expect.objectContaining({
+          name: "PixChargeValidationError",
+          code: PIX_CHARGE_ERROR_CODES.INVALID_QR_CODE,
+          field: "imagem_qrcode",
+        }),
+      );
+    },
+  );
+
+  it("should handle undefined/non-object props by throwing MISSING_PIX_KEY", () => {
+    expect(() => new CobrancaPix()).toThrowError(
+      expect.objectContaining({
+        code: PIX_CHARGE_ERROR_CODES.MISSING_PIX_KEY,
+        field: "chave_conta",
+      }),
+    );
+    expect(() => new CobrancaPix(null)).toThrowError(
+      expect.objectContaining({
+        code: PIX_CHARGE_ERROR_CODES.MISSING_PIX_KEY,
+        field: "chave_conta",
+      }),
     );
   });
 });
