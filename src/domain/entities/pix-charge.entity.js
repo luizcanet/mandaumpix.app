@@ -186,7 +186,7 @@ export function normalizeAdditionalInfo(rawInfo) {
   return normalized;
 }
 
-function resolveChaveConta(rawPixKey) {
+export function resolveChaveConta(rawPixKey) {
   if (!rawPixKey || typeof rawPixKey !== "object") {
     throw new PixChargeValidationError(
       "Selecione uma chave PIX válida para gerar a cobrança.",
