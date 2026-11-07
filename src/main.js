@@ -113,6 +113,12 @@ import {
   createPwaInstallAdapter,
   detectStandaloneMode,
 } from "./infrastructure/pwa/pwa-install.adapter.js";
+import {
+  BROWSER_SHARE_ADAPTER_ERROR_CODES,
+  BrowserShareAdapter,
+  BrowserShareAdapterError,
+  createBrowserShareAdapter,
+} from "./infrastructure/share/browser-share.adapter.js";
 
 export const APP_METADATA = Object.freeze({
   name: "Manda um PIX",
@@ -198,6 +204,9 @@ if (typeof document !== "undefined") {
 export {
   AccessController,
   ArrayHandler,
+  BROWSER_SHARE_ADAPTER_ERROR_CODES,
+  BrowserShareAdapter,
+  BrowserShareAdapterError,
   ChaveConta,
   CobrancaPix,
   CustomElement,
@@ -254,6 +263,7 @@ export {
   assertPixKeyRepository,
   assertPwaInstallGateway,
   buildWhatsAppShareUrl,
+  createBrowserShareAdapter,
   createIndexedDbPixKeyRepository,
   createPwaInstallAdapter,
   createStaticPix,
