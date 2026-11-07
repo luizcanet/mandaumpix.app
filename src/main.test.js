@@ -2,6 +2,9 @@ import { describe, expect, it, vi } from "vitest";
 import {
   APP_METADATA,
   AccessController,
+  BROWSER_SHARE_ADAPTER_ERROR_CODES,
+  BrowserShareAdapter,
+  BrowserShareAdapterError,
   ChaveConta,
   CobrancaPix,
   CustomElement,
@@ -57,6 +60,7 @@ import {
   assertPwaInstallGateway,
   bootstrapApp,
   buildWhatsAppShareUrl,
+  createBrowserShareAdapter,
   createIndexedDbPixKeyRepository,
   createPwaInstallAdapter,
   detectStandaloneMode,
@@ -593,6 +597,112 @@ describe("main.js", () => {
       expect(installResult.shouldShowInstallButton).toBe(false);
 
       adapter.destroy();
+    });
+  });
+
+  describe("infrastructure exports & BrowserShareAdapter integration (US-03.3)", () => {
+    const SAMPLE_BR_CODE =
+      "00020126350014br.gov.bcb.pix0113eu@luizca.net5204000053039865802BR5925LUIZ HENRIQUE CANET FILHO6008BRASILIA62070503***63043C63";
+
+    it("should re-export BrowserShareAdapter, factory, constants, and error class", () => {
+      expect(BrowserShareAdapter).toBeDefined();
+      expect(createBrowserShareAdapter).toBeTypeOf("function");
+      expect(BROWSER_SHARE_ADAPTER_ERROR_CODES).toBeDefined();
+      expect(BROWSER_SHARE_ADAPTER_ERROR_CODES.CLIPBOARD_UNAVAILABLE).toBe(
+        "CLIPBOARD_UNAVAILABLE",
+      );
+      expect(BrowserShareAdapterError).toBeDefined();
+    });
+
+    it("should integrate createBrowserShareAdapter with DistributePixChargeUseCase for COPY, SHARE and DOWNLOAD_QR", async () => {
+      const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+      const openSpy = vi.fn().mockReturnValue({ closed: false });
+      const fakeBlob = new Blob(["fake-png"], { type: "image/png" });
+      const exportQrCodePngSpy = vi.fn().mockResolvedValue(fakeBlob);
+      const revokedUrls = [];
+
+      const windowTarget = {
+        open: openSpy,
+        URL: {
+          createObjectURL: vi.fn(() => "blob:http://localhost/test-uuid"),
+          revokeObjectURL: vi.fn((url) => revokedUrls.push(url)),
+        },
+      };
+
+      const navigatorTarget = {
+        clipboard: {
+          writeText: writeTextSpy,
+        },
+        share: vi.fn().mockResolvedValue(undefined),
+        canShare: vi.fn().mockReturnValue(false), // triggers WhatsApp fallback
+      };
+
+      const documentTarget = {
+        body: {
+          appendChild: vi.fn(),
+          removeChild: vi.fn(),
+        },
+        createElement: vi.fn(() => ({
+          tagName: "A",
+          style: {},
+          click: vi.fn(),
+        })),
+      };
+
+      const adapter = createBrowserShareAdapter({
+        windowTarget,
+        navigatorTarget,
+        documentTarget,
+        exportQrCodePngFn: exportQrCodePngSpy,
+      });
+
+      // 1. COPY action
+      const copyResult = await executeDistributePixCharge(
+        {
+          action: PIX_CHARGE_DISTRIBUTION_ACTIONS.COPY,
+          chave_cobranca: SAMPLE_BR_CODE,
+        },
+        { chargeDistributionGateway: adapter },
+      );
+      expect(copyResult.copied).toBe(true);
+      expect(writeTextSpy).toHaveBeenCalledWith(SAMPLE_BR_CODE);
+
+      // 2. SHARE action (WhatsApp fallback)
+      const shareResult = await executeDistributePixCharge(
+        {
+          action: PIX_CHARGE_DISTRIBUTION_ACTIONS.SHARE,
+          chave_cobranca: SAMPLE_BR_CODE,
+        },
+        { chargeDistributionGateway: adapter },
+      );
+      expect(shareResult.shared).toBe(true);
+      expect(shareResult.channel).toBe(
+        PIX_CHARGE_DISTRIBUTION_CHANNELS.WHATSAPP,
+      );
+      expect(openSpy).toHaveBeenCalledWith(
+        `https://wa.me/?text=${encodeURIComponent(SAMPLE_BR_CODE)}`,
+        "_blank",
+        "noopener,noreferrer",
+      );
+
+      // 3. DOWNLOAD_QR action
+      const downloadResult = await executeDistributePixCharge(
+        {
+          action: PIX_CHARGE_DISTRIBUTION_ACTIONS.DOWNLOAD_QR,
+          chave_cobranca: SAMPLE_BR_CODE,
+          fileName: "meu-qr.png",
+          width: 512,
+          height: 512,
+        },
+        { chargeDistributionGateway: adapter },
+      );
+      expect(downloadResult.downloaded).toBe(true);
+      expect(downloadResult.fileName).toBe("meu-qr.png");
+      expect(exportQrCodePngSpy).toHaveBeenCalledWith(SAMPLE_BR_CODE, {
+        width: 512,
+        height: 512,
+      });
+      expect(revokedUrls).toContain("blob:http://localhost/test-uuid");
     });
   });
 });
