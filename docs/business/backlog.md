@@ -8,15 +8,15 @@ Este documento consolida o **Backlog do Produto e de Engenharia** do **Manda um 
 
 ## 📊 Visão Executiva e Progresso por Épico
 
-| ID        | Épico                                                                      | Regras / Escopo                                     | Progresso Atual | Status       |
-| :-------- | :------------------------------------------------------------------------- | :-------------------------------------------------- | :-------------: | :----------- |
-| **EP-01** | Fundação, Ferramental, Identidade Visual e CI/CD (`dev`)                   | Infraestrutura base, ESM/JSPM, Qualidade, Storybook |     `6 / 6`     | ✅ Concluído |
-| **EP-02** | Camada de Domínio e Casos de Uso (Clean Architecture)                      | `RN01`, `RN02`, `RN03`, `RN04`, `RN05`, `RN06`      |     `5 / 5`     | ✅ Concluído |
-| **EP-03** | Camada de Infraestrutura e Adaptadores Web APIs (Local-First)              | `RN01`, `RN05`, `RN06`, Offline/Service Worker      |     `0 / 4`     | ⏳ Pendente  |
-| **EP-04** | Casca da Aplicação, Roteamento SPA, Botão "Instalar" e Página "Sobre"      | `RN06`, `RN07`, `@modnes/router`, Layout Split-View |     `0 / 4`     | ⏳ Pendente  |
-| **EP-05** | Gestão de Chaves PIX na Interface (`<pix-key-*>`)                          | `RN01`, `RN02`, `<dialog class="key-dialog">`       |     `0 / 3`     | ⏳ Pendente  |
-| **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")              | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas    |     `0 / 3`     | ⏳ Pendente  |
-| **EP-07** | Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA) e Deploy `stg`/`prd` | Testes de Integração, Storybook a11y, Releases      |     `0 / 3`     | ⏳ Pendente  |
+| ID        | Épico                                                                      | Regras / Escopo                                     | Progresso Atual | Status          |
+| :-------- | :------------------------------------------------------------------------- | :-------------------------------------------------- | :-------------: | :-------------- |
+| **EP-01** | Fundação, Ferramental, Identidade Visual e CI/CD (`dev`)                   | Infraestrutura base, ESM/JSPM, Qualidade, Storybook |     `6 / 6`     | ✅ Concluído    |
+| **EP-02** | Camada de Domínio e Casos de Uso (Clean Architecture)                      | `RN01`, `RN02`, `RN03`, `RN04`, `RN05`, `RN06`      |     `5 / 5`     | ✅ Concluído    |
+| **EP-03** | Camada de Infraestrutura e Adaptadores Web APIs (Local-First)              | `RN01`, `RN05`, `RN06`, Offline/Service Worker      |     `1 / 4`     | 🔄 Em Progresso |
+| **EP-04** | Casca da Aplicação, Roteamento SPA, Botão "Instalar" e Página "Sobre"      | `RN06`, `RN07`, `@modnes/router`, Layout Split-View |     `0 / 4`     | ⏳ Pendente     |
+| **EP-05** | Gestão de Chaves PIX na Interface (`<pix-key-*>`)                          | `RN01`, `RN02`, `<dialog class="key-dialog">`       |     `0 / 3`     | ⏳ Pendente     |
+| **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")              | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas    |     `0 / 3`     | ⏳ Pendente     |
+| **EP-07** | Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA) e Deploy `stg`/`prd` | Testes de Integração, Storybook a11y, Releases      |     `0 / 3`     | ⏳ Pendente     |
 
 ---
 
@@ -176,7 +176,7 @@ flowchart TD
 
 > **Objetivo**: Implementar os adaptadores concretos de infraestrutura do navegador (IndexedDB, Clipboard, Web Share / WhatsApp, Download PNG, Instalação PWA e Service Worker), mantendo 100% dos dados do usuário locais no dispositivo.
 
-#### `US-03.1` — Repositório Local de Dados do Usuário no IndexedDB (`IndexedDbPixKeyRepository`) (`⏳ Pendente` · `3 Story Points`)
+#### `US-03.1` — Repositório Local de Dados do Usuário no IndexedDB (`IndexedDbPixKeyRepository`) (`✅ Concluído` · `3 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Recebedor** que utiliza o Manda um PIX no meu dispositivo,
@@ -198,7 +198,7 @@ flowchart TD
   - [x] **TASK-03.1.1 (TDD / Erros, Constantes & Gerenciador de Conexão IndexedDB)**: Definir `DEFAULT_DB_NAME` (`"mandaumpix_db"`), `DEFAULT_DB_VERSION` (`1`), `OBJECT_STORES` (`pix_keys`, `user_settings`), `PIX_KEY_INDEXES` (`by_tipo_chave`, `by_criado_em`), `SELECTED_KEY_SETTING_KEY` (`"selectedKeyId"`), `PIX_KEY_STORAGE_ERROR_CODES`, `PixKeyStorageError` e o helper de abertura/migração `openPixKeyDatabase` (`onupgradeneeded`, `onblocked`, `onerror`) em [`src/infrastructure/storage/indexed-db-pix-key.repository.js`](../../src/infrastructure/storage/indexed-db-pix-key.repository.js) com testes unitários em [`src/infrastructure/storage/indexed-db-pix-key.repository.test.js`](../../src/infrastructure/storage/indexed-db-pix-key.repository.test.js).
   - [x] **TASK-03.1.2 (TDD / Operações Transacionais da Porta `IndexedDbPixKeyRepository`)**: Implementar a classe `IndexedDbPixKeyRepository` (e fábrica `createIndexedDbPixKeyRepository`) em [`src/infrastructure/storage/indexed-db-pix-key.repository.js`](../../src/infrastructure/storage/indexed-db-pix-key.repository.js) com os métodos assíncronos `findAll()`, `findById(id)`, `save(pixKey)`, `deleteById(id)`, `getSelectedKeyId()`, `setSelectedKeyId(id)`, `getSelectedKey()`, `clear()` e `close()`, garantindo hidratação via `ChaveConta` e transações `readonly`/`readwrite`.
   - [x] **TASK-03.1.3 (TDD / Estado Reativo com `@modnes/data-controller` & Suíte de Testes)**: Integrar `DataController` (`DataHandler` / `ArrayHandler`) e método `subscribe(listener)` ao `IndexedDbPixKeyRepository`, e criar a suíte completa de testes unitários e de integração em [`src/infrastructure/storage/indexed-db-pix-key.repository.test.js`](../../src/infrastructure/storage/indexed-db-pix-key.repository.test.js) (`100%` de cobertura nas operações do banco, casos de uso integrados e cenários de erro `QuotaExceededError`, `AbortError`, `onblocked` e ausência de `indexedDB`).
-  - [ ] **TASK-03.1.4 (Integração, Reexportação & Qualidade)**: Reexportar `IndexedDbPixKeyRepository`, `createIndexedDbPixKeyRepository`, constantes e `PixKeyStorageError` em [`src/main.js`](../../src/main.js), adicionar testes de integração com os casos de uso em [`src/main.test.js`](../../src/main.test.js), atualizar [`docs/design/modules.md`](../design/modules.md) e validar `npm run lint`, `npm run format:check` e `npm run test:coverage`.
+  - [x] **TASK-03.1.4 (Integração, Reexportação & Qualidade)**: Reexportar `IndexedDbPixKeyRepository`, `createIndexedDbPixKeyRepository`, constantes e `PixKeyStorageError` em [`src/main.js`](../../src/main.js), adicionar testes de integração com os casos de uso em [`src/main.test.js`](../../src/main.test.js), atualizar [`docs/design/modules.md`](../design/modules.md) e validar `npm run lint`, `npm run format:check` e `npm run test:coverage`.
 
 #### `US-03.2` — Adaptador de Instalação do PWA (`PwaInstallAdapter`) (`⏳ Pendente`)
 
