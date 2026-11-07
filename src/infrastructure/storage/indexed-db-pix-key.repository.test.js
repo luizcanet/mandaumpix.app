@@ -1,17 +1,209 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  ChaveConta,
+  PixKeyValidationError,
+} from "../../domain/entities/pix-key.entity.js";
+import {
   DEFAULT_DB_NAME,
   DEFAULT_DB_VERSION,
+  IndexedDbPixKeyRepository,
   OBJECT_STORES,
   PIX_KEY_INDEXES,
   PIX_KEY_STORAGE_ERROR_CODES,
   PixKeyStorageError,
   SELECTED_KEY_SETTING_KEY,
   assertIndexedDbFactory,
+  createIndexedDbPixKeyRepository,
   mapStorageDomException,
   openPixKeyDatabase,
   upgradePixKeyDatabaseSchema,
 } from "./indexed-db-pix-key.repository.js";
+
+function createInMemoryIndexedDb({ failMode = null } = {}) {
+  const databases = new Map();
+
+  function createObjectStoreState(keyPath) {
+    return {
+      keyPath,
+      records: new Map(),
+      indexes: new Map(),
+    };
+  }
+
+  function createObjectStoreHandle(storeState, txState) {
+    function runRequest(operationFn) {
+      if (failMode === "sync-store-throw") {
+        throw new Error("Store operation synchronous failure");
+      }
+
+      const request = {
+        result: undefined,
+        error: null,
+        onsuccess: null,
+        onerror: null,
+      };
+
+      queueMicrotask(() => {
+        if (failMode === "quota-exceeded") {
+          const quotaError = {
+            name: "QuotaExceededError",
+            message: "Storage quota exceeded",
+          };
+          request.error = quotaError;
+          txState.error = quotaError;
+          request.onerror?.({ target: request });
+          txState.onerror?.({ target: txState });
+          return;
+        }
+
+        if (failMode === "request-error") {
+          const reqError = new Error("IDBRequest execution failed");
+          request.error = reqError;
+          request.onerror?.({ target: request });
+          return;
+        }
+
+        if (failMode === "tx-abort") {
+          const abortError = new Error("Transaction aborted");
+          abortError.name = "AbortError";
+          txState.error = abortError;
+          txState.onabort?.({ target: txState });
+          return;
+        }
+
+        if (failMode === "tx-error-without-request-error") {
+          const txError = new Error("Transaction level failure");
+          txState.error = txError;
+          txState.onerror?.({ target: txState });
+          return;
+        }
+
+        request.result = operationFn();
+        request.onsuccess?.({ target: request });
+        queueMicrotask(() => {
+          txState.oncomplete?.({ target: txState });
+        });
+      });
+
+      return request;
+    }
+
+    return {
+      indexNames: {
+        contains: (name) => storeState.indexes.has(name),
+      },
+      createIndex: vi.fn((name, keyPath, options) => {
+        storeState.indexes.set(name, { name, keyPath, options });
+        return { name, keyPath, options };
+      }),
+      getAll: vi.fn(() =>
+        runRequest(() =>
+          Array.from(storeState.records.values()).map((item) => ({ ...item })),
+        ),
+      ),
+      get: vi.fn((key) =>
+        runRequest(() => {
+          const record = storeState.records.get(key);
+          return record ? { ...record } : undefined;
+        }),
+      ),
+      put: vi.fn((value) =>
+        runRequest(() => {
+          const key = value[storeState.keyPath];
+          storeState.records.set(key, { ...value });
+          return key;
+        }),
+      ),
+      delete: vi.fn((key) =>
+        runRequest(() => {
+          storeState.records.delete(key);
+          return undefined;
+        }),
+      ),
+      clear: vi.fn(() =>
+        runRequest(() => {
+          storeState.records.clear();
+          return undefined;
+        }),
+      ),
+    };
+  }
+
+  return {
+    open: vi.fn((dbName, version) => {
+      const request = {
+        result: null,
+        transaction: null,
+        error: null,
+        onupgradeneeded: null,
+        onsuccess: null,
+        onerror: null,
+        onblocked: null,
+      };
+
+      queueMicrotask(() => {
+        let dbEntry = databases.get(dbName);
+        const isUpgrade = !dbEntry || dbEntry.version < version;
+
+        if (!dbEntry) {
+          const stores = new Map();
+          const db = {
+            name: dbName,
+            version,
+            closed: false,
+            onversionchange: null,
+            objectStoreNames: {
+              contains: (name) => stores.has(name),
+            },
+            createObjectStore: vi.fn((name, options = { keyPath: "id" }) => {
+              const storeState = createObjectStoreState(options.keyPath);
+              stores.set(name, storeState);
+              return createObjectStoreHandle(storeState, {});
+            }),
+            transaction: vi.fn((storeNames, mode = "readonly") => {
+              if (failMode === "sync-tx-throw") {
+                throw new Error("Transaction creation failed");
+              }
+
+              const txState = {
+                mode,
+                error: null,
+                oncomplete: null,
+                onerror: null,
+                onabort: null,
+                objectStore: vi.fn((name) => {
+                  const storeState = stores.get(name);
+                  return createObjectStoreHandle(storeState, txState);
+                }),
+              };
+              return txState;
+            }),
+            close: vi.fn(() => {
+              db.closed = true;
+            }),
+          };
+
+          dbEntry = { db, stores, version };
+          databases.set(dbName, dbEntry);
+        }
+
+        request.result = dbEntry.db;
+        request.transaction = {
+          objectStore: (name) =>
+            createObjectStoreHandle(dbEntry.stores.get(name), {}),
+        };
+
+        if (isUpgrade) {
+          request.onupgradeneeded?.({ target: request });
+        }
+
+        request.onsuccess?.({ target: request });
+      });
+
+      return request;
+    }),
+  };
+}
 
 function createFakeUpgradeDb({
   existingStores = [],
@@ -448,6 +640,296 @@ describe("TASK-03.1.1 — IndexedDB Constants, Errors & Connection Manager", () 
         name: "PixKeyStorageError",
         code: PIX_KEY_STORAGE_ERROR_CODES.DATABASE_OPEN_FAILED,
         message: "Failed to create store",
+      });
+    });
+  });
+
+  describe("TASK-03.1.2 — IndexedDbPixKeyRepository Transactional Operations", () => {
+    it("should create repository via constructor, static create(), and factory createIndexedDbPixKeyRepository()", async () => {
+      const indexedDb = createInMemoryIndexedDb();
+      const repoA = new IndexedDbPixKeyRepository({ indexedDb });
+      const repoB = IndexedDbPixKeyRepository.create({ indexedDb });
+      const repoC = createIndexedDbPixKeyRepository({ indexedDb });
+
+      expect(repoA).toBeInstanceOf(IndexedDbPixKeyRepository);
+      expect(repoB).toBeInstanceOf(IndexedDbPixKeyRepository);
+      expect(repoC).toBeInstanceOf(IndexedDbPixKeyRepository);
+
+      const emptyList = await repoA.findAll();
+      expect(emptyList).toEqual([]);
+      expect(Object.isFrozen(emptyList)).toBe(true);
+
+      const nonArrayGetAllIndexedDb = {
+        open: vi.fn(() => {
+          const request = {};
+          queueMicrotask(() => {
+            request.result = {
+              transaction: () => ({
+                objectStore: () => ({
+                  getAll: () => {
+                    const getAllReq = { result: null };
+                    queueMicrotask(() => getAllReq.onsuccess?.());
+                    return getAllReq;
+                  },
+                }),
+              }),
+            };
+            request.onsuccess?.();
+          });
+          return request;
+        }),
+      };
+
+      const nonArrayRepo = createIndexedDbPixKeyRepository({
+        indexedDb: nonArrayGetAllIndexedDb,
+      });
+      await expect(nonArrayRepo.findAll()).resolves.toEqual([]);
+    });
+
+    it("should save, findById, findAll (sorted by criado_em and id), and deleteById ChaveConta records", async () => {
+      const indexedDb = createInMemoryIndexedDb();
+      const repository = createIndexedDbPixKeyRepository({ indexedDb });
+
+      const keyLater = ChaveConta.create({
+        id: "key-b",
+        rotulo: "Conta Secundária",
+        tipo_chave: "EMAIL",
+        valor_chave: "secundaria@mandaumpix.app",
+        nome_recebedor: "Maria Souza",
+        cidade_recebedor: "Sao Paulo",
+        criado_em: "2026-11-07T12:00:00.000Z",
+      });
+
+      const keyEarlierB = {
+        id: "key-a-2",
+        rotulo: "Conta Principal B",
+        tipo_chave: "CPF",
+        valor_chave: "12345678909",
+        nome_recebedor: "Maria Souza",
+        cidade_recebedor: "Sao Paulo",
+        criado_em: "2026-11-07T10:00:00.000Z",
+      };
+
+      const keyEarlierA = ChaveConta.create({
+        id: "key-a-1",
+        rotulo: "Conta Principal A",
+        tipo_chave: "CNPJ",
+        valor_chave: "11222333000181",
+        nome_recebedor: "Maria Souza",
+        cidade_recebedor: "Sao Paulo",
+        criado_em: "2026-11-07T10:00:00.000Z",
+      });
+
+      const savedLater = await repository.save(keyLater);
+      const savedEarlierB = await repository.save(keyEarlierB);
+      const savedEarlierA = await repository.save(keyEarlierA);
+
+      expect(savedLater).toBeInstanceOf(ChaveConta);
+      expect(savedEarlierB).toBeInstanceOf(ChaveConta);
+      expect(savedEarlierA).toBeInstanceOf(ChaveConta);
+
+      const allKeys = await repository.findAll();
+      expect(allKeys.map((item) => item.id)).toEqual([
+        "key-a-1",
+        "key-a-2",
+        "key-b",
+      ]);
+      expect(Object.isFrozen(allKeys)).toBe(true);
+
+      const foundById = await repository.findById("  key-a-2  ");
+      expect(foundById).toBeInstanceOf(ChaveConta);
+      expect(foundById.valor_chave).toBe("12345678909");
+
+      expect(await repository.findById("non-existent")).toBeNull();
+      expect(await repository.findById("")).toBeNull();
+      expect(await repository.findById(null)).toBeNull();
+
+      expect(await repository.deleteById("")).toBe(false);
+      expect(await repository.deleteById(null)).toBe(false);
+
+      const deleted = await repository.deleteById("key-a-2");
+      expect(deleted).toBe(true);
+      expect(await repository.findById("key-a-2")).toBeNull();
+
+      const remaining = await repository.findAll();
+      expect(remaining.map((item) => item.id)).toEqual(["key-a-1", "key-b"]);
+    });
+
+    it("should reject save() with PixKeyValidationError when input is an invalid ChaveConta", async () => {
+      const indexedDb = createInMemoryIndexedDb();
+      const repository = createIndexedDbPixKeyRepository({ indexedDb });
+
+      await expect(
+        repository.save({
+          tipo_chave: "CPF",
+          valor_chave: "111.111.111-11",
+          nome_recebedor: "Titular",
+          cidade_recebedor: "Brasilia",
+        }),
+      ).rejects.toThrowError(PixKeyValidationError);
+    });
+
+    it("should persist and retrieve selectedKeyId and resolve getSelectedKey()", async () => {
+      const indexedDb = createInMemoryIndexedDb();
+      const repository = createIndexedDbPixKeyRepository({ indexedDb });
+
+      expect(await repository.getSelectedKeyId()).toBeNull();
+      expect(await repository.getSelectedKey()).toBeNull();
+
+      const key = await repository.save({
+        id: "key-selected",
+        tipo_chave: "EMAIL",
+        valor_chave: "ativa@mandaumpix.app",
+        nome_recebedor: "Luiz Canet",
+        cidade_recebedor: "Brasilia",
+      });
+
+      const persistedId = await repository.setSelectedKeyId("  key-selected  ");
+      expect(persistedId).toBe("key-selected");
+      expect(await repository.getSelectedKeyId()).toBe("key-selected");
+
+      const selectedEntity = await repository.getSelectedKey();
+      expect(selectedEntity).toBeInstanceOf(ChaveConta);
+      expect(selectedEntity.id).toBe(key.id);
+
+      const clearedId = await repository.setSelectedKeyId("   ");
+      expect(clearedId).toBeNull();
+      expect(await repository.getSelectedKeyId()).toBeNull();
+      expect(await repository.getSelectedKey()).toBeNull();
+
+      await repository.setSelectedKeyId("orphan-id");
+      expect(await repository.getSelectedKeyId()).toBe("orphan-id");
+      expect(await repository.getSelectedKey()).toBeNull();
+
+      await repository.setSelectedKeyId(null);
+      expect(await repository.getSelectedKeyId()).toBeNull();
+    });
+
+    it("should clear all stores via clear() and manage connection cache across close() and versionchange", async () => {
+      const indexedDb = createInMemoryIndexedDb();
+      const repository = createIndexedDbPixKeyRepository({ indexedDb });
+
+      await repository.save({
+        id: "key-1",
+        tipo_chave: "EMAIL",
+        valor_chave: "teste@mandaumpix.app",
+        nome_recebedor: "Luiz Canet",
+        cidade_recebedor: "Brasilia",
+      });
+      await repository.setSelectedKeyId("key-1");
+
+      expect(indexedDb.open).toHaveBeenCalledTimes(1);
+
+      await repository.clear();
+      expect(await repository.findAll()).toEqual([]);
+      expect(await repository.getSelectedKeyId()).toBeNull();
+
+      repository.close();
+      expect(() => repository.close()).not.toThrow();
+
+      await repository.findAll();
+      expect(indexedDb.open).toHaveBeenCalledTimes(2);
+
+      const activeDb = await repository.getDatabase();
+      activeDb.onversionchange();
+
+      await repository.findAll();
+      expect(indexedDb.open).toHaveBeenCalledTimes(3);
+    });
+
+    it("should reset cached database promise when openPixKeyDatabase fails so subsequent calls can retry", async () => {
+      let shouldFailOpen = true;
+      const baseIndexedDb = createInMemoryIndexedDb();
+      const flakyIndexedDb = {
+        open: vi.fn((dbName, version) => {
+          if (shouldFailOpen) {
+            throw new Error("Temporary open failure");
+          }
+          return baseIndexedDb.open(dbName, version);
+        }),
+      };
+
+      const repository = createIndexedDbPixKeyRepository({
+        indexedDb: flakyIndexedDb,
+      });
+
+      await expect(repository.findAll()).rejects.toMatchObject({
+        code: PIX_KEY_STORAGE_ERROR_CODES.DATABASE_OPEN_FAILED,
+      });
+
+      shouldFailOpen = false;
+      await expect(repository.findAll()).resolves.toEqual([]);
+    });
+
+    it("should map QuotaExceededError, AbortError, request errors, and sync throws into PixKeyStorageError", async () => {
+      const quotaRepo = createIndexedDbPixKeyRepository({
+        indexedDb: createInMemoryIndexedDb({ failMode: "quota-exceeded" }),
+      });
+
+      await expect(
+        quotaRepo.save({
+          tipo_chave: "EMAIL",
+          valor_chave: "quota@mandaumpix.app",
+          nome_recebedor: "Luiz Canet",
+          cidade_recebedor: "Brasilia",
+        }),
+      ).rejects.toMatchObject({
+        name: "PixKeyStorageError",
+        code: PIX_KEY_STORAGE_ERROR_CODES.QUOTA_EXCEEDED,
+      });
+
+      const abortRepo = createIndexedDbPixKeyRepository({
+        indexedDb: createInMemoryIndexedDb({ failMode: "tx-abort" }),
+      });
+
+      await expect(abortRepo.findAll()).rejects.toMatchObject({
+        name: "PixKeyStorageError",
+        code: PIX_KEY_STORAGE_ERROR_CODES.TRANSACTION_FAILED,
+        message: "Transaction aborted",
+      });
+
+      const reqErrorRepo = createIndexedDbPixKeyRepository({
+        indexedDb: createInMemoryIndexedDb({ failMode: "request-error" }),
+      });
+
+      await expect(reqErrorRepo.getSelectedKeyId()).rejects.toMatchObject({
+        name: "PixKeyStorageError",
+        code: PIX_KEY_STORAGE_ERROR_CODES.TRANSACTION_FAILED,
+        message: "IDBRequest execution failed",
+      });
+
+      const txErrorRepo = createIndexedDbPixKeyRepository({
+        indexedDb: createInMemoryIndexedDb({
+          failMode: "tx-error-without-request-error",
+        }),
+      });
+
+      await expect(txErrorRepo.setSelectedKeyId("id-1")).rejects.toMatchObject({
+        name: "PixKeyStorageError",
+        code: PIX_KEY_STORAGE_ERROR_CODES.TRANSACTION_FAILED,
+        message: "Transaction level failure",
+      });
+
+      const syncStoreThrowRepo = createIndexedDbPixKeyRepository({
+        indexedDb: createInMemoryIndexedDb({ failMode: "sync-store-throw" }),
+      });
+
+      await expect(syncStoreThrowRepo.deleteById("id-1")).rejects.toMatchObject(
+        {
+          name: "PixKeyStorageError",
+          code: PIX_KEY_STORAGE_ERROR_CODES.TRANSACTION_FAILED,
+          message: "Store operation synchronous failure",
+        },
+      );
+
+      const syncTxThrowRepo = createIndexedDbPixKeyRepository({
+        indexedDb: createInMemoryIndexedDb({ failMode: "sync-tx-throw" }),
+      });
+
+      await expect(syncTxThrowRepo.clear()).rejects.toMatchObject({
+        name: "PixKeyStorageError",
+        code: PIX_KEY_STORAGE_ERROR_CODES.TRANSACTION_FAILED,
+        message: "Transaction creation failed",
       });
     });
   });

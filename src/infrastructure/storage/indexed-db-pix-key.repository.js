@@ -1,3 +1,5 @@
+import { ChaveConta } from "../../domain/entities/pix-key.entity.js";
+
 export const DEFAULT_DB_NAME = "mandaumpix_db";
 export const DEFAULT_DB_VERSION = 1;
 export const SELECTED_KEY_SETTING_KEY = "selectedKeyId";
@@ -206,4 +208,300 @@ export function openPixKeyDatabase({
       );
     };
   });
+}
+
+function normalizeOptionalKeyId(id) {
+  if (typeof id !== "string") {
+    return null;
+  }
+
+  const trimmed = id.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function compareChaveContaOrder(left, right) {
+  const dateComparison = left.criado_em.localeCompare(right.criado_em);
+  if (dateComparison !== 0) {
+    return dateComparison;
+  }
+
+  return left.id.localeCompare(right.id);
+}
+
+function runStoreOperation(
+  database,
+  { storeName, mode, fallbackMessage },
+  operationFn,
+) {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let requestResult;
+    let requestSucceeded = false;
+
+    const failWith = (rawError) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      reject(
+        mapStorageDomException(rawError, {
+          fallbackCode: PIX_KEY_STORAGE_ERROR_CODES.TRANSACTION_FAILED,
+          fallbackMessage,
+          field: Array.isArray(storeName) ? storeName.join(",") : storeName,
+        }),
+      );
+    };
+
+    let transaction;
+    try {
+      transaction = database.transaction(storeName, mode);
+    } catch (error) {
+      failWith(error);
+      return;
+    }
+
+    transaction.oncomplete = () => {
+      if (!settled && requestSucceeded) {
+        settled = true;
+        resolve(requestResult);
+      }
+    };
+
+    transaction.onerror = () => {
+      failWith(transaction.error);
+    };
+
+    transaction.onabort = () => {
+      failWith(transaction.error);
+    };
+
+    let request;
+    try {
+      request = operationFn(transaction);
+    } catch (error) {
+      failWith(error);
+      return;
+    }
+
+    request.onsuccess = () => {
+      requestResult = request.result;
+      requestSucceeded = true;
+      if (mode === "readonly" && !settled) {
+        settled = true;
+        resolve(requestResult);
+      }
+    };
+
+    request.onerror = () => {
+      failWith(request.error);
+    };
+  });
+}
+
+export class IndexedDbPixKeyRepository extends EventTarget {
+  constructor({
+    indexedDb = globalThis.indexedDB,
+    dbName = DEFAULT_DB_NAME,
+    version = DEFAULT_DB_VERSION,
+  } = {}) {
+    super();
+    this.indexedDb = indexedDb;
+    this.dbName = dbName;
+    this.version = version;
+    this.databasePromise = null;
+    this.activeDatabase = null;
+  }
+
+  static create(options) {
+    return new IndexedDbPixKeyRepository(options);
+  }
+
+  getDatabase() {
+    if (!this.databasePromise) {
+      this.databasePromise = openPixKeyDatabase({
+        indexedDb: this.indexedDb,
+        dbName: this.dbName,
+        version: this.version,
+        onVersionChange: () => {
+          this.activeDatabase = null;
+          this.databasePromise = null;
+        },
+      })
+        .then((database) => {
+          this.activeDatabase = database;
+          return database;
+        })
+        .catch((error) => {
+          this.activeDatabase = null;
+          this.databasePromise = null;
+          throw error;
+        });
+    }
+
+    return this.databasePromise;
+  }
+
+  close() {
+    if (
+      this.activeDatabase &&
+      typeof this.activeDatabase.close === "function"
+    ) {
+      this.activeDatabase.close();
+    }
+    this.activeDatabase = null;
+    this.databasePromise = null;
+  }
+
+  async findAll() {
+    const database = await this.getDatabase();
+    const rawRecords = await runStoreOperation(
+      database,
+      {
+        storeName: OBJECT_STORES.PIX_KEYS,
+        mode: "readonly",
+        fallbackMessage: "Falha ao listar as chaves PIX armazenadas.",
+      },
+      (transaction) => transaction.objectStore(OBJECT_STORES.PIX_KEYS).getAll(),
+    );
+
+    const hydrated = Array.isArray(rawRecords)
+      ? rawRecords
+          .map((record) => ChaveConta.fromJSON(record))
+          .sort(compareChaveContaOrder)
+      : [];
+
+    return Object.freeze(hydrated);
+  }
+
+  async findById(id) {
+    const normalizedId = normalizeOptionalKeyId(id);
+    if (!normalizedId) {
+      return null;
+    }
+
+    const database = await this.getDatabase();
+    const record = await runStoreOperation(
+      database,
+      {
+        storeName: OBJECT_STORES.PIX_KEYS,
+        mode: "readonly",
+        fallbackMessage: "Falha ao consultar a chave PIX no banco local.",
+      },
+      (transaction) =>
+        transaction.objectStore(OBJECT_STORES.PIX_KEYS).get(normalizedId),
+    );
+
+    return record ? ChaveConta.fromJSON(record) : null;
+  }
+
+  async save(pixKey) {
+    const chaveConta =
+      pixKey instanceof ChaveConta ? pixKey : ChaveConta.fromJSON(pixKey);
+    const database = await this.getDatabase();
+
+    await runStoreOperation(
+      database,
+      {
+        storeName: OBJECT_STORES.PIX_KEYS,
+        mode: "readwrite",
+        fallbackMessage: "Falha ao salvar a chave PIX no banco local.",
+      },
+      (transaction) =>
+        transaction
+          .objectStore(OBJECT_STORES.PIX_KEYS)
+          .put(chaveConta.toJSON()),
+    );
+
+    return chaveConta;
+  }
+
+  async deleteById(id) {
+    const normalizedId = normalizeOptionalKeyId(id);
+    if (!normalizedId) {
+      return false;
+    }
+
+    const database = await this.getDatabase();
+    await runStoreOperation(
+      database,
+      {
+        storeName: OBJECT_STORES.PIX_KEYS,
+        mode: "readwrite",
+        fallbackMessage: "Falha ao excluir a chave PIX do banco local.",
+      },
+      (transaction) =>
+        transaction.objectStore(OBJECT_STORES.PIX_KEYS).delete(normalizedId),
+    );
+
+    return true;
+  }
+
+  async getSelectedKeyId() {
+    const database = await this.getDatabase();
+    const settingRecord = await runStoreOperation(
+      database,
+      {
+        storeName: OBJECT_STORES.USER_SETTINGS,
+        mode: "readonly",
+        fallbackMessage: "Falha ao ler a chave PIX selecionada.",
+      },
+      (transaction) =>
+        transaction
+          .objectStore(OBJECT_STORES.USER_SETTINGS)
+          .get(SELECTED_KEY_SETTING_KEY),
+    );
+
+    return normalizeOptionalKeyId(settingRecord?.value);
+  }
+
+  async setSelectedKeyId(id) {
+    const normalizedId = normalizeOptionalKeyId(id);
+    const database = await this.getDatabase();
+
+    await runStoreOperation(
+      database,
+      {
+        storeName: OBJECT_STORES.USER_SETTINGS,
+        mode: "readwrite",
+        fallbackMessage: "Falha ao salvar a preferência de chave selecionada.",
+      },
+      (transaction) =>
+        transaction.objectStore(OBJECT_STORES.USER_SETTINGS).put({
+          key: SELECTED_KEY_SETTING_KEY,
+          value: normalizedId,
+          updatedAt: new Date().toISOString(),
+        }),
+    );
+
+    return normalizedId;
+  }
+
+  async getSelectedKey() {
+    const selectedKeyId = await this.getSelectedKeyId();
+    if (!selectedKeyId) {
+      return null;
+    }
+
+    return this.findById(selectedKeyId);
+  }
+
+  async clear() {
+    const database = await this.getDatabase();
+    await runStoreOperation(
+      database,
+      {
+        storeName: [OBJECT_STORES.PIX_KEYS, OBJECT_STORES.USER_SETTINGS],
+        mode: "readwrite",
+        fallbackMessage: "Falha ao limpar os dados locais do banco IndexedDB.",
+      },
+      (transaction) => {
+        transaction.objectStore(OBJECT_STORES.PIX_KEYS).clear();
+        return transaction.objectStore(OBJECT_STORES.USER_SETTINGS).clear();
+      },
+    );
+  }
+}
+
+export function createIndexedDbPixKeyRepository(options) {
+  return new IndexedDbPixKeyRepository(options);
 }
