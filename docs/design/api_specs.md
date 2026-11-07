@@ -61,13 +61,13 @@ Para usuários que ainda não instalaram o aplicativo no dispositivo, a interfac
 
 ---
 
-## 4. Contrato de Navegação e Conteúdo da Página "Sobre" (Autor e Projeto)
+## 4. Contrato de Navegação e Conteúdo da Página "Sobre" (Autor, Projeto, Apoio e Divulgação)
 
-O aplicativo deve oferecer um acesso fácil na interface principal para uma página que fale sobre o aplicativo, contendo informações sobre o **autor** e o **projeto** (alinhado também à seção _Appropriate Legal Notices_ da licença [`LICENSE`](../../LICENSE)):
+O aplicativo deve oferecer um acesso fácil na interface principal para uma página que fale sobre o aplicativo, contendo informações sobre sua natureza livre, o **autor**, o **projeto**, o apoio voluntário e a divulgação (alinhado à regra de negócio [`RN07`](../business/domain_model.md) e à seção _Appropriate Legal Notices_ da licença [`LICENSE`](../../LICENSE)):
 
 - **Gatilho de Acesso**: Link ou botão de fácil acesso presente na navegação/cabeçalho ou rodapé da interface (ex.: rota SPA `/sobre` gerenciada pelo `@modnes/router`).
 - **Conteúdo Obrigatório Exibido**:
-  - **Sobre o Aplicativo**: Explicação do objetivo do **Manda um PIX** (facilitar a geração rápida e gratuita de cobranças via PIX sem precisar abrir aplicativos de banco, com privacidade 100% local).
+  - **Sobre o Aplicativo**: Explicação do objetivo do **Manda um PIX** (facilitar a geração rápida de cobranças via PIX sem precisar abrir aplicativos de banco, com privacidade 100% local), destacando expressamente que o aplicativo é **gratuito, livre e de código aberto**.
   - **Sobre o Projeto**:
     - Nome e domínio: **Manda um PIX** (`mandaumpix.app`) — Versão `1.0.0`.
     - Licença de Software Livre: **GNU Affero General Public License v3.0 (`AGPL-3.0-only`)**.
@@ -76,6 +76,15 @@ O aplicativo deve oferecer um acesso fácil na interface principal para uma pág
     - Nome: **Luiz Henrique Canet Filho**.
     - Contato / E-mail: `me@luizca.net`.
     - Perfil GitHub: [`@luizcanet`](https://github.com/luizcanet).
+  - **Contribuição Voluntária ("Manda um PIX")**:
+    - **Mensagem Descontraída com Emojis**: Texto leve e amigável com emojis explicando que o aplicativo é gratuito, livre e de código aberto, mas que se o usuário achar que o aplicativo é útil para ele e para outras pessoas, pode contribuir para ajudar a manter o projeto com **qualquer valor**, utilizando em destaque a frase **"Manda um PIX"**.
+    - **QR Code com Valor Dinâmico e Chave Copia e Cola (`eu@luizca.net`)**:
+      - Chave PIX de destino: **`eu@luizca.net`**.
+      - Modalidade: **Valor dinâmico / em aberto** (`transactionAmount = 0`, sem tag EMV `54`, permitindo que o apoiador defina livremente qualquer valor no aplicativo de seu banco).
+      - Payload BR Code (Chave Copia e Cola EMV®): `00020126350014br.gov.bcb.pix0113eu@luizca.net5204000053039865802BR5925LUIZ HENRIQUE CANET FILHO6008BRASILIA62070503***63043C63` (gerado deterministicamente por [`generatePixCharge`](../../src/main.js)).
+      - Ação de cópia rápida da Chave copia e cola via `navigator.clipboard.writeText(brCode)`.
+  - **Incentivo à Divulgação**:
+    - Mensagem incentivando o usuário a divulgar e indicar o aplicativo (`https://mandaumpix.app`) para mais pessoas (amigos, colegas, prestadores de serviço e comerciantes), acompanhada de botão de compartilhamento (`navigator.share` ou fallback para WhatsApp / cópia do link).
 
 ---
 

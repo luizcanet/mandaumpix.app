@@ -35,13 +35,13 @@ flowchart TD
         UC1["Gerenciar Chaves de Contas"]
         UC2["Gerar Cobrança ('Manda um PIX')"]
         UC3["Distribuir Cobrança (Copiar, Compartilhar, Salvar)"]
-        UC4["Consultar Página Sobre (Autor e Projeto)"]
+        UC4["Consultar Página Sobre (Autor, Projeto, Apoio 'Manda um PIX' e Divulgação)"]
     end
 
     subgraph Domain["Camada de Domínio"]
         EntKey["Chave de Conta PIX"]
         EntCharge["Cobrança PIX & Payload BR Code"]
-        EntAbout["Metadados Institucionais (Autor e Projeto)"]
+        EntAbout["Metadados Institucionais e de Apoio (Autor, Projeto e eu@luizca.net)"]
     end
 
     subgraph Infra["Camada de Infraestrutura (Browser Web APIs)"]

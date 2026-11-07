@@ -69,4 +69,3 @@ Escolhemos a **Opção 1**: utilizar o **IndexedDB** (`window.indexedDB`) como m
 ---
 
 ⬅️ **Anterior**: [ADR 0003](./0003-hospedagem-firebase-hosting-e-dominio-name-com.md) | ➡️ **Próximo**: [Design e Módulos](../../design/modules.md)
-

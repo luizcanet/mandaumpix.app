@@ -69,7 +69,7 @@ Decomposição lógica dos módulos internos planejados para a aplicação no cl
 flowchart TD
     subgraph UI["Componentes de Interface"]
         InstallPromptUI["Botão Destacado 'Instalar' UI<br/>Exibido para usuários que ainda não instalaram o app"]
-        AboutPageUI["Página 'Sobre' UI<br/>Acesso fácil com informações sobre o aplicativo, autor e projeto"]
+        AboutPageUI["Página 'Sobre' UI<br/>App livre/open-source, autor, projeto, apoio 'Manda um PIX' (eu@luizca.net) e divulgação"]
         KeyManagerUI["Gerenciador de Chaves UI<br/>Cadastro, listagem e exclusão de chaves"]
         ChargeFormUI["Formulário de Cobrança UI<br/>Seleção de chave, valor opcional e botão 'Manda um PIX'"]
         ResultViewUI["Painel de Resultado UI<br/>Exibição do QR Code e ações de distribuição"]

@@ -74,9 +74,10 @@ flowchart TD
    - Verifica se o aplicativo já foi instalado no dispositivo do usuário (ex.: execução em modo `standalone` ou evento `appinstalled`).
    - Apresenta de forma destacada um botão **"Instalar"** para usuários que ainda não instalaram o aplicativo no dispositivo.
    - Dispara o fluxo nativo de instalação quando o usuário aciona o botão **"Instalar"** e oculta o botão após a instalação.
-2. **Módulo Institucional / Página "Sobre" (Autor e Projeto)**:
-   - Oferece um ponto de acesso fácil e visível na interface para uma página que fala sobre o aplicativo.
+2. **Módulo Institucional / Página "Sobre" (Autor, Projeto, Apoio e Divulgação)**:
+   - Oferece um ponto de acesso fácil e visível na interface para uma página que fala sobre o aplicativo, destacando que ele é **gratuito, livre e de código aberto**.
    - Apresenta informações sobre o **autor** (**Luiz Henrique Canet Filho** — `<me@luizca.net>`) e sobre o **projeto** (**Manda um PIX** — `mandaumpix.app`, propósito do PWA, repositório GitHub e licença **GNU AGPL v3.0**).
+   - Exibe um convite descontraído com emojis e a frase **"Manda um PIX"** para que o usuário que achar o aplicativo útil para si e para outras pessoas possa contribuir voluntariamente com qualquer valor para ajudar a manter o projeto, renderizando um **QR Code com valor dinâmico** e a **Chave copia e cola** para **`eu@luizca.net`**, além de incentivar a divulgação do aplicativo para mais pessoas.
 3. **Módulo de Chaves de Conta**:
    - Cadastro de múltiplas chaves nas quais o usuário deseja receber.
    - Persistência e recuperação local assíncrona dos dados do usuário via **IndexedDB** para seleção rápida.

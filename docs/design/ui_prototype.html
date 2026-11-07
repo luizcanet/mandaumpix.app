@@ -1646,9 +1646,10 @@
               "
             >
               <strong>Manda um PIX</strong> é um aplicativo web progressivo
-              (PWA) gratuito que facilita a geração de cobranças via PIX sem a
-              necessidade de ficar abrindo aplicativos de banco, com execução e
-              armazenamento 100% locais no navegador.
+              (PWA) <strong>gratuito, livre e de código aberto</strong> que
+              facilita a geração de cobranças via PIX sem a necessidade de ficar
+              abrindo aplicativos de banco, com execução e armazenamento 100%
+              locais no navegador.
             </p>
 
             <div class="about-page__box">
@@ -1712,6 +1713,171 @@
               >
                 https://github.com/luizcanet/mandaumpix.app
               </div>
+            </div>
+
+            <!-- SEÇÃO DE CONTRIBUIÇÃO VOLUNTÁRIA ("MANDA UM PIX" -> eu@luizca.net) -->
+            <div
+              class="about-page__box"
+              style="
+                background-color: #f0fdf8;
+                border-color: var(--color-brand-accent);
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-xs);
+              "
+            >
+              <div
+                style="
+                  font-size: 0.8125rem;
+                  font-weight: 800;
+                  color: var(--color-brand-primary);
+                "
+              >
+                ☕🚀 Apoie o Projeto — Manda um PIX! 💚
+              </div>
+              <p
+                style="
+                  margin: 0;
+                  font-size: 0.78rem;
+                  color: var(--color-text-secondary);
+                  line-height: 1.5;
+                "
+              >
+                🎉 Este aplicativo é
+                <strong>100% gratuito, livre e de código aberto</strong>! Mas se
+                você achar que ele é útil pra você e pra outras pessoas e quiser
+                dar uma força pra ajudar a manter o projeto no ar com
+                <strong>qualquer valor</strong>... é só abrir o coração:
+                <strong>Manda um PIX!</strong> 🙌✨
+              </p>
+
+              <div
+                class="charge-result__qr-stage"
+                style="background-color: #ffffff; padding: var(--space-sm)"
+              >
+                <div class="charge-result__qr-frame">
+                  <svg
+                    class="charge-result__qr-svg"
+                    style="width: 140px; height: 140px"
+                    viewBox="0 0 120 120"
+                    role="img"
+                    aria-label="QR Code PIX com valor dinâmico para eu@luizca.net"
+                  >
+                    <rect width="120" height="120" fill="#ffffff" />
+                    <path
+                      fill="#0b1834"
+                      d="M8,8 h28 v28 h-28 z M12,12 v20 h20 v-20 z M16,16 h12 v12 h-12 z"
+                    />
+                    <path
+                      fill="#0b1834"
+                      d="M84,8 h28 v28 h-28 z M88,12 v20 h20 v-20 z M92,16 h12 v12 h-12 z"
+                    />
+                    <path
+                      fill="#0b1834"
+                      d="M8,84 h28 v28 h-28 z M12,88 v20 h20 v-20 z M16,92 h12 v12 h-12 z"
+                    />
+                    <path
+                      fill="#0b1834"
+                      d="M44,8 h4 v8 h-4 z M52,12 h8 v4 h-8 z M64,8 h4 v12 h-4 z M40,24 h12 v4 h-12 z M56,24 h8 v8 h-8 z M72,28 h4 v8 h-4 z M8,44 h8 v4 h-8 z M24,40 h8 v8 h-8 z M36,44 h12 v4 h-12 z M68,44 h12 v4 h-12 z M88,44 h8 v8 h-8 z M104,40 h8 v12 h-8 z M12,56 h12 v4 h-12 z M32,56 h8 v8 h-8 z M72,56 h8 v8 h-8 z M88,60 h16 v4 h-16 z M8,68 h8 v8 h-8 z M24,72 h12 v4 h-12 z M44,72 h8 v8 h-8 z M84,72 h8 v8 h-8 z M100,68 h12 v8 h-12 z M44,88 h8 v12 h-8 z M60,84 h8 v8 h-8 z M76,88 h12 v4 h-12 z M96,84 h16 v8 h-16 z M44,104 h16 v8 h-16 z M68,96 h8 v16 h-8 z M84,100 h12 v12 h-12 z"
+                    />
+                    <rect
+                      x="46"
+                      y="46"
+                      width="28"
+                      height="28"
+                      rx="6"
+                      fill="#0b1834"
+                      stroke="#ffffff"
+                      stroke-width="2"
+                    />
+                    <circle cx="60" cy="60" r="6" fill="#00d37f" />
+                  </svg>
+                </div>
+                <p class="charge-result__meta">
+                  Chave PIX (Valor Dinâmico): <strong>eu@luizca.net</strong>
+                </p>
+              </div>
+
+              <div>
+                <div class="charge-result__brcode-label">
+                  <span>Chave Copia e Cola (eu@luizca.net)</span>
+                  <span
+                    style="
+                      font-family: var(--font-mono);
+                      color: var(--color-success);
+                    "
+                    >Valor Dinâmico</span
+                  >
+                </div>
+                <div id="about-support-brcode" class="charge-result__brcode">
+                  00020126350014br.gov.bcb.pix0113eu@luizca.net5204000053039865802BR5925LUIZ
+                  HENRIQUE CANET FILHO6008BRASILIA62070503***63043C63
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onclick="copySupportBrCode()"
+                class="charge-result__btn charge-result__btn--copy"
+                style="flex-direction: row; width: 100%; min-height: 42px"
+              >
+                <svg
+                  class="icon"
+                  style="color: var(--color-brand-accent)"
+                  aria-hidden="true"
+                >
+                  <use href="#copy"></use>
+                </svg>
+                <span id="btn-copy-support-text"
+                  >Copiar Chave Copia e Cola (eu@luizca.net)</span
+                >
+              </button>
+            </div>
+
+            <!-- SEÇÃO DE INCENTIVO À DIVULGAÇÃO -->
+            <div
+              class="about-page__box"
+              style="
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-xs);
+              "
+            >
+              <div
+                style="
+                  font-size: 0.8125rem;
+                  font-weight: 800;
+                  color: var(--color-brand-primary);
+                "
+              >
+                📣 Espalhe a Palavra e Divulgue! 🤝
+              </div>
+              <p
+                style="
+                  margin: 0;
+                  font-size: 0.78rem;
+                  color: var(--color-text-secondary);
+                  line-height: 1.5;
+                "
+              >
+                Gostou do <strong>Manda um PIX</strong>? Ajude mais pessoas a
+                conhecerem o aplicativo! Indique e compartilhe o
+                <strong>mandaumpix.app</strong> com amigos, colegas, clientes e
+                comerciantes para facilitar o dia a dia de todo mundo! 🚀📲
+              </p>
+              <button
+                type="button"
+                onclick="shareAppFromAbout()"
+                class="charge-result__btn charge-result__btn--share"
+                style="flex-direction: row; width: 100%; min-height: 42px"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#share"></use>
+                </svg>
+                <span id="btn-share-app-text"
+                  >Compartilhar e Divulgar o Aplicativo</span
+                >
+              </button>
             </div>
           </section>
 
@@ -2120,6 +2286,33 @@
         showActionToast(
           "Arquivo mandaumpix-qrcode.png salvo no armazenamento local!",
         );
+      }
+
+      function copySupportBrCode() {
+        const text = document
+          .getElementById("about-support-brcode")
+          .textContent.replace(/\s+/g, "");
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).catch(() => {});
+        }
+        const btnText = document.getElementById("btn-copy-support-text");
+        btnText.textContent = "Chave Copia e Cola copiada! Valeu pelo apoio 💚";
+        setTimeout(() => {
+          btnText.textContent = "Copiar Chave Copia e Cola (eu@luizca.net)";
+        }, 2200);
+      }
+
+      function shareAppFromAbout() {
+        const shareUrl = "https://mandaumpix.app";
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(shareUrl).catch(() => {});
+        }
+        const btnText = document.getElementById("btn-share-app-text");
+        btnText.textContent =
+          "Link mandaumpix.app pronto para compartilhar! 🚀";
+        setTimeout(() => {
+          btnText.textContent = "Compartilhar e Divulgar o Aplicativo";
+        }, 2200);
       }
 
       function toggleInstallButtonState() {

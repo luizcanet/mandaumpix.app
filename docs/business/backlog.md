@@ -198,15 +198,17 @@ flowchart TD
   - [ ] Registrar controladores de estado e casos de uso via `SetInjectable` (`@modnes/custom-element`) para consumo desacoplado pelos componentes.
   - [ ] Garantir funcionamento com `rewrites` de SPA já configurados em [`firebase.json`](../../firebase.json).
 
-#### `US-04.4` — Página Institucional `<about-page>` (`/sobre` — Autor e Projeto) (`⏳ Pendente`)
+#### `US-04.4` — Página Institucional `<about-page>` (`/sobre` — Autor, Projeto, Apoio e Divulgação) (`⏳ Pendente`)
 
-- **História**: Como **Recebedor**, quero acessar facilmente uma página **"Sobre"** que explique o propósito do aplicativo e apresente as informações sobre o **autor** e o **projeto**.
+- **História**: Como **Recebedor**, quero acessar facilmente uma página **"Sobre"** que explique que o aplicativo é gratuito, livre e de código aberto, apresente as informações sobre o **autor** e o **projeto**, permita contribuir voluntariamente com qualquer valor via **"Manda um PIX"** para `eu@luizca.net` (com QR Code de valor dinâmico e Chave copia e cola) e me incentive a divulgar o aplicativo para mais pessoas.
 - **Regras de Negócio**: `RN07` ([Modelo de Domínio](./domain_model.md) e [Especificações e Contratos](../design/api_specs.md)).
 - **Critérios de Aceite**:
   - [ ] Criar Web Component `src/presentation/pages/about-page/about-page.component.js` (bloco BEM `.about-page`).
-  - [ ] Apresentar seção **Sobre o Aplicativo** (propósito do **Manda um PIX**, geração gratuita sem abrir apps de banco, privacidade 100% local) e botão **"Início"** (`<vector-icon name="home">`) para retornar a `/`.
+  - [ ] Apresentar seção **Sobre o Aplicativo** destacando que o **Manda um PIX** é **gratuito, livre e de código aberto**, facilita a geração de cobranças sem abrir apps de banco com privacidade 100% local, e exibir o botão **"Início"** (`<vector-icon name="home">`) para retornar a `/`.
   - [ ] Apresentar card **Sobre o Autor**: **Luiz Henrique Canet Filho**, e-mail `<me@luizca.net>` e GitHub [`@luizcanet`](https://github.com/luizcanet).
   - [ ] Apresentar card **Sobre o Projeto e Licença**: domínio `mandaumpix.app` (`v1.0.0`), link oficial do código-fonte e issues ([`github.com/luizcanet/mandaumpix.app`](https://github.com/luizcanet/mandaumpix.app)) e licença **GNU Affero General Public License v3.0 (`AGPL-3.0-only`)**.
+  - [ ] Apresentar seção/card de **Contribuição Voluntária ("Manda um PIX")**: texto descontraído com emojis explicando que o app é gratuito, livre e de código aberto, mas que se o usuário achar que ele é útil para si e para outras pessoas, pode contribuir para ajudar a manter o projeto com qualquer valor usando a frase **"Manda um PIX"**, exibindo o **QR Code com valor dinâmico (aberto)** e a **Chave copia e cola** gerados para **`eu@luizca.net`** (com botão de cópia rápida).
+  - [ ] Apresentar seção/card de **Incentivo à Divulgação**: mensagem incentivando o usuário a divulgar e compartilhar o aplicativo (`https://mandaumpix.app`) para mais pessoas, acompanhada de botão de compartilhamento.
   - [ ] Criar testes unitários (`about-page.test.js`) e story (`about-page.stories.js`).
 
 ---
@@ -305,7 +307,7 @@ flowchart TD
 - **Critérios de Aceite**:
   - [ ] Teste de integração da **Jornada Principal**: primeiro acesso (Empty State) → cadastro de chave no `<dialog>` → seleção de chave → geração de cobrança com valor fixo e com valor aberto → cópia, compartilhamento e download.
   - [ ] Teste de integração da **Jornada de Instalação (`RN06`)**: exibição do botão **"Instalar"** quando não instalado → disparo do prompt → ocultação após `appinstalled`.
-  - [ ] Teste de integração da **Jornada Institucional (`RN07`)**: clique no atalho **"Sobre"** → renderização da rota `/sobre` com dados do autor (**Luiz Henrique Canet Filho** — `<me@luizca.net>`) e do projeto (`AGPL-3.0-only`) → retorno à tela inicial (`/`).
+  - [ ] Teste de integração da **Jornada Institucional (`RN07`)**: clique no atalho **"Sobre"** → renderização da rota `/sobre` com informação de software gratuito, livre e de código aberto, dados do autor (**Luiz Henrique Canet Filho** — `<me@luizca.net>`), do projeto (`AGPL-3.0-only`), seção descontraída com emojis (**"Manda um PIX"**) com QR Code de valor dinâmico e Chave copia e cola para **`eu@luizca.net`**, e incentivo à divulgação → retorno à tela inicial (`/`).
   - [ ] Sincronizar `npm run importmap`, `npm run lint`, `npm run format:check`, `npm run test:coverage` e `npm run build`.
 
 #### `US-07.3` — Workflows de Entrega Contínua (CD) para `staging` e `production` (`⏳ Pendente`)
@@ -321,15 +323,15 @@ flowchart TD
 
 ## 🔗 Matriz de Rastreabilidade (Regras de Negócio × Backlog)
 
-| Regra de Negócio | Descrição Resumida                                                                    | Histórias Vinculadas no Backlog                                  |
-| :--------------: | :------------------------------------------------------------------------------------ | :--------------------------------------------------------------- |
-|     **RN01**     | Cadastro e persistência local de múltiplas chaves PIX de recebimento                  | `US-02.2`, `US-02.4`, `US-03.1`, `US-05.1`, `US-05.2`, `US-05.3` |
-|     **RN02**     | Seleção obrigatória de uma chave cadastrada para emitir cobrança                      | `US-02.3`, `US-02.4`, `US-05.2`, `US-06.1`                       |
-|     **RN03**     | Valor monetário opcional (valor fixo quando informado; dinâmico/aberto se omitido)    | `US-02.1`, `US-02.3`, `US-06.1`, `US-06.2`                       |
-|     **RN04**     | Geração simultânea de QR Code e chave de cobrança (PIX Copia e Cola) ao clicar        | `US-02.1`, `US-02.3`, `US-06.1`, `US-06.2`                       |
-|     **RN05**     | Opções de saída: Copiar, Compartilhar (WhatsApp) e Salvar Imagem PNG localmente       | `US-02.1`, `US-02.5`, `US-03.3`, `US-06.3`                       |
-|     **RN06**     | Exibição destacada do botão **"Instalar"** quando o PWA ainda não está instalado      | `US-02.5`, `US-03.2`, `US-04.2`, `US-07.2`                       |
-|     **RN07**     | Acesso fácil à página **"Sobre"** com informações sobre o aplicativo, autor e projeto | `US-04.2`, `US-04.3`, `US-04.4`, `US-07.2`                       |
+| Regra de Negócio | Descrição Resumida                                                                                                                                                                          | Histórias Vinculadas no Backlog                                  |
+| :--------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------- |
+|     **RN01**     | Cadastro e persistência local de múltiplas chaves PIX de recebimento                                                                                                                        | `US-02.2`, `US-02.4`, `US-03.1`, `US-05.1`, `US-05.2`, `US-05.3` |
+|     **RN02**     | Seleção obrigatória de uma chave cadastrada para emitir cobrança                                                                                                                            | `US-02.3`, `US-02.4`, `US-05.2`, `US-06.1`                       |
+|     **RN03**     | Valor monetário opcional (valor fixo quando informado; dinâmico/aberto se omitido)                                                                                                          | `US-02.1`, `US-02.3`, `US-06.1`, `US-06.2`                       |
+|     **RN04**     | Geração simultânea de QR Code e chave de cobrança (PIX Copia e Cola) ao clicar                                                                                                              | `US-02.1`, `US-02.3`, `US-06.1`, `US-06.2`                       |
+|     **RN05**     | Opções de saída: Copiar, Compartilhar (WhatsApp) e Salvar Imagem PNG localmente                                                                                                             | `US-02.1`, `US-02.5`, `US-03.3`, `US-06.3`                       |
+|     **RN06**     | Exibição destacada do botão **"Instalar"** quando o PWA ainda não está instalado                                                                                                            | `US-02.5`, `US-03.2`, `US-04.2`, `US-07.2`                       |
+|     **RN07**     | Acesso fácil à página **"Sobre"** (app gratuito/livre/open-source, autor, projeto, apoio "Manda um PIX" com QR Code dinâmico e Copia e Cola para `eu@luizca.net`, e incentivo à divulgação) | `US-04.2`, `US-04.3`, `US-04.4`, `US-07.2`                       |
 
 ---
 

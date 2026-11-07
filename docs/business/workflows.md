@@ -95,9 +95,9 @@ sequenceDiagram
 
 ---
 
-## 4. Fluxo de Acesso à Página Sobre o Aplicativo (Autor e Projeto)
+## 4. Fluxo de Acesso à Página Sobre o Aplicativo (Autor, Projeto, Apoio e Divulgação)
 
-O aplicativo disponibiliza um ponto de acesso fácil na interface para que o usuário consulte a página **"Sobre"**, contendo a explicação sobre o aplicativo, as informações sobre o **autor** e os detalhes do **projeto**.
+O aplicativo disponibiliza um ponto de acesso fácil na interface para que o usuário consulte a página **"Sobre"**, contendo a explicação de que o aplicativo é gratuito, livre e de código aberto, as informações sobre o **autor**, os detalhes do **projeto**, a seção descontraída com emojis (**"Manda um PIX"**) com **QR Code de valor dinâmico** e **Chave copia e cola** para **`eu@luizca.net`** e o incentivo para divulgar o aplicativo para mais pessoas.
 
 ```mermaid
 sequenceDiagram
@@ -105,12 +105,23 @@ sequenceDiagram
     actor U as Usuário Recebedor
     participant App as Manda um PIX (PWA)
     participant Router as Roteador SPA (@modnes/router)
-    participant About as Página "Sobre" (Autor & Projeto)
+    participant About as Página "Sobre" (Autor, Projeto & Apoio)
+    participant OS as Área de Transferência / Compartilhamento
 
     U->>App: Aciona o atalho de fácil acesso "Sobre" na interface
     App->>Router: Navega para a rota da página "Sobre" (ex: /sobre)
     Router->>About: Renderiza a página "Sobre"
-    About-->>U: Apresenta descrição do aplicativo, dados do Autor (Luiz Henrique Canet Filho) e informações do Projeto (repositório e licença AGPL-3.0-only)
+    About-->>U: Apresenta descrição (app gratuito, livre e de código aberto), Autor (Luiz Henrique Canet Filho), Projeto (AGPL-3.0-only), convite descontraído com emojis ("Manda um PIX") com QR Code de valor dinâmico e Chave copia e cola para "eu@luizca.net", e incentivo à divulgação
+    opt Contribuir voluntariamente com qualquer valor ("Manda um PIX")
+        U->>About: Escaneia o QR Code dinâmico ou clica em copiar a Chave copia e cola para "eu@luizca.net"
+        About->>OS: Grava a Chave copia e cola na Área de Transferência
+        OS-->>U: Confirmação de cópia para realizar o PIX de qualquer valor no app do banco
+    end
+    opt Divulgar o aplicativo para mais pessoas
+        U->>About: Aciona opção de compartilhar/divulgar o aplicativo (mandaumpix.app)
+        About->>OS: Aciona Web Share API / WhatsApp ou copia o link do aplicativo
+        OS-->>U: Compartilha o Manda um PIX com amigos, clientes e colegas
+    end
     opt Retorno à geração de cobrança
         U->>About: Aciona opção de voltar ao início
         About->>Router: Navega para a tela principal (/)

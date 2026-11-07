@@ -109,9 +109,14 @@ Exibido após o acionamento de **"Manda um PIX"** (ou sincronizado na coluna dir
 
 Acessível a partir do cabeçalho ou rodapé e gerenciada pelo `@modnes/router` (`RN07`):
 
-- **Sobre o Aplicativo**: Apresenta o propósito do **Manda um PIX** (facilitar a geração gratuita de cobranças via PIX sem abrir aplicativos de banco, com privacidade e armazenamento 100% local) e botão **"Início"** (`<vector-icon name="home">`) para retornar à tela de cobrança.
+- **Sobre o Aplicativo (Gratuito, Livre e de Código Aberto)**: Apresenta o propósito do **Manda um PIX** (facilitar a geração rápida de cobranças via PIX sem abrir aplicativos de banco, com privacidade e armazenamento 100% local), deixando explícito que o aplicativo é **gratuito, livre e de código aberto**, acompanhado do botão **"Início"** (`<vector-icon name="home">`) para retornar à tela de cobrança.
 - **Sobre o Autor**: Card dedicado identificando **Luiz Henrique Canet Filho**, e-mail `<me@luizca.net>` e perfil GitHub [`@luizcanet`](https://github.com/luizcanet).
 - **Sobre o Projeto e Licença**: Card destacando o domínio `mandaumpix.app` (`v1.0.0`), link para o código-fonte oficial ([`github.com/luizcanet/mandaumpix.app`](https://github.com/luizcanet/mandaumpix.app)) e termos da licença livre **GNU Affero General Public License v3.0 (`AGPL-3.0-only`)**.
+- **Card de Contribuição Voluntária (`.about-page__support` — "Manda um PIX")**:
+  - Exibe uma mensagem **descontraída e com emojis** informando que o aplicativo é gratuito, livre e de código aberto, mas que se o usuário achar que o aplicativo é útil para ele e para outras pessoas, pode contribuir para ajudar a manter o projeto com **qualquer valor**, utilizando em destaque a frase **"Manda um PIX"** (ex.: _"🎉 O **Manda um PIX** é 100% gratuito, livre e de código aberto! Mas se você acha que ele é útil pra você e pra outras pessoas e quiser dar uma força pra ajudar a manter o projeto com qualquer valor... ☕🚀 **Manda um PIX!** 💚"_).
+  - Apresenta o palco do **QR Code com valor dinâmico (aberto)** gerado para a chave **`eu@luizca.net`**, a identificação da chave (`eu@luizca.net`), a caixa com a **Chave copia e cola** (`00020126350014br.gov.bcb.pix0113eu@luizca.net5204000053039865802BR5925LUIZ HENRIQUE CANET FILHO6008BRASILIA62070503***63043C63`) e o botão **"Copiar Chave Copia e Cola"** (`<vector-icon name="copy">`).
+- **Card de Incentivo à Divulgação (`.about-page__share`)**:
+  - Convida de forma amigável e com emojis o usuário a espalhar a novidade e **divulgar o aplicativo para mais pessoas** (ex.: _"📣 Curtiu o app? Espalhe a palavra! Indique e compartilhe o **mandaumpix.app** com amigos, clientes e colegas para ajudar mais pessoas a gerarem cobranças PIX sem complicação! 🤝✨"_), acompanhado do botão **"Compartilhar o Aplicativo"** (`<vector-icon name="share">`).
 
 ---
 
@@ -119,15 +124,15 @@ Acessível a partir do cabeçalho ou rodapé e gerenciada pelo `@modnes/router` 
 
 Todos os ícones da interface são consumidos exclusivamente por meio do Web Component compartilhado [`<vector-icon>`](../../src/presentation/components/vector-icon/vector-icon.component.js) acoplado ao sprite [`icon.svg`](../../src/presentation/components/vector-icon/icon.svg):
 
-| Região / Componente                | Custom Element (`@modnes/custom-element`) | Bloco BEM Principal | Símbolos `<vector-icon>` Utilizados            |
-| :--------------------------------- | :---------------------------------------- | :------------------ | :--------------------------------------------- |
-| **Cabeçalho & Botão Instalar**     | `<app-header>`                            | `.app-header`       | `download`, `circle-info`, `home`              |
-| **Estado Inicial Sem Chaves**      | `<pix-key-empty>`                         | `.key-empty-state`  | `key`, `plus`, `check`                         |
-| **Seletor de Chaves de Conta**     | `<pix-key-selector>`                      | `.key-selector`     | `key`, `plus`, `trash`, `check`                |
-| **Modal de Cadastro (`<dialog>`)** | `<pix-key-dialog>`                        | `.key-dialog`       | `key`, `check`, `xmark`, `circle-exclamation`  |
-| **Formulário Gerador de Cobrança** | `<pix-charge-form>`                       | `.charge-form`      | `qrcode`, `xmark`                              |
-| **Cartão de Resultado & Saída**    | `<pix-charge-result>`                     | `.charge-result`    | `qrcode`, `copy`, `share`, `download`, `check` |
-| **Página Sobre (`/sobre`)**        | `<about-page>`                            | `.about-page`       | `circle-info`, `home`                          |
+| Região / Componente                | Custom Element (`@modnes/custom-element`) | Bloco BEM Principal | Símbolos `<vector-icon>` Utilizados                       |
+| :--------------------------------- | :---------------------------------------- | :------------------ | :-------------------------------------------------------- |
+| **Cabeçalho & Botão Instalar**     | `<app-header>`                            | `.app-header`       | `download`, `circle-info`, `home`                         |
+| **Estado Inicial Sem Chaves**      | `<pix-key-empty>`                         | `.key-empty-state`  | `key`, `plus`, `check`                                    |
+| **Seletor de Chaves de Conta**     | `<pix-key-selector>`                      | `.key-selector`     | `key`, `plus`, `trash`, `check`                           |
+| **Modal de Cadastro (`<dialog>`)** | `<pix-key-dialog>`                        | `.key-dialog`       | `key`, `check`, `xmark`, `circle-exclamation`             |
+| **Formulário Gerador de Cobrança** | `<pix-charge-form>`                       | `.charge-form`      | `qrcode`, `xmark`                                         |
+| **Cartão de Resultado & Saída**    | `<pix-charge-result>`                     | `.charge-result`    | `qrcode`, `copy`, `share`, `download`, `check`            |
+| **Página Sobre (`/sobre`)**        | `<about-page>`                            | `.about-page`       | `circle-info`, `home`, `qrcode`, `copy`, `share`, `check` |
 
 ---
 
