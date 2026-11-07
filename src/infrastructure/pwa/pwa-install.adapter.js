@@ -39,3 +39,245 @@ export function detectStandaloneMode({
   return isNavigatorStandalone || isMediaStandalone;
 }
 
+export class PwaInstallAdapter extends EventTarget {
+  constructor({
+    windowTarget = globalThis.window,
+    navigatorTarget = globalThis.navigator,
+  } = {}) {
+    super();
+    this.windowTarget = windowTarget || null;
+    this.navigatorTarget = navigatorTarget || null;
+    this.mediaQueryList = null;
+    this.deferredPrompt = null;
+    this.installedFlag = false;
+    this.destroyed = false;
+
+    this.boundOnBeforeInstallPrompt = (event) =>
+      this.handleBeforeInstallPrompt(event);
+    this.boundOnAppInstalled = () => this.handleAppInstalled();
+    this.boundOnMediaQueryChange = (event) =>
+      this.handleMediaQueryChange(event);
+
+    this.initialize();
+  }
+
+  initialize() {
+    if (!this.windowTarget) {
+      return;
+    }
+
+    if (typeof this.windowTarget.addEventListener === "function") {
+      this.windowTarget.addEventListener(
+        "beforeinstallprompt",
+        this.boundOnBeforeInstallPrompt,
+      );
+      this.windowTarget.addEventListener(
+        "appinstalled",
+        this.boundOnAppInstalled,
+      );
+    }
+
+    if (typeof this.windowTarget.matchMedia === "function") {
+      try {
+        this.mediaQueryList = this.windowTarget.matchMedia(
+          STANDALONE_MEDIA_QUERY,
+        );
+        if (this.mediaQueryList) {
+          if (typeof this.mediaQueryList.addEventListener === "function") {
+            this.mediaQueryList.addEventListener(
+              "change",
+              this.boundOnMediaQueryChange,
+            );
+          } else if (typeof this.mediaQueryList.addListener === "function") {
+            this.mediaQueryList.addListener(this.boundOnMediaQueryChange);
+          }
+        }
+      } catch {
+        this.mediaQueryList = null;
+      }
+    }
+  }
+
+  handleBeforeInstallPrompt(event) {
+    if (this.destroyed) {
+      return;
+    }
+
+    if (typeof event?.preventDefault === "function") {
+      event.preventDefault();
+    }
+
+    this.deferredPrompt = event;
+    this.emitStateChange();
+  }
+
+  handleAppInstalled() {
+    if (this.destroyed) {
+      return;
+    }
+
+    this.installedFlag = true;
+    this.deferredPrompt = null;
+    this.emitStateChange();
+  }
+
+  handleMediaQueryChange(event) {
+    if (this.destroyed) {
+      return;
+    }
+
+    if (event?.matches) {
+      this.installedFlag = true;
+      this.deferredPrompt = null;
+      this.emitStateChange();
+    }
+  }
+
+  emitStateChange() {
+    this.dispatchEvent(
+      new CustomEvent("statechange", { detail: this.getState() }),
+    );
+  }
+
+  isInstalled() {
+    if (this.installedFlag) {
+      return true;
+    }
+
+    return detectStandaloneMode({
+      windowTarget: this.windowTarget,
+      navigatorTarget: this.navigatorTarget,
+    });
+  }
+
+  canInstall() {
+    if (this.isInstalled()) {
+      return false;
+    }
+
+    return Boolean(this.deferredPrompt);
+  }
+
+  getState() {
+    const isInstalled = this.isInstalled();
+    const canInstall = this.canInstall();
+    const shouldShowInstallButton = !isInstalled && canInstall;
+
+    return Object.freeze({
+      isInstalled,
+      canInstall,
+      shouldShowInstallButton,
+    });
+  }
+
+  async promptInstall() {
+    if (this.isInstalled()) {
+      throw new PwaInstallAdapterError(
+        "O aplicativo já está instalado neste dispositivo.",
+        {
+          code: PWA_INSTALL_ADAPTER_ERROR_CODES.PWA_ALREADY_INSTALLED,
+          field: "isInstalled",
+        },
+      );
+    }
+
+    if (!this.canInstall() || !this.deferredPrompt) {
+      throw new PwaInstallAdapterError(
+        "O prompt nativo de instalação não está disponível no momento.",
+        {
+          code: PWA_INSTALL_ADAPTER_ERROR_CODES.INSTALL_PROMPT_UNAVAILABLE,
+          field: "canInstall",
+        },
+      );
+    }
+
+    const currentPrompt = this.deferredPrompt;
+    this.deferredPrompt = null;
+
+    let rawOutcome = "dismissed";
+    try {
+      const promptResult = await currentPrompt.prompt();
+      if (
+        currentPrompt.userChoice &&
+        typeof currentPrompt.userChoice.then === "function"
+      ) {
+        const choice = await currentPrompt.userChoice;
+        rawOutcome = choice?.outcome || promptResult?.outcome || "dismissed";
+      } else if (promptResult?.outcome) {
+        rawOutcome = promptResult.outcome;
+      } else if (typeof promptResult === "string") {
+        rawOutcome = promptResult;
+      }
+    } catch (error) {
+      throw new PwaInstallAdapterError(
+        error?.message ||
+          "Não foi possível acionar o prompt nativo de instalação.",
+        {
+          code: PWA_INSTALL_ADAPTER_ERROR_CODES.INSTALL_PROMPT_EXECUTION_FAILED,
+          field: "deferredPrompt",
+          cause: error,
+        },
+      );
+    }
+
+    const outcome =
+      String(rawOutcome).trim().toLowerCase() === "accepted"
+        ? "accepted"
+        : "dismissed";
+    const accepted = outcome === "accepted";
+
+    if (accepted) {
+      this.installedFlag = true;
+    }
+
+    this.emitStateChange();
+
+    const currentState = this.getState();
+
+    return Object.freeze({
+      outcome,
+      accepted,
+      isInstalled: currentState.isInstalled,
+      canInstall: currentState.canInstall,
+      shouldShowInstallButton: currentState.shouldShowInstallButton,
+    });
+  }
+
+  async triggerInstall() {
+    return this.promptInstall();
+  }
+
+  destroy() {
+    this.destroyed = true;
+    this.deferredPrompt = null;
+
+    if (
+      this.windowTarget &&
+      typeof this.windowTarget.removeEventListener === "function"
+    ) {
+      this.windowTarget.removeEventListener(
+        "beforeinstallprompt",
+        this.boundOnBeforeInstallPrompt,
+      );
+      this.windowTarget.removeEventListener(
+        "appinstalled",
+        this.boundOnAppInstalled,
+      );
+    }
+
+    if (this.mediaQueryList) {
+      if (typeof this.mediaQueryList.removeEventListener === "function") {
+        this.mediaQueryList.removeEventListener(
+          "change",
+          this.boundOnMediaQueryChange,
+        );
+      } else if (typeof this.mediaQueryList.removeListener === "function") {
+        this.mediaQueryList.removeListener(this.boundOnMediaQueryChange);
+      }
+    }
+  }
+}
+
+export function createPwaInstallAdapter(options) {
+  return new PwaInstallAdapter(options);
+}
