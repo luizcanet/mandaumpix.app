@@ -4,6 +4,8 @@ import {
   PIX_KEY_ERROR_CODES,
   PIX_KEY_TYPES,
   PixKeyValidationError,
+  normalizeMerchantCity,
+  normalizeMerchantName,
   validateAndNormalizeCnpj,
   validateAndNormalizeCpf,
   validateAndNormalizeEmail,
@@ -315,6 +317,60 @@ describe("pix-key.entity.js — PIX Key Validators & Normalizers (TASK-02.2.2)",
             name: "PixKeyValidationError",
             code: PIX_KEY_ERROR_CODES.INVALID_KEY_TYPE,
             field: "tipo_chave",
+          }),
+        );
+      },
+    );
+  });
+});
+
+describe("pix-key.entity.js — EMV Normalizers (TASK-02.2.3)", () => {
+  describe("normalizeMerchantName", () => {
+    it("should remove accents, symbols, collapse spaces, uppercase and truncate to 25 chars", () => {
+      expect(normalizeMerchantName("Luiz Henrique Canet Filho")).toBe(
+        "LUIZ HENRIQUE CANET FILHO",
+      );
+      expect(
+        normalizeMerchantName("  João   da Silva   Júnior & Cia Ltda  "),
+      ).toBe("JOAO DA SILVA JUNIOR CIA");
+      expect(normalizeMerchantName("Açaí & Café São-Paulo 123!")).toBe(
+        "ACAI CAFE SAOPAULO 123",
+      );
+    });
+
+    it.each([[null], [undefined], [""], ["   "], ["!@#$%^&*()"]])(
+      "should throw INVALID_MERCHANT_NAME when merchant name is empty after sanitization: %s",
+      (invalidName) => {
+        expect(() => normalizeMerchantName(invalidName)).toThrowError(
+          expect.objectContaining({
+            name: "PixKeyValidationError",
+            code: PIX_KEY_ERROR_CODES.INVALID_MERCHANT_NAME,
+            field: "nome_recebedor",
+          }),
+        );
+      },
+    );
+  });
+
+  describe("normalizeMerchantCity", () => {
+    it("should remove accents, symbols, collapse spaces, uppercase and truncate to 15 chars", () => {
+      expect(normalizeMerchantCity("Brasília")).toBe("BRASILIA");
+      expect(normalizeMerchantCity("  São Bernardo do Campo ")).toBe(
+        "SAO BERNARDO DO",
+      );
+      expect(normalizeMerchantCity("São José dos Campos")).toBe(
+        "SAO JOSE DOS CA",
+      );
+    });
+
+    it.each([[null], [undefined], [""], ["   "], ["***"]])(
+      "should throw INVALID_MERCHANT_CITY when merchant city is empty after sanitization: %s",
+      (invalidCity) => {
+        expect(() => normalizeMerchantCity(invalidCity)).toThrowError(
+          expect.objectContaining({
+            name: "PixKeyValidationError",
+            code: PIX_KEY_ERROR_CODES.INVALID_MERCHANT_CITY,
+            field: "cidade_recebedor",
           }),
         );
       },

@@ -40,11 +40,16 @@ export class PixKeyValidationError extends Error {
 const CPF_LENGTH = 11;
 const CNPJ_LENGTH = 14;
 const MAX_EMAIL_LENGTH = 77;
+const MAX_MERCHANT_NAME_LENGTH = 25;
+const MAX_MERCHANT_CITY_LENGTH = 15;
 const REPEATED_DIGITS_REGEX = /^(\d)\1+$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PHONE_E164_BR_REGEX = /^\+55[1-9][1-9]9\d{8}$/;
 const UUID_V4_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+const DIACRITICS_REGEX = /[\u0300-\u036f]/g;
+const NON_ALPHANUMERIC_SPACE_REGEX = /[^A-Z0-9 ]/g;
+const MULTIPLE_SPACES_REGEX = /\s+/g;
 
 const CNPJ_FIRST_WEIGHTS = Object.freeze([5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
 const CNPJ_SECOND_WEIGHTS = Object.freeze([
@@ -219,4 +224,46 @@ export function validateAndNormalizePixKey(tipoChave, valorChave) {
     tipo_chave: normalizedType,
     valor_chave: validator(valorChave),
   };
+}
+
+function sanitizeEmvText(rawValue, maxLength) {
+  if (typeof rawValue !== "string") {
+    return "";
+  }
+
+  return rawValue
+    .normalize("NFD")
+    .replace(DIACRITICS_REGEX, "")
+    .toUpperCase()
+    .replace(NON_ALPHANUMERIC_SPACE_REGEX, "")
+    .replace(MULTIPLE_SPACES_REGEX, " ")
+    .trim()
+    .slice(0, maxLength)
+    .trim();
+}
+
+export function normalizeMerchantName(rawName) {
+  const normalized = sanitizeEmvText(rawName, MAX_MERCHANT_NAME_LENGTH);
+
+  if (!normalized) {
+    throw new PixKeyValidationError("Nome do recebedor inválido ou vazio.", {
+      code: PIX_KEY_ERROR_CODES.INVALID_MERCHANT_NAME,
+      field: "nome_recebedor",
+    });
+  }
+
+  return normalized;
+}
+
+export function normalizeMerchantCity(rawCity) {
+  const normalized = sanitizeEmvText(rawCity, MAX_MERCHANT_CITY_LENGTH);
+
+  if (!normalized) {
+    throw new PixKeyValidationError("Cidade do recebedor inválida ou vazia.", {
+      code: PIX_KEY_ERROR_CODES.INVALID_MERCHANT_CITY,
+      field: "cidade_recebedor",
+    });
+  }
+
+  return normalized;
 }
