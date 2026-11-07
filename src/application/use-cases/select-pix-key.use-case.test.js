@@ -162,4 +162,3 @@ describe("select-pix-key.use-case.js — SelectPixKeyUseCase (TASK-02.4.3)", () 
     });
   });
 });
-

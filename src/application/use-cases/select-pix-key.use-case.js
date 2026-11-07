@@ -78,4 +78,3 @@ export class SelectPixKeyUseCase {
 export function executeSelectPixKey(input, dependencies) {
   return new SelectPixKeyUseCase(dependencies).execute(input);
 }
-
