@@ -5,6 +5,8 @@ import {
   ChaveConta,
   CobrancaPix,
   CustomElement,
+  DEFAULT_DB_NAME,
+  DEFAULT_DB_VERSION,
   DEFAULT_PIX_CHARGE_TXID,
   DEFAULT_PIX_KEY_LABELS,
   DEFAULT_QR_IMAGE_FILENAME,
@@ -14,17 +16,21 @@ import {
   DeletePixKeyUseCase,
   DistributePixChargeUseCase,
   GeneratePixChargeUseCase,
+  IndexedDbPixKeyRepository,
   InstallPwaUseCase,
   ListPixKeysUseCase,
   MAX_PIX_CHARGE_ADDITIONAL_INFO_LENGTH,
   MAX_PIX_CHARGE_AMOUNT,
   MAX_PIX_CHARGE_TXID_LENGTH,
+  OBJECT_STORES,
   PIX_CHARGE_DISTRIBUTION_ACTIONS,
   PIX_CHARGE_DISTRIBUTION_CHANNELS,
   PIX_CHARGE_DISTRIBUTION_ERROR_CODES,
   PIX_CHARGE_ERROR_CODES,
   PIX_KEY_ERROR_CODES,
+  PIX_KEY_INDEXES,
   PIX_KEY_MANAGEMENT_ERROR_CODES,
+  PIX_KEY_STORAGE_ERROR_CODES,
   PIX_KEY_TYPES,
   PWA_INSTALL_ACTIONS,
   PWA_INSTALL_ERROR_CODES,
@@ -34,16 +40,20 @@ import {
   PixChargeValidationError,
   PixKeyEntity,
   PixKeyManagementError,
+  PixKeyStorageError,
   PixKeyValidationError,
   PwaInstallError,
   Router,
+  SELECTED_KEY_SETTING_KEY,
   SavePixKeyUseCase,
   SelectPixKeyUseCase,
   assertChargeDistributionGateway,
+  assertIndexedDbFactory,
   assertPixKeyRepository,
   assertPwaInstallGateway,
   bootstrapApp,
   buildWhatsAppShareUrl,
+  createIndexedDbPixKeyRepository,
   executeDeletePixKey,
   executeDistributePixCharge,
   executeGeneratePixCharge,
@@ -54,6 +64,7 @@ import {
   extractChargeDistributionTarget,
   generatePixCharge,
   hydrateChaveContaList,
+  mapStorageDomException,
   normalizeAdditionalInfo,
   normalizeMerchantCity,
   normalizeMerchantName,
@@ -63,9 +74,11 @@ import {
   normalizeQrDownloadFileName,
   normalizeTransactionAmount,
   normalizeTxid,
+  openPixKeyDatabase,
   parsePixCharge,
   resolveChaveConta,
   resolveRequiredPixKeyId,
+  upgradePixKeyDatabaseSchema,
   validateAndNormalizePixKey,
 } from "./main.js";
 
@@ -394,6 +407,108 @@ describe("main.js", () => {
       expect(initialInstallState.shouldShowInstallButton).toBe(true);
       expect(triggerInstallResult.accepted).toBe(true);
       expect(triggerInstallResult.shouldShowInstallButton).toBe(false);
+    });
+  });
+
+  describe("infrastructure exports & IndexedDB repository integration (US-03.1)", () => {
+    it("should re-export IndexedDbPixKeyRepository, constants, error class, and helpers", () => {
+      expect(IndexedDbPixKeyRepository).toBeDefined();
+      expect(createIndexedDbPixKeyRepository).toBeTypeOf("function");
+      expect(DEFAULT_DB_NAME).toBe("mandaumpix_db");
+      expect(DEFAULT_DB_VERSION).toBe(1);
+      expect(SELECTED_KEY_SETTING_KEY).toBe("selectedKeyId");
+      expect(OBJECT_STORES).toEqual({
+        PIX_KEYS: "pix_keys",
+        USER_SETTINGS: "user_settings",
+      });
+      expect(PIX_KEY_INDEXES).toEqual({
+        BY_TIPO_CHAVE: "by_tipo_chave",
+        BY_CRIADO_EM: "by_criado_em",
+      });
+      expect(PIX_KEY_STORAGE_ERROR_CODES).toBeDefined();
+      expect(PixKeyStorageError).toBeDefined();
+      expect(assertIndexedDbFactory).toBeTypeOf("function");
+      expect(mapStorageDomException).toBeTypeOf("function");
+      expect(upgradePixKeyDatabaseSchema).toBeTypeOf("function");
+      expect(openPixKeyDatabase).toBeTypeOf("function");
+    });
+
+    it("should persist and manage PIX keys with IndexedDbPixKeyRepository via main.js exports", async () => {
+      // Arrange: lightweight in-memory IDBFactory
+      const stores = new Map([
+        ["pix_keys", { keyPath: "id", data: new Map() }],
+        ["user_settings", { keyPath: "key", data: new Map() }],
+      ]);
+
+      const fakeIndexedDb = {
+        open: () => {
+          const req = {};
+          queueMicrotask(() => {
+            req.result = {
+              objectStoreNames: { contains: (name) => stores.has(name) },
+              createObjectStore: vi.fn(),
+              transaction: () => {
+                const tx = {};
+                tx.objectStore = (name) => {
+                  const store = stores.get(name);
+                  const wrap = (fn) => {
+                    const r = {};
+                    queueMicrotask(() => {
+                      r.result = fn();
+                      r.onsuccess?.();
+                      queueMicrotask(() => tx.oncomplete?.());
+                    });
+                    return r;
+                  };
+                  return {
+                    getAll: () => wrap(() => Array.from(store.data.values())),
+                    get: (k) => wrap(() => store.data.get(k)),
+                    put: (v) =>
+                      wrap(() => {
+                        store.data.set(v[store.keyPath], v);
+                        return v[store.keyPath];
+                      }),
+                    delete: (k) => wrap(() => store.data.delete(k)),
+                  };
+                };
+                return tx;
+              },
+            };
+            req.onsuccess?.();
+          });
+          return req;
+        },
+      };
+
+      const pixKeyRepository = createIndexedDbPixKeyRepository({
+        indexedDb: fakeIndexedDb,
+      });
+
+      // Act
+      const saved = await executeSavePixKey(
+        {
+          id: "idb-key-1",
+          rotulo: "Conta IndexedDB",
+          tipo_chave: PIX_KEY_TYPES.EMAIL,
+          valor_chave: "idb@mandaumpix.app",
+          nome_recebedor: "Luiz Canet",
+          cidade_recebedor: "Brasilia",
+        },
+        { pixKeyRepository },
+      );
+
+      const listed = await executeListPixKeys({ pixKeyRepository });
+      const charge = await executeGeneratePixCharge(
+        { valor_opcional: 19.9 },
+        { pixKeyRepository },
+      );
+
+      // Assert
+      expect(saved.isSelected).toBe(true);
+      expect(listed.items).toHaveLength(1);
+      expect(listed.selectedKeyId).toBe("idb-key-1");
+      expect(charge.id_chave_conta).toBe("idb-key-1");
+      expect(charge.chave_cobranca).toContain("idb@mandaumpix.app");
     });
   });
 });
