@@ -203,4 +203,3 @@ describe("delete-pix-key.use-case.js — DeletePixKeyUseCase (TASK-02.4.4)", () 
     });
   });
 });
-

@@ -91,4 +91,3 @@ export class DeletePixKeyUseCase {
 export function executeDeletePixKey(input, dependencies) {
   return new DeletePixKeyUseCase(dependencies).execute(input);
 }
-
