@@ -151,4 +151,3 @@ export class SavePixKeyUseCase {
 export function executeSavePixKey(input, dependencies) {
   return new SavePixKeyUseCase(dependencies).execute(input);
 }
-
