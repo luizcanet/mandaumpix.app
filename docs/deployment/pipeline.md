@@ -6,28 +6,65 @@ Este documento descreve o fluxo de verificação contínua (CI) e entrega do **M
 
 ---
 
-## 🔄 Fluxo de Controle de Versão e Qualidade (GitHub Actions)
+## 🔄 Modelo de Branching Git Flow e Esteiras de Qualidade (GitHub Actions)
 
-O repositório opera com o modelo de branches Git (`main` e `develop`) e possui esteiras de Integração Contínua (CI) e Entrega Contínua (CD) automatizadas via **GitHub Actions** configuradas em [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) e [`.github/workflows/deploy-dev.yml`](../../.github/workflows/deploy-dev.yml).
+O repositório adota o modelo de branching **Git Flow** ([ADR 0005](../architecture/decisions/0005-modelo-de-branching-git-flow.md)), estruturado em duas branches permanentes (`main` e `develop`) e quatro tipos de branches temporárias de suporte (`feature/*`, `bugfix/*`, `release/*` e `hotfix/*`), integradas às esteiras de Integração Contínua (CI) e Entrega Contínua (CD) via **GitHub Actions** configuradas em [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) e [`.github/workflows/deploy-dev.yml`](../../.github/workflows/deploy-dev.yml).
 
 ```mermaid
-flowchart LR
-    PR["Pull Request / Push<br/>(develop -> main)"] --> Comp["Job: Conformidade e Segurança<br/>(Conventional Commits, AGPL-3.0, SRI, npm audit)"]
-    PR --> Qual["Job: Qualidade, Testes e Build<br/>(Prettier, ESLint, Vitest + Coverage, JSPM Build, Storybook)"]
-    Comp --> Merge["Aprovação e Merge<br/>(push em develop)"]
-    Qual --> Merge
-    Merge --> DeployDev["Workflow: CD - Deploy Development<br/>(mandaumpix-app-dev / dev.mandaumpix.app)"]
+flowchart TD
+    subgraph GitFlow["🌿 Modelo de Branching Git Flow"]
+        Feat["feature/* ou bugfix/*<br/>(Desenvolvimento de Histórias)"]
+        Dev["develop<br/>(Branch de Integração)"]
+        Rel["release/*<br/>(Estabilização de Versão)"]
+        Hot["hotfix/*<br/>(Correção Crítica Urgente)"]
+        Main["main<br/>(Código de Produção + Tag vX.Y.Z)"]
+    end
+
+    subgraph CI["🛡️ GitHub Actions — CI (ci.yml)"]
+        Comp["Job: Conformidade e Segurança<br/>(Conventional Commits, AGPL-3.0, SRI, npm audit)"]
+        Qual["Job: Qualidade, Testes e Build<br/>(Prettier, ESLint, Vitest + Coverage, JSPM Build, Storybook)"]
+    end
+
+    subgraph CD["🌍 Ambientes Firebase Hosting (CD)"]
+        EnvDev["development (dev)<br/>dev.mandaumpix.app<br/>(mandaumpix-app-dev)"]
+        EnvStg["staging (stg)<br/>stg.mandaumpix.app<br/>(mandaumpix-app-stg)"]
+        EnvPrd["production (prd)<br/>mandaumpix.app<br/>(mandaumpix-app-prd)"]
+    end
+
+    Feat -->|"Pull Request"| Comp & Qual
+    Comp & Qual -->|"Aprovação e Merge"| Dev
+    Dev -->|"Push Automatizado (deploy-dev.yml)"| EnvDev
+    Dev -->|"Corte de Release"| Rel
+    Rel -->|"Deploy de Homologação"| EnvStg
+    Rel -->|"Merge + Tag SemVer"| Main
+    Rel -.->|"Back-merge"| Dev
+    Main -->|"Corte de Hotfix"| Hot
+    Hot -->|"Validação Prévia"| EnvStg
+    Hot -->|"Merge + Tag de Patch"| Main
+    Hot -.->|"Back-merge"| Dev
+    Main -->|"Deploy de Produção"| EnvPrd
 ```
+
+### 🌿 Convenção e Ciclo de Vida das Branches (Git Flow)
+
+| Tipo de Branch | Padrão de Nome              | Criada a partir de       | Mesclada em (Destino)        | Papel no Fluxo de Engenharia                                                                                      |
+| :------------- | :-------------------------- | :----------------------- | :--------------------------- | :---------------------------------------------------------------------------------------------------------------- |
+| **Produção**   | `main`                      | — (Permanente)           | —                            | Armazena exclusivamente o histórico oficial de releases estáveis em produção (marcadas com tags `vX.Y.Z`).        |
+| **Integração** | `develop`                   | `main` (Permanente)      | —                            | Consolida continuamente as histórias concluídas para a próxima release e alimenta o ambiente `development`.       |
+| **Feature**    | `feature/<escopo>`          | `develop`                | `develop` (via Pull Request) | Desenvolvimento isolado de novas funcionalidades ou tarefas técnicas do [Backlog](../business/backlog.md).        |
+| **Bugfix**     | `bugfix/<escopo>`           | `develop` ou `release/*` | `develop` ou `release/*`     | Correção de defeitos não emergenciais identificados durante o desenvolvimento ou na estabilização de uma release. |
+| **Release**    | `release/<versao>`          | `develop`                | `main` (com tag) e `develop` | Congelamento de escopo para homologação no ambiente `staging` (`stg`), ajustes finais de versão e documentação.   |
+| **Hotfix**     | `hotfix/<versao-ou-escopo>` | `main`                   | `main` (com tag) e `develop` | Correção imediata de incidentes críticos detectados em produção (`prd`), com sincronização reversa na `develop`.  |
 
 ### 🌍 Promoção entre Ambientes (Firebase Hosting)
 
 A entrega contínua direciona os artefatos estáticos gerados pelo build (`dist/`), mapeados via [`firebase.json`](../../firebase.json) e [`.firebaserc`](../../.firebaserc), para três ambientes isolados no **Firebase Hosting**, sob o domínio `mandaumpix.app` registrado e certificado no **Name.com** (detalhes em [Infraestrutura e Topologia](./infrastructure.md)):
 
-| Ambiente      | Sigla | Domínio de Destino   | Projeto no Firebase  | Workflow de Automação                                                        |
-| :------------ | :---: | :------------------- | :------------------- | :--------------------------------------------------------------------------- |
-| `development` | `dev` | `dev.mandaumpix.app` | `mandaumpix-app-dev` | [`.github/workflows/deploy-dev.yml`](../../.github/workflows/deploy-dev.yml) |
-| `staging`     | `stg` | `stg.mandaumpix.app` | `mandaumpix-app-stg` | Planejado                                                                    |
-| `production`  | `prd` | `mandaumpix.app`     | `mandaumpix-app-prd` | Planejado                                                                    |
+| Ambiente      | Sigla | Branch Git Flow Associada | Domínio de Destino   | Projeto no Firebase  | Workflow de Automação                                                        |
+| :------------ | :---: | :------------------------ | :------------------- | :------------------- | :--------------------------------------------------------------------------- |
+| `development` | `dev` | `develop`                 | `dev.mandaumpix.app` | `mandaumpix-app-dev` | [`.github/workflows/deploy-dev.yml`](../../.github/workflows/deploy-dev.yml) |
+| `staging`     | `stg` | `release/*` e `hotfix/*`  | `stg.mandaumpix.app` | `mandaumpix-app-stg` | Planejado (`deploy-stg.yml`)                                                 |
+| `production`  | `prd` | `main` (tags `v*`)        | `mandaumpix.app`     | `mandaumpix-app-prd` | Planejado (`deploy-prd.yml`)                                                 |
 
 ### 🚢 Implantação Automatizada em Development (`CD - Deploy Development`)
 

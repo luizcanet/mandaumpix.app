@@ -40,13 +40,14 @@ flowchart LR
 
 ## 📊 Status Atual do Repositório
 
-| Dimensão                          | Estado Atual no Código                                          | Referência no Repositório                                                            |
-| :-------------------------------- | :-------------------------------------------------------------- | :----------------------------------------------------------------------------------- |
-| **Metadados e Manifesto**         | ✅ Configurado (`v1.0.0`, ES Modules `"type": "module"`)        | [`package.json`](../package.json)                                                    |
-| **Análise Estática e Formatação** | ✅ ESLint v10 (JS, JSON, CSS, Markdown) + Prettier v3           | [`eslint.config.js`](../eslint.config.js), [`.prettierrc`](../.prettierrc)           |
-| **Módulos da Aplicação (PWA)**    | ✅ Entrypoint e funções base em [`src/main.js`](../src/main.js) | [`package.json`](../package.json), [`src/main.js`](../src/main.js)                   |
-| **Suíte de Testes Automatizados** | ✅ Configurado (Vitest v5 + JSDOM + Coverage V8)                | [`vitest.config.js`](../vitest.config.js), [`src/main.test.js`](../src/main.test.js) |
-| **Hospedagem e Domínio**          | ✅ Definido (Firebase Hosting `dev`/`stg`/`prd` + Name.com TLS) | [`docs/deployment/infrastructure.md`](./deployment/infrastructure.md)                |
+| Dimensão                          | Estado Atual no Código                                                                 | Referência no Repositório                                                                                                            |
+| :-------------------------------- | :------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
+| **Metadados e Manifesto**         | ✅ Configurado (`v1.0.0`, ES Modules `"type": "module"`)                               | [`package.json`](../package.json)                                                                                                    |
+| **Análise Estática e Formatação** | ✅ ESLint v10 (JS, JSON, CSS, Markdown) + Prettier v3                                  | [`eslint.config.js`](../eslint.config.js), [`.prettierrc`](../.prettierrc)                                                           |
+| **Módulos da Aplicação (PWA)**    | ✅ Entrypoint e funções base em [`src/main.js`](../src/main.js)                        | [`package.json`](../package.json), [`src/main.js`](../src/main.js)                                                                   |
+| **Suíte de Testes Automatizados** | ✅ Configurado (Vitest v5 + JSDOM + Coverage V8)                                       | [`vitest.config.js`](../vitest.config.js), [`src/main.test.js`](../src/main.test.js)                                                 |
+| **Versionamento e CI/CD**         | ✅ Git Flow (`main`, `develop`, `feature/*`, `release/*`, `hotfix/*`) + GitHub Actions | [`docs/deployment/pipeline.md`](./deployment/pipeline.md), [ADR 0005](./architecture/decisions/0005-modelo-de-branching-git-flow.md) |
+| **Hospedagem e Domínio**          | ✅ Definido (Firebase Hosting `dev`/`stg`/`prd` + Name.com TLS)                        | [`docs/deployment/infrastructure.md`](./deployment/infrastructure.md)                                                                |
 
 ---
 

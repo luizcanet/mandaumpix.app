@@ -312,11 +312,11 @@ flowchart TD
 
 #### `US-07.3` — Workflows de Entrega Contínua (CD) para `staging` e `production` (`⏳ Pendente`)
 
-- **História**: Como **Mantenedor**, quero pipelines automatizados no GitHub Actions para promover releases homologadas para `stg.mandaumpix.app` (`mandaumpix-app-stg`) e `mandaumpix.app` (`mandaumpix-app-prd`).
-- **Referência**: [Pipeline de Implantação](../deployment/pipeline.md) e [ADR 0003](../architecture/decisions/0003-hospedagem-firebase-hosting-e-dominio-name-com.md).
+- **História**: Como **Mantenedor**, quero pipelines automatizados no GitHub Actions alinhados ao modelo **Git Flow** para promover releases em homologação (`release/*` e `hotfix/*`) para `stg.mandaumpix.app` (`mandaumpix-app-stg`) e versões estáveis (`main` / tags `v*`) para `mandaumpix.app` (`mandaumpix-app-prd`).
+- **Referência**: [Pipeline de Implantação](../deployment/pipeline.md), [ADR 0003](../architecture/decisions/0003-hospedagem-firebase-hosting-e-dominio-name-com.md) e [ADR 0005](../architecture/decisions/0005-modelo-de-branching-git-flow.md).
 - **Critérios de Aceite**:
-  - [ ] Criar workflow `.github/workflows/deploy-stg.yml` para deploy no projeto Firebase `mandaumpix-app-stg` (`https://stg.mandaumpix.app`).
-  - [ ] Criar workflow `.github/workflows/deploy-prd.yml` (disparado em `push` na branch `main` / tags de release) para deploy no projeto Firebase `mandaumpix-app-prd` (`https://mandaumpix.app`).
+  - [ ] Criar workflow `.github/workflows/deploy-stg.yml` (disparado em `push` nas branches `release/*` e `hotfix/*` do Git Flow) para deploy no projeto Firebase `mandaumpix-app-stg` (`https://stg.mandaumpix.app`).
+  - [ ] Criar workflow `.github/workflows/deploy-prd.yml` (disparado em `push` na branch `main` / tags de release `v*` do Git Flow) para deploy no projeto Firebase `mandaumpix-app-prd` (`https://mandaumpix.app`).
   - [ ] Atualizar a matriz de status em [`docs/deployment/pipeline.md`](../deployment/pipeline.md).
 
 ---

@@ -77,9 +77,24 @@ npx eslint docs/ README.md
 
 ---
 
-## 📏 Convenção de Commits
+## 🌿 Modelo de Branching (Git Flow) e Convenção de Commits
 
-Ao contribuir com código ou documentação neste repositório, todas as mensagens de commit devem ser redigidas em **inglês** utilizando o padrão **Conventional Commits** (ex.: `feat: ...`, `fix: ...`, `docs: ...`, `chore: ...`).
+O projeto adota o modelo de branching **Git Flow** ([ADR 0005](../architecture/decisions/0005-modelo-de-branching-git-flow.md) e [Pipeline CI/CD](../deployment/pipeline.md)):
+
+- **`main`**: Branch de produção (`https://mandaumpix.app`). Nunca recebe commits diretos; é atualizada exclusivamente via merge de branches `release/*` ou `hotfix/*` acompanhado de tag SemVer (`vX.Y.Z`).
+- **`develop`**: Branch principal de integração de desenvolvimento (`https://dev.mandaumpix.app`). É a base para criação de novas funcionalidades.
+- **`feature/<escopo>`** e **`bugfix/<escopo>`**: Criadas a partir de `develop` para implementação de itens do backlog ou correções de bugs e reintegradas em `develop` via Pull Request:
+  ```bash
+  git checkout develop
+  git pull origin develop
+  git checkout -b feature/minha-funcionalidade
+  ```
+- **`release/<versao>`**: Criada a partir de `develop` para estabilização e homologação no ambiente `staging` (`https://stg.mandaumpix.app`), sendo posteriormente mesclada em `main` e de volta em `develop`.
+- **`hotfix/<versao-ou-escopo>`**: Criada a partir de `main` para correções urgentes em produção, sendo mesclada em `main` e sincronizada de volta em `develop`.
+
+### 📏 Padrão de Mensagens de Commit
+
+Ao contribuir com código ou documentação neste repositório, todas as mensagens de commit e títulos de Pull Request devem ser redigidos em **inglês** utilizando o padrão **Conventional Commits** (ex.: `feat: ...`, `fix: ...`, `docs: ...`, `chore: ...`).
 
 ---
 

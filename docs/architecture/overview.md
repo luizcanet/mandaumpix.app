@@ -74,6 +74,7 @@ flowchart TD
   - [ADR 0002: Arquitetura PWA Client-Side com ES Modules e Linting Multi-Linguagem](./decisions/0002-arquitetura-pwa-client-side-es-modules.md)
   - [ADR 0003: Hospedagem em Firebase Hosting Multi-Ambiente e Domínio no Name.com](./decisions/0003-hospedagem-firebase-hosting-e-dominio-name-com.md)
   - [ADR 0004: Persistência Local de Dados do Usuário com IndexedDB](./decisions/0004-persistencia-local-indexeddb.md)
+  - [ADR 0005: Adoção do Modelo de Branching Git Flow Alinhado aos Ambientes de Deploy](./decisions/0005-modelo-de-branching-git-flow.md)
 
 ---
 

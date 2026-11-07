@@ -2,7 +2,7 @@
 
 # ☁️ Infraestrutura e Topologia de Execução
 
-Por ser um **Progressive Web App (PWA)** gratuito baseado em módulos ES nativos para o navegador, a topologia do **Manda um PIX** dispensa servidores de aplicação backend dedicados ou bancos de dados gerenciados em nuvem, utilizando **Firebase Hosting** para distribuição estática global e **Name.com** para gestão de domínio e certificado digital.
+Por ser um **Progressive Web App (PWA)** gratuito, livre e de código aberto, baseado em módulos ES nativos para o navegador, a topologia do **Manda um PIX** dispensa servidores de aplicação backend dedicados ou bancos de dados gerenciados em nuvem, utilizando **Firebase Hosting** para distribuição estática global e **Name.com** para gestão de domínio e certificado digital.
 
 ---
 
@@ -11,13 +11,13 @@ Por ser um **Progressive Web App (PWA)** gratuito baseado em módulos ES nativos
 - **Registrador de Domínio e Autoridade de Certificado**: [**Name.com**](https://www.name.com/) — responsável pelo registro do domínio `mandaumpix.app`, gerenciamento de zonas DNS e fornecimento do certificado SSL/TLS.
 - **Plataforma de Hospedagem e CDN**: [**Firebase Hosting**](https://firebase.google.com/docs/hosting) — hospedagem estática de alta performance segregada em três projetos independentes no Firebase (veja a decisão arquitetural em [ADR 0003](../architecture/decisions/0003-hospedagem-firebase-hosting-e-dominio-name-com.md)).
 
-### Matriz de Ambientes e Projetos Firebase
+### Matriz de Ambientes, Branches (Git Flow) e Projetos Firebase
 
-| Ambiente      | Sigla | Domínio / URL                | Projeto no Firebase  | Finalidade Operacional                                                          |
-| :------------ | :---: | :--------------------------- | :------------------- | :------------------------------------------------------------------------------ |
-| `development` | `dev` | `https://dev.mandaumpix.app` | `mandaumpix-app-dev` | Validação contínua de integrações e novas funcionalidades em desenvolvimento.   |
-| `staging`     | `stg` | `https://stg.mandaumpix.app` | `mandaumpix-app-stg` | Homologação pré-produção, testes de aceitação e validação de release candidate. |
-| `production`  | `prd` | `https://mandaumpix.app`     | `mandaumpix-app-prd` | Ambiente produtivo oficial disponível para os usuários finais do PWA.           |
+| Ambiente      | Sigla | Branch Git Flow ([ADR 0005](../architecture/decisions/0005-modelo-de-branching-git-flow.md)) | Domínio / URL                | Projeto no Firebase  | Finalidade Operacional                                                          |
+| :------------ | :---: | :------------------------------------------------------------------------------------------- | :--------------------------- | :------------------- | :------------------------------------------------------------------------------ |
+| `development` | `dev` | `develop`                                                                                    | `https://dev.mandaumpix.app` | `mandaumpix-app-dev` | Validação contínua de integrações e novas funcionalidades em desenvolvimento.   |
+| `staging`     | `stg` | `release/*` / `hotfix/*`                                                                     | `https://stg.mandaumpix.app` | `mandaumpix-app-stg` | Homologação pré-produção, testes de aceitação e validação de release candidate. |
+| `production`  | `prd` | `main` (tags `v*`)                                                                           | `https://mandaumpix.app`     | `mandaumpix-app-prd` | Ambiente produtivo oficial disponível para os usuários finais do PWA.           |
 
 ---
 
