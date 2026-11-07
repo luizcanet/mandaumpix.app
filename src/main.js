@@ -9,9 +9,30 @@ import { createStaticPix, hasError, isStaticPix, parsePix } from "pix-utils";
 import encodeQR from "qr";
 import { gifToPng, svgToPng } from "qr/dom.js";
 import {
+  DeletePixKeyUseCase,
+  executeDeletePixKey,
+} from "./application/use-cases/delete-pix-key.use-case.js";
+import {
   GeneratePixChargeUseCase,
   executeGeneratePixCharge,
 } from "./application/use-cases/generate-pix-charge.use-case.js";
+import {
+  ListPixKeysUseCase,
+  executeListPixKeys,
+} from "./application/use-cases/list-pix-keys.use-case.js";
+import {
+  PIX_KEY_MANAGEMENT_ERROR_CODES,
+  PixKeyManagementError,
+  SavePixKeyUseCase,
+  assertPixKeyRepository,
+  executeSavePixKey,
+  hydrateChaveContaList,
+} from "./application/use-cases/save-pix-key.use-case.js";
+import {
+  SelectPixKeyUseCase,
+  executeSelectPixKey,
+  resolveRequiredPixKeyId,
+} from "./application/use-cases/select-pix-key.use-case.js";
 import {
   CobrancaPix,
   DEFAULT_PIX_CHARGE_TXID,
@@ -134,24 +155,36 @@ export {
   DEFAULT_PIX_KEY_LABELS,
   DataController,
   DataHandler,
+  DeletePixKeyUseCase,
   GeneratePixChargeUseCase,
+  ListPixKeysUseCase,
   MAX_PIX_CHARGE_ADDITIONAL_INFO_LENGTH,
   MAX_PIX_CHARGE_AMOUNT,
   MAX_PIX_CHARGE_TXID_LENGTH,
   PIX_CHARGE_ERROR_CODES,
   PIX_KEY_ERROR_CODES,
+  PIX_KEY_MANAGEMENT_ERROR_CODES,
   PIX_KEY_TYPES,
   PixChargeEntity,
   PixChargeValidationError,
   PixKeyEntity,
+  PixKeyManagementError,
   PixKeyValidationError,
   Router,
+  SavePixKeyUseCase,
+  SelectPixKeyUseCase,
   SetInjectable,
+  assertPixKeyRepository,
   createStaticPix,
   encodeQR,
+  executeDeletePixKey,
   executeGeneratePixCharge,
+  executeListPixKeys,
+  executeSavePixKey,
+  executeSelectPixKey,
   gifToPng,
   hasError,
+  hydrateChaveContaList,
   isStaticPix,
   normalizeAdditionalInfo,
   normalizeMerchantCity,
@@ -160,6 +193,7 @@ export {
   normalizeTxid,
   parsePix,
   resolveChaveConta,
+  resolveRequiredPixKeyId,
   svgToPng,
   validateAndNormalizeCnpj,
   validateAndNormalizeCpf,

@@ -8,21 +8,33 @@ import {
   DEFAULT_PIX_CHARGE_TXID,
   DEFAULT_PIX_KEY_LABELS,
   DataController,
+  DeletePixKeyUseCase,
   GeneratePixChargeUseCase,
+  ListPixKeysUseCase,
   MAX_PIX_CHARGE_ADDITIONAL_INFO_LENGTH,
   MAX_PIX_CHARGE_AMOUNT,
   MAX_PIX_CHARGE_TXID_LENGTH,
   PIX_CHARGE_ERROR_CODES,
   PIX_KEY_ERROR_CODES,
+  PIX_KEY_MANAGEMENT_ERROR_CODES,
   PIX_KEY_TYPES,
   PixChargeEntity,
   PixChargeValidationError,
   PixKeyEntity,
+  PixKeyManagementError,
   PixKeyValidationError,
   Router,
+  SavePixKeyUseCase,
+  SelectPixKeyUseCase,
+  assertPixKeyRepository,
   bootstrapApp,
+  executeDeletePixKey,
   executeGeneratePixCharge,
+  executeListPixKeys,
+  executeSavePixKey,
+  executeSelectPixKey,
   generatePixCharge,
+  hydrateChaveContaList,
   normalizeAdditionalInfo,
   normalizeMerchantCity,
   normalizeMerchantName,
@@ -30,6 +42,7 @@ import {
   normalizeTxid,
   parsePixCharge,
   resolveChaveConta,
+  resolveRequiredPixKeyId,
   validateAndNormalizePixKey,
 } from "./main.js";
 
@@ -174,6 +187,95 @@ describe("main.js", () => {
       expect(charge.valor_dinamico).toBe(false);
       expect(charge.chave_cobranca).toContain("540525.50");
       expect(charge.imagem_qrcode.svg).toContain("<svg");
+    });
+  });
+
+  describe("application exports & lifecycle integration (US-02.4)", () => {
+    it("should re-export PIX key management use cases, error class, error codes, and helpers", () => {
+      expect(SavePixKeyUseCase).toBeDefined();
+      expect(ListPixKeysUseCase).toBeDefined();
+      expect(SelectPixKeyUseCase).toBeDefined();
+      expect(DeletePixKeyUseCase).toBeDefined();
+      expect(executeSavePixKey).toBeTypeOf("function");
+      expect(executeListPixKeys).toBeTypeOf("function");
+      expect(executeSelectPixKey).toBeTypeOf("function");
+      expect(executeDeletePixKey).toBeTypeOf("function");
+      expect(PixKeyManagementError).toBeDefined();
+      expect(PIX_KEY_MANAGEMENT_ERROR_CODES).toBeDefined();
+      expect(assertPixKeyRepository).toBeTypeOf("function");
+      expect(hydrateChaveContaList).toBeTypeOf("function");
+      expect(resolveRequiredPixKeyId).toBeTypeOf("function");
+    });
+
+    it("should orchestrate full PIX key management lifecycle and charge generation via main.js exports", async () => {
+      // Arrange
+      const store = new Map();
+      let selectedKeyId = null;
+      const pixKeyRepository = {
+        findAll: async () => Array.from(store.values()),
+        save: async (key) => {
+          store.set(key.id, key);
+          return key;
+        },
+        deleteById: async (id) => {
+          store.delete(id);
+        },
+        getSelectedKeyId: async () => selectedKeyId,
+        setSelectedKeyId: async (id) => {
+          selectedKeyId = id;
+        },
+      };
+
+      // Act 1: Save first key (auto-selected) and second key
+      const savedFirst = await executeSavePixKey(
+        {
+          id: "key-01",
+          rotulo: "Conta Principal",
+          tipo_chave: PIX_KEY_TYPES.EMAIL,
+          valor_chave: "eu@luizca.net",
+          nome_recebedor: "Luiz Henrique Canet Filho",
+          cidade_recebedor: "Brasília",
+        },
+        { pixKeyRepository },
+      );
+      const savedSecond = await executeSavePixKey(
+        {
+          id: "key-02",
+          rotulo: "Conta Celular",
+          tipo_chave: PIX_KEY_TYPES.TELEFONE,
+          valor_chave: "(61) 99999-8888",
+          nome_recebedor: "Luiz Henrique Canet Filho",
+          cidade_recebedor: "Brasília",
+        },
+        { pixKeyRepository },
+      );
+
+      // Assert 1
+      expect(savedFirst.isSelected).toBe(true);
+      expect(savedSecond.isSelected).toBe(false);
+
+      // Act 2: Select second key and generate charge from repository active key
+      await executeSelectPixKey("key-02", { pixKeyRepository });
+      const listedAfterSelect = await executeListPixKeys({ pixKeyRepository });
+      const charge = await executeGeneratePixCharge(
+        { valor_opcional: 100 },
+        { pixKeyRepository },
+      );
+
+      // Assert 2
+      expect(listedAfterSelect.items).toHaveLength(2);
+      expect(listedAfterSelect.selectedKeyId).toBe("key-02");
+      expect(charge.id_chave_conta).toBe("key-02");
+      expect(charge.chave_cobranca).toContain("+5561999998888");
+
+      // Act 3: Delete active key (key-02) -> auto-reassigns to key-01
+      const afterDeleteActive = await executeDeletePixKey("key-02", {
+        pixKeyRepository,
+      });
+
+      // Assert 3
+      expect(afterDeleteActive.selectedKeyId).toBe("key-01");
+      expect(afterDeleteActive.items).toHaveLength(1);
     });
   });
 });
