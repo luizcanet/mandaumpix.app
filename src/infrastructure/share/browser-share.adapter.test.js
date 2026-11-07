@@ -17,6 +17,10 @@ const VALID_BR_CODE =
 function createMockNavigatorTarget({
   hasClipboard = true,
   writeTextImpl = vi.fn().mockResolvedValue(undefined),
+  hasShare = true,
+  shareImpl = vi.fn().mockResolvedValue(undefined),
+  hasCanShare = true,
+  canShareImpl = vi.fn().mockReturnValue(true),
 } = {}) {
   const clipboard = hasClipboard
     ? {
@@ -24,8 +28,31 @@ function createMockNavigatorTarget({
       }
     : undefined;
 
-  return {
+  const target = {
     clipboard,
+  };
+
+  if (hasShare) {
+    target.share = shareImpl;
+  }
+
+  if (hasCanShare) {
+    target.canShare = canShareImpl;
+  }
+
+  return target;
+}
+
+function createMockWindowTarget({
+  hasOpen = true,
+  openImpl = vi.fn().mockReturnValue({ closed: false }),
+} = {}) {
+  if (!hasOpen) {
+    return {};
+  }
+
+  return {
+    open: openImpl,
   };
 }
 
@@ -280,6 +307,438 @@ describe("BrowserShareAdapter — TASK-03.3.1 (Clipboard API & Constantes)", () 
       ).rejects.toMatchObject({
         name: "PixChargeDistributionError",
         code: PIX_CHARGE_DISTRIBUTION_ERROR_CODES.COPY_FAILED,
+      });
+    });
+  });
+
+  describe("BrowserShareAdapter — TASK-03.3.2 (Web Share API, Fallback WhatsApp & Janelas Seguras)", () => {
+    describe("Método canShare", () => {
+      it("deve retornar true quando navigator.canShare retornar true", () => {
+        const canShareSpy = vi.fn().mockReturnValue(true);
+        const mockNavigator = createMockNavigatorTarget({
+          canShareImpl: canShareSpy,
+        });
+        const adapter = new BrowserShareAdapter({
+          navigatorTarget: mockNavigator,
+        });
+
+        const result = adapter.canShare({ title: "PIX", text: VALID_BR_CODE });
+
+        expect(canShareSpy).toHaveBeenCalledWith({
+          title: "PIX",
+          text: VALID_BR_CODE,
+        });
+        expect(result).toBe(true);
+      });
+
+      it("deve retornar false quando navigator.canShare retornar false", () => {
+        const canShareSpy = vi.fn().mockReturnValue(false);
+        const mockNavigator = createMockNavigatorTarget({
+          canShareImpl: canShareSpy,
+        });
+        const adapter = new BrowserShareAdapter({
+          navigatorTarget: mockNavigator,
+        });
+
+        expect(adapter.canShare({ title: "PIX", text: VALID_BR_CODE })).toBe(
+          false,
+        );
+      });
+
+      it("deve retornar true como fallback quando navigator.share existir mas canShare não estiver definido", () => {
+        const mockNavigator = createMockNavigatorTarget({
+          hasShare: true,
+          hasCanShare: false,
+        });
+        const adapter = new BrowserShareAdapter({
+          navigatorTarget: mockNavigator,
+        });
+
+        expect(adapter.canShare({ title: "PIX", text: VALID_BR_CODE })).toBe(
+          true,
+        );
+      });
+
+      it("deve retornar false quando navigator.share não existir ou navigatorTarget for nulo", () => {
+        const mockNavigator = createMockNavigatorTarget({
+          hasShare: false,
+          hasCanShare: false,
+        });
+        const adapter1 = new BrowserShareAdapter({
+          navigatorTarget: mockNavigator,
+        });
+        const adapter2 = new BrowserShareAdapter({ navigatorTarget: null });
+
+        expect(adapter1.canShare({ text: VALID_BR_CODE })).toBe(false);
+        expect(adapter2.canShare({ text: VALID_BR_CODE })).toBe(false);
+      });
+    });
+
+    describe("Método share", () => {
+      it("deve disparar navigator.share com sucesso e retornar payload congelado", async () => {
+        const shareSpy = vi.fn().mockResolvedValue(undefined);
+        const mockNavigator = createMockNavigatorTarget({
+          shareImpl: shareSpy,
+        });
+        const adapter = new BrowserShareAdapter({
+          navigatorTarget: mockNavigator,
+        });
+
+        const sharePayload = {
+          title: "Manda um PIX",
+          text: VALID_BR_CODE,
+        };
+
+        const result = await adapter.share(sharePayload);
+
+        expect(shareSpy).toHaveBeenCalledWith(sharePayload);
+        expect(result).toEqual({
+          action: PIX_CHARGE_DISTRIBUTION_ACTIONS.SHARE,
+          shared: true,
+          aborted: false,
+          payload: sharePayload,
+        });
+        expect(Object.isFrozen(result)).toBe(true);
+      });
+
+      it("deve lançar INVALID_PAYLOAD quando payload for nulo ou não for objeto", async () => {
+        const adapter = new BrowserShareAdapter({
+          navigatorTarget: createMockNavigatorTarget(),
+        });
+
+        await expect(adapter.share(null)).rejects.toMatchObject({
+          name: "BrowserShareAdapterError",
+          code: BROWSER_SHARE_ADAPTER_ERROR_CODES.INVALID_PAYLOAD,
+          field: "payload",
+        });
+
+        await expect(adapter.share("texto")).rejects.toMatchObject({
+          name: "BrowserShareAdapterError",
+          code: BROWSER_SHARE_ADAPTER_ERROR_CODES.INVALID_PAYLOAD,
+          field: "payload",
+        });
+      });
+
+      it("deve lançar SHARE_UNAVAILABLE quando navigator.share não estiver disponível", async () => {
+        const adapter = new BrowserShareAdapter({
+          navigatorTarget: createMockNavigatorTarget({ hasShare: false }),
+        });
+
+        await expect(
+          adapter.share({ text: VALID_BR_CODE }),
+        ).rejects.toMatchObject({
+          name: "BrowserShareAdapterError",
+          code: BROWSER_SHARE_ADAPTER_ERROR_CODES.SHARE_UNAVAILABLE,
+          field: "share",
+        });
+      });
+
+      it("deve tratar AbortError graciosamente retornando shared: false e aborted: true", async () => {
+        const abortError = new Error("Share canceled by user.");
+        abortError.name = "AbortError";
+
+        const shareSpy = vi.fn().mockRejectedValue(abortError);
+        const adapter = new BrowserShareAdapter({
+          navigatorTarget: createMockNavigatorTarget({ shareImpl: shareSpy }),
+        });
+
+        const result = await adapter.share({ text: VALID_BR_CODE });
+
+        expect(result).toEqual({
+          action: PIX_CHARGE_DISTRIBUTION_ACTIONS.SHARE,
+          shared: false,
+          aborted: true,
+        });
+        expect(Object.isFrozen(result)).toBe(true);
+      });
+
+      it("deve lançar SHARE_FAILED quando navigator.share falhar com erro inesperado", async () => {
+        const networkError = new Error("Internal share provider failure.");
+        const shareSpy = vi.fn().mockRejectedValue(networkError);
+        const adapter = new BrowserShareAdapter({
+          navigatorTarget: createMockNavigatorTarget({ shareImpl: shareSpy }),
+        });
+
+        await expect(
+          adapter.share({ text: VALID_BR_CODE }),
+        ).rejects.toMatchObject({
+          name: "BrowserShareAdapterError",
+          code: BROWSER_SHARE_ADAPTER_ERROR_CODES.SHARE_FAILED,
+          field: "share",
+          cause: networkError,
+        });
+      });
+
+      it("deve utilizar mensagem padrão de falha quando erro em share não tiver mensagem", async () => {
+        const shareSpy = vi.fn().mockRejectedValue({});
+        const adapter = new BrowserShareAdapter({
+          navigatorTarget: createMockNavigatorTarget({ shareImpl: shareSpy }),
+        });
+
+        await expect(
+          adapter.share({ text: VALID_BR_CODE }),
+        ).rejects.toMatchObject({
+          name: "BrowserShareAdapterError",
+          code: BROWSER_SHARE_ADAPTER_ERROR_CODES.SHARE_FAILED,
+          message: "Falha ao acionar o compartilhamento nativo do sistema.",
+        });
+      });
+    });
+
+    describe("Método openExternalUrl", () => {
+      it("deve abrir URL com target '_blank' e 'noopener,noreferrer' por padrão", () => {
+        const openSpy = vi.fn().mockReturnValue({ closed: false });
+        const mockWindow = createMockWindowTarget({ openImpl: openSpy });
+        const adapter = new BrowserShareAdapter({ windowTarget: mockWindow });
+
+        const opened = adapter.openExternalUrl("https://wa.me/?text=teste");
+
+        expect(openSpy).toHaveBeenCalledWith(
+          "https://wa.me/?text=teste",
+          "_blank",
+          "noopener,noreferrer",
+        );
+        expect(opened).toEqual({ closed: false });
+      });
+
+      it("deve lançar INVALID_PAYLOAD quando url for inválida ou vazia", () => {
+        const adapter = new BrowserShareAdapter({
+          windowTarget: createMockWindowTarget(),
+        });
+
+        expect(() => adapter.openExternalUrl("")).toThrow(
+          BrowserShareAdapterError,
+        );
+        expect(() => adapter.openExternalUrl(null)).toThrow(
+          BrowserShareAdapterError,
+        );
+      });
+
+      it("deve lançar POPUP_BLOCKED quando windowTarget ou window.open não estiver disponível", () => {
+        const adapter1 = new BrowserShareAdapter({ windowTarget: null });
+        const adapter2 = new BrowserShareAdapter({
+          windowTarget: createMockWindowTarget({ hasOpen: false }),
+        });
+
+        expect(() =>
+          adapter1.openExternalUrl("https://wa.me/?text=teste"),
+        ).toThrow(
+          expect.objectContaining({
+            name: "BrowserShareAdapterError",
+            code: BROWSER_SHARE_ADAPTER_ERROR_CODES.POPUP_BLOCKED,
+          }),
+        );
+
+        expect(() =>
+          adapter2.openExternalUrl("https://wa.me/?text=teste"),
+        ).toThrow(
+          expect.objectContaining({
+            name: "BrowserShareAdapterError",
+            code: BROWSER_SHARE_ADAPTER_ERROR_CODES.POPUP_BLOCKED,
+          }),
+        );
+      });
+
+      it("deve lançar POPUP_BLOCKED quando window.open retornar null (bloqueador ativo)", () => {
+        const openSpy = vi.fn().mockReturnValue(null);
+        const mockWindow = createMockWindowTarget({ openImpl: openSpy });
+        const adapter = new BrowserShareAdapter({ windowTarget: mockWindow });
+
+        expect(() =>
+          adapter.openExternalUrl("https://wa.me/?text=teste"),
+        ).toThrow(
+          expect.objectContaining({
+            name: "BrowserShareAdapterError",
+            code: BROWSER_SHARE_ADAPTER_ERROR_CODES.POPUP_BLOCKED,
+            field: "url",
+          }),
+        );
+      });
+
+      it("deve lançar POPUP_BLOCKED quando window.open lançar uma exceção", () => {
+        const openSpy = vi.fn().mockImplementation(() => {
+          throw new Error("Window open denied");
+        });
+        const mockWindow = createMockWindowTarget({ openImpl: openSpy });
+        const adapter = new BrowserShareAdapter({ windowTarget: mockWindow });
+
+        expect(() =>
+          adapter.openExternalUrl("https://wa.me/?text=teste"),
+        ).toThrow(
+          expect.objectContaining({
+            name: "BrowserShareAdapterError",
+            code: BROWSER_SHARE_ADAPTER_ERROR_CODES.POPUP_BLOCKED,
+            field: "url",
+          }),
+        );
+      });
+
+      it("deve usar mensagem padrão quando window.open lançar erro sem mensagem", () => {
+        const openSpy = vi.fn().mockImplementation(() => {
+          throw {};
+        });
+        const mockWindow = createMockWindowTarget({ openImpl: openSpy });
+        const adapter = new BrowserShareAdapter({ windowTarget: mockWindow });
+
+        expect(() =>
+          adapter.openExternalUrl("https://wa.me/?text=teste"),
+        ).toThrow(
+          expect.objectContaining({
+            name: "BrowserShareAdapterError",
+            code: BROWSER_SHARE_ADAPTER_ERROR_CODES.POPUP_BLOCKED,
+            message: "Falha ao abrir a URL externa no navegador.",
+          }),
+        );
+      });
+    });
+
+    describe("Método shareViaWhatsApp", () => {
+      it("deve construir URL do WhatsApp e abrir janela segura quando apenas text for passado", () => {
+        const openSpy = vi.fn().mockReturnValue({ closed: false });
+        const mockWindow = createMockWindowTarget({ openImpl: openSpy });
+        const adapter = new BrowserShareAdapter({ windowTarget: mockWindow });
+
+        const expectedUrl = `https://wa.me/?text=${encodeURIComponent(VALID_BR_CODE)}`;
+        const result = adapter.shareViaWhatsApp({ text: VALID_BR_CODE });
+
+        expect(openSpy).toHaveBeenCalledWith(
+          expectedUrl,
+          "_blank",
+          "noopener,noreferrer",
+        );
+        expect(result).toEqual({
+          action: PIX_CHARGE_DISTRIBUTION_ACTIONS.SHARE,
+          shared: true,
+          channel: "WHATSAPP",
+          url: expectedUrl,
+        });
+        expect(Object.isFrozen(result)).toBe(true);
+      });
+
+      it("deve respeitar url pré-construída fornecida no payload", () => {
+        const openSpy = vi.fn().mockReturnValue({ closed: false });
+        const mockWindow = createMockWindowTarget({ openImpl: openSpy });
+        const adapter = new BrowserShareAdapter({ windowTarget: mockWindow });
+
+        const customUrl = "https://wa.me/?text=custom-text";
+        const result = adapter.shareViaWhatsApp({ url: customUrl });
+
+        expect(openSpy).toHaveBeenCalledWith(
+          customUrl,
+          "_blank",
+          "noopener,noreferrer",
+        );
+        expect(result.url).toBe(customUrl);
+      });
+
+      it("deve lançar INVALID_PAYLOAD quando nem url nem text válidos forem fornecidos", () => {
+        const adapter = new BrowserShareAdapter({
+          windowTarget: createMockWindowTarget(),
+        });
+
+        expect(() => adapter.shareViaWhatsApp({})).toThrow(
+          BrowserShareAdapterError,
+        );
+        expect(() => adapter.shareViaWhatsApp({ text: "   " })).toThrow(
+          BrowserShareAdapterError,
+        );
+      });
+    });
+
+    describe("Integração de Compartilhamento com DistributePixChargeUseCase", () => {
+      it("deve acionar Web Share nativo quando suportado pelo adaptador", async () => {
+        const shareSpy = vi.fn().mockResolvedValue(undefined);
+        const canShareSpy = vi.fn().mockReturnValue(true);
+        const mockNavigator = createMockNavigatorTarget({
+          shareImpl: shareSpy,
+          canShareImpl: canShareSpy,
+        });
+        const adapter = new BrowserShareAdapter({
+          navigatorTarget: mockNavigator,
+        });
+
+        const useCase = new DistributePixChargeUseCase({
+          chargeDistributionGateway: adapter,
+        });
+
+        const result = await useCase.shareCharge({
+          chave_cobranca: VALID_BR_CODE,
+          title: "Manda um PIX",
+        });
+
+        expect(shareSpy).toHaveBeenCalledWith({
+          title: "Manda um PIX",
+          text: VALID_BR_CODE,
+        });
+        expect(result).toEqual({
+          action: PIX_CHARGE_DISTRIBUTION_ACTIONS.SHARE,
+          shared: true,
+          channel: "WEB_SHARE",
+          chave_cobranca: VALID_BR_CODE,
+          whatsappUrl: `https://wa.me/?text=${encodeURIComponent(VALID_BR_CODE)}`,
+        });
+      });
+
+      it("deve utilizar fallback para shareViaWhatsApp quando canShare retornar false", async () => {
+        const openSpy = vi.fn().mockReturnValue({ closed: false });
+        const mockWindow = createMockWindowTarget({ openImpl: openSpy });
+        const mockNavigator = createMockNavigatorTarget({
+          hasShare: true,
+          canShareImpl: vi.fn().mockReturnValue(false),
+        });
+        const adapter = new BrowserShareAdapter({
+          navigatorTarget: mockNavigator,
+          windowTarget: mockWindow,
+        });
+
+        const useCase = new DistributePixChargeUseCase({
+          chargeDistributionGateway: adapter,
+        });
+
+        const result = await useCase.shareCharge({
+          chave_cobranca: VALID_BR_CODE,
+        });
+
+        const expectedUrl = `https://wa.me/?text=${encodeURIComponent(VALID_BR_CODE)}`;
+        expect(openSpy).toHaveBeenCalledWith(
+          expectedUrl,
+          "_blank",
+          "noopener,noreferrer",
+        );
+        expect(result).toEqual({
+          action: PIX_CHARGE_DISTRIBUTION_ACTIONS.SHARE,
+          shared: true,
+          channel: "WHATSAPP",
+          chave_cobranca: VALID_BR_CODE,
+          whatsappUrl: expectedUrl,
+        });
+      });
+
+      it("deve forçar envio pelo WhatsApp quando channel for explicitamente WHATSAPP", async () => {
+        const openSpy = vi.fn().mockReturnValue({ closed: false });
+        const mockWindow = createMockWindowTarget({ openImpl: openSpy });
+        const shareSpy = vi.fn();
+        const mockNavigator = createMockNavigatorTarget({
+          shareImpl: shareSpy,
+          canShareImpl: vi.fn().mockReturnValue(true),
+        });
+        const adapter = new BrowserShareAdapter({
+          navigatorTarget: mockNavigator,
+          windowTarget: mockWindow,
+        });
+
+        const useCase = new DistributePixChargeUseCase({
+          chargeDistributionGateway: adapter,
+        });
+
+        const result = await useCase.shareCharge({
+          chave_cobranca: VALID_BR_CODE,
+          channel: "WHATSAPP",
+        });
+
+        expect(shareSpy).not.toHaveBeenCalled();
+        expect(openSpy).toHaveBeenCalledTimes(1);
+        expect(result.channel).toBe("WHATSAPP");
       });
     });
   });

@@ -1,4 +1,8 @@
-import { PIX_CHARGE_DISTRIBUTION_ACTIONS } from "../../application/use-cases/distribute-pix-charge.use-case.js";
+import {
+  PIX_CHARGE_DISTRIBUTION_ACTIONS,
+  PIX_CHARGE_DISTRIBUTION_CHANNELS,
+  buildWhatsAppShareUrl,
+} from "../../application/use-cases/distribute-pix-charge.use-case.js";
 
 export const BROWSER_SHARE_ADAPTER_ERROR_CODES = Object.freeze({
   CLIPBOARD_UNAVAILABLE: "CLIPBOARD_UNAVAILABLE",
@@ -90,9 +94,148 @@ export class BrowserShareAdapter {
   async copyChargeCode(text) {
     return this.copyText(text);
   }
+
+  canShare(payload) {
+    if (
+      !this.navigatorTarget ||
+      typeof this.navigatorTarget.share !== "function"
+    ) {
+      return false;
+    }
+
+    if (typeof this.navigatorTarget.canShare === "function") {
+      return Boolean(this.navigatorTarget.canShare(payload));
+    }
+
+    return true;
+  }
+
+  async share(payload) {
+    if (!payload || typeof payload !== "object") {
+      throw new BrowserShareAdapterError(
+        "Payload para compartilhamento nativo inválido (deve ser um objeto).",
+        {
+          code: BROWSER_SHARE_ADAPTER_ERROR_CODES.INVALID_PAYLOAD,
+          field: "payload",
+        },
+      );
+    }
+
+    if (
+      !this.navigatorTarget ||
+      typeof this.navigatorTarget.share !== "function"
+    ) {
+      throw new BrowserShareAdapterError(
+        "Web Share API (navigator.share) não está disponível no ambiente atual.",
+        {
+          code: BROWSER_SHARE_ADAPTER_ERROR_CODES.SHARE_UNAVAILABLE,
+          field: "share",
+        },
+      );
+    }
+
+    try {
+      await this.navigatorTarget.share(payload);
+
+      return Object.freeze({
+        action: PIX_CHARGE_DISTRIBUTION_ACTIONS.SHARE,
+        shared: true,
+        aborted: false,
+        payload,
+      });
+    } catch (error) {
+      if (error?.name === "AbortError") {
+        return Object.freeze({
+          action: PIX_CHARGE_DISTRIBUTION_ACTIONS.SHARE,
+          shared: false,
+          aborted: true,
+        });
+      }
+
+      throw new BrowserShareAdapterError(
+        error?.message ||
+          "Falha ao acionar o compartilhamento nativo do sistema.",
+        {
+          code: BROWSER_SHARE_ADAPTER_ERROR_CODES.SHARE_FAILED,
+          field: "share",
+          cause: error,
+        },
+      );
+    }
+  }
+
+  openExternalUrl(url, target = "_blank", features = "noopener,noreferrer") {
+    const normalizedUrl = normalizeRequiredString(
+      url,
+      "url",
+      "URL externa para navegação inválida ou vazia.",
+    );
+
+    if (!this.windowTarget || typeof this.windowTarget.open !== "function") {
+      throw new BrowserShareAdapterError(
+        "Ambiente sem suporte a abertura de novas janelas (window.open não disponível).",
+        {
+          code: BROWSER_SHARE_ADAPTER_ERROR_CODES.POPUP_BLOCKED,
+          field: "url",
+        },
+      );
+    }
+
+    let openedWindow;
+    try {
+      openedWindow = this.windowTarget.open(normalizedUrl, target, features);
+    } catch (error) {
+      throw new BrowserShareAdapterError(
+        error?.message || "Falha ao abrir a URL externa no navegador.",
+        {
+          code: BROWSER_SHARE_ADAPTER_ERROR_CODES.POPUP_BLOCKED,
+          field: "url",
+          cause: error,
+        },
+      );
+    }
+
+    if (!openedWindow) {
+      throw new BrowserShareAdapterError(
+        "Abertura da URL bloqueada pelo navegador (bloqueador de pop-ups ativo).",
+        {
+          code: BROWSER_SHARE_ADAPTER_ERROR_CODES.POPUP_BLOCKED,
+          field: "url",
+        },
+      );
+    }
+
+    return openedWindow;
+  }
+
+  shareViaWhatsApp({ text, url } = {}) {
+    let targetUrl;
+
+    if (typeof url === "string" && url.trim()) {
+      targetUrl = url.trim();
+    } else if (typeof text === "string" && text.trim()) {
+      targetUrl = buildWhatsAppShareUrl(text);
+    } else {
+      throw new BrowserShareAdapterError(
+        "Informe um texto ou URL válida para compartilhamento via WhatsApp.",
+        {
+          code: BROWSER_SHARE_ADAPTER_ERROR_CODES.INVALID_PAYLOAD,
+          field: "text",
+        },
+      );
+    }
+
+    this.openExternalUrl(targetUrl, "_blank", "noopener,noreferrer");
+
+    return Object.freeze({
+      action: PIX_CHARGE_DISTRIBUTION_ACTIONS.SHARE,
+      shared: true,
+      channel: PIX_CHARGE_DISTRIBUTION_CHANNELS.WHATSAPP,
+      url: targetUrl,
+    });
+  }
 }
 
 export function createBrowserShareAdapter(options) {
   return new BrowserShareAdapter(options);
 }
-
