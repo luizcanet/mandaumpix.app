@@ -8,6 +8,22 @@ import Router from "@modnes/router";
 import { createStaticPix, hasError, isStaticPix, parsePix } from "pix-utils";
 import encodeQR from "qr";
 import { gifToPng, svgToPng } from "qr/dom.js";
+import {
+  ChaveConta,
+  DEFAULT_PIX_KEY_LABELS,
+  PIX_KEY_ERROR_CODES,
+  PIX_KEY_TYPES,
+  PixKeyEntity,
+  PixKeyValidationError,
+  normalizeMerchantCity,
+  normalizeMerchantName,
+  validateAndNormalizeCnpj,
+  validateAndNormalizeCpf,
+  validateAndNormalizeEmail,
+  validateAndNormalizeEvp,
+  validateAndNormalizePhone,
+  validateAndNormalizePixKey,
+} from "./domain/entities/pix-key.entity.js";
 
 export const APP_METADATA = Object.freeze({
   name: "Manda um PIX",
@@ -93,9 +109,15 @@ if (typeof document !== "undefined") {
 export {
   AccessController,
   ArrayHandler,
+  ChaveConta,
   CustomElement,
+  DEFAULT_PIX_KEY_LABELS,
   DataController,
   DataHandler,
+  PIX_KEY_ERROR_CODES,
+  PIX_KEY_TYPES,
+  PixKeyEntity,
+  PixKeyValidationError,
   Router,
   SetInjectable,
   createStaticPix,
@@ -103,6 +125,14 @@ export {
   gifToPng,
   hasError,
   isStaticPix,
+  normalizeMerchantCity,
+  normalizeMerchantName,
   parsePix,
   svgToPng,
+  validateAndNormalizeCnpj,
+  validateAndNormalizeCpf,
+  validateAndNormalizeEmail,
+  validateAndNormalizeEvp,
+  validateAndNormalizePhone,
+  validateAndNormalizePixKey,
 };
