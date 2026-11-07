@@ -3,19 +3,33 @@ import {
   APP_METADATA,
   AccessController,
   ChaveConta,
+  CobrancaPix,
   CustomElement,
+  DEFAULT_PIX_CHARGE_TXID,
   DEFAULT_PIX_KEY_LABELS,
   DataController,
+  GeneratePixChargeUseCase,
+  MAX_PIX_CHARGE_ADDITIONAL_INFO_LENGTH,
+  MAX_PIX_CHARGE_AMOUNT,
+  MAX_PIX_CHARGE_TXID_LENGTH,
+  PIX_CHARGE_ERROR_CODES,
   PIX_KEY_ERROR_CODES,
   PIX_KEY_TYPES,
+  PixChargeEntity,
+  PixChargeValidationError,
   PixKeyEntity,
   PixKeyValidationError,
   Router,
   bootstrapApp,
+  executeGeneratePixCharge,
   generatePixCharge,
+  normalizeAdditionalInfo,
   normalizeMerchantCity,
   normalizeMerchantName,
+  normalizeTransactionAmount,
+  normalizeTxid,
   parsePixCharge,
+  resolveChaveConta,
   validateAndNormalizePixKey,
 } from "./main.js";
 
@@ -117,6 +131,49 @@ describe("main.js", () => {
       expect(validateAndNormalizePixKey).toBeTypeOf("function");
       expect(normalizeMerchantName).toBeTypeOf("function");
       expect(normalizeMerchantCity).toBeTypeOf("function");
+    });
+  });
+
+  describe("domain & application exports (US-02.3)", () => {
+    it("should re-export CobrancaPix entity, GeneratePixChargeUseCase, constants, errors, and sanitizers", () => {
+      expect(CobrancaPix).toBeDefined();
+      expect(PixChargeEntity).toBe(CobrancaPix);
+      expect(PixChargeValidationError).toBeDefined();
+      expect(PIX_CHARGE_ERROR_CODES).toBeDefined();
+      expect(DEFAULT_PIX_CHARGE_TXID).toBe("***");
+      expect(MAX_PIX_CHARGE_AMOUNT).toBe(999999999.99);
+      expect(MAX_PIX_CHARGE_TXID_LENGTH).toBe(25);
+      expect(MAX_PIX_CHARGE_ADDITIONAL_INFO_LENGTH).toBe(72);
+      expect(normalizeTransactionAmount).toBeTypeOf("function");
+      expect(normalizeTxid).toBeTypeOf("function");
+      expect(normalizeAdditionalInfo).toBeTypeOf("function");
+      expect(resolveChaveConta).toBeTypeOf("function");
+      expect(GeneratePixChargeUseCase).toBeDefined();
+      expect(executeGeneratePixCharge).toBeTypeOf("function");
+    });
+
+    it("should generate a complete CobrancaPix from a ChaveConta via main.js exports", () => {
+      // Arrange
+      const pixKey = ChaveConta.create({
+        tipo_chave: PIX_KEY_TYPES.EMAIL,
+        valor_chave: "eu@luizca.net",
+        nome_recebedor: "Luiz Henrique Canet Filho",
+        cidade_recebedor: "Brasília",
+      });
+
+      // Act
+      const charge = executeGeneratePixCharge({
+        chaveConta: pixKey,
+        valor_opcional: 25.5,
+      });
+
+      // Assert
+      expect(charge).toBeInstanceOf(CobrancaPix);
+      expect(charge.id_chave_conta).toBe(pixKey.id);
+      expect(charge.valor_opcional).toBe(25.5);
+      expect(charge.valor_dinamico).toBe(false);
+      expect(charge.chave_cobranca).toContain("540525.50");
+      expect(charge.imagem_qrcode.svg).toContain("<svg");
     });
   });
 });
