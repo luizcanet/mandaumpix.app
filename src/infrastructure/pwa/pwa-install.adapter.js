@@ -1,3 +1,5 @@
+import DataController from "@modnes/data-controller";
+
 export const STANDALONE_MEDIA_QUERY = "(display-mode: standalone)";
 
 export const PWA_INSTALL_ADAPTER_ERROR_CODES = Object.freeze({
@@ -52,6 +54,19 @@ export class PwaInstallAdapter extends EventTarget {
     this.installedFlag = false;
     this.destroyed = false;
 
+    const initialInstalled = detectStandaloneMode({
+      windowTarget: this.windowTarget,
+      navigatorTarget: this.navigatorTarget,
+    });
+
+    this.rawState = {
+      isInstalled: initialInstalled,
+      canInstall: false,
+      shouldShowInstallButton: false,
+    };
+    this.dataController = new DataController(this);
+    this.data = this.rawState;
+
     this.boundOnBeforeInstallPrompt = (event) =>
       this.handleBeforeInstallPrompt(event);
     this.boundOnAppInstalled = () => this.handleAppInstalled();
@@ -98,6 +113,22 @@ export class PwaInstallAdapter extends EventTarget {
     }
   }
 
+  syncState() {
+    const isInstalled = this.isInstalled();
+    const canInstall = this.canInstall();
+    const shouldShowInstallButton = !isInstalled && canInstall;
+
+    if (this.rawState.isInstalled !== isInstalled) {
+      this.data.isInstalled = isInstalled;
+    }
+    if (this.rawState.canInstall !== canInstall) {
+      this.data.canInstall = canInstall;
+    }
+    if (this.rawState.shouldShowInstallButton !== shouldShowInstallButton) {
+      this.data.shouldShowInstallButton = shouldShowInstallButton;
+    }
+  }
+
   handleBeforeInstallPrompt(event) {
     if (this.destroyed) {
       return;
@@ -108,7 +139,7 @@ export class PwaInstallAdapter extends EventTarget {
     }
 
     this.deferredPrompt = event;
-    this.emitStateChange();
+    this.syncState();
   }
 
   handleAppInstalled() {
@@ -118,7 +149,7 @@ export class PwaInstallAdapter extends EventTarget {
 
     this.installedFlag = true;
     this.deferredPrompt = null;
-    this.emitStateChange();
+    this.syncState();
   }
 
   handleMediaQueryChange(event) {
@@ -129,18 +160,12 @@ export class PwaInstallAdapter extends EventTarget {
     if (event?.matches) {
       this.installedFlag = true;
       this.deferredPrompt = null;
-      this.emitStateChange();
+      this.syncState();
     }
   }
 
-  emitStateChange() {
-    this.dispatchEvent(
-      new CustomEvent("statechange", { detail: this.getState() }),
-    );
-  }
-
   isInstalled() {
-    if (this.installedFlag) {
+    if (this.installedFlag || this.rawState?.isInstalled) {
       return true;
     }
 
@@ -168,6 +193,28 @@ export class PwaInstallAdapter extends EventTarget {
       canInstall,
       shouldShowInstallButton,
     });
+  }
+
+  subscribe(listener) {
+    if (typeof listener !== "function") {
+      throw new PwaInstallAdapterError(
+        "Listener de estado de instalação inválido (esperada uma função).",
+        {
+          code: PWA_INSTALL_ADAPTER_ERROR_CODES.INVALID_INSTALL_LISTENER,
+          field: "listener",
+        },
+      );
+    }
+
+    const handler = (event) => {
+      listener(this.getState(), event?.detail);
+    };
+
+    this.addEventListener("dataUpdated", handler);
+
+    return () => {
+      this.removeEventListener("dataUpdated", handler);
+    };
   }
 
   async promptInstall() {
@@ -230,7 +277,7 @@ export class PwaInstallAdapter extends EventTarget {
       this.installedFlag = true;
     }
 
-    this.emitStateChange();
+    this.syncState();
 
     const currentState = this.getState();
 

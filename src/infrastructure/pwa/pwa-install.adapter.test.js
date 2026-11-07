@@ -1,5 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  InstallPwaUseCase,
+  PWA_INSTALL_ACTIONS,
+  PwaInstallError,
+  executeInstallPwa,
+} from "../../application/use-cases/install-pwa.use-case.js";
+import {
   PWA_INSTALL_ADAPTER_ERROR_CODES,
   PwaInstallAdapter,
   PwaInstallAdapterError,
@@ -613,6 +619,328 @@ describe("pwa-install.adapter.js — TASK-03.2.2: PwaInstallAdapter & Browser Li
 
       mediaQueryList.dispatchChange(false);
       expect(adapter.isInstalled()).toBe(false);
+    });
+  });
+
+  describe("TASK-03.2.3 — Reactive State (@modnes/data-controller) & InstallPwaUseCase Integration", () => {
+    describe("subscribe() and DataController reactivity", () => {
+      it("should throw INVALID_INSTALL_LISTENER if subscribe is called with non-function", () => {
+        const { windowTarget, navigatorTarget } = createMockBrowserTargets();
+        const adapter = new PwaInstallAdapter({
+          windowTarget,
+          navigatorTarget,
+        });
+
+        expect(() => adapter.subscribe(null)).toThrowError(
+          expect.objectContaining({
+            name: "PwaInstallAdapterError",
+            code: PWA_INSTALL_ADAPTER_ERROR_CODES.INVALID_INSTALL_LISTENER,
+            field: "listener",
+          }),
+        );
+        expect(() => adapter.subscribe("invalid")).toThrowError(
+          expect.objectContaining({
+            code: PWA_INSTALL_ADAPTER_ERROR_CODES.INVALID_INSTALL_LISTENER,
+          }),
+        );
+      });
+
+      it("should notify subscriber when beforeinstallprompt event arrives", () => {
+        const { windowTarget, navigatorTarget } = createMockBrowserTargets();
+        const adapter = new PwaInstallAdapter({
+          windowTarget,
+          navigatorTarget,
+        });
+
+        const notifications = [];
+        const unsubscribe = adapter.subscribe((state, detail) => {
+          notifications.push({ state, detail });
+        });
+
+        const promptEvent = createBeforeInstallPromptEvent();
+        windowTarget.dispatchEvent(promptEvent);
+
+        expect(notifications.length).toBeGreaterThanOrEqual(1);
+        const lastNotification = notifications[notifications.length - 1];
+        expect(lastNotification.state).toEqual({
+          isInstalled: false,
+          canInstall: true,
+          shouldShowInstallButton: true,
+        });
+
+        unsubscribe();
+      });
+
+      it("should notify subscriber when appinstalled event arrives", () => {
+        const { windowTarget, navigatorTarget } = createMockBrowserTargets();
+        const adapter = new PwaInstallAdapter({
+          windowTarget,
+          navigatorTarget,
+        });
+
+        const promptEvent = createBeforeInstallPromptEvent();
+        windowTarget.dispatchEvent(promptEvent);
+
+        const notifications = [];
+        const unsubscribe = adapter.subscribe((state) => {
+          notifications.push(state);
+        });
+
+        windowTarget.dispatchEvent({ type: "appinstalled" });
+
+        expect(notifications.length).toBeGreaterThanOrEqual(1);
+        expect(notifications[notifications.length - 1]).toEqual({
+          isInstalled: true,
+          canInstall: false,
+          shouldShowInstallButton: false,
+        });
+
+        unsubscribe();
+      });
+
+      it("should notify subscriber when mediaQuery changes to standalone", () => {
+        const { windowTarget, navigatorTarget, mediaQueryList } =
+          createMockBrowserTargets();
+        const adapter = new PwaInstallAdapter({
+          windowTarget,
+          navigatorTarget,
+        });
+
+        const notifications = [];
+        const unsubscribe = adapter.subscribe((state) => {
+          notifications.push(state);
+        });
+
+        mediaQueryList.dispatchChange(true);
+
+        expect(notifications.length).toBeGreaterThanOrEqual(1);
+        expect(notifications[notifications.length - 1]).toEqual({
+          isInstalled: true,
+          canInstall: false,
+          shouldShowInstallButton: false,
+        });
+
+        unsubscribe();
+      });
+
+      it("should notify subscriber when promptInstall succeeds and then stop after unsubscribe", async () => {
+        const { windowTarget, navigatorTarget } = createMockBrowserTargets();
+        const adapter = new PwaInstallAdapter({
+          windowTarget,
+          navigatorTarget,
+        });
+
+        const promptEvent = createBeforeInstallPromptEvent({
+          outcome: "accepted",
+        });
+        windowTarget.dispatchEvent(promptEvent);
+
+        const notifications = [];
+        const unsubscribe = adapter.subscribe((state) => {
+          notifications.push(state);
+        });
+
+        await adapter.promptInstall();
+
+        expect(notifications.length).toBeGreaterThanOrEqual(1);
+        expect(notifications[notifications.length - 1]).toEqual({
+          isInstalled: true,
+          canInstall: false,
+          shouldShowInstallButton: false,
+        });
+
+        unsubscribe();
+
+        // Dispatches after unsubscribe should not notify listener
+        const countBefore = notifications.length;
+        windowTarget.dispatchEvent({ type: "appinstalled" });
+        expect(notifications.length).toBe(countBefore);
+      });
+    });
+
+    describe("Integration with InstallPwaUseCase", () => {
+      it("should integrate with InstallPwaUseCase.getInstallState() before and after beforeinstallprompt", async () => {
+        const { windowTarget, navigatorTarget } = createMockBrowserTargets();
+        const adapter = createPwaInstallAdapter({
+          windowTarget,
+          navigatorTarget,
+        });
+        const useCase = new InstallPwaUseCase({ pwaInstallGateway: adapter });
+
+        const initialState = await useCase.getInstallState();
+        expect(initialState).toEqual({
+          isInstalled: false,
+          canInstall: false,
+          shouldShowInstallButton: false,
+        });
+
+        const promptEvent = createBeforeInstallPromptEvent();
+        windowTarget.dispatchEvent(promptEvent);
+
+        const readyState = await useCase.getInstallState();
+        expect(readyState).toEqual({
+          isInstalled: false,
+          canInstall: true,
+          shouldShowInstallButton: true,
+        });
+      });
+
+      it("should integrate with InstallPwaUseCase.getInstallState() when in standalone mode", async () => {
+        const { windowTarget, navigatorTarget } = createMockBrowserTargets({
+          matchesStandalone: true,
+        });
+        const adapter = createPwaInstallAdapter({
+          windowTarget,
+          navigatorTarget,
+        });
+        const useCase = new InstallPwaUseCase({ pwaInstallGateway: adapter });
+
+        const state = await useCase.getInstallState();
+        expect(state).toEqual({
+          isInstalled: true,
+          canInstall: false,
+          shouldShowInstallButton: false,
+        });
+      });
+
+      it("should integrate with InstallPwaUseCase.triggerInstall() when user accepts", async () => {
+        const { windowTarget, navigatorTarget } = createMockBrowserTargets();
+        const adapter = createPwaInstallAdapter({
+          windowTarget,
+          navigatorTarget,
+        });
+        const useCase = new InstallPwaUseCase({ pwaInstallGateway: adapter });
+
+        const promptEvent = createBeforeInstallPromptEvent({
+          outcome: "accepted",
+        });
+        windowTarget.dispatchEvent(promptEvent);
+
+        const result = await useCase.triggerInstall();
+
+        expect(result).toEqual({
+          outcome: "accepted",
+          accepted: true,
+          isInstalled: true,
+          canInstall: false,
+          shouldShowInstallButton: false,
+        });
+
+        const finalState = await useCase.getInstallState();
+        expect(finalState.isInstalled).toBe(true);
+        expect(finalState.canInstall).toBe(false);
+        expect(finalState.shouldShowInstallButton).toBe(false);
+      });
+
+      it("should integrate with InstallPwaUseCase.triggerInstall() when user dismisses", async () => {
+        const { windowTarget, navigatorTarget } = createMockBrowserTargets();
+        const adapter = createPwaInstallAdapter({
+          windowTarget,
+          navigatorTarget,
+        });
+        const useCase = new InstallPwaUseCase({ pwaInstallGateway: adapter });
+
+        const promptEvent = createBeforeInstallPromptEvent({
+          outcome: "dismissed",
+        });
+        windowTarget.dispatchEvent(promptEvent);
+
+        const result = await useCase.triggerInstall();
+
+        expect(result).toEqual({
+          outcome: "dismissed",
+          accepted: false,
+          isInstalled: false,
+          canInstall: false,
+          shouldShowInstallButton: false,
+        });
+      });
+
+      it("should propagate PwaInstallError when triggerInstall is called when prompt is not available", async () => {
+        const { windowTarget, navigatorTarget } = createMockBrowserTargets();
+        const adapter = createPwaInstallAdapter({
+          windowTarget,
+          navigatorTarget,
+        });
+        const useCase = new InstallPwaUseCase({ pwaInstallGateway: adapter });
+
+        await expect(useCase.triggerInstall()).rejects.toThrowError(
+          PwaInstallError,
+        );
+      });
+
+      it("should propagate PwaInstallError when triggerInstall is called when already installed", async () => {
+        const { windowTarget, navigatorTarget } = createMockBrowserTargets({
+          matchesStandalone: true,
+        });
+        const adapter = createPwaInstallAdapter({
+          windowTarget,
+          navigatorTarget,
+        });
+        const useCase = new InstallPwaUseCase({ pwaInstallGateway: adapter });
+
+        await expect(useCase.triggerInstall()).rejects.toThrowError(
+          PwaInstallError,
+        );
+      });
+
+      it("should integrate with InstallPwaUseCase.subscribe() and notify normalized states", () => {
+        const { windowTarget, navigatorTarget } = createMockBrowserTargets();
+        const adapter = createPwaInstallAdapter({
+          windowTarget,
+          navigatorTarget,
+        });
+        const useCase = new InstallPwaUseCase({ pwaInstallGateway: adapter });
+
+        const observedStates = [];
+        const unsubscribe = useCase.subscribe((state) => {
+          observedStates.push(state);
+        });
+
+        const promptEvent = createBeforeInstallPromptEvent();
+        windowTarget.dispatchEvent(promptEvent);
+
+        expect(observedStates.length).toBeGreaterThanOrEqual(1);
+        expect(observedStates[observedStates.length - 1]).toEqual({
+          isInstalled: false,
+          canInstall: true,
+          shouldShowInstallButton: true,
+        });
+
+        windowTarget.dispatchEvent({ type: "appinstalled" });
+        expect(observedStates[observedStates.length - 1]).toEqual({
+          isInstalled: true,
+          canInstall: false,
+          shouldShowInstallButton: false,
+        });
+
+        unsubscribe();
+      });
+
+      it("should execute actions GET_STATE and TRIGGER_INSTALL via executeInstallPwa helper", async () => {
+        const { windowTarget, navigatorTarget } = createMockBrowserTargets();
+        const adapter = createPwaInstallAdapter({
+          windowTarget,
+          navigatorTarget,
+        });
+
+        const promptEvent = createBeforeInstallPromptEvent({
+          outcome: "accepted",
+        });
+        windowTarget.dispatchEvent(promptEvent);
+
+        const stateResult = await executeInstallPwa(
+          { action: PWA_INSTALL_ACTIONS.GET_STATE },
+          { pwaInstallGateway: adapter },
+        );
+        expect(stateResult.shouldShowInstallButton).toBe(true);
+
+        const triggerResult = await executeInstallPwa(
+          { action: PWA_INSTALL_ACTIONS.TRIGGER_INSTALL },
+          { pwaInstallGateway: adapter },
+        );
+        expect(triggerResult.accepted).toBe(true);
+      });
     });
   });
 });
