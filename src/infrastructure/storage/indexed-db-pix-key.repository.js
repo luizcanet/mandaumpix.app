@@ -1,3 +1,4 @@
+import DataController from "@modnes/data-controller";
 import { ChaveConta } from "../../domain/entities/pix-key.entity.js";
 
 export const DEFAULT_DB_NAME = "mandaumpix_db";
@@ -310,10 +311,52 @@ export class IndexedDbPixKeyRepository extends EventTarget {
     this.version = version;
     this.databasePromise = null;
     this.activeDatabase = null;
+    this.rawState = {
+      items: [],
+      selectedKeyId: null,
+      selectedKey: null,
+    };
+    this.dataController = new DataController(this);
+    this.data = this.rawState;
   }
 
   static create(options) {
     return new IndexedDbPixKeyRepository(options);
+  }
+
+  getState() {
+    const items = Object.freeze([...this.rawState.items]);
+    const selectedKeyId = this.rawState.selectedKeyId;
+    const selectedKey = items.find((item) => item.id === selectedKeyId) || null;
+
+    return Object.freeze({
+      items,
+      keys: items,
+      selectedKeyId,
+      selectedKey,
+    });
+  }
+
+  subscribe(listener) {
+    if (typeof listener !== "function") {
+      throw new PixKeyStorageError(
+        "Listener de estado do repositório inválido (esperada uma função).",
+        {
+          code: PIX_KEY_STORAGE_ERROR_CODES.INVALID_STORAGE_LISTENER,
+          field: "listener",
+        },
+      );
+    }
+
+    const handler = (event) => {
+      listener(this.getState(), event.detail);
+    };
+
+    this.addEventListener("dataUpdated", handler);
+
+    return () => {
+      this.removeEventListener("dataUpdated", handler);
+    };
   }
 
   getDatabase() {
@@ -370,6 +413,10 @@ export class IndexedDbPixKeyRepository extends EventTarget {
           .sort(compareChaveContaOrder)
       : [];
 
+    this.rawState.selectedKey =
+      hydrated.find((item) => item.id === this.rawState.selectedKeyId) || null;
+    this.data.items = [...hydrated];
+
     return Object.freeze(hydrated);
   }
 
@@ -412,6 +459,15 @@ export class IndexedDbPixKeyRepository extends EventTarget {
           .put(chaveConta.toJSON()),
     );
 
+    const nextItems = [
+      ...this.rawState.items.filter((item) => item.id !== chaveConta.id),
+      chaveConta,
+    ].sort(compareChaveContaOrder);
+
+    this.rawState.selectedKey =
+      nextItems.find((item) => item.id === this.rawState.selectedKeyId) || null;
+    this.data.items = nextItems;
+
     return chaveConta;
   }
 
@@ -433,6 +489,13 @@ export class IndexedDbPixKeyRepository extends EventTarget {
         transaction.objectStore(OBJECT_STORES.PIX_KEYS).delete(normalizedId),
     );
 
+    const nextItems = this.rawState.items.filter(
+      (item) => item.id !== normalizedId,
+    );
+    this.rawState.selectedKey =
+      nextItems.find((item) => item.id === this.rawState.selectedKeyId) || null;
+    this.data.items = nextItems;
+
     return true;
   }
 
@@ -451,7 +514,12 @@ export class IndexedDbPixKeyRepository extends EventTarget {
           .get(SELECTED_KEY_SETTING_KEY),
     );
 
-    return normalizeOptionalKeyId(settingRecord?.value);
+    const normalizedId = normalizeOptionalKeyId(settingRecord?.value);
+    this.rawState.selectedKeyId = normalizedId;
+    this.rawState.selectedKey =
+      this.rawState.items.find((item) => item.id === normalizedId) || null;
+
+    return normalizedId;
   }
 
   async setSelectedKeyId(id) {
@@ -472,6 +540,10 @@ export class IndexedDbPixKeyRepository extends EventTarget {
           updatedAt: new Date().toISOString(),
         }),
     );
+
+    this.rawState.selectedKey =
+      this.rawState.items.find((item) => item.id === normalizedId) || null;
+    this.data.selectedKeyId = normalizedId;
 
     return normalizedId;
   }
@@ -499,6 +571,10 @@ export class IndexedDbPixKeyRepository extends EventTarget {
         return transaction.objectStore(OBJECT_STORES.USER_SETTINGS).clear();
       },
     );
+
+    this.rawState.selectedKeyId = null;
+    this.rawState.selectedKey = null;
+    this.data.items = [];
   }
 }
 

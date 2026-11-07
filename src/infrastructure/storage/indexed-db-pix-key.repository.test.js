@@ -1,4 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
+import { DeletePixKeyUseCase } from "../../application/use-cases/delete-pix-key.use-case.js";
+import { GeneratePixChargeUseCase } from "../../application/use-cases/generate-pix-charge.use-case.js";
+import { ListPixKeysUseCase } from "../../application/use-cases/list-pix-keys.use-case.js";
+import {
+  PIX_KEY_MANAGEMENT_ERROR_CODES,
+  SavePixKeyUseCase,
+} from "../../application/use-cases/save-pix-key.use-case.js";
+import { SelectPixKeyUseCase } from "../../application/use-cases/select-pix-key.use-case.js";
 import {
   ChaveConta,
   PixKeyValidationError,
@@ -931,6 +939,187 @@ describe("TASK-03.1.1 — IndexedDB Constants, Errors & Connection Manager", () 
         code: PIX_KEY_STORAGE_ERROR_CODES.TRANSACTION_FAILED,
         message: "Transaction creation failed",
       });
+    });
+  });
+
+  describe("TASK-03.1.3 — Reactive State (@modnes/data-controller) & Use Cases Integration", () => {
+    it("should initialize reactive state with DataController and notify subscribers on state changes", async () => {
+      const indexedDb = createInMemoryIndexedDb();
+      const repository = createIndexedDbPixKeyRepository({ indexedDb });
+
+      expect(repository.getState()).toEqual({
+        items: [],
+        keys: [],
+        selectedKeyId: null,
+        selectedKey: null,
+      });
+      expect(Object.isFrozen(repository.getState())).toBe(true);
+
+      const events = [];
+      const unsubscribe = repository.subscribe((state, detail) => {
+        events.push({ state, detail });
+      });
+
+      const savedKey1 = await repository.save({
+        id: "key-reactive-1",
+        tipo_chave: "EMAIL",
+        valor_chave: "reativo1@mandaumpix.app",
+        nome_recebedor: "Luiz Canet",
+        cidade_recebedor: "Brasilia",
+        criado_em: "2026-11-07T10:00:00.000Z",
+      });
+
+      expect(events).toHaveLength(1);
+      expect(events[0].detail.property).toBe("items");
+      expect(events[0].state.items).toEqual([savedKey1]);
+
+      await repository.setSelectedKeyId("key-reactive-1");
+      expect(events).toHaveLength(2);
+      expect(events[1].detail.property).toBe("selectedKeyId");
+      expect(events[1].state.selectedKeyId).toBe("key-reactive-1");
+      expect(events[1].state.selectedKey).toEqual(savedKey1);
+
+      const updatedKey1 = await repository.save({
+        id: "key-reactive-1",
+        rotulo: "Conta Atualizada",
+        tipo_chave: "EMAIL",
+        valor_chave: "reativo1@mandaumpix.app",
+        nome_recebedor: "Luiz Canet",
+        cidade_recebedor: "Brasilia",
+        criado_em: "2026-11-07T10:00:00.000Z",
+      });
+      expect(repository.getState().selectedKey.rotulo).toBe("Conta Atualizada");
+      expect(repository.getState().items).toEqual([updatedKey1]);
+
+      await repository.deleteById("key-reactive-1");
+      expect(repository.getState().items).toEqual([]);
+      expect(repository.getState().selectedKey).toBeNull();
+
+      await repository.clear();
+      expect(repository.getState()).toEqual({
+        items: [],
+        keys: [],
+        selectedKeyId: null,
+        selectedKey: null,
+      });
+
+      const countBeforeUnsubscribe = events.length;
+      unsubscribe();
+
+      await repository.save({
+        id: "key-reactive-2",
+        tipo_chave: "CPF",
+        valor_chave: "12345678909",
+        nome_recebedor: "Luiz Canet",
+        cidade_recebedor: "Brasilia",
+      });
+      expect(events).toHaveLength(countBeforeUnsubscribe);
+    });
+
+    it("should expose DataHandler and ArrayHandler proxies on repository.data and validate subscribe listener", () => {
+      const indexedDb = createInMemoryIndexedDb();
+      const repository = createIndexedDbPixKeyRepository({ indexedDb });
+
+      expect(() => repository.subscribe(null)).toThrowError(
+        expect.objectContaining({
+          name: "PixKeyStorageError",
+          code: PIX_KEY_STORAGE_ERROR_CODES.INVALID_STORAGE_LISTENER,
+          field: "listener",
+        }),
+      );
+
+      const arrayMutations = [];
+      repository.subscribe((state, detail) => {
+        arrayMutations.push({ state, detail });
+      });
+
+      const sampleKey = ChaveConta.create({
+        id: "key-proxy",
+        tipo_chave: "EMAIL",
+        valor_chave: "proxy@mandaumpix.app",
+        nome_recebedor: "Luiz Canet",
+        cidade_recebedor: "Brasilia",
+      });
+
+      repository.data.items.push(sampleKey);
+      expect(arrayMutations.length).toBeGreaterThanOrEqual(1);
+      expect(arrayMutations[0].detail.property).toBe("items");
+      expect(repository.getState().items).toEqual([sampleKey]);
+    });
+
+    it("should integrate seamlessly with SavePixKeyUseCase, ListPixKeysUseCase, SelectPixKeyUseCase, DeletePixKeyUseCase, and GeneratePixChargeUseCase", async () => {
+      const indexedDb = createInMemoryIndexedDb();
+      const pixKeyRepository = createIndexedDbPixKeyRepository({ indexedDb });
+
+      const saveUseCase = SavePixKeyUseCase.create({ pixKeyRepository });
+      const listUseCase = ListPixKeysUseCase.create({ pixKeyRepository });
+      const selectUseCase = SelectPixKeyUseCase.create({ pixKeyRepository });
+      const deleteUseCase = DeletePixKeyUseCase.create({ pixKeyRepository });
+      const generateChargeUseCase = GeneratePixChargeUseCase.create({
+        pixKeyRepository,
+      });
+
+      const firstSaved = await saveUseCase.execute({
+        id: "conta-1",
+        rotulo: "Nubank",
+        tipo_chave: "EMAIL",
+        valor_chave: "receber@mandaumpix.app",
+        nome_recebedor: "Luiz Henrique Canet Filho",
+        cidade_recebedor: "Brasilia",
+        criado_em: "2026-11-07T08:00:00.000Z",
+      });
+
+      expect(firstSaved.isSelected).toBe(true);
+      expect(firstSaved.selectedKeyId).toBe("conta-1");
+      expect(pixKeyRepository.getState().selectedKeyId).toBe("conta-1");
+
+      const secondSaved = await saveUseCase.execute({
+        id: "conta-2",
+        rotulo: "Itaú",
+        tipo_chave: "CPF",
+        valor_chave: "123.456.789-09",
+        nome_recebedor: "Luiz Henrique Canet Filho",
+        cidade_recebedor: "Brasilia",
+        criado_em: "2026-11-07T09:00:00.000Z",
+      });
+
+      expect(secondSaved.isSelected).toBe(false);
+      expect(secondSaved.selectedKeyId).toBe("conta-1");
+
+      await expect(
+        saveUseCase.execute({
+          tipo_chave: "EMAIL",
+          valor_chave: "RECEBER@MANDAUMPIX.APP",
+          nome_recebedor: "Outro Nome",
+          cidade_recebedor: "Brasilia",
+        }),
+      ).rejects.toMatchObject({
+        code: PIX_KEY_MANAGEMENT_ERROR_CODES.DUPLICATE_PIX_KEY,
+      });
+
+      await selectUseCase.execute({ id: "conta-2" });
+      expect(await pixKeyRepository.getSelectedKeyId()).toBe("conta-2");
+
+      const chargeFixed = await generateChargeUseCase.execute({
+        valor_opcional: "50,00",
+      });
+      expect(chargeFixed.id_chave_conta).toBe("conta-2");
+      expect(chargeFixed.valor_opcional).toBe(50);
+      expect(chargeFixed.valor_dinamico).toBe(false);
+      expect(chargeFixed.chave_cobranca).toContain("12345678909");
+
+      const afterDeleteActive = await deleteUseCase.execute({ id: "conta-2" });
+      expect(afterDeleteActive.selectedKeyId).toBe("conta-1");
+      expect(afterDeleteActive.items).toHaveLength(1);
+
+      await pixKeyRepository.setSelectedKeyId("id-orfao");
+      const listed = await listUseCase.execute();
+      expect(listed.selectedKeyId).toBe("conta-1");
+      expect(listed.selectedKey.id).toBe("conta-1");
+
+      const afterDeleteLast = await deleteUseCase.execute({ id: "conta-1" });
+      expect(afterDeleteLast.items).toEqual([]);
+      expect(afterDeleteLast.selectedKeyId).toBeNull();
     });
   });
 });
