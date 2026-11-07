@@ -46,14 +46,76 @@ function createMockNavigatorTarget({
 function createMockWindowTarget({
   hasOpen = true,
   openImpl = vi.fn().mockReturnValue({ closed: false }),
+  urlTarget = null,
 } = {}) {
-  if (!hasOpen) {
+  const windowObj = {};
+
+  if (hasOpen) {
+    windowObj.open = openImpl;
+  }
+
+  if (urlTarget) {
+    windowObj.URL = urlTarget;
+  }
+
+  return windowObj;
+}
+
+function createMockDocumentTarget({
+  hasCreateElement = true,
+  createElementImpl = null,
+} = {}) {
+  if (!hasCreateElement) {
     return {};
   }
 
-  return {
-    open: openImpl,
+  const appendedChildren = [];
+  const body = {
+    appendChild: vi.fn((el) => {
+      appendedChildren.push(el);
+      return el;
+    }),
+    removeChild: vi.fn((el) => {
+      const idx = appendedChildren.indexOf(el);
+      if (idx !== -1) {
+        appendedChildren.splice(idx, 1);
+      }
+      return el;
+    }),
   };
+
+  const createElement =
+    createElementImpl ||
+    vi.fn((tagName) => {
+      return {
+        tagName: tagName.toUpperCase(),
+        href: "",
+        download: "",
+        style: {},
+        click: vi.fn(),
+      };
+    });
+
+  return {
+    body,
+    createElement,
+  };
+}
+
+function createMockUrlTarget({ hasCreate = true, hasRevoke = true } = {}) {
+  const urlObj = {};
+
+  if (hasCreate) {
+    urlObj.createObjectURL = vi.fn(
+      () => `blob:http://localhost/${Math.random().toString(36).slice(2)}`,
+    );
+  }
+
+  if (hasRevoke) {
+    urlObj.revokeObjectURL = vi.fn();
+  }
+
+  return urlObj;
 }
 
 describe("BrowserShareAdapter — TASK-03.3.1 (Clipboard API & Constantes)", () => {
@@ -739,6 +801,374 @@ describe("BrowserShareAdapter — TASK-03.3.1 (Clipboard API & Constantes)", () 
         expect(shareSpy).not.toHaveBeenCalled();
         expect(openSpy).toHaveBeenCalledTimes(1);
         expect(result.channel).toBe("WHATSAPP");
+      });
+    });
+  });
+
+  describe("BrowserShareAdapter — TASK-03.3.3 (Download PNG do QR Code, Blob & Liberação de Recursos)", () => {
+    it("deve converter e baixar o QR Code PNG utilizando exportQrCodePngFn e disparar o clique da âncora", async () => {
+      const fakeBlob = new Blob(["png-binary-content"], { type: "image/png" });
+      const exportQrCodePngSpy = vi.fn().mockResolvedValue(fakeBlob);
+      const mockDocument = createMockDocumentTarget();
+      const mockUrl = createMockUrlTarget();
+      const mockWindow = createMockWindowTarget({ urlTarget: mockUrl });
+
+      const adapter = new BrowserShareAdapter({
+        documentTarget: mockDocument,
+        windowTarget: mockWindow,
+        exportQrCodePngFn: exportQrCodePngSpy,
+      });
+
+      const result = await adapter.downloadQrCodePng({
+        chave_cobranca: VALID_BR_CODE,
+        fileName: "meu-pix.png",
+        width: 512,
+        height: 512,
+      });
+
+      expect(exportQrCodePngSpy).toHaveBeenCalledWith(VALID_BR_CODE, {
+        width: 512,
+        height: 512,
+      });
+      expect(mockUrl.createObjectURL).toHaveBeenCalledWith(fakeBlob);
+      expect(mockDocument.createElement).toHaveBeenCalledWith("a");
+      expect(mockDocument.body.appendChild).toHaveBeenCalledTimes(1);
+      expect(mockDocument.body.removeChild).toHaveBeenCalledTimes(1);
+      expect(mockUrl.revokeObjectURL).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({
+        action: PIX_CHARGE_DISTRIBUTION_ACTIONS.DOWNLOAD_QR,
+        downloaded: true,
+        fileName: "meu-pix.png",
+        width: 512,
+        height: 512,
+        chave_cobranca: VALID_BR_CODE,
+      });
+      expect(Object.isFrozen(result)).toBe(true);
+    });
+
+    it("deve suportar o alias downloadQrImage delegando para downloadQrCodePng", async () => {
+      const fakeBlob = new Blob(["png-binary-content"], { type: "image/png" });
+      const exportQrCodePngSpy = vi.fn().mockResolvedValue(fakeBlob);
+      const mockDocument = createMockDocumentTarget();
+      const mockUrl = createMockUrlTarget();
+      const mockWindow = createMockWindowTarget({ urlTarget: mockUrl });
+
+      const adapter = new BrowserShareAdapter({
+        documentTarget: mockDocument,
+        windowTarget: mockWindow,
+        exportQrCodePngFn: exportQrCodePngSpy,
+      });
+
+      const result = await adapter.downloadQrImage({
+        chave_cobranca: VALID_BR_CODE,
+      });
+
+      expect(result.downloaded).toBe(true);
+      expect(result.fileName).toBe("mandaumpix-qrcode.png");
+    });
+
+    it("deve normalizar o nome do arquivo acrescentando extensão .png quando omitida", async () => {
+      const fakeBlob = new Blob(["png-data"], { type: "image/png" });
+      const exportQrCodePngSpy = vi.fn().mockResolvedValue(fakeBlob);
+      const mockDocument = createMockDocumentTarget();
+      const mockUrl = createMockUrlTarget();
+      const mockWindow = createMockWindowTarget({ urlTarget: mockUrl });
+
+      const adapter = new BrowserShareAdapter({
+        documentTarget: mockDocument,
+        windowTarget: mockWindow,
+        exportQrCodePngFn: exportQrCodePngSpy,
+      });
+
+      const result = await adapter.downloadQrCodePng({
+        chave_cobranca: VALID_BR_CODE,
+        fileName: "cobranca-loja",
+      });
+
+      expect(result.fileName).toBe("cobranca-loja.png");
+    });
+
+    it("deve suportar payload contendo blob diretamente sem invocar exportQrCodePngFn", async () => {
+      const directBlob = new Blob(["direct-blob"], { type: "image/png" });
+      const exportQrCodePngSpy = vi.fn();
+      const mockDocument = createMockDocumentTarget();
+      const mockUrl = createMockUrlTarget();
+      const mockWindow = createMockWindowTarget({ urlTarget: mockUrl });
+
+      const adapter = new BrowserShareAdapter({
+        documentTarget: mockDocument,
+        windowTarget: mockWindow,
+        exportQrCodePngFn: exportQrCodePngSpy,
+      });
+
+      const result = await adapter.downloadQrCodePng({
+        chave_cobranca: VALID_BR_CODE,
+        blob: directBlob,
+      });
+
+      expect(exportQrCodePngSpy).not.toHaveBeenCalled();
+      expect(mockUrl.createObjectURL).toHaveBeenCalledWith(directBlob);
+      expect(result.downloaded).toBe(true);
+    });
+
+    it("deve suportar conversão de dataUrl (base64) para Blob quando fornecido", async () => {
+      const fakeDataUrl =
+        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+      const mockDocument = createMockDocumentTarget();
+      const mockUrl = createMockUrlTarget();
+      const mockWindow = createMockWindowTarget({ urlTarget: mockUrl });
+
+      const adapter = new BrowserShareAdapter({
+        documentTarget: mockDocument,
+        windowTarget: mockWindow,
+      });
+
+      const result = await adapter.downloadQrCodePng({
+        dataUrl: fakeDataUrl,
+      });
+
+      expect(mockUrl.createObjectURL).toHaveBeenCalled();
+      expect(result.downloaded).toBe(true);
+    });
+
+    it("deve lançar INVALID_PAYLOAD quando payload for nulo ou não contiver chave_cobranca, svg, dataUrl ou blob", async () => {
+      const adapter = new BrowserShareAdapter();
+
+      await expect(adapter.downloadQrCodePng(null)).rejects.toMatchObject({
+        name: "BrowserShareAdapterError",
+        code: BROWSER_SHARE_ADAPTER_ERROR_CODES.INVALID_PAYLOAD,
+        field: "payload",
+      });
+
+      await expect(adapter.downloadQrCodePng({})).rejects.toMatchObject({
+        name: "BrowserShareAdapterError",
+        code: BROWSER_SHARE_ADAPTER_ERROR_CODES.INVALID_PAYLOAD,
+        field: "chave_cobranca",
+      });
+    });
+
+    it("deve lançar DOWNLOAD_FAILED quando documentTarget for nulo ou sem suporte a createElement", async () => {
+      const adapter = new BrowserShareAdapter({
+        documentTarget: null,
+        exportQrCodePngFn: vi.fn().mockResolvedValue(new Blob([])),
+      });
+
+      await expect(
+        adapter.downloadQrCodePng({ chave_cobranca: VALID_BR_CODE }),
+      ).rejects.toMatchObject({
+        name: "BrowserShareAdapterError",
+        code: BROWSER_SHARE_ADAPTER_ERROR_CODES.DOWNLOAD_FAILED,
+        field: "document",
+      });
+    });
+
+    it("deve lançar DOWNLOAD_FAILED quando URL.createObjectURL não estiver disponível", async () => {
+      const mockDocument = createMockDocumentTarget();
+      const mockWindow = createMockWindowTarget({
+        urlTarget: { createObjectURL: null },
+      });
+      const adapter = new BrowserShareAdapter({
+        documentTarget: mockDocument,
+        windowTarget: mockWindow,
+        exportQrCodePngFn: vi.fn().mockResolvedValue(new Blob([])),
+      });
+
+      await expect(
+        adapter.downloadQrCodePng({ chave_cobranca: VALID_BR_CODE }),
+      ).rejects.toMatchObject({
+        name: "BrowserShareAdapterError",
+        code: BROWSER_SHARE_ADAPTER_ERROR_CODES.DOWNLOAD_FAILED,
+        field: "createObjectURL",
+      });
+    });
+
+    it("deve converter dataURL retornado por exportQrCodePngFn para Blob", async () => {
+      const fakeDataUrl =
+        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+      const exportQrCodePngSpy = vi.fn().mockResolvedValue(fakeDataUrl);
+      const mockDocument = createMockDocumentTarget();
+      const mockUrl = createMockUrlTarget();
+      const mockWindow = createMockWindowTarget({ urlTarget: mockUrl });
+
+      const adapter = new BrowserShareAdapter({
+        documentTarget: mockDocument,
+        windowTarget: mockWindow,
+        exportQrCodePngFn: exportQrCodePngSpy,
+      });
+
+      const result = await adapter.downloadQrCodePng({
+        chave_cobranca: VALID_BR_CODE,
+      });
+
+      expect(result.downloaded).toBe(true);
+      expect(mockUrl.createObjectURL).toHaveBeenCalled();
+    });
+
+    it("deve converter resultado não-Blob e não-dataURL retornado por exportQrCodePngFn em Blob", async () => {
+      const rawBytes = new Uint8Array([1, 2, 3]);
+      const exportQrCodePngSpy = vi.fn().mockResolvedValue(rawBytes);
+      const mockDocument = createMockDocumentTarget();
+      const mockUrl = createMockUrlTarget();
+      const mockWindow = createMockWindowTarget({ urlTarget: mockUrl });
+
+      const adapter = new BrowserShareAdapter({
+        documentTarget: mockDocument,
+        windowTarget: mockWindow,
+        exportQrCodePngFn: exportQrCodePngSpy,
+      });
+
+      const result = await adapter.downloadQrCodePng({
+        chave_cobranca: VALID_BR_CODE,
+      });
+
+      expect(result.downloaded).toBe(true);
+    });
+
+    it("deve lançar DOWNLOAD_FAILED quando exportQrCodePngFn retornar valor nulo ou indefinido", async () => {
+      const exportQrCodePngSpy = vi.fn().mockResolvedValue(null);
+      const mockDocument = createMockDocumentTarget();
+      const mockUrl = createMockUrlTarget();
+      const mockWindow = createMockWindowTarget({ urlTarget: mockUrl });
+
+      const adapter = new BrowserShareAdapter({
+        documentTarget: mockDocument,
+        windowTarget: mockWindow,
+        exportQrCodePngFn: exportQrCodePngSpy,
+      });
+
+      await expect(
+        adapter.downloadQrCodePng({ chave_cobranca: VALID_BR_CODE }),
+      ).rejects.toMatchObject({
+        name: "BrowserShareAdapterError",
+        code: BROWSER_SHARE_ADAPTER_ERROR_CODES.DOWNLOAD_FAILED,
+        field: "imagem_qrcode",
+      });
+    });
+
+    it("deve usar mensagem padrão quando exportQrCodePngFn rejeitar sem mensagem", async () => {
+      const mockDocument = createMockDocumentTarget();
+      const mockUrl = createMockUrlTarget();
+      const mockWindow = createMockWindowTarget({ urlTarget: mockUrl });
+
+      const adapter = new BrowserShareAdapter({
+        documentTarget: mockDocument,
+        windowTarget: mockWindow,
+        exportQrCodePngFn: vi.fn().mockRejectedValue({}),
+      });
+
+      await expect(
+        adapter.downloadQrCodePng({ chave_cobranca: VALID_BR_CODE }),
+      ).rejects.toMatchObject({
+        name: "BrowserShareAdapterError",
+        code: BROWSER_SHARE_ADAPTER_ERROR_CODES.DOWNLOAD_FAILED,
+        message: "Falha ao converter ou rasterizar a imagem PNG do QR Code.",
+      });
+    });
+
+    it("deve lançar DOWNLOAD_FAILED quando exportQrCodePngFn rejeitar", async () => {
+      const generationError = new Error("Falha na rasterização do QR Code");
+      const mockDocument = createMockDocumentTarget();
+      const mockUrl = createMockUrlTarget();
+      const mockWindow = createMockWindowTarget({ urlTarget: mockUrl });
+
+      const adapter = new BrowserShareAdapter({
+        documentTarget: mockDocument,
+        windowTarget: mockWindow,
+        exportQrCodePngFn: vi.fn().mockRejectedValue(generationError),
+      });
+
+      await expect(
+        adapter.downloadQrCodePng({ chave_cobranca: VALID_BR_CODE }),
+      ).rejects.toMatchObject({
+        name: "BrowserShareAdapterError",
+        code: BROWSER_SHARE_ADAPTER_ERROR_CODES.DOWNLOAD_FAILED,
+        field: "imagem_qrcode",
+        cause: generationError,
+      });
+    });
+
+    it("deve lançar DOWNLOAD_FAILED quando o clique da âncora lançar erro", async () => {
+      const mockDocument = createMockDocumentTarget({
+        createElementImpl: () => ({
+          tagName: "A",
+          style: {},
+          click: () => {
+            throw new Error("Click event dispatch blocked");
+          },
+        }),
+      });
+      const mockUrl = createMockUrlTarget();
+      const mockWindow = createMockWindowTarget({ urlTarget: mockUrl });
+
+      const adapter = new BrowserShareAdapter({
+        documentTarget: mockDocument,
+        windowTarget: mockWindow,
+        exportQrCodePngFn: vi.fn().mockResolvedValue(new Blob([])),
+      });
+
+      await expect(
+        adapter.downloadQrCodePng({ chave_cobranca: VALID_BR_CODE }),
+      ).rejects.toMatchObject({
+        name: "BrowserShareAdapterError",
+        code: BROWSER_SHARE_ADAPTER_ERROR_CODES.DOWNLOAD_FAILED,
+      });
+      // Verifica que mesmo se o click falhar, a URL é revogada na limpeza
+      expect(mockUrl.revokeObjectURL).toHaveBeenCalledTimes(1);
+    });
+
+    describe("Integração com DistributePixChargeUseCase (downloadQrImage)", () => {
+      it("deve executar o fluxo completo de download através de DistributePixChargeUseCase", async () => {
+        const fakeBlob = new Blob(["pix-png"], { type: "image/png" });
+        const exportQrCodePngSpy = vi.fn().mockResolvedValue(fakeBlob);
+        const mockDocument = createMockDocumentTarget();
+        const mockUrl = createMockUrlTarget();
+        const mockWindow = createMockWindowTarget({ urlTarget: mockUrl });
+
+        const adapter = new BrowserShareAdapter({
+          documentTarget: mockDocument,
+          windowTarget: mockWindow,
+          exportQrCodePngFn: exportQrCodePngSpy,
+        });
+
+        const useCase = new DistributePixChargeUseCase({
+          chargeDistributionGateway: adapter,
+        });
+
+        const result = await useCase.downloadQrImage({
+          chave_cobranca: VALID_BR_CODE,
+          fileName: "cobranca-cliente.png",
+          width: 512,
+          height: 512,
+        });
+
+        expect(result).toEqual({
+          action: PIX_CHARGE_DISTRIBUTION_ACTIONS.DOWNLOAD_QR,
+          downloaded: true,
+          fileName: "cobranca-cliente.png",
+          width: 512,
+          height: 512,
+          chave_cobranca: VALID_BR_CODE,
+        });
+        expect(mockUrl.createObjectURL).toHaveBeenCalledWith(fakeBlob);
+        expect(mockUrl.revokeObjectURL).toHaveBeenCalled();
+      });
+
+      it("deve permitir que DistributePixChargeUseCase converta falha em PixChargeDistributionError com DOWNLOAD_FAILED", async () => {
+        const adapter = new BrowserShareAdapter({
+          documentTarget: null,
+          exportQrCodePngFn: vi.fn().mockResolvedValue(new Blob([])),
+        });
+
+        const useCase = new DistributePixChargeUseCase({
+          chargeDistributionGateway: adapter,
+        });
+
+        await expect(
+          useCase.downloadQrImage({ chave_cobranca: VALID_BR_CODE }),
+        ).rejects.toMatchObject({
+          name: "PixChargeDistributionError",
+          code: PIX_CHARGE_DISTRIBUTION_ERROR_CODES.DOWNLOAD_FAILED,
+        });
       });
     });
   });
