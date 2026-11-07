@@ -419,4 +419,3 @@ describe("install-pwa.use-case.js — InstallPwaUseCase (TASK-02.5.2)", () => {
     });
   });
 });
-

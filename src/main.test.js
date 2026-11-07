@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   APP_METADATA,
   AccessController,
@@ -7,37 +7,60 @@ import {
   CustomElement,
   DEFAULT_PIX_CHARGE_TXID,
   DEFAULT_PIX_KEY_LABELS,
+  DEFAULT_QR_IMAGE_FILENAME,
+  DEFAULT_QR_IMAGE_SIZE,
+  DEFAULT_SHARE_TITLE,
   DataController,
   DeletePixKeyUseCase,
+  DistributePixChargeUseCase,
   GeneratePixChargeUseCase,
+  InstallPwaUseCase,
   ListPixKeysUseCase,
   MAX_PIX_CHARGE_ADDITIONAL_INFO_LENGTH,
   MAX_PIX_CHARGE_AMOUNT,
   MAX_PIX_CHARGE_TXID_LENGTH,
+  PIX_CHARGE_DISTRIBUTION_ACTIONS,
+  PIX_CHARGE_DISTRIBUTION_CHANNELS,
+  PIX_CHARGE_DISTRIBUTION_ERROR_CODES,
   PIX_CHARGE_ERROR_CODES,
   PIX_KEY_ERROR_CODES,
   PIX_KEY_MANAGEMENT_ERROR_CODES,
   PIX_KEY_TYPES,
+  PWA_INSTALL_ACTIONS,
+  PWA_INSTALL_ERROR_CODES,
+  PWA_INSTALL_OUTCOMES,
+  PixChargeDistributionError,
   PixChargeEntity,
   PixChargeValidationError,
   PixKeyEntity,
   PixKeyManagementError,
   PixKeyValidationError,
+  PwaInstallError,
   Router,
   SavePixKeyUseCase,
   SelectPixKeyUseCase,
+  assertChargeDistributionGateway,
   assertPixKeyRepository,
+  assertPwaInstallGateway,
   bootstrapApp,
+  buildWhatsAppShareUrl,
   executeDeletePixKey,
+  executeDistributePixCharge,
   executeGeneratePixCharge,
+  executeInstallPwa,
   executeListPixKeys,
   executeSavePixKey,
   executeSelectPixKey,
+  extractChargeDistributionTarget,
   generatePixCharge,
   hydrateChaveContaList,
   normalizeAdditionalInfo,
   normalizeMerchantCity,
   normalizeMerchantName,
+  normalizePwaInstallOutcome,
+  normalizePwaInstallState,
+  normalizeQrDimensions,
+  normalizeQrDownloadFileName,
   normalizeTransactionAmount,
   normalizeTxid,
   parsePixCharge,
@@ -276,6 +299,101 @@ describe("main.js", () => {
       // Assert 3
       expect(afterDeleteActive.selectedKeyId).toBe("key-01");
       expect(afterDeleteActive.items).toHaveLength(1);
+    });
+  });
+
+  describe("application exports & distribution/install integration (US-02.5)", () => {
+    it("should re-export DistributePixChargeUseCase, InstallPwaUseCase, constants, error classes, and helpers", () => {
+      expect(DistributePixChargeUseCase).toBeDefined();
+      expect(InstallPwaUseCase).toBeDefined();
+      expect(executeDistributePixCharge).toBeTypeOf("function");
+      expect(executeInstallPwa).toBeTypeOf("function");
+      expect(PixChargeDistributionError).toBeDefined();
+      expect(PwaInstallError).toBeDefined();
+      expect(PIX_CHARGE_DISTRIBUTION_ACTIONS).toBeDefined();
+      expect(PIX_CHARGE_DISTRIBUTION_CHANNELS).toBeDefined();
+      expect(PIX_CHARGE_DISTRIBUTION_ERROR_CODES).toBeDefined();
+      expect(PWA_INSTALL_ACTIONS).toBeDefined();
+      expect(PWA_INSTALL_OUTCOMES).toBeDefined();
+      expect(PWA_INSTALL_ERROR_CODES).toBeDefined();
+      expect(DEFAULT_QR_IMAGE_FILENAME).toBe("mandaumpix-qrcode.png");
+      expect(DEFAULT_QR_IMAGE_SIZE).toBe(512);
+      expect(DEFAULT_SHARE_TITLE).toBe("Manda um PIX");
+      expect(assertChargeDistributionGateway).toBeTypeOf("function");
+      expect(assertPwaInstallGateway).toBeTypeOf("function");
+      expect(buildWhatsAppShareUrl).toBeTypeOf("function");
+      expect(extractChargeDistributionTarget).toBeTypeOf("function");
+      expect(normalizeQrDownloadFileName).toBeTypeOf("function");
+      expect(normalizeQrDimensions).toBeTypeOf("function");
+      expect(normalizePwaInstallState).toBeTypeOf("function");
+      expect(normalizePwaInstallOutcome).toBeTypeOf("function");
+    });
+
+    it("should orchestrate charge distribution (copy, share, download) and PWA installation via main.js exports", async () => {
+      // Arrange
+      const pixKey = ChaveConta.create({
+        tipo_chave: PIX_KEY_TYPES.EMAIL,
+        valor_chave: "eu@luizca.net",
+        nome_recebedor: "Luiz Henrique Canet Filho",
+        cidade_recebedor: "Brasília",
+      });
+      const charge = executeGeneratePixCharge({
+        chaveConta: pixKey,
+        valor_opcional: 15,
+      });
+
+      const chargeDistributionGateway = {
+        copyText: vi.fn().mockResolvedValue(undefined),
+        canShare: vi.fn().mockReturnValue(false),
+        shareViaWhatsApp: vi.fn().mockResolvedValue(undefined),
+        downloadQrCodePng: vi.fn().mockResolvedValue(undefined),
+      };
+
+      let installed = false;
+      const pwaInstallGateway = {
+        isInstalled: () => installed,
+        canInstall: () => !installed,
+        promptInstall: async () => {
+          installed = true;
+          return { outcome: "accepted" };
+        },
+      };
+
+      // Act
+      const copyResult = await executeDistributePixCharge(
+        { action: PIX_CHARGE_DISTRIBUTION_ACTIONS.COPY, cobranca: charge },
+        { chargeDistributionGateway },
+      );
+      const shareResult = await executeDistributePixCharge(
+        { action: PIX_CHARGE_DISTRIBUTION_ACTIONS.SHARE, cobranca: charge },
+        { chargeDistributionGateway },
+      );
+      const downloadResult = await executeDistributePixCharge(
+        {
+          action: PIX_CHARGE_DISTRIBUTION_ACTIONS.DOWNLOAD_QR,
+          cobranca: charge,
+        },
+        { chargeDistributionGateway },
+      );
+
+      const initialInstallState = await executeInstallPwa(
+        { action: PWA_INSTALL_ACTIONS.GET_STATE },
+        { pwaInstallGateway },
+      );
+      const triggerInstallResult = await executeInstallPwa(
+        { action: PWA_INSTALL_ACTIONS.TRIGGER_INSTALL },
+        { pwaInstallGateway },
+      );
+
+      // Assert
+      expect(copyResult.copied).toBe(true);
+      expect(shareResult.channel).toBe(
+        PIX_CHARGE_DISTRIBUTION_CHANNELS.WHATSAPP,
+      );
+      expect(downloadResult.downloaded).toBe(true);
+      expect(initialInstallState.shouldShowInstallButton).toBe(true);
+      expect(triggerInstallResult.accepted).toBe(true);
+      expect(triggerInstallResult.shouldShowInstallButton).toBe(false);
     });
   });
 });

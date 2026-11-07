@@ -8,15 +8,15 @@ Este documento consolida o **Backlog do Produto e de Engenharia** do **Manda um 
 
 ## 📊 Visão Executiva e Progresso por Épico
 
-| ID        | Épico                                                                      | Regras / Escopo                                     | Progresso Atual | Status          |
-| :-------- | :------------------------------------------------------------------------- | :-------------------------------------------------- | :-------------: | :-------------- |
-| **EP-01** | Fundação, Ferramental, Identidade Visual e CI/CD (`dev`)                   | Infraestrutura base, ESM/JSPM, Qualidade, Storybook |     `6 / 6`     | ✅ Concluído    |
-| **EP-02** | Camada de Domínio e Casos de Uso (Clean Architecture)                      | `RN01`, `RN02`, `RN03`, `RN04`, `RN05`, `RN06`      |     `4 / 5`     | 🔄 Em andamento |
-| **EP-03** | Camada de Infraestrutura e Adaptadores Web APIs (Local-First)              | `RN01`, `RN05`, `RN06`, Offline/Service Worker      |     `0 / 4`     | ⏳ Pendente     |
-| **EP-04** | Casca da Aplicação, Roteamento SPA, Botão "Instalar" e Página "Sobre"      | `RN06`, `RN07`, `@modnes/router`, Layout Split-View |     `0 / 4`     | ⏳ Pendente     |
-| **EP-05** | Gestão de Chaves PIX na Interface (`<pix-key-*>`)                          | `RN01`, `RN02`, `<dialog class="key-dialog">`       |     `0 / 3`     | ⏳ Pendente     |
-| **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")              | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas    |     `0 / 3`     | ⏳ Pendente     |
-| **EP-07** | Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA) e Deploy `stg`/`prd` | Testes de Integração, Storybook a11y, Releases      |     `0 / 3`     | ⏳ Pendente     |
+| ID        | Épico                                                                      | Regras / Escopo                                     | Progresso Atual | Status       |
+| :-------- | :------------------------------------------------------------------------- | :-------------------------------------------------- | :-------------: | :----------- |
+| **EP-01** | Fundação, Ferramental, Identidade Visual e CI/CD (`dev`)                   | Infraestrutura base, ESM/JSPM, Qualidade, Storybook |     `6 / 6`     | ✅ Concluído |
+| **EP-02** | Camada de Domínio e Casos de Uso (Clean Architecture)                      | `RN01`, `RN02`, `RN03`, `RN04`, `RN05`, `RN06`      |     `5 / 5`     | ✅ Concluído |
+| **EP-03** | Camada de Infraestrutura e Adaptadores Web APIs (Local-First)              | `RN01`, `RN05`, `RN06`, Offline/Service Worker      |     `0 / 4`     | ⏳ Pendente  |
+| **EP-04** | Casca da Aplicação, Roteamento SPA, Botão "Instalar" e Página "Sobre"      | `RN06`, `RN07`, `@modnes/router`, Layout Split-View |     `0 / 4`     | ⏳ Pendente  |
+| **EP-05** | Gestão de Chaves PIX na Interface (`<pix-key-*>`)                          | `RN01`, `RN02`, `<dialog class="key-dialog">`       |     `0 / 3`     | ⏳ Pendente  |
+| **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")              | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas    |     `0 / 3`     | ⏳ Pendente  |
+| **EP-07** | Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA) e Deploy `stg`/`prd` | Testes de Integração, Storybook a11y, Releases      |     `0 / 3`     | ⏳ Pendente  |
 
 ---
 
@@ -25,7 +25,7 @@ Este documento consolida o **Backlog do Produto e de Engenharia** do **Manda um 
 ```mermaid
 flowchart TD
     EP01["✅ EP-01: Fundação, Identidade, JSPM, Testes & CI/CD (dev)"]
-    EP02["🔄 EP-02: Camada de Domínio & Casos de Uso<br/>(ChaveConta, CobrancaPix, Use Cases)"]
+    EP02["✅ EP-02: Camada de Domínio & Casos de Uso<br/>(ChaveConta, CobrancaPix, Use Cases)"]
     EP03["⏳ EP-03: Infraestrutura & Adaptadores Web APIs<br/>(IndexedDB, PWA Install, Clipboard/Share, SW)"]
     EP04["⏳ EP-04: Casca Global, Roteador SPA (@modnes/router),<br/>Botão 'Instalar' (RN06) & Página 'Sobre' (RN07)"]
     EP05["⏳ EP-05: Gestão de Chaves PIX na UI<br/>(Empty State, Seletor Radio Cards, Modal &lt;dialog&gt;)"]
@@ -146,7 +146,7 @@ flowchart TD
   - [x] **TASK-02.4.4 (TDD / Caso de Uso `DeletePixKeyUseCase`)**: Implementar `DeletePixKeyUseCase` (`executeDeletePixKey`) em [`src/application/use-cases/delete-pix-key.use-case.js`](../../src/application/use-cases/delete-pix-key.use-case.js) com testes unitários em [`src/application/use-cases/delete-pix-key.use-case.test.js`](../../src/application/use-cases/delete-pix-key.use-case.test.js) cobrindo remoção de chave inativa, reatribuição ao excluir chave ativa e limpeza ao excluir a última chave.
   - [x] **TASK-02.4.5 (Integração, Reexportação & Qualidade)**: Reexportar os casos de uso e erros de gestão de chaves em [`src/main.js`](../../src/main.js), atualizar [`src/main.test.js`](../../src/main.test.js) e validar `npm run lint`, `npm run format:check` e `npm run test:coverage`.
 
-#### `US-02.5` — Casos de Uso de Distribuição da Cobrança e Instalação do PWA (`⏳ Pendente` · `3 Story Points`)
+#### `US-02.5` — Casos de Uso de Distribuição da Cobrança e Instalação do PWA (`✅ Concluído` · `3 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Recebedor** que gerou uma cobrança no Manda um PIX,
@@ -168,7 +168,7 @@ flowchart TD
 - **Tarefas de Desenvolvimento (Dev Tasks)**:
   - [x] **TASK-02.5.1 (TDD / Erros, Constantes & Caso de Uso `DistributePixChargeUseCase`)**: Definir `PIX_CHARGE_DISTRIBUTION_ACTIONS`, `PIX_CHARGE_DISTRIBUTION_ERROR_CODES`, `PixChargeDistributionError`, `buildWhatsAppShareUrl` e implementar `DistributePixChargeUseCase` (`executeDistributePixCharge`) em [`src/application/use-cases/distribute-pix-charge.use-case.js`](../../src/application/use-cases/distribute-pix-charge.use-case.js) com testes unitários em [`src/application/use-cases/distribute-pix-charge.use-case.test.js`](../../src/application/use-cases/distribute-pix-charge.use-case.test.js) (`100%` de cobertura para cópia, compartilhamento nativo, fallback WhatsApp, download PNG e validações de erro).
   - [x] **TASK-02.5.2 (TDD / Erros, Constantes & Caso de Uso `InstallPwaUseCase`)**: Definir `PWA_INSTALL_ERROR_CODES`, `PwaInstallError` e implementar `InstallPwaUseCase` (`executeInstallPwa`) em [`src/application/use-cases/install-pwa.use-case.js`](../../src/application/use-cases/install-pwa.use-case.js) com testes unitários em [`src/application/use-cases/install-pwa.use-case.test.js`](../../src/application/use-cases/install-pwa.use-case.test.js) (`100%` de cobertura para `getInstallState`, `triggerInstall`, `subscribe`, aceitação/recusa do prompt e invariante `RN06`).
-  - [ ] **TASK-02.5.3 (Integração, Reexportação & Qualidade)**: Reexportar `DistributePixChargeUseCase`, `InstallPwaUseCase`, helpers e classes de erro em [`src/main.js`](../../src/main.js), adicionar testes de integração da API pública em [`src/main.test.js`](../../src/main.test.js), atualizar [`docs/design/modules.md`](../design/modules.md) e validar `npm run lint`, `npm run format:check` e `npm run test:coverage`.
+  - [x] **TASK-02.5.3 (Integração, Reexportação & Qualidade)**: Reexportar `DistributePixChargeUseCase`, `InstallPwaUseCase`, helpers e classes de erro em [`src/main.js`](../../src/main.js), adicionar testes de integração da API pública em [`src/main.test.js`](../../src/main.test.js), atualizar [`docs/design/modules.md`](../design/modules.md) e validar `npm run lint`, `npm run format:check` e `npm run test:coverage`.
 
 ---
 
