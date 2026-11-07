@@ -2,12 +2,21 @@ import { describe, expect, it } from "vitest";
 import {
   APP_METADATA,
   AccessController,
+  ChaveConta,
   CustomElement,
+  DEFAULT_PIX_KEY_LABELS,
   DataController,
+  PIX_KEY_ERROR_CODES,
+  PIX_KEY_TYPES,
+  PixKeyEntity,
+  PixKeyValidationError,
   Router,
   bootstrapApp,
   generatePixCharge,
+  normalizeMerchantCity,
+  normalizeMerchantName,
   parsePixCharge,
+  validateAndNormalizePixKey,
 } from "./main.js";
 
 describe("main.js", () => {
@@ -94,6 +103,20 @@ describe("main.js", () => {
       expect(CustomElement).toBeDefined();
       expect(DataController).toBeDefined();
       expect(Router).toBeDefined();
+    });
+  });
+
+  describe("domain exports (US-02.2)", () => {
+    it("should re-export ChaveConta entity, constants, error class, and validators", () => {
+      expect(ChaveConta).toBeDefined();
+      expect(PixKeyEntity).toBe(ChaveConta);
+      expect(PIX_KEY_TYPES).toBeDefined();
+      expect(DEFAULT_PIX_KEY_LABELS).toBeDefined();
+      expect(PIX_KEY_ERROR_CODES).toBeDefined();
+      expect(PixKeyValidationError).toBeDefined();
+      expect(validateAndNormalizePixKey).toBeTypeOf("function");
+      expect(normalizeMerchantName).toBeTypeOf("function");
+      expect(normalizeMerchantCity).toBeTypeOf("function");
     });
   });
 });
