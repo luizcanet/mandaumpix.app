@@ -33,6 +33,7 @@ import {
   PIX_KEY_STORAGE_ERROR_CODES,
   PIX_KEY_TYPES,
   PWA_INSTALL_ACTIONS,
+  PWA_INSTALL_ADAPTER_ERROR_CODES,
   PWA_INSTALL_ERROR_CODES,
   PWA_INSTALL_OUTCOMES,
   PixChargeDistributionError,
@@ -42,9 +43,12 @@ import {
   PixKeyManagementError,
   PixKeyStorageError,
   PixKeyValidationError,
+  PwaInstallAdapter,
+  PwaInstallAdapterError,
   PwaInstallError,
   Router,
   SELECTED_KEY_SETTING_KEY,
+  STANDALONE_MEDIA_QUERY,
   SavePixKeyUseCase,
   SelectPixKeyUseCase,
   assertChargeDistributionGateway,
@@ -54,6 +58,8 @@ import {
   bootstrapApp,
   buildWhatsAppShareUrl,
   createIndexedDbPixKeyRepository,
+  createPwaInstallAdapter,
+  detectStandaloneMode,
   executeDeletePixKey,
   executeDistributePixCharge,
   executeGeneratePixCharge,
@@ -509,6 +515,84 @@ describe("main.js", () => {
       expect(listed.selectedKeyId).toBe("idb-key-1");
       expect(charge.id_chave_conta).toBe("idb-key-1");
       expect(charge.chave_cobranca).toContain("idb@mandaumpix.app");
+    });
+  });
+
+  describe("infrastructure exports & PWA installation adapter integration (US-03.2)", () => {
+    it("should re-export PwaInstallAdapter, factory, constants, error class, and standalone detector", () => {
+      expect(PwaInstallAdapter).toBeDefined();
+      expect(createPwaInstallAdapter).toBeTypeOf("function");
+      expect(STANDALONE_MEDIA_QUERY).toBe("(display-mode: standalone)");
+      expect(PWA_INSTALL_ADAPTER_ERROR_CODES).toBeDefined();
+      expect(PwaInstallAdapterError).toBeDefined();
+      expect(detectStandaloneMode).toBeTypeOf("function");
+    });
+
+    it("should integrate createPwaInstallAdapter with InstallPwaUseCase via main.js exports", async () => {
+      // Arrange
+      const listeners = new Map();
+      const windowTarget = {
+        addEventListener: vi.fn((event, cb) => {
+          const set = listeners.get(event) || new Set();
+          set.add(cb);
+          listeners.set(event, set);
+        }),
+        removeEventListener: vi.fn(),
+        dispatchEvent: (event) => {
+          const set = listeners.get(event.type) || [];
+          for (const cb of set) cb(event);
+        },
+        matchMedia: vi.fn().mockReturnValue({
+          matches: false,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+        }),
+      };
+
+      const adapter = createPwaInstallAdapter({
+        windowTarget,
+        navigatorTarget: { standalone: false },
+      });
+
+      // Act & Assert 1: before beforeinstallprompt
+      const stateBefore = await executeInstallPwa(
+        { action: PWA_INSTALL_ACTIONS.GET_STATE },
+        { pwaInstallGateway: adapter },
+      );
+      expect(stateBefore.shouldShowInstallButton).toBe(false);
+
+      // Act & Assert 2: dispatch beforeinstallprompt
+      let promptDefaultPrevented = false;
+      const promptEvent = {
+        type: "beforeinstallprompt",
+        preventDefault: vi.fn(() => {
+          promptDefaultPrevented = true;
+        }),
+        prompt: vi.fn().mockResolvedValue({ outcome: "accepted" }),
+        userChoice: Promise.resolve({ outcome: "accepted" }),
+      };
+      windowTarget.dispatchEvent(promptEvent);
+
+      expect(promptDefaultPrevented).toBe(true);
+
+      const stateAfterPrompt = await executeInstallPwa(
+        { action: PWA_INSTALL_ACTIONS.GET_STATE },
+        { pwaInstallGateway: adapter },
+      );
+      expect(stateAfterPrompt.shouldShowInstallButton).toBe(true);
+      expect(stateAfterPrompt.canInstall).toBe(true);
+
+      // Act & Assert 3: triggerInstall
+      const installResult = await executeInstallPwa(
+        { action: PWA_INSTALL_ACTIONS.TRIGGER_INSTALL },
+        { pwaInstallGateway: adapter },
+      );
+
+      expect(installResult.accepted).toBe(true);
+      expect(installResult.isInstalled).toBe(true);
+      expect(installResult.shouldShowInstallButton).toBe(false);
+
+      adapter.destroy();
     });
   });
 });

@@ -105,6 +105,14 @@ import {
   openPixKeyDatabase,
   upgradePixKeyDatabaseSchema,
 } from "./infrastructure/storage/indexed-db-pix-key.repository.js";
+import {
+  PWA_INSTALL_ADAPTER_ERROR_CODES,
+  PwaInstallAdapter,
+  PwaInstallAdapterError,
+  STANDALONE_MEDIA_QUERY,
+  createPwaInstallAdapter,
+  detectStandaloneMode,
+} from "./infrastructure/pwa/pwa-install.adapter.js";
 
 export const APP_METADATA = Object.freeze({
   name: "Manda um PIX",
@@ -222,6 +230,7 @@ export {
   PIX_KEY_STORAGE_ERROR_CODES,
   PIX_KEY_TYPES,
   PWA_INSTALL_ACTIONS,
+  PWA_INSTALL_ADAPTER_ERROR_CODES,
   PWA_INSTALL_ERROR_CODES,
   PWA_INSTALL_OUTCOMES,
   PixChargeDistributionError,
@@ -231,9 +240,12 @@ export {
   PixKeyManagementError,
   PixKeyStorageError,
   PixKeyValidationError,
+  PwaInstallAdapter,
+  PwaInstallAdapterError,
   PwaInstallError,
   Router,
   SELECTED_KEY_SETTING_KEY,
+  STANDALONE_MEDIA_QUERY,
   SavePixKeyUseCase,
   SelectPixKeyUseCase,
   SetInjectable,
@@ -243,7 +255,9 @@ export {
   assertPwaInstallGateway,
   buildWhatsAppShareUrl,
   createIndexedDbPixKeyRepository,
+  createPwaInstallAdapter,
   createStaticPix,
+  detectStandaloneMode,
   encodeQR,
   executeDeletePixKey,
   executeDistributePixCharge,
