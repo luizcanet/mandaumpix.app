@@ -42,6 +42,7 @@ const CNPJ_LENGTH = 14;
 const MAX_EMAIL_LENGTH = 77;
 const MAX_MERCHANT_NAME_LENGTH = 25;
 const MAX_MERCHANT_CITY_LENGTH = 15;
+const MAX_ACCOUNT_LABEL_LENGTH = 40;
 const REPEATED_DIGITS_REGEX = /^(\d)\1+$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PHONE_E164_BR_REGEX = /^\+55[1-9][1-9]9\d{8}$/;
@@ -267,3 +268,74 @@ export function normalizeMerchantCity(rawCity) {
 
   return normalized;
 }
+
+function normalizeAccountLabel(rawLabel, tipoChave) {
+  const cleaned =
+    typeof rawLabel === "string"
+      ? rawLabel.replace(MULTIPLE_SPACES_REGEX, " ").trim()
+      : "";
+
+  if (!cleaned) {
+    return DEFAULT_PIX_KEY_LABELS[tipoChave];
+  }
+
+  return cleaned.slice(0, MAX_ACCOUNT_LABEL_LENGTH).trim();
+}
+
+function normalizeEntityId(rawId) {
+  const cleaned = typeof rawId === "string" ? rawId.trim() : "";
+  return cleaned || crypto.randomUUID();
+}
+
+function normalizeCreatedAt(rawCreatedAt) {
+  if (typeof rawCreatedAt === "string" && rawCreatedAt.trim()) {
+    const parsedTime = Date.parse(rawCreatedAt);
+    if (!Number.isNaN(parsedTime)) {
+      return new Date(parsedTime).toISOString();
+    }
+  }
+  return new Date().toISOString();
+}
+
+export class ChaveConta {
+  constructor(props = {}) {
+    const safeProps = props && typeof props === "object" ? props : {};
+
+    const { tipo_chave, valor_chave } = validateAndNormalizePixKey(
+      safeProps.tipo_chave,
+      safeProps.valor_chave,
+    );
+
+    this.id = normalizeEntityId(safeProps.id);
+    this.rotulo = normalizeAccountLabel(safeProps.rotulo, tipo_chave);
+    this.tipo_chave = tipo_chave;
+    this.valor_chave = valor_chave;
+    this.nome_recebedor = normalizeMerchantName(safeProps.nome_recebedor);
+    this.cidade_recebedor = normalizeMerchantCity(safeProps.cidade_recebedor);
+    this.criado_em = normalizeCreatedAt(safeProps.criado_em);
+
+    Object.freeze(this);
+  }
+
+  static create(props) {
+    return new ChaveConta(props);
+  }
+
+  static fromJSON(json) {
+    return new ChaveConta(json);
+  }
+
+  toJSON() {
+    return {
+      id: this.id,
+      rotulo: this.rotulo,
+      tipo_chave: this.tipo_chave,
+      valor_chave: this.valor_chave,
+      nome_recebedor: this.nome_recebedor,
+      cidade_recebedor: this.cidade_recebedor,
+      criado_em: this.criado_em,
+    };
+  }
+}
+
+export const PixKeyEntity = ChaveConta;

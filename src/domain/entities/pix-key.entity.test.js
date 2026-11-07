@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { generatePixCharge, parsePixCharge } from "../../main.js";
 import {
+  ChaveConta,
   DEFAULT_PIX_KEY_LABELS,
   PIX_KEY_ERROR_CODES,
   PIX_KEY_TYPES,
+  PixKeyEntity,
   PixKeyValidationError,
   normalizeMerchantCity,
   normalizeMerchantName,
@@ -375,5 +378,136 @@ describe("pix-key.entity.js — EMV Normalizers (TASK-02.2.3)", () => {
         );
       },
     );
+  });
+});
+
+describe("pix-key.entity.js — ChaveConta Entity (TASK-02.2.4)", () => {
+  it("should create a frozen ChaveConta instance normalizing CPF, holder and city", () => {
+    // Arrange
+    const rawProps = {
+      id: "  key-cpf-01  ",
+      rotulo: "  Nubank   Pessoal  ",
+      tipo_chave: "CPF",
+      valor_chave: "123.456.789-09",
+      nome_recebedor: "Luiz Henrique Canet Filho",
+      cidade_recebedor: "Brasília",
+      criado_em: "2026-11-07T15:00:00.000Z",
+    };
+
+    // Act
+    const entity = ChaveConta.create(rawProps);
+
+    // Assert
+    expect(entity).toBeInstanceOf(ChaveConta);
+    expect(PixKeyEntity).toBe(ChaveConta);
+    expect(Object.isFrozen(entity)).toBe(true);
+    expect(entity.id).toBe("key-cpf-01");
+    expect(entity.rotulo).toBe("Nubank Pessoal");
+    expect(entity.tipo_chave).toBe("CPF");
+    expect(entity.valor_chave).toBe("12345678909");
+    expect(entity.nome_recebedor).toBe("LUIZ HENRIQUE CANET FILHO");
+    expect(entity.cidade_recebedor).toBe("BRASILIA");
+    expect(entity.criado_em).toBe("2026-11-07T15:00:00.000Z");
+  });
+
+  it("should auto-generate id, default rotulo by key type, and ISO criado_em when omitted or invalid", () => {
+    // Arrange & Act
+    const entity = ChaveConta.create({
+      tipo_chave: "EMAIL",
+      valor_chave: "  Contato@MandaUmPix.APP ",
+      nome_recebedor: "João da Silva Júnior & Cia Comércio",
+      cidade_recebedor: "São Bernardo do Campo",
+      rotulo: "   ",
+      criado_em: "data-invalida",
+    });
+
+    // Assert
+    expect(entity.id).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
+    );
+    expect(entity.rotulo).toBe("Conta E-mail");
+    expect(entity.valor_chave).toBe("contato@mandaumpix.app");
+    expect(entity.nome_recebedor).toBe("JOAO DA SILVA JUNIOR CIA");
+    expect(entity.cidade_recebedor).toBe("SAO BERNARDO DO");
+    expect(() => new Date(entity.criado_em).toISOString()).not.toThrow();
+  });
+
+  it("should truncate rotulo to at most 40 characters", () => {
+    // Arrange
+    const longLabel = "Conta Empresarial Principal de Recebimentos PIX 2026";
+
+    // Act
+    const entity = ChaveConta.create({
+      tipo_chave: "CNPJ",
+      valor_chave: "11.222.333/0001-81",
+      nome_recebedor: "Empresa Exemplo",
+      cidade_recebedor: "Sao Paulo",
+      rotulo: longLabel,
+    });
+
+    // Assert
+    expect(entity.rotulo.length).toBeLessThanOrEqual(40);
+    expect(entity.rotulo).toBe("Conta Empresarial Principal de Recebimen");
+  });
+
+  it("should serialize to plain object via toJSON() and reconstruct via fromJSON()", () => {
+    // Arrange
+    const original = ChaveConta.create({
+      id: "k-phone-1",
+      rotulo: "Inter Celular",
+      tipo_chave: "TELEFONE",
+      valor_chave: "(61) 99988-7766",
+      nome_recebedor: "Luiz Canet",
+      cidade_recebedor: "Brasília",
+      criado_em: "2026-11-07T18:00:00.000Z",
+    });
+
+    // Act
+    const json = original.toJSON();
+    const restored = ChaveConta.fromJSON(json);
+
+    // Assert
+    expect(json).toEqual({
+      id: "k-phone-1",
+      rotulo: "Inter Celular",
+      tipo_chave: "TELEFONE",
+      valor_chave: "+5561999887766",
+      nome_recebedor: "LUIZ CANET",
+      cidade_recebedor: "BRASILIA",
+      criado_em: "2026-11-07T18:00:00.000Z",
+    });
+    expect(restored).toBeInstanceOf(ChaveConta);
+    expect(restored.toJSON()).toEqual(json);
+  });
+
+  it("should throw PixKeyValidationError when instantiated without arguments", () => {
+    expect(() => new ChaveConta()).toThrowError(PixKeyValidationError);
+    expect(() => ChaveConta.create(null)).toThrowError(PixKeyValidationError);
+  });
+
+  it("should integrate seamlessly with generatePixCharge and parsePixCharge", () => {
+    // Arrange
+    const chaveConta = ChaveConta.create({
+      tipo_chave: "EVP",
+      valor_chave: "123E4567-E89B-42D3-A456-556642440000",
+      nome_recebedor: "João da Silva Júnior & Cia Comércio",
+      cidade_recebedor: "São José dos Campos",
+    });
+
+    // Act
+    const charge = generatePixCharge({
+      pixKey: chaveConta.valor_chave,
+      merchantName: chaveConta.nome_recebedor,
+      merchantCity: chaveConta.cidade_recebedor,
+      transactionAmount: 99.9,
+    });
+    const parsed = parsePixCharge(charge.brCode);
+
+    // Assert
+    expect(parsed.isStatic).toBe(true);
+    expect(parsed.parsed.pixKey).toBe("123e4567-e89b-42d3-a456-556642440000");
+    expect(parsed.parsed.merchantName).toBe("JOAO DA SILVA JUNIOR CIA");
+    expect(parsed.parsed.merchantCity).toBe("SAO JOSE DOS CA");
+    expect(parsed.parsed.transactionAmount).toBe(99.9);
   });
 });
