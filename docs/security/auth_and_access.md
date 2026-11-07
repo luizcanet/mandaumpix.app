@@ -17,9 +17,9 @@ O principal benefício de segurança operacional do **Manda um PIX** reside just
 
 ## 👤 Controle de Acesso no Dispositivo
 
-- **Escopo Local ao Navegador/Dispositivo**:
-  - As chaves de contas cadastradas ficam armazenadas exclusivamente no contexto de origem (_Same-Origin Policy_) do navegador do próprio dispositivo do usuário.
-  - Nenhum outro site ou domínio tem permissão de leitura sobre o armazenamento local do `mandaumpix.app`.
+- **Escopo Local ao Navegador/Dispositivo (`IndexedDB`)**:
+  - Os dados do usuário e as chaves de contas cadastradas ficam armazenados exclusivamente no banco de dados local **IndexedDB** (`mandaumpix_db`), protegido pela política de mesma origem (_Same-Origin Policy_) do navegador do próprio dispositivo do usuário.
+  - Nenhum outro site ou domínio tem permissão de leitura ou escrita sobre o banco **IndexedDB** do `mandaumpix.app`.
 
 ---
 

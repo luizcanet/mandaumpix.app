@@ -15,7 +15,7 @@ O **Manda um PIX** (`mandaumpix.app`) é concebido como uma aplicação **Progre
    - Instalável em dispositivos móveis e desktops, apresentando de forma destacada um botão **"Instalar"** para usuários que ainda não instalaram o aplicativo no dispositivo.
    - Operação rápida e resiliente mesmo em conexões instáveis, uma vez que a geração do QR Code e da chave de cobrança é matemática e determinística no cliente.
 3. **Integração Nativa com a Plataforma Web**:
-   - Uso de APIs padronizadas do navegador (Instalação PWA via `BeforeInstallPromptEvent` e `matchMedia('(display-mode: standalone)')`, Armazenamento Local, Clipboard API, Web Share API / Deep Links para WhatsApp, Canvas/Blob Download).
+   - Uso de APIs padronizadas do navegador (Instalação PWA via `BeforeInstallPromptEvent` e `matchMedia('(display-mode: standalone)')`, Persistência Local Assíncrona de Dados do Usuário via **IndexedDB**, Clipboard API, Web Share API / Deep Links para WhatsApp, Canvas/Blob Download).
 4. **Padronização e Qualidade Multi-Linguagem**:
    - Código-fonte JavaScript, folhas de estilo CSS, arquivos de configuração JSON e documentação Markdown são verificados estaticamente por uma configuração unificada no [`eslint.config.js`](../../eslint.config.js) combinada ao [`prettier`](../../package.json).
 
@@ -46,7 +46,7 @@ flowchart TD
 
     subgraph Infra["Camada de Infraestrutura (Browser Web APIs)"]
         PWAInstall["API de Instalação PWA (beforeinstallprompt / appinstalled)"]
-        Storage["Persistência Local (LocalStorage / IndexedDB)"]
+        Storage["Persistência Local (IndexedDB)"]
         QRGen["Renderizador Gráfico de QR Code (Canvas / SVG / Blob)"]
         ShareClip["Clipboard API / Web Share API / Download Anchor"]
         RouterInfra["History API / Roteador SPA (@modnes/router)"]
@@ -73,6 +73,7 @@ flowchart TD
   - [ADR 0001: Registro de Decisões Arquiteturais](./decisions/0001-record-architecture-decisions.md)
   - [ADR 0002: Arquitetura PWA Client-Side com ES Modules e Linting Multi-Linguagem](./decisions/0002-arquitetura-pwa-client-side-es-modules.md)
   - [ADR 0003: Hospedagem em Firebase Hosting Multi-Ambiente e Domínio no Name.com](./decisions/0003-hospedagem-firebase-hosting-e-dominio-name-com.md)
+  - [ADR 0004: Persistência Local de Dados do Usuário com IndexedDB](./decisions/0004-persistencia-local-indexeddb.md)
 
 ---
 

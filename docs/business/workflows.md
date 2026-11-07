@@ -15,13 +15,13 @@ sequenceDiagram
     autonumber
     actor U as Usuário Recebedor
     participant App as Manda um PIX (PWA)
-    participant Storage as Armazenamento Local (Browser)
+    participant Storage as Banco Local (IndexedDB)
 
     U->>App: Acessa gestão de chaves de contas
     U->>App: Informa dados da chave PIX (conta de recebimento)
     App->>App: Valida formato dos dados informados
-    App->>Storage: Persiste chave cadastrada localmente
-    Storage-->>App: Confirmação de persistência
+    App->>Storage: Persiste chave e seleção ativa no IndexedDB (readwrite)
+    Storage-->>App: Confirmação da transação assíncrona
     App-->>U: Exibe chave disponível na lista de seleção
 ```
 

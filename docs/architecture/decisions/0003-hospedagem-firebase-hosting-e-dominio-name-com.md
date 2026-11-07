@@ -49,4 +49,4 @@ Escolhemos a **Opção 1**:
 
 ---
 
-⬅️ **Anterior**: [ADR 0002](./0002-arquitetura-pwa-client-side-es-modules.md) | ➡️ **Próximo**: [Design e Módulos](../../design/modules.md)
+⬅️ **Anterior**: [ADR 0002](./0002-arquitetura-pwa-client-side-es-modules.md) | ➡️ **Próximo**: [ADR 0004: Persistência Local de Dados do Usuário com IndexedDB](./0004-persistencia-local-indexeddb.md)

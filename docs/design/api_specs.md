@@ -79,4 +79,20 @@ O aplicativo deve oferecer um acesso fácil na interface principal para uma pág
 
 ---
 
+## 5. Contrato de Persistência Local de Dados do Usuário (`IndexedDB`)
+
+A persistência de todos os dados do usuário no dispositivo segue o contrato assíncrono sobre a API nativa `window.indexedDB` ([ADR 0004](../architecture/decisions/0004-persistencia-local-indexeddb.md)):
+
+- **Inicialização e Migração**:
+  - `indexedDB.open('mandaumpix_db', 1)`
+  - No evento `onupgradeneeded`, garante a criação das _object stores_ `pix_keys` (`{ keyPath: 'id' }`) e `user_settings` (`{ keyPath: 'key' }`).
+- **Operações do Repositório (`IndexedDbPixKeyRepository`)**:
+  - `findAll(): Promise<ChaveConta[]>` — Transação `readonly` em `pix_keys` (`objectStore.getAll()`).
+  - `save(pixKey: ChaveConta): Promise<ChaveConta>` — Transação `readwrite` em `pix_keys` (`objectStore.put(pixKey)`).
+  - `deleteById(id: string): Promise<void>` — Transação `readwrite` em `pix_keys` (`objectStore.delete(id)`).
+  - `getSelectedKeyId(): Promise<string | null>` — Transação `readonly` em `user_settings` (`objectStore.get('selectedKeyId')`).
+  - `setSelectedKeyId(id: string | null): Promise<void>` — Transação `readwrite` em `user_settings` (`objectStore.put({ key: 'selectedKeyId', value: id, updatedAt })`).
+
+---
+
 ⬅️ **Anterior**: [Modelo de Dados](./data_models.md) | ➡️ **Próximo**: [Proposta de Interface (UI)](./ui_proposal.md)

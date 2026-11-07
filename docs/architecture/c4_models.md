@@ -44,7 +44,7 @@ flowchart TD
     subgraph Browser["Navegador Web / Runtime PWA (Dispositivo do Usuário)"]
         PWAApp["📱 Aplicação Web SPA / PWA<br/>(ES Modules, HTML5, CSS3)<br/>Interface e lógica de geração PIX"]
         SW["⚙️ Service Worker<br/>Cache de ativos e funcionamento offline"]
-        LocalStore[("🗄️ Armazenamento Local do Navegador<br/>(IndexedDB / Web Storage)<br/>Chaves PIX cadastradas pelo usuário")]
+        LocalStore[("🗄️ Banco de Dados Local do Navegador<br/>(IndexedDB: mandaumpix_db)<br/>Dados do usuário e chaves PIX cadastradas")]
     end
 
     DNS["🌐 Name.com (DNS & Certificado SSL/TLS)<br/>Domínios: mandaumpix.app, stg.mandaumpix.app, dev.mandaumpix.app"]
@@ -86,7 +86,7 @@ flowchart TD
 
     subgraph Adapters["Adaptadores do Navegador"]
         InstallAdapter["PWA Install Prompt Adapter"]
-        StorageAdapter["Storage Adapter"]
+        StorageAdapter["IndexedDB Storage Adapter"]
         BrowserShareAdapter["Clipboard & Web Share Adapter"]
     end
 

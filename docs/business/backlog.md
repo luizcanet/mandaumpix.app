@@ -26,7 +26,7 @@ Este documento consolida o **Backlog do Produto e de Engenharia** do **Manda um 
 flowchart TD
     EP01["✅ EP-01: Fundação, Identidade, JSPM, Testes & CI/CD (dev)"]
     EP02["🔄 EP-02: Camada de Domínio & Casos de Uso<br/>(ChaveConta, CobrancaPix, Use Cases)"]
-    EP03["⏳ EP-03: Infraestrutura & Adaptadores Web APIs<br/>(LocalStorage, PWA Install, Clipboard/Share, SW)"]
+    EP03["⏳ EP-03: Infraestrutura & Adaptadores Web APIs<br/>(IndexedDB, PWA Install, Clipboard/Share, SW)"]
     EP04["⏳ EP-04: Casca Global, Roteador SPA (@modnes/router),<br/>Botão 'Instalar' (RN06) & Página 'Sobre' (RN07)"]
     EP05["⏳ EP-05: Gestão de Chaves PIX na UI<br/>(Empty State, Seletor Radio Cards, Modal &lt;dialog&gt;)"]
     EP06["⏳ EP-06: Geração e Distribuição 'Manda um PIX'<br/>(Formulário de Valor, QR Code SVG, Copiar/WhatsApp/PNG)"]
@@ -121,17 +121,18 @@ flowchart TD
 
 ### 🔌 Épico 03 — Camada de Infraestrutura e Adaptadores Web APIs (Local-First)
 
-> **Objetivo**: Implementar os adaptadores concretos de infraestrutura do navegador (Storage, Clipboard, Web Share / WhatsApp, Download PNG, Instalação PWA e Service Worker), mantendo 100% dos dados locais no dispositivo.
+> **Objetivo**: Implementar os adaptadores concretos de infraestrutura do navegador (IndexedDB, Clipboard, Web Share / WhatsApp, Download PNG, Instalação PWA e Service Worker), mantendo 100% dos dados do usuário locais no dispositivo.
 
-#### `US-03.1` — Repositório Local de Chaves PIX (`LocalStoragePixKeyRepository`) (`⏳ Pendente`)
+#### `US-03.1` — Repositório Local de Dados do Usuário no IndexedDB (`IndexedDbPixKeyRepository`) (`⏳ Pendente`)
 
-- **História**: Como **Recebedor**, quero que minhas chaves cadastradas fiquem salvas no meu próprio navegador para não precisar redigitá-las a cada cobrança, sem que meus dados sejam enviados para servidores externos.
-- **Regras de Negócio**: `RN01` e [Conformidade e Privacidade](../security/compliance.md).
+- **História**: Como **Recebedor**, quero que meus dados e chaves PIX cadastradas fiquem salvos de forma segura e estruturada no banco **IndexedDB** do meu próprio navegador para não precisar redigitá-los a cada cobrança, sem que meus dados sejam enviados para servidores externos.
+- **Regras de Negócio**: `RN01`, [ADR 0004](../architecture/decisions/0004-persistencia-local-indexeddb.md) e [Conformidade e Privacidade](../security/compliance.md).
 - **Critérios de Aceite**:
-  - [ ] Implementar `src/infrastructure/storage/local-storage-pix-key.repository.js` persistindo a lista de `ChaveConta` e o `selectedKeyId` em `window.localStorage` sob namespace versionado (`mandaumpix:v1:keys` e `mandaumpix:v1:selected-key`).
+  - [ ] Implementar `src/infrastructure/storage/indexed-db-pix-key.repository.js` persistindo os registros de `ChaveConta` e as preferências do usuário (`selectedKeyId`) em `window.indexedDB` (banco `mandaumpix_db`, versão `1`, _object stores_ `pix_keys` e `user_settings`).
+  - [ ] Gerenciar criação e migração de esquema via evento `onupgradeneeded` e executar leituras/escritas em transações atômicas (`readonly` e `readwrite`) encapsuladas em `Promises`.
   - [ ] Integrar reatividade de estado com `@modnes/data-controller` (`DataHandler` / `ArrayHandler`) para sincronizar alterações com a camada de apresentação.
-  - [ ] Tratar falhas de parse JSON corrompido ou indisponibilidade de storage (`QuotaExceededError`) de forma resiliente.
-  - [ ] Testes unitários e de integração simulando `localStorage` no JSDOM.
+  - [ ] Tratar indisponibilidade do `indexedDB`, bloqueio de versão ou erros de transação (`QuotaExceededError`, `AbortError`) de forma resiliente.
+  - [ ] Testes unitários e de integração validando as operações assíncronas do repositório sobre `indexedDB`.
 
 #### `US-03.2` — Adaptador de Instalação do PWA (`PwaInstallAdapter`) (`⏳ Pendente`)
 

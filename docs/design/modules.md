@@ -79,7 +79,7 @@ flowchart TD
    - Apresenta informações sobre o **autor** (**Luiz Henrique Canet Filho** — `<me@luizca.net>`) e sobre o **projeto** (**Manda um PIX** — `mandaumpix.app`, propósito do PWA, repositório GitHub e licença **GNU AGPL v3.0**).
 3. **Módulo de Chaves de Conta**:
    - Cadastro de múltiplas chaves nas quais o usuário deseja receber.
-   - Persistência e recuperação local das chaves para seleção rápida.
+   - Persistência e recuperação local assíncrona dos dados do usuário via **IndexedDB** para seleção rápida.
 4. **Módulo Gerador de Cobrança ("Manda um PIX")**:
    - Recebe a chave selecionada e o valor opcional.
    - Caso o valor não seja informado, configura a cobrança como valor dinâmico/aberto.
@@ -94,4 +94,4 @@ flowchart TD
 
 ---
 
-⬅️ **Anterior**: [ADR 0003](../architecture/decisions/0003-hospedagem-firebase-hosting-e-dominio-name-com.md) | ➡️ **Próximo**: [Modelo de Dados](./data_models.md)
+⬅️ **Anterior**: [ADR 0004](../architecture/decisions/0004-persistencia-local-indexeddb.md) | ➡️ **Próximo**: [Modelo de Dados](./data_models.md)

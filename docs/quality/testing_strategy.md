@@ -40,7 +40,7 @@ Para o desenvolvimento isolado, inspeção visual e validação de acessibilidad
 
 ```mermaid
 flowchart TD
-    E2E["3. Testes de Fluxo / UI (PWA)<br/>Selecionar chave -> Informar valor opcional -> Clicar em 'Manda um PIX'<br/>-> Verificar exibição do QR Code, cópia, compartilhamento e download"] --> Int["2. Testes de Integração Local<br/>Persistência de múltiplas chaves no armazenamento do navegador<br/>e integração com mocks de Clipboard / Web Share"]
+    E2E["3. Testes de Fluxo / UI (PWA)<br/>Selecionar chave -> Informar valor opcional -> Clicar em 'Manda um PIX'<br/>-> Verificar exibição do QR Code, cópia, compartilhamento e download"] --> Int["2. Testes de Integração Local<br/>Persistência assíncrona dos dados do usuário no IndexedDB<br/>e integração com mocks de Clipboard / Web Share"]
     Int --> Unit["1. Testes Unitários de Domínio (Base Crítica)<br/>Validação de chaves PIX, geração do payload BR Code (com e sem valor)<br/>e cálculo exato do checksum CRC16"]
 ```
 
