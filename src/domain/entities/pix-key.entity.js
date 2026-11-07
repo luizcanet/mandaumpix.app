@@ -36,3 +36,187 @@ export class PixKeyValidationError extends Error {
     this.field = field;
   }
 }
+
+const CPF_LENGTH = 11;
+const CNPJ_LENGTH = 14;
+const MAX_EMAIL_LENGTH = 77;
+const REPEATED_DIGITS_REGEX = /^(\d)\1+$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PHONE_E164_BR_REGEX = /^\+55[1-9][1-9]9\d{8}$/;
+const UUID_V4_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+
+const CNPJ_FIRST_WEIGHTS = Object.freeze([5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+const CNPJ_SECOND_WEIGHTS = Object.freeze([
+  6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2,
+]);
+
+function extractDigits(rawValue) {
+  if (typeof rawValue !== "string") {
+    return "";
+  }
+  return rawValue.replace(/\D/g, "");
+}
+
+function calculateCpfVerifierDigit(digits, length, initialWeight) {
+  let sum = 0;
+  for (let index = 0; index < length; index += 1) {
+    sum += Number(digits[index]) * (initialWeight - index);
+  }
+  const remainder = sum % 11;
+  return remainder < 2 ? 0 : 11 - remainder;
+}
+
+function calculateCnpjVerifierDigit(digits, weights) {
+  let sum = 0;
+  for (let index = 0; index < weights.length; index += 1) {
+    sum += Number(digits[index]) * weights[index];
+  }
+  const remainder = sum % 11;
+  return remainder < 2 ? 0 : 11 - remainder;
+}
+
+export function validateAndNormalizeCpf(rawValue) {
+  const digits = extractDigits(rawValue);
+
+  if (digits.length !== CPF_LENGTH || REPEATED_DIGITS_REGEX.test(digits)) {
+    throw new PixKeyValidationError("Chave CPF inválida.", {
+      code: PIX_KEY_ERROR_CODES.INVALID_CPF,
+      field: "valor_chave",
+    });
+  }
+
+  const firstDigit = calculateCpfVerifierDigit(digits, 9, 10);
+  const secondDigit = calculateCpfVerifierDigit(digits, 10, 11);
+
+  if (firstDigit !== Number(digits[9]) || secondDigit !== Number(digits[10])) {
+    throw new PixKeyValidationError(
+      "Chave CPF com dígitos verificadores inválidos.",
+      {
+        code: PIX_KEY_ERROR_CODES.INVALID_CPF,
+        field: "valor_chave",
+      },
+    );
+  }
+
+  return digits;
+}
+
+export function validateAndNormalizeCnpj(rawValue) {
+  const digits = extractDigits(rawValue);
+
+  if (digits.length !== CNPJ_LENGTH || REPEATED_DIGITS_REGEX.test(digits)) {
+    throw new PixKeyValidationError("Chave CNPJ inválida.", {
+      code: PIX_KEY_ERROR_CODES.INVALID_CNPJ,
+      field: "valor_chave",
+    });
+  }
+
+  const firstDigit = calculateCnpjVerifierDigit(digits, CNPJ_FIRST_WEIGHTS);
+  const secondDigit = calculateCnpjVerifierDigit(digits, CNPJ_SECOND_WEIGHTS);
+
+  if (firstDigit !== Number(digits[12]) || secondDigit !== Number(digits[13])) {
+    throw new PixKeyValidationError(
+      "Chave CNPJ com dígitos verificadores inválidos.",
+      {
+        code: PIX_KEY_ERROR_CODES.INVALID_CNPJ,
+        field: "valor_chave",
+      },
+    );
+  }
+
+  return digits;
+}
+
+export function validateAndNormalizeEmail(rawValue) {
+  const normalized =
+    typeof rawValue === "string" ? rawValue.trim().toLowerCase() : "";
+
+  if (
+    !normalized ||
+    normalized.length > MAX_EMAIL_LENGTH ||
+    !EMAIL_REGEX.test(normalized)
+  ) {
+    throw new PixKeyValidationError(
+      "Chave de e-mail inválida ou acima de 77 caracteres.",
+      {
+        code: PIX_KEY_ERROR_CODES.INVALID_EMAIL,
+        field: "valor_chave",
+      },
+    );
+  }
+
+  return normalized;
+}
+
+export function validateAndNormalizePhone(rawValue) {
+  const trimmed = typeof rawValue === "string" ? rawValue.trim() : "";
+  const digits = extractDigits(trimmed);
+
+  let normalizedCandidate = "";
+  if (trimmed.startsWith("+")) {
+    normalizedCandidate = `+${digits}`;
+  } else if (digits.length === 11) {
+    normalizedCandidate = `+55${digits}`;
+  } else if (digits.length === 13 && digits.startsWith("55")) {
+    normalizedCandidate = `+${digits}`;
+  }
+
+  if (!PHONE_E164_BR_REGEX.test(normalizedCandidate)) {
+    throw new PixKeyValidationError(
+      "Chave de telefone celular inválida (esperado padrão +55DDD9XXXXXXXX).",
+      {
+        code: PIX_KEY_ERROR_CODES.INVALID_PHONE,
+        field: "valor_chave",
+      },
+    );
+  }
+
+  return normalizedCandidate;
+}
+
+export function validateAndNormalizeEvp(rawValue) {
+  const normalized =
+    typeof rawValue === "string" ? rawValue.trim().toLowerCase() : "";
+
+  if (!UUID_V4_REGEX.test(normalized)) {
+    throw new PixKeyValidationError(
+      "Chave aleatória (EVP) inválida (esperado UUID v4).",
+      {
+        code: PIX_KEY_ERROR_CODES.INVALID_EVP,
+        field: "valor_chave",
+      },
+    );
+  }
+
+  return normalized;
+}
+
+const VALIDATOR_BY_KEY_TYPE = Object.freeze({
+  [PIX_KEY_TYPES.CPF]: validateAndNormalizeCpf,
+  [PIX_KEY_TYPES.CNPJ]: validateAndNormalizeCnpj,
+  [PIX_KEY_TYPES.EMAIL]: validateAndNormalizeEmail,
+  [PIX_KEY_TYPES.TELEFONE]: validateAndNormalizePhone,
+  [PIX_KEY_TYPES.EVP]: validateAndNormalizeEvp,
+});
+
+export function validateAndNormalizePixKey(tipoChave, valorChave) {
+  const normalizedType =
+    typeof tipoChave === "string" ? tipoChave.trim().toUpperCase() : "";
+  const validator = VALIDATOR_BY_KEY_TYPE[normalizedType];
+
+  if (!validator) {
+    throw new PixKeyValidationError(
+      "Tipo de chave PIX inválido (permitidos: CPF, CNPJ, EMAIL, TELEFONE, EVP).",
+      {
+        code: PIX_KEY_ERROR_CODES.INVALID_KEY_TYPE,
+        field: "tipo_chave",
+      },
+    );
+  }
+
+  return {
+    tipo_chave: normalizedType,
+    valor_chave: validator(valorChave),
+  };
+}

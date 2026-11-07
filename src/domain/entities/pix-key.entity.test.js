@@ -4,6 +4,12 @@ import {
   PIX_KEY_ERROR_CODES,
   PIX_KEY_TYPES,
   PixKeyValidationError,
+  validateAndNormalizeCnpj,
+  validateAndNormalizeCpf,
+  validateAndNormalizeEmail,
+  validateAndNormalizeEvp,
+  validateAndNormalizePhone,
+  validateAndNormalizePixKey,
 } from "./pix-key.entity.js";
 
 describe("pix-key.entity.js — Domain Constants & PixKeyValidationError (TASK-02.2.1)", () => {
@@ -94,5 +100,224 @@ describe("pix-key.entity.js — Domain Constants & PixKeyValidationError (TASK-0
       expect(error.code).toBe("PIX_KEY_VALIDATION_ERROR");
       expect(error.field).toBeNull();
     });
+  });
+});
+
+describe("pix-key.entity.js — PIX Key Validators & Normalizers (TASK-02.2.2)", () => {
+  describe("validateAndNormalizeCpf", () => {
+    it("should strip formatting and return 11 digits for valid CPFs", () => {
+      expect(validateAndNormalizeCpf("123.456.789-09")).toBe("12345678909");
+      expect(validateAndNormalizeCpf("52998224725")).toBe("52998224725");
+      expect(validateAndNormalizeCpf(" 111.444.777-35 ")).toBe("11144477735");
+    });
+
+    it.each([
+      [null],
+      [undefined],
+      [""],
+      ["123456789"],
+      ["123456789012"],
+      ["000.000.000-00"],
+      ["111.111.111-11"],
+      ["99999999999"],
+      ["123.456.789-19"],
+      ["123.456.789-00"],
+    ])("should throw INVALID_CPF for invalid CPF input: %s", (invalidInput) => {
+      expect(() => validateAndNormalizeCpf(invalidInput)).toThrowError(
+        expect.objectContaining({
+          name: "PixKeyValidationError",
+          code: PIX_KEY_ERROR_CODES.INVALID_CPF,
+          field: "valor_chave",
+        }),
+      );
+    });
+  });
+
+  describe("validateAndNormalizeCnpj", () => {
+    it("should strip formatting and return 14 digits for valid CNPJs", () => {
+      expect(validateAndNormalizeCnpj("11.222.333/0001-81")).toBe(
+        "11222333000181",
+      );
+      expect(validateAndNormalizeCnpj("11444777000161")).toBe("11444777000161");
+      expect(validateAndNormalizeCnpj("00.360.305/0001-04")).toBe(
+        "00360305000104",
+      );
+    });
+
+    it.each([
+      [null],
+      [undefined],
+      [""],
+      ["1122233300018"],
+      ["112223330001819"],
+      ["00.000.000/0000-00"],
+      ["11.111.111/1111-11"],
+      ["11.222.333/0001-91"],
+      ["11.222.333/0001-89"],
+    ])(
+      "should throw INVALID_CNPJ for invalid CNPJ input: %s",
+      (invalidInput) => {
+        expect(() => validateAndNormalizeCnpj(invalidInput)).toThrowError(
+          expect.objectContaining({
+            name: "PixKeyValidationError",
+            code: PIX_KEY_ERROR_CODES.INVALID_CNPJ,
+            field: "valor_chave",
+          }),
+        );
+      },
+    );
+  });
+
+  describe("validateAndNormalizeEmail", () => {
+    it("should trim, lowercase and validate a standard email up to 77 chars", () => {
+      expect(validateAndNormalizeEmail("  Contato@MandaUmPix.APP  ")).toBe(
+        "contato@mandaumpix.app",
+      );
+
+      const max77Email = `${"a".repeat(62)}@exemplo.com.br`; // 62 + 15 = 77 chars
+      expect(max77Email.length).toBe(77);
+      expect(validateAndNormalizeEmail(max77Email)).toBe(max77Email);
+    });
+
+    it.each([
+      [null],
+      [undefined],
+      [""],
+      ["   "],
+      ["email-sem-arroba.com"],
+      ["@dominio.com"],
+      ["usuario@"],
+      ["usuario@dominio"],
+      ["usuario com espaco@dominio.com"],
+      [`${"a".repeat(63)}@exemplo.com.br`], // 78 chars (> 77 BACEN limit)
+    ])(
+      "should throw INVALID_EMAIL for invalid email input: %s",
+      (invalidInput) => {
+        expect(() => validateAndNormalizeEmail(invalidInput)).toThrowError(
+          expect.objectContaining({
+            name: "PixKeyValidationError",
+            code: PIX_KEY_ERROR_CODES.INVALID_EMAIL,
+            field: "valor_chave",
+          }),
+        );
+      },
+    );
+  });
+
+  describe("validateAndNormalizePhone", () => {
+    it("should normalize valid Brazilian mobile phone numbers to E.164 (+55DDD9XXXXXXXX)", () => {
+      expect(validateAndNormalizePhone("+5511987654321")).toBe(
+        "+5511987654321",
+      );
+      expect(validateAndNormalizePhone("+55 (61) 99988-7766")).toBe(
+        "+5561999887766",
+      );
+      expect(validateAndNormalizePhone("(11) 98765-4321")).toBe(
+        "+5511987654321",
+      );
+      expect(validateAndNormalizePhone("21998765432")).toBe("+5521998765432");
+      expect(validateAndNormalizePhone("5521998765432")).toBe("+5521998765432");
+    });
+
+    it.each([
+      [null],
+      [undefined],
+      [""],
+      ["+551187654321"], // 8-digit landline without leading 9
+      ["+5501987654321"], // invalid DDD starting with 0
+      ["+5510987654321"], // invalid DDD ending with 0 (10)
+      ["+14155552671"], // non-BR country code
+      ["123456"],
+    ])(
+      "should throw INVALID_PHONE for invalid phone input: %s",
+      (invalidInput) => {
+        expect(() => validateAndNormalizePhone(invalidInput)).toThrowError(
+          expect.objectContaining({
+            name: "PixKeyValidationError",
+            code: PIX_KEY_ERROR_CODES.INVALID_PHONE,
+            field: "valor_chave",
+          }),
+        );
+      },
+    );
+  });
+
+  describe("validateAndNormalizeEvp", () => {
+    it("should trim, lowercase and validate a canonical UUID v4 EVP key", () => {
+      expect(
+        validateAndNormalizeEvp("  123E4567-E89B-42D3-A456-556642440000  "),
+      ).toBe("123e4567-e89b-42d3-a456-556642440000");
+    });
+
+    it.each([
+      [null],
+      [undefined],
+      [""],
+      ["123e4567-e89b-12d3-a456-556642440000"], // UUID v1 instead of v4
+      ["123e4567-e89b-42d3-c456-556642440000"], // invalid RFC 4122 variant
+      ["123e4567e89b42d3a456556642440000"], // missing hyphens
+      ["chave-aleatoria-invalida"],
+    ])("should throw INVALID_EVP for invalid EVP input: %s", (invalidInput) => {
+      expect(() => validateAndNormalizeEvp(invalidInput)).toThrowError(
+        expect.objectContaining({
+          name: "PixKeyValidationError",
+          code: PIX_KEY_ERROR_CODES.INVALID_EVP,
+          field: "valor_chave",
+        }),
+      );
+    });
+  });
+
+  describe("validateAndNormalizePixKey", () => {
+    it("should dispatch validation by PIX key type and return normalized type and value", () => {
+      expect(
+        validateAndNormalizePixKey(PIX_KEY_TYPES.CPF, "123.456.789-09"),
+      ).toEqual({
+        tipo_chave: "CPF",
+        valor_chave: "12345678909",
+      });
+
+      expect(validateAndNormalizePixKey("cnpj", "11.222.333/0001-81")).toEqual({
+        tipo_chave: "CNPJ",
+        valor_chave: "11222333000181",
+      });
+
+      expect(validateAndNormalizePixKey("EMAIL", " Eu@LuizCa.Net ")).toEqual({
+        tipo_chave: "EMAIL",
+        valor_chave: "eu@luizca.net",
+      });
+
+      expect(validateAndNormalizePixKey("TELEFONE", "(61) 99988-7766")).toEqual(
+        {
+          tipo_chave: "TELEFONE",
+          valor_chave: "+5561999887766",
+        },
+      );
+
+      expect(
+        validateAndNormalizePixKey(
+          "EVP",
+          "123E4567-E89B-42D3-A456-556642440000",
+        ),
+      ).toEqual({
+        tipo_chave: "EVP",
+        valor_chave: "123e4567-e89b-42d3-a456-556642440000",
+      });
+    });
+
+    it.each([[null], [undefined], [""], ["INVALIDO"], ["RG"]])(
+      "should throw INVALID_KEY_TYPE when tipo_chave is unsupported: %s",
+      (invalidType) => {
+        expect(() =>
+          validateAndNormalizePixKey(invalidType, "12345678909"),
+        ).toThrowError(
+          expect.objectContaining({
+            name: "PixKeyValidationError",
+            code: PIX_KEY_ERROR_CODES.INVALID_KEY_TYPE,
+            field: "tipo_chave",
+          }),
+        );
+      },
+    );
   });
 });
