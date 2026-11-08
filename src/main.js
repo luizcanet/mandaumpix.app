@@ -119,6 +119,20 @@ import {
   BrowserShareAdapterError,
   createBrowserShareAdapter,
 } from "./infrastructure/share/browser-share.adapter.js";
+import {
+  CACHE_VERSION,
+  DEFAULT_SW_SCOPE,
+  DEFAULT_SW_SCRIPT_URL,
+  PRECACHE_NAME,
+  RUNTIME_CACHE_NAME,
+  SERVICE_WORKER_ADAPTER_ERROR_CODES,
+  SERVICE_WORKER_STATUS,
+  ServiceWorkerAdapter,
+  ServiceWorkerAdapterError,
+  createServiceWorkerAdapter,
+  isOnline,
+  isServiceWorkerSupported,
+} from "./infrastructure/pwa/service-worker.adapter.js";
 
 export const APP_METADATA = Object.freeze({
   name: "Manda um PIX",
@@ -188,12 +202,54 @@ export async function exportQrCodePng(
   return svgToPng(svgMarkup, width, height);
 }
 
-export function bootstrapApp(rootElement = document.querySelector("#app")) {
+export function bootstrapApp(
+  rootElement = typeof document !== "undefined"
+    ? document.querySelector("#app")
+    : null,
+  {
+    windowTarget = typeof window !== "undefined" ? window : globalThis.window,
+    navigatorTarget = typeof navigator !== "undefined"
+      ? navigator
+      : globalThis.navigator,
+    autoRegisterServiceWorker = true,
+    serviceWorkerAdapter = null,
+  } = {},
+) {
   if (!rootElement) {
     return null;
   }
 
   rootElement.dataset.initialized = "true";
+
+  let swAdapter = serviceWorkerAdapter;
+  if (autoRegisterServiceWorker && !swAdapter) {
+    swAdapter = createServiceWorkerAdapter({
+      windowTarget,
+      navigatorTarget,
+      scriptUrl: DEFAULT_SW_SCRIPT_URL,
+      scope: DEFAULT_SW_SCOPE,
+    });
+  }
+
+  if (swAdapter && autoRegisterServiceWorker) {
+    const registerWorker = () => {
+      swAdapter.register().catch(() => {
+        // Falha no registro é tolerada sem quebrar a inicialização da aplicação
+      });
+    };
+
+    if (
+      windowTarget?.document?.readyState === "complete" ||
+      !windowTarget?.addEventListener
+    ) {
+      registerWorker();
+    } else {
+      windowTarget.addEventListener("load", registerWorker, { once: true });
+    }
+  }
+
+  rootElement.__serviceWorkerAdapter = swAdapter;
+
   return rootElement;
 }
 
@@ -207,6 +263,7 @@ export {
   BROWSER_SHARE_ADAPTER_ERROR_CODES,
   BrowserShareAdapter,
   BrowserShareAdapterError,
+  CACHE_VERSION,
   ChaveConta,
   CobrancaPix,
   CustomElement,
@@ -217,6 +274,8 @@ export {
   DEFAULT_QR_IMAGE_FILENAME,
   DEFAULT_QR_IMAGE_SIZE,
   DEFAULT_SHARE_TITLE,
+  DEFAULT_SW_SCOPE,
+  DEFAULT_SW_SCRIPT_URL,
   DataController,
   DataHandler,
   DeletePixKeyUseCase,
@@ -242,6 +301,7 @@ export {
   PWA_INSTALL_ADAPTER_ERROR_CODES,
   PWA_INSTALL_ERROR_CODES,
   PWA_INSTALL_OUTCOMES,
+  PRECACHE_NAME,
   PixChargeDistributionError,
   PixChargeEntity,
   PixChargeValidationError,
@@ -252,11 +312,16 @@ export {
   PwaInstallAdapter,
   PwaInstallAdapterError,
   PwaInstallError,
+  RUNTIME_CACHE_NAME,
   Router,
   SELECTED_KEY_SETTING_KEY,
   STANDALONE_MEDIA_QUERY,
+  SERVICE_WORKER_ADAPTER_ERROR_CODES,
+  SERVICE_WORKER_STATUS,
   SavePixKeyUseCase,
   SelectPixKeyUseCase,
+  ServiceWorkerAdapter,
+  ServiceWorkerAdapterError,
   SetInjectable,
   assertChargeDistributionGateway,
   assertIndexedDbFactory,
@@ -266,6 +331,7 @@ export {
   createBrowserShareAdapter,
   createIndexedDbPixKeyRepository,
   createPwaInstallAdapter,
+  createServiceWorkerAdapter,
   createStaticPix,
   detectStandaloneMode,
   encodeQR,
@@ -280,6 +346,8 @@ export {
   gifToPng,
   hasError,
   hydrateChaveContaList,
+  isOnline,
+  isServiceWorkerSupported,
   isStaticPix,
   mapStorageDomException,
   normalizeAdditionalInfo,
