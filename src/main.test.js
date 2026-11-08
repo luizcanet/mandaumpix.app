@@ -1033,4 +1033,317 @@ describe("main.js", () => {
       rootElement.remove();
     });
   });
+
+  describe("Dependency Injection container with SetInjectable (TASK-04.3.3)", () => {
+    function resolveDependency(target, name) {
+      let resolvedValue = null;
+      target.dispatchEvent(
+        new CustomEvent("request-provider", {
+          bubbles: true,
+          composed: true,
+          detail: {
+            name,
+            inject: (val) => {
+              resolvedValue = val;
+            },
+          },
+        }),
+      );
+      return resolvedValue;
+    }
+
+    it("should register all core gateways, use cases and app-router via SetInjectable in ownerDocument", () => {
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      // Gateways
+      expect(
+        resolveDependency(rootElement, "pwa-install-gateway"),
+      ).toBeInstanceOf(PwaInstallAdapter);
+      expect(
+        resolveDependency(rootElement, "service-worker-gateway"),
+      ).toBeInstanceOf(ServiceWorkerAdapter);
+      expect(
+        resolveDependency(rootElement, "browser-share-gateway"),
+      ).toBeInstanceOf(BrowserShareAdapter);
+      expect(
+        resolveDependency(rootElement, "pix-key-repository"),
+      ).toBeInstanceOf(IndexedDbPixKeyRepository);
+
+      // Casos de Uso
+      expect(
+        resolveDependency(rootElement, "install-pwa-use-case"),
+      ).toBeInstanceOf(InstallPwaUseCase);
+      expect(
+        resolveDependency(rootElement, "generate-pix-charge-use-case"),
+      ).toBeInstanceOf(GeneratePixChargeUseCase);
+      expect(
+        resolveDependency(rootElement, "distribute-pix-charge-use-case"),
+      ).toBeInstanceOf(DistributePixChargeUseCase);
+      expect(
+        resolveDependency(rootElement, "save-pix-key-use-case"),
+      ).toBeInstanceOf(SavePixKeyUseCase);
+      expect(
+        resolveDependency(rootElement, "list-pix-keys-use-case"),
+      ).toBeInstanceOf(ListPixKeysUseCase);
+      expect(
+        resolveDependency(rootElement, "select-pix-key-use-case"),
+      ).toBeInstanceOf(SelectPixKeyUseCase);
+      expect(
+        resolveDependency(rootElement, "delete-pix-key-use-case"),
+      ).toBeInstanceOf(DeletePixKeyUseCase);
+
+      // Router
+      expect(resolveDependency(rootElement, "app-router")).toBe(
+        rootElement.__appRouter,
+      );
+
+      rootElement.remove();
+    });
+
+    it("should resolve injectables in a CustomElement child via this.addInjectable() upon connection", () => {
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      const tagName = "test-consumer-element";
+      if (!customElements.get(tagName)) {
+        class TestConsumerElement extends CustomElement {
+          constructor() {
+            super();
+            this.addInjectable("pix-key-repository", "keyRepo");
+            this.addInjectable("generate-pix-charge-use-case", "generateCharge");
+            this.addInjectable(
+              "distribute-pix-charge-use-case",
+              "distributeCharge",
+            );
+            this.addInjectable("app-router", "router");
+          }
+        }
+        customElements.define(tagName, TestConsumerElement);
+      }
+
+      const consumer = document.createElement(tagName);
+      rootElement.appendChild(consumer);
+
+      expect(consumer.keyRepo).toBeInstanceOf(IndexedDbPixKeyRepository);
+      expect(consumer.generateCharge).toBeInstanceOf(GeneratePixChargeUseCase);
+      expect(consumer.distributeCharge).toBeInstanceOf(
+        DistributePixChargeUseCase,
+      );
+      expect(consumer.router).toBe(rootElement.__appRouter);
+
+      rootElement.remove();
+    });
+
+    it("should allow passing custom use case and gateway instances in bootstrapApp options", () => {
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      const customKeyRepo = { findById: vi.fn(), findAll: vi.fn() };
+      const customGenerateUseCase = { execute: vi.fn() };
+      const customDistributeUseCase = { execute: vi.fn() };
+      const customShareGateway = { share: vi.fn(), canShare: vi.fn() };
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+        pixKeyRepository: customKeyRepo,
+        generatePixChargeUseCase: customGenerateUseCase,
+        distributePixChargeUseCase: customDistributeUseCase,
+        browserShareGateway: customShareGateway,
+      });
+
+      expect(resolveDependency(rootElement, "pix-key-repository")).toBe(
+        customKeyRepo,
+      );
+      expect(
+        resolveDependency(rootElement, "generate-pix-charge-use-case"),
+      ).toBe(customGenerateUseCase);
+      expect(
+        resolveDependency(rootElement, "distribute-pix-charge-use-case"),
+      ).toBe(customDistributeUseCase);
+      expect(resolveDependency(rootElement, "browser-share-gateway")).toBe(
+        customShareGateway,
+      );
+
+      rootElement.remove();
+    });
+  });
+
+  describe("Dependency Injection container with SetInjectable (TASK-04.3.3)", () => {
+    function resolveDependency(target, name) {
+      let resolvedValue = null;
+      target.dispatchEvent(
+        new CustomEvent("request-provider", {
+          bubbles: true,
+          composed: true,
+          detail: {
+            name,
+            inject: (val) => {
+              resolvedValue = val;
+            },
+          },
+        }),
+      );
+      return resolvedValue;
+    }
+
+    it("should register all core gateways, use cases and app-router via SetInjectable in ownerDocument", () => {
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      // Gateways
+      expect(
+        resolveDependency(rootElement, "pwa-install-gateway"),
+      ).toBeInstanceOf(PwaInstallAdapter);
+      expect(
+        resolveDependency(rootElement, "service-worker-gateway"),
+      ).toBeInstanceOf(ServiceWorkerAdapter);
+      expect(
+        resolveDependency(rootElement, "browser-share-gateway"),
+      ).toBeInstanceOf(BrowserShareAdapter);
+      expect(
+        resolveDependency(rootElement, "pix-key-repository"),
+      ).toBeInstanceOf(IndexedDbPixKeyRepository);
+
+      // Casos de Uso
+      expect(
+        resolveDependency(rootElement, "install-pwa-use-case"),
+      ).toBeInstanceOf(InstallPwaUseCase);
+      expect(
+        resolveDependency(rootElement, "generate-pix-charge-use-case"),
+      ).toBeInstanceOf(GeneratePixChargeUseCase);
+      expect(
+        resolveDependency(rootElement, "distribute-pix-charge-use-case"),
+      ).toBeInstanceOf(DistributePixChargeUseCase);
+      expect(
+        resolveDependency(rootElement, "save-pix-key-use-case"),
+      ).toBeInstanceOf(SavePixKeyUseCase);
+      expect(
+        resolveDependency(rootElement, "list-pix-keys-use-case"),
+      ).toBeInstanceOf(ListPixKeysUseCase);
+      expect(
+        resolveDependency(rootElement, "select-pix-key-use-case"),
+      ).toBeInstanceOf(SelectPixKeyUseCase);
+      expect(
+        resolveDependency(rootElement, "delete-pix-key-use-case"),
+      ).toBeInstanceOf(DeletePixKeyUseCase);
+
+      // Router
+      expect(resolveDependency(rootElement, "app-router")).toBe(
+        rootElement.__appRouter,
+      );
+
+      rootElement.remove();
+    });
+
+    it("should resolve injectables in a CustomElement child via this.addInjectable() upon connection", () => {
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      const tagName = "test-consumer-element";
+      if (!customElements.get(tagName)) {
+        class TestConsumerElement extends CustomElement {
+          constructor() {
+            super();
+            this.addInjectable("pix-key-repository", "keyRepo");
+            this.addInjectable(
+              "generate-pix-charge-use-case",
+              "generateCharge",
+            );
+            this.addInjectable(
+              "distribute-pix-charge-use-case",
+              "distributeCharge",
+            );
+            this.addInjectable("app-router", "router");
+          }
+        }
+        customElements.define(tagName, TestConsumerElement);
+      }
+
+      const consumer = document.createElement(tagName);
+      rootElement.appendChild(consumer);
+
+      expect(consumer.keyRepo).toBeInstanceOf(IndexedDbPixKeyRepository);
+      expect(consumer.generateCharge).toBeInstanceOf(GeneratePixChargeUseCase);
+      expect(consumer.distributeCharge).toBeInstanceOf(
+        DistributePixChargeUseCase,
+      );
+      expect(consumer.router).toBe(rootElement.__appRouter);
+
+      rootElement.remove();
+    });
+
+    it("should allow passing custom use case and gateway instances in bootstrapApp options", () => {
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      const customKeyRepo = { findById: vi.fn(), findAll: vi.fn() };
+      const customGenerateUseCase = { execute: vi.fn() };
+      const customDistributeUseCase = { execute: vi.fn() };
+      const customShareGateway = { share: vi.fn(), canShare: vi.fn() };
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+        pixKeyRepository: customKeyRepo,
+        generatePixChargeUseCase: customGenerateUseCase,
+        distributePixChargeUseCase: customDistributeUseCase,
+        browserShareGateway: customShareGateway,
+      });
+
+      expect(resolveDependency(rootElement, "pix-key-repository")).toBe(
+        customKeyRepo,
+      );
+      expect(
+        resolveDependency(rootElement, "generate-pix-charge-use-case"),
+      ).toBe(customGenerateUseCase);
+      expect(
+        resolveDependency(rootElement, "distribute-pix-charge-use-case"),
+      ).toBe(customDistributeUseCase);
+      expect(resolveDependency(rootElement, "browser-share-gateway")).toBe(
+        customShareGateway,
+      );
+
+      rootElement.remove();
+    });
+  });
 });
