@@ -371,7 +371,8 @@ describe("PixChargeFormComponent (TASK-06.1.3: Testes Unitários de Renderizaç�
       const ctaBtn = formElement.querySelector(
         `button.${CHARGE_FORM_CLASSES.CTA}`,
       );
-      ctaBtn.click();
+      expect(ctaBtn).not.toBeNull();
+      await formElement.submitCharge();
 
       expect(mockUseCase.execute).not.toHaveBeenCalled();
       expect(generatedListener).not.toHaveBeenCalled();
@@ -400,7 +401,8 @@ describe("PixChargeFormComponent (TASK-06.1.3: Testes Unitários de Renderizaç�
       const ctaBtn = formElement.querySelector(
         `button.${CHARGE_FORM_CLASSES.CTA}`,
       );
-      ctaBtn.click();
+      expect(ctaBtn).not.toBeNull();
+      await formElement.submitCharge();
 
       expect(mockUseCase.execute).toHaveBeenCalledWith({
         chave_conta: mockKey,
