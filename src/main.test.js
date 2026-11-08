@@ -24,6 +24,9 @@ import {
   CHARGE_FORM_ICONS,
   CHARGE_FORM_INJECTABLES,
   CHARGE_FORM_PRESETS,
+  CHARGE_RESULT_CLASSES,
+  CHARGE_RESULT_EVENT_NAMES,
+  CHARGE_RESULT_ICONS,
   DEFAULT_CHARGE_FORM_CLEAR_LABEL,
   DEFAULT_CHARGE_FORM_CTA_DISABLED_TITLE,
   DEFAULT_CHARGE_FORM_CTA_LABEL,
@@ -36,6 +39,18 @@ import {
   DEFAULT_CHARGE_FORM_STEP,
   DEFAULT_CHARGE_FORM_TITLE,
   DEFAULT_CHARGE_FORM_TITLE_ID,
+  DEFAULT_CHARGE_RESULT_ACCOUNT_FALLBACK,
+  DEFAULT_CHARGE_RESULT_AMOUNT_OPEN,
+  DEFAULT_CHARGE_RESULT_AMOUNT_PREFIX,
+  DEFAULT_CHARGE_RESULT_ARIA_LABEL,
+  DEFAULT_CHARGE_RESULT_BRCODE_ARIA_LABEL,
+  DEFAULT_CHARGE_RESULT_BRCODE_TITLE,
+  DEFAULT_CHARGE_RESULT_MODE_FIXED,
+  DEFAULT_CHARGE_RESULT_MODE_OPEN,
+  DEFAULT_CHARGE_RESULT_QR_ALT,
+  DEFAULT_CHARGE_RESULT_READY_BADGE,
+  DEFAULT_CHARGE_RESULT_WAITING_DESCRIPTION,
+  DEFAULT_CHARGE_RESULT_WAITING_TITLE,
   DEFAULT_EMPTY_STATE_ARIA_LABEL,
   DEFAULT_EMPTY_STATE_CTA,
   DEFAULT_EMPTY_STATE_DESCRIPTION,
@@ -102,6 +117,7 @@ import {
   PixChargeDistributionError,
   PixChargeEntity,
   PixChargeFormComponent,
+  PixChargeResultComponent,
   PixChargeValidationError,
   PixKeyDialogComponent,
   PixKeyEmptyComponent,
@@ -143,8 +159,12 @@ import {
   executeSavePixKey,
   executeSelectPixKey,
   extractChargeDistributionTarget,
+  formatAccountSummary,
+  formatChargeAmountBadge,
+  formatCurrencyBRL,
   formatFixedAmountStatus,
   formatKeyDeleteAriaLabel,
+  formatKeyMetadata,
   generatePixCharge,
   getKeyTypeConfig,
   hydrateChaveContaList,
@@ -1000,6 +1020,32 @@ describe("main.js", () => {
       expect(resolveCtaTooltip).toBeTypeOf("function");
       expect(customElements.get("pix-charge-form")).toBe(
         PixChargeFormComponent,
+      );
+    });
+
+    it("should re-export PixChargeResultComponent and charge-result constants (TASK-06.2.7)", () => {
+      expect(PixChargeResultComponent).toBeDefined();
+      expect(CHARGE_RESULT_CLASSES).toBeDefined();
+      expect(CHARGE_RESULT_EVENT_NAMES).toBeDefined();
+      expect(CHARGE_RESULT_ICONS).toBeDefined();
+      expect(DEFAULT_CHARGE_RESULT_ACCOUNT_FALLBACK).toBeDefined();
+      expect(DEFAULT_CHARGE_RESULT_AMOUNT_OPEN).toBeDefined();
+      expect(DEFAULT_CHARGE_RESULT_AMOUNT_PREFIX).toBeDefined();
+      expect(DEFAULT_CHARGE_RESULT_ARIA_LABEL).toBeDefined();
+      expect(DEFAULT_CHARGE_RESULT_BRCODE_ARIA_LABEL).toBeDefined();
+      expect(DEFAULT_CHARGE_RESULT_BRCODE_TITLE).toBeDefined();
+      expect(DEFAULT_CHARGE_RESULT_MODE_FIXED).toBeDefined();
+      expect(DEFAULT_CHARGE_RESULT_MODE_OPEN).toBeDefined();
+      expect(DEFAULT_CHARGE_RESULT_QR_ALT).toBeDefined();
+      expect(DEFAULT_CHARGE_RESULT_READY_BADGE).toBeDefined();
+      expect(DEFAULT_CHARGE_RESULT_WAITING_DESCRIPTION).toBeDefined();
+      expect(DEFAULT_CHARGE_RESULT_WAITING_TITLE).toBeDefined();
+      expect(formatAccountSummary).toBeTypeOf("function");
+      expect(formatChargeAmountBadge).toBeTypeOf("function");
+      expect(formatCurrencyBRL).toBeTypeOf("function");
+      expect(formatKeyMetadata).toBeTypeOf("function");
+      expect(customElements.get("pix-charge-result")).toBe(
+        PixChargeResultComponent,
       );
     });
 
