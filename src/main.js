@@ -55,6 +55,24 @@ import {
   KEY_SELECTOR_INJECTABLES,
   formatKeyDeleteAriaLabel,
 } from "./presentation/components/pix-key-selector/pix-key-selector.constants.js";
+import PixKeyDialogComponent from "./presentation/components/pix-key-dialog/pix-key-dialog.component.js";
+import {
+  DEFAULT_KEY_DIALOG_CANCEL_BTN_LABEL,
+  DEFAULT_KEY_DIALOG_CLOSE_TITLE,
+  DEFAULT_KEY_DIALOG_FIELD_LABELS,
+  DEFAULT_KEY_DIALOG_INITIAL_TYPE,
+  DEFAULT_KEY_DIALOG_SAVE_BTN_LABEL,
+  DEFAULT_KEY_DIALOG_TITLE,
+  DEFAULT_KEY_DIALOG_TITLE_ID,
+  KEY_DIALOG_CLASSES,
+  KEY_DIALOG_EVENT_NAMES,
+  KEY_DIALOG_FIELD_LABELS,
+  KEY_DIALOG_ICONS,
+  KEY_DIALOG_INJECTABLES,
+  KEY_DIALOG_MAX_LENGTHS,
+  KEY_DIALOG_TYPES_CONFIG,
+  getKeyTypeConfig,
+} from "./presentation/components/pix-key-dialog/pix-key-dialog.constants.js";
 import AboutPageComponent from "./presentation/pages/about-page/about-page.component.js";
 import {
   ABOUT_AUTHOR,
@@ -229,6 +247,7 @@ export {
   // Componentes de Apresentação
   AboutPageComponent,
   AppHeaderComponent,
+  PixKeyDialogComponent,
   PixKeyEmptyComponent,
   PixKeySelectorComponent,
   VectorIconComponent,
@@ -251,6 +270,22 @@ export {
   KEY_SELECTOR_ICONS,
   KEY_SELECTOR_INJECTABLES,
   formatKeyDeleteAriaLabel,
+  // Metadados e Constantes do Modal de Cadastro de Chaves PIX (<pix-key-dialog>)
+  DEFAULT_KEY_DIALOG_CANCEL_BTN_LABEL,
+  DEFAULT_KEY_DIALOG_CLOSE_TITLE,
+  DEFAULT_KEY_DIALOG_FIELD_LABELS,
+  DEFAULT_KEY_DIALOG_INITIAL_TYPE,
+  DEFAULT_KEY_DIALOG_SAVE_BTN_LABEL,
+  DEFAULT_KEY_DIALOG_TITLE,
+  DEFAULT_KEY_DIALOG_TITLE_ID,
+  KEY_DIALOG_CLASSES,
+  KEY_DIALOG_EVENT_NAMES,
+  KEY_DIALOG_FIELD_LABELS,
+  KEY_DIALOG_ICONS,
+  KEY_DIALOG_INJECTABLES,
+  KEY_DIALOG_MAX_LENGTHS,
+  KEY_DIALOG_TYPES_CONFIG,
+  getKeyTypeConfig,
   // Metadados e Constantes da Página Sobre (/sobre)
   ABOUT_AUTHOR,
   ABOUT_NAVIGATION,

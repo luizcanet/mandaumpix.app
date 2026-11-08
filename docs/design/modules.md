@@ -245,4 +245,28 @@ O componente de seleção de chaves é implementado pelo Web Component `PixKeySe
 - **Injeção de Dependências e Reatividade**: Registra dependências via `this.addInjectable()` (`select-pix-key-use-case`, `delete-pix-key-use-case`, `list-pix-keys-use-case`, `pix-key-repository`), com auto-inscrição reativa às alterações do repositório local (`subscribe()`) e suporte a propriedades diretas `keys` e `selectedKeyId` para execução autônoma em Storybook e testes.
 - **Catálogo Interativo no Storybook**: Stories dedicadas em [`pix-key-selector.stories.js`](../../src/presentation/components/pix-key-selector/pix-key-selector.stories.js) cobrindo chave única selecionada, múltiplas chaves cadastradas e alternância interativa de seleção, 100% auditadas com `@storybook/addon-a11y`.
 
+---
+
+### 7. Modal de Cadastro de Chave PIX `<pix-key-dialog>` (`RN01`, `RN02` e `US-05.3`)
+
+O modal de cadastro é implementado pelo Web Component `PixKeyDialogComponent` em [`src/presentation/components/pix-key-dialog/pix-key-dialog.component.js`](../../src/presentation/components/pix-key-dialog/pix-key-dialog.component.js), renderizado na casca da aplicação ou tela principal para permitir a adição rápida de novas contas bancárias sem mudança de contexto:
+
+- **Arquitetura BEM e Elemento Semântico Nativo `<dialog>`**: Estruturado sob o bloco BEM `.key-dialog`, operando internamente um elemento `<dialog class="key-dialog">` via métodos nativos do navegador (`.showModal()` e `.close()`). Proporciona isolamento visual, aprisionamento de foco nativo (_focus trap_) e renderização estilizada da camada de fundo via `::backdrop` com desfoque e escurecimento suave (`@supports (backdrop-filter: blur(4px))`).
+- **Seletor de Tipo com Pílulas Reativas**: O cabeçalho do diálogo disponibiliza a barra de seleção `.key-dialog__types` com botões acessíveis para os 5 tipos de chave canônicos (`CPF`, `CNPJ`, `EMAIL`, `TELEFONE`, `EVP`), identificados por `data-type` e `aria-pressed="true|false"`. A seleção da pílula ativa (`.key-dialog__type-btn--active`) reconfigura dinamicamente o `placeholder`, o tipo de teclado virtual (`inputmode="numeric" | "email" | "tel" | "text"`), o comprimento máximo (`maxlength`) e a validação do campo de valor da chave.
+- **Campos Obrigatórios e Sanitização EMV**: Formulário `<form method="dialog" class="key-dialog__form">` contendo campos com etiquetas flutuantes ou associadas:
+  - `valor_chave`: Chave PIX com validação em tempo real e formato canônico.
+  - `rotulo`: Apelido opcional da conta (com fallback automático para `DEFAULT_PIX_KEY_LABELS[tipo_chave]` caso em branco).
+  - `nome_recebedor`: Nome do titular com limite EMV de 25 caracteres.
+  - `cidade_recebedor`: Cidade do titular com limite EMV de 15 caracteres.
+- **Feedback Visual de Erros e Região de Alerta Acessível (`role="alert"`)**: Validações locais ou erros propagados pela camada de domínio (`PixKeyValidationError` ou conflito `DUPLICATE_PIX_KEY`) renderizam dinamicamente a área `.key-dialog__alert` contendo o ícone `<vector-icon name="circle-exclamation">`, semântica `role="alert"` e `aria-live="assertive"`, sinalizando os campos com a classe `.key-dialog__input--error`.
+- **Submissão, Persistência Local e Seleção Automática**: Ao submeter o formulário (botão primário `.key-dialog__btn-save` com ícone `<vector-icon name="check">` ou tecla `Enter`), consome o `SavePixKeyUseCase` injetado (com fallback resiliente para entidade `ChaveConta`), persistindo os dados 100% no IndexedDB do navegador (`RN01`). Ao salvar com sucesso:
+  1. Fecha o diálogo via `.closeModal()`;
+  2. Reseta o estado do formulário para os valores padrão;
+  3. Despacha o evento customizado borbulhante `CustomEvent("key-saved", { bubbles: true, composed: true, detail: { chaveConta, selectedKeyId } })`.
+- **Fechamento Seguro e Gestão de Eventos**: Suporta múltiplos fluxos de saída sem alteração de dados: botão de fechar no topo (`.key-dialog__close-btn`), botão de cancelamento secundário (`.key-dialog__btn-cancel`), clique no `::backdrop` (fora do retângulo do diálogo) ou acionamento da tecla `Escape` (evento nativo `cancel` do `<dialog>`). O fechamento emite `CustomEvent("close-key-dialog", { bubbles: true, composed: true })`.
+- **Injeção de Dependências e Resiliência**: Registra dependências através de `this.addInjectable()` (`save-pix-key-use-case`, `pix-key-repository`), permitindo testes unitários simplificados e execução autônoma isolada no Storybook.
+- **Acessibilidade W3C e Catálogo Storybook**: Alvos de toque $\ge 44\times 44\text{px}$ para todos os botões e pílulas, gestão de foco com redirecionamento ao primeiro input e suíte de stories em [`pix-key-dialog.stories.js`](../../src/presentation/components/pix-key-dialog/pix-key-dialog.stories.js) auditadas via `@storybook/addon-a11y`.
+
+---
+
 ⬅️ **Anterior**: [ADR 0004](../architecture/decisions/0004-persistencia-local-indexeddb.md) | ➡️ **Próximo**: [Modelo de Dados](./data_models.md)

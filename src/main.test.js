@@ -29,6 +29,13 @@ import {
   DEFAULT_KEY_SELECTOR_STEP,
   DEFAULT_KEY_SELECTOR_TITLE,
   DEFAULT_KEY_SELECTOR_TITLE_ID,
+  DEFAULT_KEY_DIALOG_CANCEL_BTN_LABEL,
+  DEFAULT_KEY_DIALOG_CLOSE_TITLE,
+  DEFAULT_KEY_DIALOG_FIELD_LABELS,
+  DEFAULT_KEY_DIALOG_INITIAL_TYPE,
+  DEFAULT_KEY_DIALOG_SAVE_BTN_LABEL,
+  DEFAULT_KEY_DIALOG_TITLE,
+  DEFAULT_KEY_DIALOG_TITLE_ID,
   DEFAULT_PIX_CHARGE_TXID,
   DEFAULT_PIX_KEY_LABELS,
   DEFAULT_QR_IMAGE_FILENAME,
@@ -45,6 +52,13 @@ import {
   InstallPwaUseCase,
   KEY_EMPTY_EVENT_NAMES,
   KEY_EMPTY_ICONS,
+  KEY_DIALOG_CLASSES,
+  KEY_DIALOG_EVENT_NAMES,
+  KEY_DIALOG_FIELD_LABELS,
+  KEY_DIALOG_ICONS,
+  KEY_DIALOG_INJECTABLES,
+  KEY_DIALOG_MAX_LENGTHS,
+  KEY_DIALOG_TYPES_CONFIG,
   KEY_SELECTOR_CLASSES,
   KEY_SELECTOR_EVENT_NAMES,
   KEY_SELECTOR_ICONS,
@@ -71,6 +85,7 @@ import {
   PixChargeDistributionError,
   PixChargeEntity,
   PixChargeValidationError,
+  PixKeyDialogComponent,
   PixKeyEmptyComponent,
   PixKeySelectorComponent,
   PixKeyEntity,
@@ -112,6 +127,7 @@ import {
   extractChargeDistributionTarget,
   formatKeyDeleteAriaLabel,
   generatePixCharge,
+  getKeyTypeConfig,
   hydrateChaveContaList,
   isOnline,
   isServiceWorkerSupported,
@@ -917,6 +933,26 @@ describe("main.js", () => {
       expect(customElements.get("pix-key-selector")).toBe(
         PixKeySelectorComponent,
       );
+    });
+
+    it("should re-export PixKeyDialogComponent and key-dialog constants (TASK-05.3.6)", () => {
+      expect(PixKeyDialogComponent).toBeDefined();
+      expect(DEFAULT_KEY_DIALOG_CANCEL_BTN_LABEL).toBeDefined();
+      expect(DEFAULT_KEY_DIALOG_CLOSE_TITLE).toBeDefined();
+      expect(DEFAULT_KEY_DIALOG_FIELD_LABELS).toBeDefined();
+      expect(DEFAULT_KEY_DIALOG_INITIAL_TYPE).toBeDefined();
+      expect(DEFAULT_KEY_DIALOG_SAVE_BTN_LABEL).toBeDefined();
+      expect(DEFAULT_KEY_DIALOG_TITLE).toBeDefined();
+      expect(DEFAULT_KEY_DIALOG_TITLE_ID).toBeDefined();
+      expect(KEY_DIALOG_CLASSES).toBeDefined();
+      expect(KEY_DIALOG_EVENT_NAMES).toBeDefined();
+      expect(KEY_DIALOG_FIELD_LABELS).toBeDefined();
+      expect(KEY_DIALOG_ICONS).toBeDefined();
+      expect(KEY_DIALOG_INJECTABLES).toBeDefined();
+      expect(KEY_DIALOG_MAX_LENGTHS).toBeDefined();
+      expect(KEY_DIALOG_TYPES_CONFIG).toBeDefined();
+      expect(getKeyTypeConfig).toBeDefined();
+      expect(customElements.get("pix-key-dialog")).toBe(PixKeyDialogComponent);
     });
 
     it("should initialize PWA install adapter and use case on rootElement during bootstrapApp", () => {
