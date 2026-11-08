@@ -65,6 +65,9 @@ describe("about-page.constants", () => {
       expect(ABOUT_SUPPORT_PIX.message).toContain("Manda um PIX!");
       expect(ABOUT_SUPPORT_PIX.copyButtonText).toContain("eu@luizca.net");
       expect(ABOUT_SUPPORT_PIX.copiedButtonText).toBe("Chave copiada!");
+      expect(ABOUT_SUPPORT_PIX.copiedFeedbackMessage).toBe(
+        "Chave copiada com sucesso!",
+      );
     });
 
     it("deve possuir payload BR Code EMV válido correspondente à chave eu@luizca.net", () => {

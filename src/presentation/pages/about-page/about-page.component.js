@@ -166,7 +166,7 @@ export class AboutPageComponent extends CustomElement {
           </span>
         </button>
         <div class="about-page__live-region" aria-live="polite" id="about-copy-feedback">
-          ${this.isCopied ? "Chave copiada com sucesso!" : ""}
+          ${this.isCopied ? ABOUT_SUPPORT_PIX.copiedFeedbackMessage : ""}
         </div>
       </div>
 
@@ -361,7 +361,9 @@ export class AboutPageComponent extends CustomElement {
         : ABOUT_SUPPORT_PIX.copyButtonText;
     }
     if (feedback) {
-      feedback.textContent = isCopied ? "Chave copiada com sucesso!" : "";
+      feedback.textContent = isCopied
+        ? ABOUT_SUPPORT_PIX.copiedFeedbackMessage
+        : "";
     }
   }
 
@@ -382,7 +384,7 @@ export class AboutPageComponent extends CustomElement {
         typeof this.#distributePixChargeUseCase.shareCharge === "function"
       ) {
         const result = await this.#distributePixChargeUseCase.shareCharge({
-          cobranca: { chave_cobranca: ABOUT_SUPPORT_PIX.brCode },
+          chave_cobranca: ABOUT_SUPPORT_PIX.brCode,
           title: shareData.title,
           text: `${shareData.text} ${shareData.url}`,
         });

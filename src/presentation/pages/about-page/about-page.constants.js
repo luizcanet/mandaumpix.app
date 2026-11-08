@@ -53,6 +53,7 @@ export const ABOUT_SUPPORT_PIX = Object.freeze({
   qrAriaLabel: "QR Code PIX com valor dinâmico para eu@luizca.net",
   copyButtonText: "Copiar Chave Copia e Cola (eu@luizca.net)",
   copiedButtonText: "Chave copiada!",
+  copiedFeedbackMessage: "Chave copiada com sucesso!",
 });
 
 /**

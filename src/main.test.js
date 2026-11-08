@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   ABOUT_AUTHOR,
   ABOUT_NAVIGATION,
@@ -1483,6 +1483,129 @@ describe("main.js", () => {
 
       focusSpy.mockRestore();
       window.history.replaceState(null, "", "/");
+      rootElement.remove();
+    });
+  });
+
+  describe("End-to-end integrated route & component lifecycle: / -> /sobre -> return via 'Início' button (TASK-04.4.7)", () => {
+    let originalClipboard;
+    let writeTextMock;
+
+    beforeEach(() => {
+      writeTextMock = vi.fn().mockResolvedValue(undefined);
+      originalClipboard = navigator.clipboard;
+      Object.defineProperty(navigator, "clipboard", {
+        value: { writeText: writeTextMock },
+        writable: true,
+        configurable: true,
+      });
+    });
+
+    afterEach(() => {
+      delete navigator.share;
+      if (originalClipboard !== undefined) {
+        Object.defineProperty(navigator, "clipboard", {
+          value: originalClipboard,
+          writable: true,
+          configurable: true,
+        });
+      } else {
+        delete navigator.clipboard;
+      }
+      window.history.replaceState(null, "", "/");
+    });
+
+    it("should execute the complete navigation cycle between / and /sobre, render institutional content, interact, and return to / via 'Início' button", async () => {
+      window.history.replaceState(null, "", "/");
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      // 1. Estado inicial na home ("/")
+      expect(window.location.pathname).toBe("/");
+      expect(document.title).toBe("Manda um PIX — Cobrança rápida");
+      expect(outlet.querySelector(".charge-page")).not.toBeNull();
+      expect(outlet.querySelector("about-page")).toBeNull();
+
+      // 2. Navegação para "/sobre"
+      Router.goTo("/sobre");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(window.location.pathname).toBe("/sobre");
+      expect(document.title).toBe("Sobre o aplicativo — Manda um PIX");
+
+      const aboutPage = outlet.querySelector("about-page");
+      expect(aboutPage).not.toBeNull();
+      expect(aboutPage instanceof AboutPageComponent).toBe(true);
+      expect(aboutPage.classList.contains("about-page")).toBe(true);
+
+      // 3. Verificação de elementos-chave institucionais
+      const authorLink = aboutPage.querySelector(
+        `a[href="${ABOUT_AUTHOR.githubUrl}"]`,
+      );
+      expect(authorLink).not.toBeNull();
+      expect(authorLink.getAttribute("target")).toBe("_blank");
+      expect(authorLink.getAttribute("rel")).toBe("noopener noreferrer");
+
+      const emailLink = aboutPage.querySelector(
+        `a[href="mailto:${ABOUT_AUTHOR.email}"]`,
+      );
+      expect(emailLink).not.toBeNull();
+
+      const repoLink = aboutPage.querySelector(
+        `a[href="${ABOUT_PROJECT.repositoryUrl}"]`,
+      );
+      expect(repoLink).not.toBeNull();
+
+      // 4. Interação de cópia do PIX de apoio
+      const copyButton = aboutPage.querySelector(".about-page__copy-btn");
+      expect(copyButton).not.toBeNull();
+      copyButton.click();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(writeTextMock).toHaveBeenCalledWith(ABOUT_SUPPORT_PIX.brCode);
+      const liveRegion = aboutPage.querySelector(".about-page__live-region");
+      expect(liveRegion.textContent).toBe(
+        ABOUT_SUPPORT_PIX.copiedFeedbackMessage,
+      );
+
+      // Interação de compartilhamento
+      const shareMock = vi.fn().mockResolvedValue(undefined);
+      Object.assign(navigator, { share: shareMock });
+      const shareListener = vi.fn();
+      aboutPage.addEventListener("app-shared", shareListener);
+
+      const shareButton = aboutPage.querySelector(".about-page__share-btn");
+      expect(shareButton).not.toBeNull();
+      shareButton.click();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(shareMock).toHaveBeenCalledWith({
+        title: ABOUT_SHARE.shareTitle,
+        text: `${ABOUT_SHARE.shareText} ${ABOUT_SHARE.shareUrl}`,
+      });
+      expect(shareListener).toHaveBeenCalledTimes(1);
+
+      // 5. Retorno à home via botão "Início" do cabeçalho de <about-page>
+      const backButton = aboutPage.querySelector(".about-page__home-btn");
+      expect(backButton).not.toBeNull();
+      backButton.click();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      // 6. Confirmação do retorno à home ("/") e restauração da página e título
+      expect(window.location.pathname).toBe("/");
+      expect(document.title).toBe("Manda um PIX — Cobrança rápida");
+      expect(outlet.querySelector(".charge-page")).not.toBeNull();
+      expect(outlet.querySelector("about-page")).toBeNull();
+
       rootElement.remove();
     });
   });
