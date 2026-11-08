@@ -943,6 +943,48 @@ describe("main.js", () => {
       rootElement.remove();
     });
 
+    it("should mount initial route cleanly without duplicating children in #router-outlet", () => {
+      window.history.replaceState(null, "", "/");
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      outlet.innerHTML = `<div class="charge-page charge-page--split"><!-- placeholder --></div>`;
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      expect(outlet.querySelectorAll(".charge-page")).toHaveLength(1);
+
+      rootElement.remove();
+    });
+
+    it("should mount <about-page> directly when initial URL is /sobre without leaving placeholder", () => {
+      window.history.replaceState(null, "", "/sobre");
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      outlet.innerHTML = `<div class="charge-page charge-page--split"><!-- placeholder --></div>`;
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      expect(outlet.querySelector(".charge-page")).toBeNull();
+      expect(outlet.querySelector("about-page")).not.toBeNull();
+
+      window.history.replaceState(null, "", "/");
+      rootElement.remove();
+    });
+
     it("should navigate between / and /sobre and handle unknown paths via Router.goTo", async () => {
       window.history.replaceState(null, "", "/");
 

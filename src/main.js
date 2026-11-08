@@ -309,6 +309,7 @@ export function bootstrapApp(
   const outletElement = rootElement.querySelector("#router-outlet");
   let router = appRouter;
   if (!router && outletElement) {
+    outletElement.replaceChildren();
     router = new Router(outletElement, routes);
   }
   rootElement.__appRouter = router;
