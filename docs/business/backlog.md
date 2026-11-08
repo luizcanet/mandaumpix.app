@@ -1074,12 +1074,78 @@ flowchart LR
 
 > **Objetivo**: Garantir cobertura de testes de integração de ponta a ponta, conformidade de acessibilidade WCAG 2.2 AA no Storybook e automação completa de deploy para os ambientes `staging` e `production`.
 
-#### `US-07.1` — Catálogo Completo no Storybook e Auditoria `@storybook/addon-a11y` (`⏳ Pendente`)
+#### `US-07.1` — Catálogo Completo no Storybook e Auditoria `@storybook/addon-a11y` (`⏳ Pendente` · `3 Story Points`)
 
-- **História**: Como **Mantenedor**, quero que todos os Web Components possuam documentação interativa (`autodocs`) e passem sem violações nos testes de acessibilidade do Storybook (`@storybook/addon-a11y`).
-- **Critérios de Aceite**:
-  - [ ] Garantir stories publicadas para `<vector-icon>`, `<app-header>`, `<pix-key-empty>`, `<pix-key-selector>`, `<pix-key-dialog>`, `<pix-charge-form>`, `<pix-charge-result>` e `<about-page>`.
-  - [ ] Validar contraste de cores, navegação por teclado (`Tab`, `Enter`, `Space`, `Esc`), alvos de toque `>= 44x44px` e atributos ARIA sem erros no `npm run build-storybook`.
+- **História (Narrativa Canônica)**:
+  > **Como** **Mantenedor e Desenvolvedor Front-end** do Manda um PIX,
+  > **Quero** um catálogo de componentes completo e interativo no Storybook com documentação automática (`autodocs`) e auditoria automatizada de acessibilidade via `@storybook/addon-a11y`,
+  > **Para que** todas as variações visuais dos Web Components nativos do aplicativo possam ser inspecionadas isoladamente e validadas contra as diretrizes WCAG 2.2 AA (contraste de cores, alvos de toque $\ge 44\times 44\text{px}$, navegação por teclado e semântica ARIA) prevenindo regressões de design e barreiras de acessibilidade.
+- **Estimativa de Complexidade**: **`3 Story Points`** (Complexidade Técnica: Média · Esforço: Médio · Incerteza: Baixa).
+- **Regras de Negócio e Invariantes**:
+  - **INV-01 (Cobertura Canônica Integral de Componentes)**: Todos os 8 blocos de interface do projeto devem possuir stories dedicadas com categorização padronizada no Storybook (`Shared Components/`, `Components/`, `Pages/`), metadados `tags: ["autodocs"]`, documentação descritiva (`parameters.docs.description.component`), controles dinâmicos (`argTypes`) e renderização consistente:
+    1. `<vector-icon>` em [`src/presentation/components/vector-icon/vector-icon.stories.js`](../../src/presentation/components/vector-icon/vector-icon.stories.js) (`Shared Components/VectorIcon`)
+    2. `<app-header>` em [`src/presentation/components/app-header/app-header.stories.js`](../../src/presentation/components/app-header/app-header.stories.js) (`Components/AppHeader`)
+    3. `<pix-key-empty>` em [`src/presentation/components/pix-key-empty/pix-key-empty.stories.js`](../../src/presentation/components/pix-key-empty/pix-key-empty.stories.js) (`Components/PixKeyEmpty`)
+    4. `<pix-key-selector>` em [`src/presentation/components/pix-key-selector/pix-key-selector.stories.js`](../../src/presentation/components/pix-key-selector/pix-key-selector.stories.js) (`Components/PixKeySelector`)
+    5. `<pix-key-dialog>` em [`src/presentation/components/pix-key-dialog/pix-key-dialog.stories.js`](../../src/presentation/components/pix-key-dialog/pix-key-dialog.stories.js) (`Components/PixKeyDialog`)
+    6. `<pix-charge-form>` em [`src/presentation/components/pix-charge-form/pix-charge-form.stories.js`](../../src/presentation/components/pix-charge-form/pix-charge-form.stories.js) (`Components/PixChargeForm`)
+    7. `<pix-charge-result>` em [`src/presentation/components/pix-charge-result/pix-charge-result.stories.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.stories.js) (`Components/PixChargeResult`)
+    8. `<about-page>` em [`src/presentation/pages/about-page/about-page.stories.js`](../../src/presentation/pages/about-page/about-page.stories.js) (`Pages/AboutPage`)
+  - **INV-02 (Conformidade WCAG 2.2 Nível AA via `@storybook/addon-a11y` e Axe Core)**:
+    - O arquivo [`.storybook/preview.js`](../../.storybook/preview.js) deve configurar globalmente o `@storybook/addon-a11y` ativando regras estritas do Axe Core para WCAG 2.2 AA (`color-contrast`, `target-size`, `button-name`, `aria-required-children`, `aria-allowed-attr`, `duplicate-id`).
+    - Nenhuma story padrão ou de variação deve apresentar violações de acessibilidade críticas ou sérias.
+  - **INV-03 (Alvos de Toque $\ge 44\times 44\text{px}$ — WCAG 2.2 SC 2.5.8)**:
+    - Todos os elementos interativos (botões de ação, pílulas de tipo de chave, cards de seleção de chave, atalhos de valor e links de navegação) devem manter dimensões mínimas de toque $\ge 44\times 44\text{px}$ (ou $\ge 48\times 48\text{px}$ em CTAs primários) em layouts mobile e desktop.
+  - **INV-04 (Contraste Cromático Estrito $\ge 4.5:1$ e $\ge 3:1$)**:
+    - Garantir contraste $\ge 4.5:1$ para texto regular e $\ge 3:1$ para textos em destaque/gráficos de interface em todos os fundos configurados no Storybook (Superfície Clara `#f8fafc`, Branco Puro `#ffffff`, Azul Marca `#0b1834` e Azul Noturno `#060d1e`).
+  - **INV-05 (Navegação por Teclado e Estados de Foco Visível)**:
+    - Suporte a navegação por teclado sequencial (`Tab` / `Shift+Tab`), acionamento por `Enter` e `Space`, escape por `Esc` em modais e roving tabindex por setas em listas.
+    - Todos os controles devem exibir anel de foco `:focus-visible` de alto contraste (`--color-brand-primary` / `--color-brand-accent`) sem obstrução.
+  - **INV-06 (Compilação Estática Determinística)**:
+    - O script `npm run build-storybook` deve executar e compilar todos os módulos para `storybook-static/` com código de retorno `0` e sem erros de resolução de dependências.
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Compilação e Build Estático do Storybook — Happy Path)**:
+    - Dado que o projeto possui todas as dependências instaladas,
+    - Quando o mantenedor executar o comando `npm run build-storybook`,
+    - Então o Storybook v10 deve compilar com sucesso todos os módulos e stories para o diretório `storybook-static/`,
+    - E o processo deve encerrar com código de saída 0 sem erros de importação ou sintaxe.
+  - **Cenário 02 (Documentação Interativa com Autodocs para Todos os 8 Componentes)**:
+    - Dado que o Storybook está em execução ou compilado estaticamente,
+    - Quando a documentação de qualquer um dos 8 componentes for acessada no menu lateral,
+    - Então a página deve conter a aba `Docs` gerada automaticamente via `tags: ["autodocs"]`,
+    - E deve exibir a tabela de propriedades/atributos (`argTypes`) com controles interativos reativos,
+    - E deve descrever as regras de negócio (`RN01` a `RN07`) e comportamentos associados.
+  - **Cenário 03 (Auditoria de Contraste e Acessibilidade com Axe Core)**:
+    - Dado que as stories são renderizadas no painel do Storybook,
+    - Quando o add-on `@storybook/addon-a11y` auditar cada story,
+    - Então a verificação de contraste de cores (`color-contrast`) deve passar com índice $\ge 4.5:1$,
+    - E não devem ser reportadas violações com impacto crítico ou sério nas regras do Axe Core.
+  - **Cenário 04 (Navegação por Teclado e Foco Visível)**:
+    - Dado que o avaliador interage com as stories de componentes acionáveis (`<app-header>`, `<pix-key-empty>`, `<pix-key-selector>`, `<pix-key-dialog>`, `<pix-charge-form>`, `<pix-charge-result>`, `<about-page>`),
+    - Quando a navegação ocorrer exclusivamente por teclado (`Tab`, `Shift+Tab`, setas, `Enter`, `Space`, `Esc`),
+    - Então o foco deve transitar na ordem lógica do DOM,
+    - E cada controle interativo deve exibir anel de foco `:focus-visible` nítido,
+    - E nenhum componente deve prender o foco indefinidamente (_focus trap_ indevido fora do modal).
+  - **Cenário 05 (Validação de Alvos de Toque Mínimos $\ge 44\times 44\text{px}$)**:
+    - Dado que um componente de ação ou formulário é inspecionado,
+    - Quando as dimensões da caixa delimitadora (_bounding box_) dos elementos clicáveis forem avaliadas,
+    - Então nenhum botão interativo deve possuir altura ou largura inferior a $44\text{px}$.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-07.1.1 (Configuração Centralizada de A11y e Estilos Globais em `.storybook/preview.js`)**: Atualizar [`.storybook/preview.js`](../../.storybook/preview.js) adicionando a configuração centralizada do `@storybook/addon-a11y` com regras do Axe Core para WCAG 2.2 AA (`color-contrast`, `target-size`, `button-name`) e importação das folhas de estilo restantes (`pix-key-selector.css`, `pix-key-dialog.css`, `pix-charge-form.css`, `pix-charge-result.css`) para garantir renderização idêntica ao app em todas as stories.
+  - [ ] **TASK-07.1.2 (Auditoria e Parametrização A11y em `VectorIcon` e `AppHeader`)**: Atualizar [`src/presentation/components/vector-icon/vector-icon.stories.js`](../../src/presentation/components/vector-icon/vector-icon.stories.js) e [`src/presentation/components/app-header/app-header.stories.js`](../../src/presentation/components/app-header/app-header.stories.js) configurando parâmetros explícitos `a11y`, validação de `aria-hidden` vs `role="img"` e garantindo conformidade com o botão "Instalar" (`RN06`) e atalho "Sobre" (`RN07`).
+  - [ ] **TASK-07.1.3 (Auditoria e Parametrização A11y nos Componentes de Gestão de Chaves PIX)**: Auditar e validar [`pix-key-empty.stories.js`](../../src/presentation/components/pix-key-empty/pix-key-empty.stories.js), [`pix-key-selector.stories.js`](../../src/presentation/components/pix-key-selector/pix-key-selector.stories.js) e [`pix-key-dialog.stories.js`](../../src/presentation/components/pix-key-dialog/pix-key-dialog.stories.js) assegurando roving tabindex, foco no modal `<dialog>`, tratamento de `Esc`, alvos de toque $\ge 44\text{px}$ e feedback em `role="alert"`.
+  - [ ] **TASK-07.1.4 (Auditoria e Parametrização A11y nos Componentes de Cobrança e Página Sobre)**: Auditar e validar [`pix-charge-form.stories.js`](../../src/presentation/components/pix-charge-form/pix-charge-form.stories.js), [`pix-charge-result.stories.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.stories.js) e [`about-page.stories.js`](../../src/presentation/pages/about-page/about-page.stories.js) assegurando contraste nos botões de distribuição (Copiar, WhatsApp, Salvar PNG), status em `aria-live="polite"` e links institucionais acessíveis.
+  - [ ] **TASK-07.1.5 (TDD / Teste Automatizado de Metadados e Integridade do Catálogo de Stories)**: Criar testes unitários em [`src/presentation/storybook.test.js`](../../src/presentation/storybook.test.js) para verificar se todas as 8 stories de componentes exportam metadados válidos com `tags: ["autodocs"]`, componentes associados, controles (`argTypes`) e parâmetros de acessibilidade definidos.
+  - [ ] **TASK-07.1.6 (Validação do Build Estático, Verificação de Acessibilidade e Sincronização da Documentação)**: Executar `npm run build-storybook`, validar conformidade estática em `storybook-static/`, sincronizar a matriz de rastreabilidade em [`docs/business/backlog.md`](./backlog.md) e executar suíte geral (`npm run lint`, `npm run format:check` e `npm test`).
+
+```mermaid
+flowchart LR
+    T1["TASK-07.1.1: Configuração Preview & A11y Global"] --> T2["TASK-07.1.2: A11y VectorIcon & AppHeader"]
+    T1 --> T3["TASK-07.1.3: A11y Chaves (Empty, Selector, Dialog)"]
+    T1 --> T4["TASK-07.1.4: A11y Cobrança & About (Form, Result, About)"]
+    T2 & T3 & T4 --> T5["TASK-07.1.5: Teste Automatizado de Stories (TDD)"]
+    T5 --> T6["TASK-07.1.6: Build Estático & Validação Final"]
+```
 
 #### `US-07.2` — Suíte de Testes de Integração das Jornadas Completas (Vitest + JSDOM) (`⏳ Pendente`)
 
