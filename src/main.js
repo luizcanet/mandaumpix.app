@@ -123,6 +123,7 @@ import {
   CACHE_VERSION,
   DEFAULT_SW_SCOPE,
   DEFAULT_SW_SCRIPT_URL,
+  DEFAULT_SW_TYPE,
   PRECACHE_NAME,
   RUNTIME_CACHE_NAME,
   SERVICE_WORKER_ADAPTER_ERROR_CODES,
@@ -133,6 +134,8 @@ import {
   isOnline,
   isServiceWorkerSupported,
 } from "./infrastructure/pwa/service-worker.adapter.js";
+import AppHeaderComponent from "./presentation/components/app-header/app-header.component.js";
+import VectorIconComponent from "./presentation/components/vector-icon/vector-icon.component.js";
 
 export const APP_METADATA = Object.freeze({
   name: "Manda um PIX",
@@ -213,6 +216,8 @@ export function bootstrapApp(
       : globalThis.navigator,
     autoRegisterServiceWorker = true,
     serviceWorkerAdapter = null,
+    pwaInstallAdapter = null,
+    installPwaUseCase = null,
   } = {},
 ) {
   if (!rootElement) {
@@ -250,6 +255,37 @@ export function bootstrapApp(
 
   rootElement.__serviceWorkerAdapter = swAdapter;
 
+  let installAdapter = pwaInstallAdapter;
+  if (!installAdapter) {
+    installAdapter = createPwaInstallAdapter({
+      windowTarget,
+      navigatorTarget,
+    });
+  }
+
+  let installUseCase = installPwaUseCase;
+  if (!installUseCase) {
+    installUseCase = new InstallPwaUseCase({
+      pwaInstallGateway: installAdapter,
+    });
+  }
+
+  const ownerDoc =
+    rootElement.ownerDocument ||
+    (typeof document !== "undefined" ? document : null);
+  if (ownerDoc) {
+    SetInjectable("install-pwa-use-case", installUseCase, ownerDoc);
+    SetInjectable("pwa-install-gateway", installAdapter, ownerDoc);
+  }
+
+  rootElement.__pwaInstallAdapter = installAdapter;
+  rootElement.__installPwaUseCase = installUseCase;
+
+  const headerElement = rootElement.querySelector("app-header");
+  if (headerElement) {
+    headerElement.installPwaUseCase = installUseCase;
+  }
+
   return rootElement;
 }
 
@@ -259,6 +295,7 @@ if (typeof document !== "undefined") {
 
 export {
   AccessController,
+  AppHeaderComponent,
   ArrayHandler,
   BROWSER_SHARE_ADAPTER_ERROR_CODES,
   BrowserShareAdapter,
@@ -276,6 +313,7 @@ export {
   DEFAULT_SHARE_TITLE,
   DEFAULT_SW_SCOPE,
   DEFAULT_SW_SCRIPT_URL,
+  DEFAULT_SW_TYPE,
   DataController,
   DataHandler,
   DeletePixKeyUseCase,
@@ -323,6 +361,7 @@ export {
   ServiceWorkerAdapter,
   ServiceWorkerAdapterError,
   SetInjectable,
+  VectorIconComponent,
   assertChargeDistributionGateway,
   assertIndexedDbFactory,
   assertPixKeyRepository,

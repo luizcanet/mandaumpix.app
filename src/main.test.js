@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   APP_METADATA,
   AccessController,
+  AppHeaderComponent,
   BROWSER_SHARE_ADAPTER_ERROR_CODES,
   BrowserShareAdapter,
   BrowserShareAdapterError,
@@ -18,6 +19,7 @@ import {
   DEFAULT_SHARE_TITLE,
   DEFAULT_SW_SCOPE,
   DEFAULT_SW_SCRIPT_URL,
+  DEFAULT_SW_TYPE,
   DataController,
   DeletePixKeyUseCase,
   DistributePixChargeUseCase,
@@ -63,6 +65,7 @@ import {
   SelectPixKeyUseCase,
   ServiceWorkerAdapter,
   ServiceWorkerAdapterError,
+  VectorIconComponent,
   assertChargeDistributionGateway,
   assertIndexedDbFactory,
   assertPixKeyRepository,
@@ -793,9 +796,9 @@ describe("main.js", () => {
         SERVICE_WORKER_ADAPTER_ERROR_CODES.SERVICE_WORKER_UNSUPPORTED,
       ).toBe("SERVICE_WORKER_UNSUPPORTED");
       expect(ServiceWorkerAdapterError).toBeDefined();
-      expect(CACHE_VERSION).toBe("v1.0.0");
-      expect(PRECACHE_NAME).toBe("mandaumpix-v1.0.0-precache");
-      expect(RUNTIME_CACHE_NAME).toBe("mandaumpix-v1.0.0-runtime");
+      expect(CACHE_VERSION).toBe("v1.0.1");
+      expect(PRECACHE_NAME).toBe("mandaumpix-v1.0.1-precache");
+      expect(RUNTIME_CACHE_NAME).toBe("mandaumpix-v1.0.1-runtime");
       expect(DEFAULT_SW_SCRIPT_URL).toBe("./sw.js");
       expect(DEFAULT_SW_SCOPE).toBe("./");
       expect(isOnline).toBeTypeOf("function");
@@ -841,6 +844,33 @@ describe("main.js", () => {
       expect(adapter.isOnline()).toBe(true);
 
       adapter.destroy();
+    });
+  });
+
+  describe("presentation components & bootstrapApp integration (TASK-04.2.4)", () => {
+    it("should re-export AppHeaderComponent and VectorIconComponent", () => {
+      expect(AppHeaderComponent).toBeDefined();
+      expect(VectorIconComponent).toBeDefined();
+      expect(DEFAULT_SW_TYPE).toBe("module");
+    });
+
+    it("should initialize PWA install adapter and use case on rootElement during bootstrapApp", () => {
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      document.body.appendChild(rootElement);
+
+      const header = document.createElement("app-header");
+      rootElement.appendChild(header);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      expect(rootElement.__pwaInstallAdapter).toBeDefined();
+      expect(rootElement.__installPwaUseCase).toBeDefined();
+      expect(header.installPwaUseCase).toBe(rootElement.__installPwaUseCase);
+
+      rootElement.remove();
     });
   });
 });
