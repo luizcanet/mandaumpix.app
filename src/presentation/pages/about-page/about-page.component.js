@@ -423,4 +423,3 @@ if (!customElements.get("about-page")) {
 }
 
 export default AboutPageComponent;
-

@@ -257,6 +257,36 @@ describe("AboutPageComponent (TASK-04.4.2: Testes Unitários de Renderização e
       );
     });
 
+    it("deve reiniciar o temporizador de feedback caso o usuário clique em copiar novamente", async () => {
+      vi.useFakeTimers();
+      Object.assign(navigator, {
+        clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+      });
+
+      document.body.appendChild(aboutElement);
+      const copyBtn = aboutElement.querySelector(
+        '[data-action="copy-support-brcode"]',
+      );
+
+      await copyBtn.click();
+      vi.advanceTimersByTime(1000);
+      expect(copyBtn.querySelector("vector-icon").getAttribute("name")).toBe(
+        "check",
+      );
+
+      // Segundo clique reinicia o timer
+      await copyBtn.click();
+      vi.advanceTimersByTime(2000);
+      expect(copyBtn.querySelector("vector-icon").getAttribute("name")).toBe(
+        "check",
+      );
+
+      vi.advanceTimersByTime(600);
+      expect(copyBtn.querySelector("vector-icon").getAttribute("name")).toBe(
+        "copy",
+      );
+    });
+
     it("deve emitir evento 'support-brcode-copy-error' quando a gravação falhar", async () => {
       const failureError = new Error("Clipboard permission denied");
       Object.assign(navigator, {
@@ -335,6 +365,24 @@ describe("AboutPageComponent (TASK-04.4.2: Testes Unitários de Renderização e
 
       expect(mockUseCase.shareCharge).toHaveBeenCalled();
     });
+
+    it("deve emitir evento 'app-share-error' quando o compartilhamento falhar", async () => {
+      const shareError = new Error("Share operation failed");
+      Object.assign(navigator, {
+        share: vi.fn().mockRejectedValue(shareError),
+      });
+
+      const errorListener = vi.fn();
+      aboutElement.addEventListener("app-share-error", errorListener);
+
+      document.body.appendChild(aboutElement);
+
+      const shareBtn = aboutElement.querySelector('[data-action="share-app"]');
+      await shareBtn.click();
+
+      expect(errorListener).toHaveBeenCalledTimes(1);
+      expect(errorListener.mock.calls[0][0].detail).toBe(shareError);
+    });
   });
 
   describe("Injeção de Dependências e Reatividade de Atributos", () => {
@@ -377,6 +425,17 @@ describe("AboutPageComponent (TASK-04.4.2: Testes Unitários de Renderização e
 
       expect(title.textContent.trim()).toBe("Sobre o App Personalizado");
       expect(version.textContent.trim()).toBe("custom-app • v2.0.0");
+    });
+
+    it("deve atualizar dinamicamente logo-src e home-href quando os atributos forem alterados", () => {
+      document.body.appendChild(aboutElement);
+
+      aboutElement.setAttribute("logo-src", "/custom-logo.svg");
+      aboutElement.setAttribute("home-href", "/inicio");
+
+      const logo = aboutElement.querySelector(".about-page__logo");
+      expect(logo.getAttribute("src")).toBe("/custom-logo.svg");
+      expect(aboutElement.homeHref).toBe("/inicio");
     });
   });
 });
