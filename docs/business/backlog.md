@@ -340,15 +340,53 @@ flowchart TD
   - [x] **TASK-04.1.4 (TDD / Testes Automatizados de DOM e Acessibilidade da Casca)**: Criar testes automatizados em [`src/presentation/styles/app-shell.test.js`](../../src/presentation/styles/app-shell.test.js) (ou equivalente DOM em Vitest) validando a estrutura semântica dos elementos, classes BEM esperadas e landmarks de acessibilidade da casca.
   - [x] **TASK-04.1.5 (Qualidade, Linters & Documentação)**: Validar conformidade de formatação e tipagem com `npm run lint`, `npm run format:check` e `npm test`, e atualizar a documentação de arquitetura de apresentação em [`docs/design/modules.md`](../design/modules.md).
 
-#### `US-04.2` — Componente `<app-header>` com Botão Destacado "Instalar" (`RN06`) e Atalho "Sobre" (`RN07`) (`⏳ Pendente`)
+#### `US-04.2` — Componente `<app-header>` com Botão Destacado "Instalar" (`RN06`) e Atalho "Sobre" (`RN07`) (`⏳ Pendente` · `3 Story Points`)
 
-- **História**: Como **Recebedor**, quero ver um botão destacado **"Instalar"** no topo do aplicativo caso ainda não o tenha instalado no meu aparelho, além de um botão de fácil acesso para a página **"Sobre"**.
-- **Regras de Negócio**: `RN06`, `RN07`.
-- **Critérios de Aceite**:
-  - [ ] Criar Web Component `src/presentation/components/app-header/app-header.component.js` estendendo `CustomElement` (`@modnes/custom-element`).
-  - [ ] Exibir logotipo vetorial, título **Manda um PIX**, botão destacado **`.app-header__install-btn`** (`#00d37f` com `<vector-icon name="download">`) e link **`.app-header__about-link`** (`<vector-icon name="circle-info">`).
-  - [ ] Renderizar `.app-header__install-btn` exclusivamente quando o PWA não estiver instalado e ocultá-lo imediatamente após a instalação (`RN06`).
-  - [ ] Criar testes unitários (`app-header.test.js`) e stories no Storybook (`app-header.stories.js` nos estados _Não Instalado / Com Botão Instalar_ e _Já Instalado_).
+- **História (Narrativa Canônica)**:
+  > **Como** **Recebedor** que acessa o Manda um PIX pelo smartphone ou computador,
+  > **Quero** um componente de cabeçalho global reativo (`<app-header>`) que exiba a marca da aplicação, um botão destacado "Instalar" exclusivamente quando o PWA estiver disponível para instalação no meu dispositivo (`RN06`), e um atalho acessível para a página institucional "Sobre" (`RN07`),
+  > **Para que** eu possa instalar o aplicativo com um único toque na tela inicial quando elegível e navegar para as informações institucionais e de apoio a qualquer momento com navegação rápida e acessível.
+- **Referência Visual & Protótipo**:
+  - [Proposta de Interface (UI)](../design/ui_proposal.md), protótipo [`docs/design/ui_prototype.html`](../design/ui_prototype.html) e folha de estilos da casca [`src/presentation/styles/app-shell.css`](../../src/presentation/styles/app-shell.css).
+- **Regras de Negócio e Invariantes**:
+  - **INV-01 (Web Component Nativo `@modnes/custom-element`)**: Definir a classe `AppHeaderComponent` estendendo `CustomElement` (`@modnes/custom-element`) e registrando o custom element `<app-header>` no DOM global.
+  - **INV-02 (Arquitetura BEM e Estilização Consistente)**: O componente deve renderizar como bloco semântico `<header class="app-header">` (ou encapsular internamente o bloco `.app-header`), integrando `.app-header__brand`, `.app-header__logo`, `.app-header__title`, `.app-header__subtitle`, `.app-header__actions`, `.app-header__install-btn` e `.app-header__about-link`, consumindo as regras já definidas em `app-shell.css` e tokens em `tokens.css`.
+  - **INV-03 (Visibilidade Condicional e Reativa do Botão "Instalar" — `RN06`)**: O botão `.app-header__install-btn` deve ser exibido exclusivamente quando `shouldShowInstallButton === true` (isto é, `!isInstalled && canInstall`), obtido a partir de `InstallPwaUseCase` ou `PwaInstallAdapter`. Caso o aplicativo já esteja em modo `standalone` ou o prompt não esteja disponível, o botão deve permanecer oculto (`display: none` ou classe `.hidden`).
+  - **INV-04 (Acionamento do Prompt Nativo de Instalação — `RN06`)**: Ao clicar no botão `.app-header__install-btn`, o componente deve invocar `installPwaUseCase.triggerInstall()`. Quando o usuário aceita (`outcome: "accepted"`) ou o evento `appinstalled` é disparado, o botão deve ser ocultado imediatamente sem necessidade de recarregar a página.
+  - **INV-05 (Atalho Institucional para "Sobre" — `RN07`)**: O link `.app-header__about-link` deve possuir `href="/sobre"`, rótulo acessível e ícone `<vector-icon name="circle-info">`, permitindo transição fluida para a tela institucional. A área da marca (`.app-header__brand`) deve apontar para `/` para permitir retorno à tela principal de cobrança.
+  - **INV-06 (Acessibilidade Semântica, Teclado & WCAG AA)**: Garantir `role="banner"` no cabeçalho, `aria-label="Instalar aplicativo"` no botão, `aria-label="Sobre o aplicativo"` no link, áreas de toque mínimas confortáveis (mínimo de 36px de altura) e foco visualmente destacado via `:focus-visible`.
+  - **INV-07 (Injeção Desacoplada e Tolerância a Falhas)**: O componente deve aceitar injeção explícita de `installPwaUseCase` ou instanciá-lo a partir do `PwaInstallAdapter` padrão, comportando-se de forma segura e resiliente caso a API de instalação não seja suportada pelo navegador do usuário.
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Renderização Inicial e Elementos Estruturais da Marca)**:
+    - Dado que o componente `<app-header>` é adicionado ao DOM,
+    - Quando o ciclo de vida inicial for executado,
+    - Então deve renderizar o logotipo vetorial (`./src/assets/icons/icon.svg`), o título principal _"Manda um PIX"_, o subtítulo _"Cobrança rápida via PIX"_ e o link institucional para `/sobre` com `<vector-icon name="circle-info">`.
+  - **Cenário 02 (Exibição do Botão "Instalar" Quando Elegível — `RN06`)**:
+    - Dado que o aplicativo roda no navegador e o prompt de instalação está disponível (`canInstall: true` e `isInstalled: false`),
+    - Quando o componente `<app-header>` sincronizar o estado de instalação,
+    - Então o botão destacado `.app-header__install-btn` deve estar visível com o ícone `<vector-icon name="download">` e o texto _"Instalar"_.
+  - **Cenário 03 (Ocultação do Botão "Instalar" Quando Já Instalado ou Indisponível — `RN06`)**:
+    - Dado que o aplicativo está rodando em modo standalone (`isInstalled: true`) ou o prompt de instalação ainda não foi capturado (`canInstall: false`),
+    - Quando o componente renderizar ou receber atualização de estado,
+    - Então o botão `.app-header__install-btn` não deve ser exibido (oculto com `.hidden` ou ausente do fluxo).
+  - **Cenário 04 (Disparo do Prompt de Instalação ao Clicar no Botão — `RN06`)**:
+    - Dado que o botão `.app-header__install-btn` está visível,
+    - Quando o usuário clicar no botão ou acioná-lo via teclado (`Enter` / `Espaço`),
+    - Então deve ser chamado o método `triggerInstall()` do caso de uso de instalação, disparando o diálogo nativo do navegador.
+  - **Cenário 05 (Ocultação Imediata do Botão Pós-Instalação Bem-Sucedida — `RN06`)**:
+    - Dado que o prompt de instalação foi acionado pelo usuário e aceito (`outcome: "accepted"`),
+    - Quando o estado de instalação transicionar para `isInstalled: true`,
+    - Então o botão `.app-header__install-btn` deve ser imediatamente ocultado da interface.
+  - **Cenário 06 (Acessibilidade por Teclado e Navegação — `RN07`)**:
+    - Dado que o usuário navega pelo cabeçalho utilizando a tecla `Tab`,
+    - Quando os elementos interativos (marca, botão instalar e link sobre) receberem foco sequencial,
+    - Então devem exibir contorno visível de foco (`:focus-visible`) e possuir descrições acessíveis correspondentes.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-04.2.1 (TDD / Web Component `<app-header>` & Ciclo de Vida)**: Criar o Web Component `AppHeaderComponent` em [`src/presentation/components/app-header/app-header.component.js`](../../src/presentation/components/app-header/app-header.component.js) estendendo `CustomElement` (`@modnes/custom-element`), com template BEM para marca, ações e atalho `/sobre` com `<vector-icon name="circle-info">`, com testes unitários em [`src/presentation/components/app-header/app-header.test.js`](../../src/presentation/components/app-header/app-header.test.js).
+  - [ ] **TASK-04.2.2 (TDD / Integração Reativa com PWA Install & Disparo do Prompt — `RN06`)**: Conectar `<app-header>` a `InstallPwaUseCase` e/ou `PwaInstallAdapter`, escutando mudanças de estado para alternar a exibição de `.app-header__install-btn` (`<vector-icon name="download">`) e disparando `triggerInstall()` no clique com testes unitários de interação.
+  - [ ] **TASK-04.2.3 (Storybook / Stories do Componente nos Estados de Instalação)**: Criar arquivo de stories em [`src/presentation/components/app-header/app-header.stories.js`](../../src/presentation/components/app-header/app-header.stories.js) cobrindo os estados _Disponível para Instalação (com botão verde destacado)_, _Já Instalado / Standalone (sem botão de instalação)_ e _Sem Suporte PWA_.
+  - [ ] **TASK-04.2.4 (Integração na Casca Global `index.html`, Exportação em `src/main.js` & Bootstrap)**: Atualizar [`index.html`](../../index.html) substituindo o cabeçalho estático pelo Web Component `<app-header></app-header>`, reexportar o componente em [`src/main.js`](../../src/main.js) e inicializá-lo com injeção segura de dependências no `bootstrapApp`.
+  - [ ] **TASK-04.2.5 (Qualidade, Linters, Testes de Regressão & Documentação)**: Executar validações com `npm test`, `npm run lint` e `npm run format:check`, e atualizar a documentação de arquitetura de apresentação em [`docs/design/modules.md`](../design/modules.md).
 
 #### `US-04.3` — Roteamento SPA (`@modnes/router`) e Injeção de Dependências (`SetInjectable`) (`⏳ Pendente`)
 
