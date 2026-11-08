@@ -1236,14 +1236,81 @@ flowchart LR
     T3 & T4 & T5 & T6 --> T7["TASK-07.2.7: Cobertura, Lint, Build & Sincronização"]
 ```
 
-#### `US-07.3` — Workflows de Entrega Contínua (CD) para `staging` e `production` (`⏳ Pendente`)
+#### `US-07.3` — Workflows de Entrega Contínua (CD) para `staging` e `production` (`⏳ Pendente` · `3 Story Points`)
 
-- **História**: Como **Mantenedor**, quero pipelines automatizados no GitHub Actions alinhados ao modelo **Git Flow** para promover releases em homologação (`release/*` e `hotfix/*`) para `stg.mandaumpix.app` (`mandaumpix-app-stg`) e versões estáveis (`main` / tags `v*`) para `mandaumpix.app` (`mandaumpix-app-prd`).
-- **Referência**: [Pipeline de Implantação](../deployment/pipeline.md), [ADR 0003](../architecture/decisions/0003-hospedagem-firebase-hosting-e-dominio-name-com.md) e [ADR 0005](../architecture/decisions/0005-modelo-de-branching-git-flow.md).
-- **Critérios de Aceite**:
-  - [ ] Criar workflow `.github/workflows/deploy-stg.yml` (disparado em `push` nas branches `release/*` e `hotfix/*` do Git Flow) para deploy no projeto Firebase `mandaumpix-app-stg` (`https://stg.mandaumpix.app`).
-  - [ ] Criar workflow `.github/workflows/deploy-prd.yml` (disparado em `push` na branch `main` / tags de release `v*` do Git Flow) para deploy no projeto Firebase `mandaumpix-app-prd` (`https://mandaumpix.app`).
-  - [ ] Atualizar a matriz de status em [`docs/deployment/pipeline.md`](../deployment/pipeline.md).
+- **História (Narrativa Canônica)**:
+  > **Como** **Mantenedor e Engenheiro DevOps/Front-end** do Manda um PIX,
+  > **Quero** pipelines automatizados de Entrega Contínua (CD) no GitHub Actions alinhados ao modelo de branching Git Flow e integrados aos projetos independentes do Firebase Hosting,
+  > **Para que** novas versões candidatas em branches de homologação (`release/*` e `hotfix/*`) sejam promovidas de forma determinística para `stg.mandaumpix.app` (`mandaumpix-app-stg`) e versões estáveis na branch `main` (incluindo tags SemVer `v*`) sejam entregues com segurança e alta disponibilidade em `mandaumpix.app` (`mandaumpix-app-prd`), assegurando barreiras estritas de qualidade pré-deploy e isolamento de ambientes.
+- **Estimativa de Complexidade**: **`3 Story Points`** (Complexidade Técnica: Média · Esforço: Médio · Incerteza: Baixa).
+- **Regras de Negócio e Invariantes**:
+  - **INV-01 (Mapeamento Estrito Git Flow e Disparos por Ambiente)**:
+    - O workflow de staging (`deploy-stg.yml`) deve ser disparado automaticamente em eventos de `push` nas branches `release/*` e `hotfix/*`, além de suporte a acionamento manual (`workflow_dispatch`).
+    - O workflow de produção (`deploy-prd.yml`) deve ser disparado automaticamente em eventos de `push` na branch `main` e em tags de release `v*` (`refs/tags/v*`), além de suporte a acionamento manual (`workflow_dispatch`).
+    - Commits nas branches `feature/*`, `bugfix/*` ou `develop` nunca devem acionar publicação nos ambientes de staging ou produção.
+  - **INV-02 (Quality Gates Obrigatórios Pré-Deploy)**:
+    - Antes de qualquer publicação no Firebase Hosting, ambos os pipelines devem executar e passar com sucesso na cadeia estrita de validação:
+      1. `npm ci` (instalação com lockfile estrito);
+      2. `npm run format:check` (verificação de conformidade de código e docs com Prettier v3);
+      3. `npm run lint` (análise estática estrita com ESLint v10);
+      4. `npm test` (execução da suíte completa de testes unitários e de integração com Vitest e JSDOM);
+      5. `npm run build` (geração dos artefatos otimizados de produção em `dist/`).
+    - Se qualquer etapa da esteira falhar, a execução deve ser abortada imediatamente sem realizar qualquer modificação no Firebase Hosting.
+  - **INV-03 (Segregação Estrita de Credenciais e Projetos Firebase)**:
+    - O workflow `deploy-stg.yml` deve operar exclusivamente sob o projeto Firebase `mandaumpix-app-stg`, utilizando o secret `FIREBASE_SERVICE_ACCOUNT_STG`.
+    - O workflow `deploy-prd.yml` deve operar exclusivamente sob o projeto Firebase `mandaumpix-app-prd`, utilizando o secret `FIREBASE_SERVICE_ACCOUNT_PRD`.
+    - Sob nenhuma circunstância credenciais ou identificadores de projeto devem ser intercambiados ou compartilhados entre ambientes.
+  - **INV-04 (Publicação em Canal `live` e Concorrência Segura)**:
+    - A publicação em ambos os ambientes deve utilizar a action oficial `FirebaseExtended/action-hosting-deploy@v0` direcionada ao canal `live`, garantindo atualização imediata nos domínios personalizados (`stg.mandaumpix.app` e `mandaumpix.app`).
+    - O controle de concorrência (`concurrency`) deve garantir cancelamento de deploys obsoletos ou evitar conflitos de deploy concorrente por branch/tag (`group: ${{ github.workflow }}-${{ github.ref }}`).
+  - **INV-05 (Catálogo Storybook no Ambiente de Homologação)**:
+    - No workflow de staging (`deploy-stg.yml`), o build estático do Storybook (`npm run build-storybook -- -o dist/storybook`) deve ser compilado e embarcado no diretório de distribuição, permitindo a validação visual e auditoria de acessibilidade por stakeholders e QA em `https://stg.mandaumpix.app/storybook`.
+    - No workflow de produção (`deploy-prd.yml`), o empacotamento deve permanecer limpo e dedicado à aplicação final para os usuários (`dist/`), sem inclusão desnecessária de assets de documentação ou desenvolvimento.
+  - **INV-06 (Auditoria e Rastreabilidade via GitHub Environments)**:
+    - Os jobs devem declarar explicitamente os ambientes `staging` (URL: `https://stg.mandaumpix.app`) e `production` (URL: `https://mandaumpix.app`), mantendo registro histórico e links diretos para auditoria no painel de Deployments do repositório GitHub.
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Deploy Automatizado em Staging via Push em Branch de Release — Happy Path)**:
+    - Dado que uma release candidate é finalizada e enviada com `git push origin release/v1.0.0`,
+    - Quando o GitHub Actions receber o evento de push na branch `release/*`,
+    - Então o workflow `CD - Deploy Staging` (`.github/workflows/deploy-stg.yml`) deve ser iniciado automaticamente,
+    - E deve executar com sucesso os testes (`npm test`), linter (`npm run lint`), formatação (`npm run format:check`), build da aplicação (`npm run build`) e build do Storybook (`npm run build-storybook -- -o dist/storybook`),
+    - E deve implantar os arquivos estáticos no projeto Firebase `mandaumpix-app-stg` no canal `live`,
+    - E a versão de homologação deve ficar imediatamente acessível em `https://stg.mandaumpix.app` e o catálogo em `https://stg.mandaumpix.app/storybook`.
+  - **Cenário 02 (Deploy Automatizado em Staging via Push em Branch de Hotfix)**:
+    - Dado que uma correção emergencial é criada na branch `hotfix/v1.0.1`,
+    - Quando o mantenedor realizar o push da branch para o repositório remoto,
+    - Então o workflow `CD - Deploy Staging` deve ser acionado para validação prévia em homologação,
+    - E após a passagem de todos os quality gates, a versão corrigida deve ser publicada em `https://stg.mandaumpix.app`.
+  - **Cenário 03 (Deploy Automatizado em Produção via Push na Branch Main ou Tag de Release — Happy Path)**:
+    - Dado que a release homologada foi mesclada na branch `main` e anotada com a tag `v1.0.0`,
+    - Quando o evento de push ocorrer na branch `main` ou na tag `v*`,
+    - Então o workflow `CD - Deploy Production` (`.github/workflows/deploy-prd.yml`) deve ser iniciado automaticamente,
+    - E deve executar toda a suíte de testes e validações estáticas,
+    - E deve gerar o build estático otimizado de produção em `dist/`,
+    - E deve publicar os ativos estáticos no projeto Firebase `mandaumpix-app-prd` no canal `live`,
+    - E a aplicação final deve ficar disponível globalmente sobre HTTPS em `https://mandaumpix.app`.
+  - **Cenário 04 (Bloqueio Automático de Deploy por Violação de Quality Gate)**:
+    - Dado que uma branch `release/*`, `hotfix/*` ou `main` possui um teste quebrado ou erro de formatação/lint,
+    - Quando o workflow de deploy correspondente for disparado,
+    - Então a etapa com falha (`npm test`, `npm run lint` ou `npm run format:check`) deve interromper a execução com código de saída diferente de 0,
+    - E a etapa de deploy no Firebase Hosting não deve ser executada,
+    - E o ambiente (`stg.mandaumpix.app` ou `mandaumpix.app`) deve permanecer intacto na versão anterior estável.
+  - **Cenário 05 (Disparo Manual sob Demanda via workflow_dispatch)**:
+    - Dado que o mantenedor precisa forçar uma reimplantação em staging ou produção sem realizar novo push,
+    - Quando o workflow for disparado manualmente pela interface do GitHub Actions (`workflow_dispatch`),
+    - Então a esteira de CD deve ser executada no contexto da branch selecionada e publicar a aplicação no ambiente respectivo.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-07.3.1 (Construção do Workflow CD Staging `.github/workflows/deploy-stg.yml`)**: Criar o workflow de implantação contínua para homologação com gatilhos para `release/*`, `hotfix/*` e `workflow_dispatch`, environment `staging`, steps de qualidade, build da aplicação (`npm run build`), build do Storybook (`dist/storybook`), publicação no projeto `mandaumpix-app-stg` e canal `live` via secret `FIREBASE_SERVICE_ACCOUNT_STG`.
+  - [ ] **TASK-07.3.2 (Construção do Workflow CD Production `.github/workflows/deploy-prd.yml`)**: Criar o workflow de implantação contínua para produção com gatilhos para `main`, tags `v*` e `workflow_dispatch`, environment `production`, steps de qualidade, build otimizado da aplicação (`npm run build`), publicação no projeto `mandaumpix-app-prd` e canal `live` via secret `FIREBASE_SERVICE_ACCOUNT_PRD`.
+  - [ ] **TASK-07.3.3 (Validação Sintática, Linting dos Workflows e Simulação Local)**: Validar a sintaxe dos arquivos YAML criados utilizando o ESLint v10 (`npm run lint`), formatador Prettier (`npm run format:check`) e validar localmente que os comandos de build e paths referenciados nos workflows correspondem exatamente aos scripts do `package.json` e ao `firebase.json`.
+  - [ ] **TASK-07.3.4 (Atualização da Matriz de Implantação e Documentação Técnica)**: Atualizar a matriz de status em [`docs/deployment/pipeline.md`](../deployment/pipeline.md) apontando os novos workflows de homologação e produção com seus respectivos links, detalhar o fluxo operacional de promoção e sincronizar o Backlog.
+
+```mermaid
+flowchart LR
+    T1["TASK-07.3.1: Workflow deploy-stg.yml"] --> T3["TASK-07.3.3: Validação Sintática & Lint"]
+    T2["TASK-07.3.2: Workflow deploy-prd.yml"] --> T3
+    T3 --> T4["TASK-07.3.4: Docs Pipeline & Matriz"]
+```
 
 ---
 
