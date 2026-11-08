@@ -249,13 +249,47 @@ flowchart TD
   - [x] **TASK-03.3.3 (TDD / Download PNG do QR Code, Blob & Liberação de Recursos)**: Implementar `downloadQrCodePng({ chave_cobranca, svg, dataUrl, fileName, width, height })` integrando com `exportQrCodePng`, criação de Blob, âncora `<a download>`, `URL.createObjectURL` e `URL.revokeObjectURL` em [`src/infrastructure/share/browser-share.adapter.js`](../../src/infrastructure/share/browser-share.adapter.js) com testes unitários em [`src/infrastructure/share/browser-share.adapter.test.js`](../../src/infrastructure/share/browser-share.adapter.test.js).
   - [x] **TASK-03.3.4 (TDD / Fábrica `createBrowserShareAdapter`, Integração com `DistributePixChargeUseCase`, Reexportação & Qualidade)**: Criar a classe e fábrica `BrowserShareAdapter`, integrar à suíte de testes de `DistributePixChargeUseCase`, reexportar em [`src/main.js`](../../src/main.js), adicionar testes em [`src/main.test.js`](../../src/main.test.js), atualizar [`docs/design/modules.md`](../design/modules.md) e validar `npm run lint`, `npm run format:check` e `npm run test:coverage`.
 
-#### `US-03.4` — Service Worker (`sw.js`) e Funcionamento Offline (`⏳ Pendente`)
+#### `US-03.4` — Service Worker (`sw.js`) e Funcionamento Offline (`⏳ Pendente` · `3 Story Points`)
 
-- **História**: Como **Recebedor**, quero abrir o **Manda um PIX** e gerar cobranças mesmo quando estiver em locais com sinal de internet instável ou sem conexão.
-- **Critérios de Aceite**:
-  - [ ] Implementar `sw.js` na raiz da aplicação com estratégia de cache para a casca HTML (`index.html`), estilos, ícones, `manifest.json` e módulos mapeados no Import Map.
-  - [ ] Registrar o Service Worker de forma segura no bootstrap da aplicação (`navigator.serviceWorker.register('./sw.js')`).
-  - [ ] Atualizar [`importmap` / build](../../package.json) e [`firebase.json`](../../firebase.json) caso necessário para servir `sw.js` com escopo raiz (`/`).
+- **História (Narrativa Canônica)**:
+  > **Como** **Recebedor** que utiliza o Manda um PIX no dia a dia,
+  > **Quero** que o aplicativo registre um Service Worker com estratégia de cache offline para a casca PWA (HTML, manifest, ícones, estilos e módulos JavaScript),
+  > **Para que** eu consiga abrir a aplicação e gerar cobranças PIX mesmo quando estiver em locais sem conexão de internet ou com sinal instável (`RN01`, `RN04`, `RN05`).
+- **Regras de Negócio e Invariantes**:
+  - **INV-01 (Autonomia Offline Total — `RN01`, `RN04`, `RN05`)**: Como o Manda um PIX é um PWA 100% client-side, toda a lógica de negócio (geração do payload BR Code, renderização de QR Code, persistência em IndexedDB, cópia para clipboard e download PNG) deve funcionar perfeitamente sem qualquer requisição de rede ativa após a primeira carga.
+  - **INV-02 (Estratégia de Cache da App Shell e Ativos Estáticos)**: O Service Worker (`sw.js`) deve realizar o pré-carregamento (_pre-caching_) no evento `install` dos recursos essenciais da aplicação (`/`, `/index.html`, `/manifest.json`, `/src/main.js`, ícones SVG/PNG e módulos essenciais do runtime) em um cache versionado (`mandaumpix-v1.0.0-precache`), ativando-se imediatamente com `self.skipWaiting()`.
+  - **INV-03 (Interceptação de Requisições & Estratégia de Runtime Caching)**:
+    - Para navegações de página (`navigate` / HTML): adotar estratégia **Network-First** com fallback transparente para o cache da App Shell (`index.html`) em caso de falha de rede/offline.
+    - Para ativos estáticos da aplicação e dependências do CDN JSPM (`ga.jspm.io`): adotar estratégia **Stale-While-Revalidate** ou **Cache-First**, persistindo recursos resolvidos em `mandaumpix-v1.0.0-runtime` para garantir disponibilidade offline imediata.
+  - **INV-04 (Ciclo de Vida e Limpeza de Versões Obsoletas)**: No evento `activate`, o Service Worker deve identificar e expurgar todos os caches legados que não pertençam à versão ativa e assumir imediatamente o controle das abas abertas chamando `self.clients.claim()`.
+  - **INV-05 (Isolamento do Próprio Script `sw.js`)**: O arquivo `sw.js` nunca deve ser armazenado em cache pelo próprio Service Worker e deve ser servido pelo servidor estático ([`firebase.json`](../../firebase.json)) com cabeçalho `Cache-Control: no-cache, no-store, must-revalidate` para viabilizar atualizações transparentes.
+  - **INV-06 (Adaptador de Registro e Resiliência em Ambientes sem Suporte)**: O registro do Service Worker deve ser gerenciado por um adaptador desacoplado ([`src/infrastructure/pwa/service-worker.adapter.js`](../../src/infrastructure/pwa/service-worker.adapter.js)), injetando `navigator.serviceWorker` de forma testável, registrando `./sw.js` com escopo `./` após o evento `window.load` e monitorando reativamente o status de conectividade (`navigator.onLine`, eventos `online`/`offline`) via `@modnes/data-controller`. Se o ambiente não suportar Service Worker (ex.: navegadores antigos ou `iframe` restrito), o sistema deve operar normalmente em modo fallback online sem lançar exceções não tratadas.
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Pré-cache da App Shell na Instalação do Service Worker)**:
+    - Dado que o navegador suporta Service Worker e o usuário acessa o aplicativo pela primeira vez,
+    - Quando o evento `install` de `sw.js` for disparado,
+    - Então o Service Worker deve abrir o cache versionado `mandaumpix-v1.0.0-precache`, realizar o pré-carregamento dos ativos fundamentais da App Shell e invocar `self.skipWaiting()`.
+  - **Cenário 02 (Funcionamento Offline Transparente via Interceptação de Rede)**:
+    - Dado que o Service Worker está ativado e a conexão com a internet é perdida (`offline`),
+    - Quando o usuário carregar ou recarregar a URL raiz `/` ou qualquer rota SPA,
+    - Então o Service Worker deve interceptar a requisição e responder imediatamente com a casca `index.html` e os módulos/ativos cacheados, permitindo gerar cobranças normalmente.
+  - **Cenário 03 (Expurgo de Caches Obsoletos na Ativação de Nova Versão)**:
+    - Dado que existe um cache legado de versão anterior (`mandaumpix-v0.9.0-precache`),
+    - Quando uma nova versão do Service Worker disparar o evento `activate`,
+    - Então o Service Worker deve remover todos os caches não correspondentes à versão ativa, chamar `self.clients.claim()` e assumir o controle dos clientes abertos.
+  - **Cenário 04 (Registro Seguro e Monitoramento de Conectividade pelo Adaptador)**:
+    - Dado que o aplicativo foi iniciado no navegador (`bootstrapApp`),
+    - Quando a janela emitir o evento `load`,
+    - Então `ServiceWorkerAdapter` deve invocar `navigator.serviceWorker.register('./sw.js', { scope: './' })`, expor o estado `{ isRegistered: true, isOnline: navigator.onLine }` e notificar observadores reativos caso ocorram eventos `online` ou `offline`.
+  - **Cenário 05 (Resiliência em Ambientes sem Suporte a Service Worker)**:
+    - Dado um navegador ou ambiente de testes onde `navigator.serviceWorker` é indefinido,
+    - Quando `ServiceWorkerAdapter.register()` for executado,
+    - Então deve retornar status `{ isSupported: false, isRegistered: false }` de forma segura sem lançar exceções e permitindo que a aplicação funcione em modo online padrão.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-03.4.1 (TDD / Constantes, Erros & Adaptador de Service Worker e Conectividade)**: Definir constantes de cache e eventos, classes de erro estruturadas e implementar a classe `ServiceWorkerAdapter` (e fábrica `createServiceWorkerAdapter`) em [`src/infrastructure/pwa/service-worker.adapter.js`](../../src/infrastructure/pwa/service-worker.adapter.js) gerenciando `register({ scriptUrl, scope })`, detecção de suporte, listeners `online`/`offline` e reatividade com `@modnes/data-controller`, com testes unitários em [`src/infrastructure/pwa/service-worker.adapter.test.js`](../../src/infrastructure/pwa/service-worker.adapter.test.js).
+  - [ ] **TASK-03.4.2 (TDD / Script do Service Worker `sw.js` & Estratégias de Cache Offline)**: Implementar o script [`sw.js`](../../sw.js) na raiz do projeto contendo a lista de ativos de pré-cache (`PRECACHE_ASSETS`), estratégias de interceptação `fetch` (Network-First para HTML e Stale-While-Revalidate/Cache-First para ativos estáticos e dependências CDN `ga.jspm.io`), e ciclo de vida com expurgo de caches legados em `activate`, com testes unitários/mocking em [`src/infrastructure/pwa/sw.test.js`](../../src/infrastructure/pwa/sw.test.js).
+  - [ ] **TASK-03.4.3 (Configuração de Servidor & Headers HTTP no `firebase.json`)**: Configurar em [`firebase.json`](../../firebase.json) os cabeçalhos de resposta estáticos para `sw.js` com `Cache-Control: no-cache, no-store, must-revalidate` e `Service-Worker-Allowed: /`, garantindo que atualizações do Service Worker não fiquem presas em cache HTTP de CDN.
+  - [ ] **TASK-03.4.4 (Integração no Bootstrap, Reexportação em `src/main.js` & Qualidade)**: Integrar a inicialização do `ServiceWorkerAdapter` no `bootstrapApp` em [`src/main.js`](../../src/main.js), reexportar símbolos públicos, adicionar testes de integração em [`src/main.test.js`](../../src/main.test.js), atualizar [`docs/design/modules.md`](../design/modules.md) e validar conformidade com `npm run lint`, `npm run format:check` e `npm run test:coverage`.
 
 ---
 
