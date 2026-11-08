@@ -1,4 +1,5 @@
 import CustomElement from "@modnes/custom-element";
+import { InstallPwaUseCase } from "../../../application/use-cases/install-pwa.use-case.js";
 
 export const DEFAULT_LOGO_SRC = "./src/assets/icons/icon.svg";
 export const DEFAULT_TITLE = "Manda um PIX";
@@ -12,6 +13,11 @@ export class AppHeaderComponent extends CustomElement {
   aboutHref = DEFAULT_ABOUT_HREF;
   showInstallButton = false;
 
+  #installPwaUseCase = null;
+  #pwaInstallGateway = null;
+  #installSubscription = null;
+  #isHandlingInstall = false;
+
   static observedAttributes = [
     "logo-src",
     "title-text",
@@ -22,6 +28,9 @@ export class AppHeaderComponent extends CustomElement {
 
   constructor() {
     super();
+
+    this.addInjectable("install-pwa-use-case", "installPwaUseCase");
+    this.addInjectable("pwa-install-gateway", "pwaInstallGateway");
 
     this.template = () => `
       <div class="app-header__brand" role="button" tabindex="0">
@@ -58,6 +67,30 @@ export class AppHeaderComponent extends CustomElement {
     `;
   }
 
+  get installPwaUseCase() {
+    return this.#installPwaUseCase;
+  }
+
+  set installPwaUseCase(useCase) {
+    this.#installPwaUseCase = useCase || null;
+    if (this.isConnected && this.#installPwaUseCase) {
+      this.setupInstallIntegration();
+    }
+  }
+
+  get pwaInstallGateway() {
+    return this.#pwaInstallGateway;
+  }
+
+  set pwaInstallGateway(gateway) {
+    this.#pwaInstallGateway = gateway || null;
+    if (!this.#installPwaUseCase && this.#pwaInstallGateway) {
+      this.installPwaUseCase = new InstallPwaUseCase({
+        pwaInstallGateway: this.#pwaInstallGateway,
+      });
+    }
+  }
+
   connectedCallback() {
     if (!this.classList.contains("app-header")) {
       this.classList.add("app-header");
@@ -69,6 +102,99 @@ export class AppHeaderComponent extends CustomElement {
 
     this.syncAttributes();
     super.connectedCallback();
+
+    if (!this.#installPwaUseCase && this.#pwaInstallGateway) {
+      this.installPwaUseCase = new InstallPwaUseCase({
+        pwaInstallGateway: this.#pwaInstallGateway,
+      });
+    }
+
+    if (this.#installPwaUseCase) {
+      this.setupInstallIntegration();
+    }
+  }
+
+  disconnectedCallback() {
+    this.teardownInstallIntegration();
+  }
+
+  init() {
+    const installBtn = this.querySelector(".app-header__install-btn");
+    installBtn?.addEventListener("click", this.handleInstallClick.bind(this));
+  }
+
+  setupInstallIntegration() {
+    this.teardownInstallIntegration();
+
+    if (!this.#installPwaUseCase) {
+      return;
+    }
+
+    if (typeof this.#installPwaUseCase.subscribe === "function") {
+      this.#installSubscription = this.#installPwaUseCase.subscribe(
+        (state = {}) => {
+          if (state.shouldShowInstallButton) {
+            this.showInstall();
+          } else {
+            this.hideInstall();
+          }
+        },
+      );
+    }
+
+    if (typeof this.#installPwaUseCase.getInstallState === "function") {
+      Promise.resolve(this.#installPwaUseCase.getInstallState())
+        .then((state) => {
+          if (state?.shouldShowInstallButton) {
+            this.showInstall();
+          } else {
+            this.hideInstall();
+          }
+        })
+        .catch(() => {
+          // Degrada graciosamente em caso de erro ao obter estado
+        });
+    }
+  }
+
+  teardownInstallIntegration() {
+    if (typeof this.#installSubscription === "function") {
+      this.#installSubscription();
+      this.#installSubscription = null;
+    }
+  }
+
+  async handleInstallClick(event) {
+    event?.preventDefault();
+
+    if (!this.#installPwaUseCase || this.#isHandlingInstall) {
+      return;
+    }
+
+    this.#isHandlingInstall = true;
+    try {
+      const outcome = await this.#installPwaUseCase.triggerInstall();
+      if (outcome?.accepted || outcome?.isInstalled) {
+        this.hideInstall();
+      }
+      this.dispatchEvent(
+        new CustomEvent("pwa-install-outcome", {
+          detail: outcome,
+          bubbles: true,
+          composed: true,
+        }),
+      );
+    } catch (error) {
+      this.dispatchEvent(
+        new CustomEvent("pwa-install-error", {
+          detail: error,
+          bubbles: true,
+          composed: true,
+        }),
+      );
+    } finally {
+      this.#isHandlingInstall = false;
+    }
   }
 
   syncAttributes() {
