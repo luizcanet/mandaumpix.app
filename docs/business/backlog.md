@@ -15,7 +15,7 @@ Este documento consolida o **Backlog do Produto e de Engenharia** do **Manda um 
 | **EP-03** | Camada de Infraestrutura e Adaptadores Web APIs (Local-First)              | `RN01`, `RN05`, `RN06`, Offline/Service Worker      |     `4 / 4`     | ✅ Concluído |
 | **EP-04** | Casca da Aplicação, Roteamento SPA, Botão "Instalar" e Página "Sobre"      | `RN06`, `RN07`, `@modnes/router`, Layout Split-View |     `4 / 4`     | ✅ Concluído |
 | **EP-05** | Gestão de Chaves PIX na Interface (`<pix-key-*>`)                          | `RN01`, `RN02`, `<dialog class="key-dialog">`       |     `3 / 3`     | ✅ Concluído |
-| **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")              | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas    |     `2 / 3`     | ⏳ Pendente  |
+| **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")              | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas    |     `3 / 3`     | ✅ Concluído |
 | **EP-07** | Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA) e Deploy `stg`/`prd` | Testes de Integração, Storybook a11y, Releases      |     `0 / 3`     | ⏳ Pendente  |
 
 ---
@@ -29,7 +29,7 @@ flowchart TD
     EP03["✅ EP-03: Infraestrutura & Adaptadores Web APIs<br/>(IndexedDB, PWA Install, Clipboard/Share, SW)"]
     EP04["✅ EP-04: Casca Global, Roteador SPA (@modnes/router),<br/>Botão 'Instalar' (RN06) & Página 'Sobre' (RN07)"]
     EP05["✅ EP-05: Gestão de Chaves PIX na UI<br/>(Empty State, Seletor Radio Cards, Modal &lt;dialog&gt;)"]
-    EP06["⏳ EP-06: Geração e Distribuição 'Manda um PIX'<br/>(Formulário de Valor, QR Code SVG, Copiar/WhatsApp/PNG)"]
+    EP06["✅ EP-06: Geração e Distribuição 'Manda um PIX'<br/>(Formulário de Valor, QR Code SVG, Copiar/WhatsApp/PNG)"]
     EP07["⏳ EP-07: Testes Integrados, Catálogo Storybook Completo<br/>& Pipelines CD (staging / production)"]
 
     EP01 --> EP02
@@ -956,7 +956,7 @@ flowchart LR
     T6 & T7 --> T8["TASK-06.2.8: Documentação Viva"]
 ```
 
-#### `US-06.3` — Ações de Distribuição da Cobrança: Copiar, Compartilhar (WhatsApp) e Salvar PNG (`⏳ Pendente` · `3 Story Points`)
+#### `US-06.3` — Ações de Distribuição da Cobrança: Copiar, Compartilhar (WhatsApp) e Salvar PNG (`✅ Concluído` · `3 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Recebedor** que gerou uma cobrança no Manda um PIX,
@@ -1054,7 +1054,7 @@ flowchart LR
   - [x] **TASK-06.3.4 (Implementação / Integração das Ações no Web Component `PixChargeResultComponent`)**: Implementar a lógica de distribuição em [`src/presentation/components/pix-charge-result/pix-charge-result.component.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.component.js), integrando `this.useInjectable("distribute-pix-charge-use-case")`, renderização declarativa dos botões no container `.charge-result__actions`, gerenciamento do timer de feedback visual de cópia e anúncios em `aria-live="polite"`.
   - [x] **TASK-06.3.5 (Estilização CSS BEM, Cores dos Botões, Alvos de Toque e Estados Visuais)**: Atualizar [`src/presentation/components/pix-charge-result/pix-charge-result.css`](../../src/presentation/components/pix-charge-result/pix-charge-result.css) e [`src/presentation/components/pix-charge-result/pix-charge-result.css.test.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.css.test.js) estilizando `.charge-result__btn`, variações `--copy`, `--copied`, `--share`, `--download`, altura mínima $\ge 48\text{px}$, alinhamento flex vertical, estados `:hover` e `:focus-visible`.
   - [x] **TASK-06.3.6 (Catálogo Storybook & Auditoria a11y das Ações de Distribuição)**: Atualizar [`src/presentation/components/pix-charge-result/pix-charge-result.stories.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.stories.js) com stories interativas simulando as ações: _Cobrança com Ações Ativas_, _Estado Copiado Ativo ("Copiado!")_ e validação automatizada de acessibilidade `@storybook/addon-a11y`.
-  - [ ] **TASK-06.3.7 (Exportação Pública no Módulo Principal, Documentação Viva & Validação Geral)**: Reexportar novos identificadores e constantes em [`src/main.js`](../../src/main.js), atualizar [`docs/design/modules.md`](../design/modules.md) e [`docs/business/backlog.md`](./backlog.md), e validar suíte completa (`npm run lint`, `npm run format:check` e `npm test`).
+  - [x] **TASK-06.3.7 (Exportação Pública no Módulo Principal, Documentação Viva & Validação Geral)**: Reexportar novos identificadores e constantes em [`src/main.js`](../../src/main.js), atualizar [`docs/design/modules.md`](../design/modules.md) e [`docs/business/backlog.md`](./backlog.md), e validar suíte completa (`npm run lint`, `npm run format:check` e `npm test`).
 
 ```mermaid
 flowchart LR
