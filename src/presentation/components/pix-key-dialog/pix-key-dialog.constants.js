@@ -185,6 +185,8 @@ export function getKeyTypeConfig(tipo = "") {
   const found = KEY_DIALOG_TYPES_CONFIG.find((cfg) => cfg.type === normalized);
   return (
     found ||
-    KEY_DIALOG_TYPES_CONFIG.find((cfg) => cfg.type === DEFAULT_KEY_DIALOG_INITIAL_TYPE)
+    KEY_DIALOG_TYPES_CONFIG.find(
+      (cfg) => cfg.type === DEFAULT_KEY_DIALOG_INITIAL_TYPE,
+    )
   );
 }

@@ -193,7 +193,9 @@ describe("pix-key-dialog.constants", () => {
 
       const evpConfig = getKeyTypeConfig("evp");
       expect(evpConfig.type).toBe(PIX_KEY_TYPES.EVP);
-      expect(evpConfig.placeholder).toBe("123e4567-e89b-12d3-a456-426614174000");
+      expect(evpConfig.placeholder).toBe(
+        "123e4567-e89b-12d3-a456-426614174000",
+      );
     });
 
     it("deve retornar a configuração padrão de CPF em caso de tipo desconhecido, vazio ou inválido", () => {
