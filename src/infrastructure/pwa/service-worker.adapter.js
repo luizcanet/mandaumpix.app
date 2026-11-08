@@ -2,7 +2,8 @@ import DataController from "@modnes/data-controller";
 
 export const DEFAULT_SW_SCRIPT_URL = "./sw.js";
 export const DEFAULT_SW_SCOPE = "./";
-export const CACHE_VERSION = "v1.0.0";
+export const DEFAULT_SW_TYPE = "module";
+export const CACHE_VERSION = "v1.0.1";
 export const PRECACHE_NAME = `mandaumpix-${CACHE_VERSION}-precache`;
 export const RUNTIME_CACHE_NAME = `mandaumpix-${CACHE_VERSION}-runtime`;
 
@@ -56,12 +57,14 @@ export class ServiceWorkerAdapter extends EventTarget {
     navigatorTarget = globalThis.navigator,
     scriptUrl = DEFAULT_SW_SCRIPT_URL,
     scope = DEFAULT_SW_SCOPE,
+    type = DEFAULT_SW_TYPE,
   } = {}) {
     super();
     this.windowTarget = windowTarget || null;
     this.navigatorTarget = navigatorTarget || null;
     this.scriptUrl = scriptUrl;
     this.scope = scope;
+    this.type = type;
     this.registration = null;
     this.destroyed = false;
 
@@ -80,6 +83,7 @@ export class ServiceWorkerAdapter extends EventTarget {
         : SERVICE_WORKER_STATUS.UNSUPPORTED,
       scriptUrl: this.scriptUrl,
       scope: this.scope,
+      type: this.type,
     };
 
     this.dataController = new DataController(this);
@@ -201,7 +205,11 @@ export class ServiceWorkerAdapter extends EventTarget {
     };
   }
 
-  async register({ scriptUrl = this.scriptUrl, scope = this.scope } = {}) {
+  async register({
+    scriptUrl = this.scriptUrl,
+    scope = this.scope,
+    type = this.type,
+  } = {}) {
     if (!this.isSupported()) {
       this.syncState({
         isSupported: false,
@@ -218,14 +226,19 @@ export class ServiceWorkerAdapter extends EventTarget {
     this.syncState({ status: SERVICE_WORKER_STATUS.REGISTERING });
 
     try {
+      const registrationOptions = { scope };
+      if (type) {
+        registrationOptions.type = type;
+      }
       const registration = await this.navigatorTarget.serviceWorker.register(
         scriptUrl,
-        { scope },
+        registrationOptions,
       );
 
       this.registration = registration;
       this.scriptUrl = scriptUrl;
       this.scope = scope;
+      this.type = type;
 
       const hasWaiting = Boolean(registration?.waiting);
 
@@ -239,6 +252,7 @@ export class ServiceWorkerAdapter extends EventTarget {
         status: SERVICE_WORKER_STATUS.REGISTERED,
         scriptUrl,
         scope,
+        type,
       });
 
       return {

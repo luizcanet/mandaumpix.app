@@ -123,6 +123,7 @@ import {
   CACHE_VERSION,
   DEFAULT_SW_SCOPE,
   DEFAULT_SW_SCRIPT_URL,
+  DEFAULT_SW_TYPE,
   PRECACHE_NAME,
   RUNTIME_CACHE_NAME,
   SERVICE_WORKER_ADAPTER_ERROR_CODES,
@@ -134,6 +135,7 @@ import {
   isServiceWorkerSupported,
 } from "./infrastructure/pwa/service-worker.adapter.js";
 import AppHeaderComponent from "./presentation/components/app-header/app-header.component.js";
+import VectorIconComponent from "./presentation/components/vector-icon/vector-icon.component.js";
 
 export const APP_METADATA = Object.freeze({
   name: "Manda um PIX",
@@ -311,6 +313,7 @@ export {
   DEFAULT_SHARE_TITLE,
   DEFAULT_SW_SCOPE,
   DEFAULT_SW_SCRIPT_URL,
+  DEFAULT_SW_TYPE,
   DataController,
   DataHandler,
   DeletePixKeyUseCase,
@@ -358,6 +361,7 @@ export {
   ServiceWorkerAdapter,
   ServiceWorkerAdapterError,
   SetInjectable,
+  VectorIconComponent,
   assertChargeDistributionGateway,
   assertIndexedDbFactory,
   assertPixKeyRepository,

@@ -19,6 +19,7 @@ import {
   DEFAULT_SHARE_TITLE,
   DEFAULT_SW_SCOPE,
   DEFAULT_SW_SCRIPT_URL,
+  DEFAULT_SW_TYPE,
   DataController,
   DeletePixKeyUseCase,
   DistributePixChargeUseCase,
@@ -64,6 +65,7 @@ import {
   SelectPixKeyUseCase,
   ServiceWorkerAdapter,
   ServiceWorkerAdapterError,
+  VectorIconComponent,
   assertChargeDistributionGateway,
   assertIndexedDbFactory,
   assertPixKeyRepository,
@@ -794,9 +796,9 @@ describe("main.js", () => {
         SERVICE_WORKER_ADAPTER_ERROR_CODES.SERVICE_WORKER_UNSUPPORTED,
       ).toBe("SERVICE_WORKER_UNSUPPORTED");
       expect(ServiceWorkerAdapterError).toBeDefined();
-      expect(CACHE_VERSION).toBe("v1.0.0");
-      expect(PRECACHE_NAME).toBe("mandaumpix-v1.0.0-precache");
-      expect(RUNTIME_CACHE_NAME).toBe("mandaumpix-v1.0.0-runtime");
+      expect(CACHE_VERSION).toBe("v1.0.1");
+      expect(PRECACHE_NAME).toBe("mandaumpix-v1.0.1-precache");
+      expect(RUNTIME_CACHE_NAME).toBe("mandaumpix-v1.0.1-runtime");
       expect(DEFAULT_SW_SCRIPT_URL).toBe("./sw.js");
       expect(DEFAULT_SW_SCOPE).toBe("./");
       expect(isOnline).toBeTypeOf("function");
@@ -846,8 +848,10 @@ describe("main.js", () => {
   });
 
   describe("presentation components & bootstrapApp integration (TASK-04.2.4)", () => {
-    it("should re-export AppHeaderComponent", () => {
+    it("should re-export AppHeaderComponent and VectorIconComponent", () => {
       expect(AppHeaderComponent).toBeDefined();
+      expect(VectorIconComponent).toBeDefined();
+      expect(DEFAULT_SW_TYPE).toBe("module");
     });
 
     it("should initialize PWA install adapter and use case on rootElement during bootstrapApp", () => {

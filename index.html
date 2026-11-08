@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="./src/presentation/styles/layout.css" />
     <link rel="stylesheet" href="./src/presentation/styles/app-shell.css" />
     <link rel="stylesheet" href="./src/presentation/components/vector-icon/vector-icon.css" />
+    <script src="./importmap.js"></script>
     <script async src="https://ga.jspm.io/npm:es-module-shims@2.8.4/dist/es-module-shims.js" crossorigin="anonymous" integrity="sha384-0bdb7F9U10QF2R23CYCgvGdsStkMEEjDOVhWxFXpTlArSrMLKtrnsYtk21d8cBUc"></script>
     <script type="importmap">
     {
@@ -54,7 +55,21 @@
         }
       },
       "integrity": {
-        "./src/main.js": "sha384-aYEgafzzUFnobW0De/i09TeiOfkEq4CNzyCOUJNNNYrAFOz+C89O/Xe6oJ9MFyrz",
+        "./src/application/use-cases/delete-pix-key.use-case.js": "sha384-krKbDLunpr6j9ZQbbqyWfIEVfCuvjawabC2I8gFg4hf+0zMDmK+ljAUWV6lsAh9L",
+        "./src/application/use-cases/distribute-pix-charge.use-case.js": "sha384-hMWAEAdms4g/ACJNXSzrLuKjXt3Wxt4lNlb7TVsWuJO/MoGLP7dtpF2kVK+qtBEl",
+        "./src/application/use-cases/generate-pix-charge.use-case.js": "sha384-TjU0cI5Yel8TJg/R4BMVDc3zDTEPQqsgFoHoBMpNarmUk3T7IOMXuFQwQDMxszxK",
+        "./src/application/use-cases/install-pwa.use-case.js": "sha384-L+5w/Ve3ydG3Yle+el6WNjYITAnGNdy9wp9H1cg0gYwjS9JxZZeL0gJcWp2xRpZz",
+        "./src/application/use-cases/list-pix-keys.use-case.js": "sha384-vnNc1Ea5bajvVBLrQpWjVXqHkOkPMIktDH3Y1P24OLZYT2BrYfguXgQpOYYibU8X",
+        "./src/application/use-cases/save-pix-key.use-case.js": "sha384-TLUzOFJfIl0ebksS0Hx3I185b7DhGiStwkxHEFyDNObFrQp73qInEchpF4xuHDnn",
+        "./src/application/use-cases/select-pix-key.use-case.js": "sha384-jLGXaxkzhfzdhfk/ZrnbxEpLwKDXND4kUFLSbQBoy6z0xCtQC5cc8rlFxbwytByO",
+        "./src/domain/entities/pix-charge.entity.js": "sha384-apdRQcRsyQfyadI2Btnfu8n75qfQLV0nLNogV0lE3MtYqME1OonNK5x18PdhOLjf",
+        "./src/domain/entities/pix-key.entity.js": "sha384-NWXWgFf5B31RDkjZUiEI9r0nVY+RJe0817XNX33GYk+K5bNX1M33l4vDtpP9li3Q",
+        "./src/infrastructure/pwa/pwa-install.adapter.js": "sha384-XOk5WSXPeAXZRjOZKBDIfqFi4d/Y4Rat3hXM05jJqMGNd4OrGLvCdfDYxeJDEIk/",
+        "./src/infrastructure/pwa/service-worker.adapter.js": "sha384-nt64KZgC5UE77rjn5xL9miD6GnXR+EBq5mou3BHngueGP3Ch7IVrq4xm4fYXsioB",
+        "./src/infrastructure/share/browser-share.adapter.js": "sha384-7Sjp01hfs3Ffr9ErJCioJwtCAhPcYRUAMtrZC5qGBfEpyPEGWTG9dYoBmXBj1eL9",
+        "./src/infrastructure/storage/indexed-db-pix-key.repository.js": "sha384-djuXXh00PTK15Qx/P8GeJdOVMFC74q1CtfAkHj2wRKYl3MVjZwixhGo6lUTBeYcK",
+        "./src/main.js": "sha384-tnquEh1XNheYOak/T/KYyAeA8xjXXo4jPAVXGkMf6tYzgt2mFo5GoSbv47/xlGA3",
+        "./src/presentation/components/app-header/app-header.component.js": "sha384-HBqaLcqxBwsqpklYgal5XzZI4P3TbJUDXZZH1HaWImdnvWWVyYdIevodgImjMzVw",
         "https://ga.jspm.io/npm:@jspm/core@2.1.0/_/C7GZrc4O.js": "sha384-7BA1wTGX6TfnX1PVEYnKzX6AlyrTpyBK6+SCzPv/XcooYQix+LK8svULqStqIzsh",
         "https://ga.jspm.io/npm:@jspm/core@2.1.0/nodelibs/browser/buffer.js": "sha384-U3TD1RLqK9oLHfATmMNq4eS89TD8PaoauwqwUBNNdXhrybKIiWe0jY94gMzMMq2m",
         "https://ga.jspm.io/npm:@modnes/access-controller@1.0.0/access-controller.js": "sha384-gqeROFOE+APS5hQyWFaFZJsuAQ5HR9x5OhDgDuQgpRTHvhDC2potFMMDq7558N46",
@@ -135,7 +150,21 @@
       }
     }
     </script>
-    <link rel="modulepreload" href="./src/main.js" integrity="sha384-aYEgafzzUFnobW0De/i09TeiOfkEq4CNzyCOUJNNNYrAFOz+C89O/Xe6oJ9MFyrz" />
+    <link rel="modulepreload" href="./src/application/use-cases/delete-pix-key.use-case.js" integrity="sha384-krKbDLunpr6j9ZQbbqyWfIEVfCuvjawabC2I8gFg4hf+0zMDmK+ljAUWV6lsAh9L" />
+    <link rel="modulepreload" href="./src/application/use-cases/distribute-pix-charge.use-case.js" integrity="sha384-hMWAEAdms4g/ACJNXSzrLuKjXt3Wxt4lNlb7TVsWuJO/MoGLP7dtpF2kVK+qtBEl" />
+    <link rel="modulepreload" href="./src/application/use-cases/generate-pix-charge.use-case.js" integrity="sha384-TjU0cI5Yel8TJg/R4BMVDc3zDTEPQqsgFoHoBMpNarmUk3T7IOMXuFQwQDMxszxK" />
+    <link rel="modulepreload" href="./src/application/use-cases/install-pwa.use-case.js" integrity="sha384-L+5w/Ve3ydG3Yle+el6WNjYITAnGNdy9wp9H1cg0gYwjS9JxZZeL0gJcWp2xRpZz" />
+    <link rel="modulepreload" href="./src/application/use-cases/list-pix-keys.use-case.js" integrity="sha384-vnNc1Ea5bajvVBLrQpWjVXqHkOkPMIktDH3Y1P24OLZYT2BrYfguXgQpOYYibU8X" />
+    <link rel="modulepreload" href="./src/application/use-cases/save-pix-key.use-case.js" integrity="sha384-TLUzOFJfIl0ebksS0Hx3I185b7DhGiStwkxHEFyDNObFrQp73qInEchpF4xuHDnn" />
+    <link rel="modulepreload" href="./src/application/use-cases/select-pix-key.use-case.js" integrity="sha384-jLGXaxkzhfzdhfk/ZrnbxEpLwKDXND4kUFLSbQBoy6z0xCtQC5cc8rlFxbwytByO" />
+    <link rel="modulepreload" href="./src/domain/entities/pix-charge.entity.js" integrity="sha384-apdRQcRsyQfyadI2Btnfu8n75qfQLV0nLNogV0lE3MtYqME1OonNK5x18PdhOLjf" />
+    <link rel="modulepreload" href="./src/domain/entities/pix-key.entity.js" integrity="sha384-NWXWgFf5B31RDkjZUiEI9r0nVY+RJe0817XNX33GYk+K5bNX1M33l4vDtpP9li3Q" />
+    <link rel="modulepreload" href="./src/infrastructure/pwa/pwa-install.adapter.js" integrity="sha384-XOk5WSXPeAXZRjOZKBDIfqFi4d/Y4Rat3hXM05jJqMGNd4OrGLvCdfDYxeJDEIk/" />
+    <link rel="modulepreload" href="./src/infrastructure/pwa/service-worker.adapter.js" integrity="sha384-nt64KZgC5UE77rjn5xL9miD6GnXR+EBq5mou3BHngueGP3Ch7IVrq4xm4fYXsioB" />
+    <link rel="modulepreload" href="./src/infrastructure/share/browser-share.adapter.js" integrity="sha384-7Sjp01hfs3Ffr9ErJCioJwtCAhPcYRUAMtrZC5qGBfEpyPEGWTG9dYoBmXBj1eL9" />
+    <link rel="modulepreload" href="./src/infrastructure/storage/indexed-db-pix-key.repository.js" integrity="sha384-djuXXh00PTK15Qx/P8GeJdOVMFC74q1CtfAkHj2wRKYl3MVjZwixhGo6lUTBeYcK" />
+    <link rel="modulepreload" href="./src/main.js" integrity="sha384-tnquEh1XNheYOak/T/KYyAeA8xjXXo4jPAVXGkMf6tYzgt2mFo5GoSbv47/xlGA3" />
+    <link rel="modulepreload" href="./src/presentation/components/app-header/app-header.component.js" integrity="sha384-HBqaLcqxBwsqpklYgal5XzZI4P3TbJUDXZZH1HaWImdnvWWVyYdIevodgImjMzVw" />
     <link rel="modulepreload" href="https://ga.jspm.io/npm:@jspm/core@2.1.0/_/C7GZrc4O.js" integrity="sha384-7BA1wTGX6TfnX1PVEYnKzX6AlyrTpyBK6+SCzPv/XcooYQix+LK8svULqStqIzsh" />
     <link rel="modulepreload" href="https://ga.jspm.io/npm:@jspm/core@2.1.0/nodelibs/browser/buffer.js" integrity="sha384-U3TD1RLqK9oLHfATmMNq4eS89TD8PaoauwqwUBNNdXhrybKIiWe0jY94gMzMMq2m" />
     <link rel="modulepreload" href="https://ga.jspm.io/npm:@modnes/access-controller@1.0.0/access-controller.js" integrity="sha384-gqeROFOE+APS5hQyWFaFZJsuAQ5HR9x5OhDgDuQgpRTHvhDC2potFMMDq7558N46" />
