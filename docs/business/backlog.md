@@ -13,7 +13,7 @@ Este documento consolida o **Backlog do Produto e de Engenharia** do **Manda um 
 | **EP-01** | Fundação, Ferramental, Identidade Visual e CI/CD (`dev`)                   | Infraestrutura base, ESM/JSPM, Qualidade, Storybook |     `6 / 6`     | ✅ Concluído |
 | **EP-02** | Camada de Domínio e Casos de Uso (Clean Architecture)                      | `RN01`, `RN02`, `RN03`, `RN04`, `RN05`, `RN06`      |     `5 / 5`     | ✅ Concluído |
 | **EP-03** | Camada de Infraestrutura e Adaptadores Web APIs (Local-First)              | `RN01`, `RN05`, `RN06`, Offline/Service Worker      |     `4 / 4`     | ✅ Concluído |
-| **EP-04** | Casca da Aplicação, Roteamento SPA, Botão "Instalar" e Página "Sobre"      | `RN06`, `RN07`, `@modnes/router`, Layout Split-View |     `0 / 4`     | ⏳ Pendente  |
+| **EP-04** | Casca da Aplicação, Roteamento SPA, Botão "Instalar" e Página "Sobre"      | `RN06`, `RN07`, `@modnes/router`, Layout Split-View |     `1 / 4`     | ⏳ Pendente  |
 | **EP-05** | Gestão de Chaves PIX na Interface (`<pix-key-*>`)                          | `RN01`, `RN02`, `<dialog class="key-dialog">`       |     `0 / 3`     | ⏳ Pendente  |
 | **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")              | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas    |     `0 / 3`     | ⏳ Pendente  |
 | **EP-07** | Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA) e Deploy `stg`/`prd` | Testes de Integração, Storybook a11y, Releases      |     `0 / 3`     | ⏳ Pendente  |
@@ -297,7 +297,7 @@ flowchart TD
 
 > **Objetivo**: Construir a estrutura global da interface (`.app-root`, `<app-header>`, `.app-footer`), configurar as rotas `/` e `/sobre` com `@modnes/router` e entregar os requisitos completos do botão destacado **"Instalar"** (`RN06`) e da página **"Sobre"** (`RN07`).
 
-#### `US-04.1` — Casca Semântica Global e Layout Responsivo (Mobile-First & Desktop Split-View) (`⏳ Pendente` · `3 Story Points`)
+#### `US-04.1` — Casca Semântica Global e Layout Responsivo (Mobile-First & Desktop Split-View) (`✅ Concluído` · `3 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Recebedor** que acessa o Manda um PIX pelo smartphone ou computador,
@@ -334,11 +334,11 @@ flowchart TD
     - Quando os elementos interativos do rodapé ou links receberem foco,
     - Então deve ser aplicado o indicador de foco `:focus-visible` com contraste adequado conforme definido nos tokens.
 - **Tarefas de Desenvolvimento (Dev Tasks)**:
-  - [ ] **TASK-04.1.1 (Arquitetura CSS / Grid Responsivo & Split-View)**: Criar o arquivo [`src/presentation/styles/layout.css`](../../src/presentation/styles/layout.css) contendo o sistema de grid, container responsivo, regras de quebra para `< 768px` (coluna única) e `>= 768px` (`.charge-page--split` em 2 colunas CSS Grid de até 960px).
-  - [ ] **TASK-04.1.2 (Arquitetura CSS / Estilos BEM da Casca Global)**: Criar o arquivo [`src/presentation/styles/app-shell.css`](../../src/presentation/styles/app-shell.css) definindo os estilos BEM para `.app-root`, `.app-header`, `.app-main`, `.app-footer`, `.app-footer__status`, `.app-footer__dot` e `.app-footer__link`, consumindo [`tokens.css`](../../src/presentation/styles/tokens.css).
-  - [ ] **TASK-04.1.3 (Marcação Semântica no `index.html` & Vinculação de Folhas de Estilo)**: Atualizar [`index.html`](../../index.html) importando `layout.css` e `app-shell.css`, e estruturando os landmarks `<main id="app" class="app-root">`, casca inicial com `<header class="app-header">`, `<div id="router-outlet" class="app-main">` e `<footer class="app-footer">` alinhado ao protótipo visual.
-  - [ ] **TASK-04.1.4 (TDD / Testes Automatizados de DOM e Acessibilidade da Casca)**: Criar testes automatizados em [`src/presentation/styles/app-shell.test.js`](../../src/presentation/styles/app-shell.test.js) (ou equivalente DOM em Vitest) validando a estrutura semântica dos elementos, classes BEM esperadas e landmarks de acessibilidade da casca.
-  - [ ] **TASK-04.1.5 (Qualidade, Linters & Documentação)**: Validar conformidade de formatação e tipagem com `npm run lint`, `npm run format:check` e `npm test`, e atualizar a documentação de arquitetura de apresentação em [`docs/design/modules.md`](../design/modules.md).
+  - [x] **TASK-04.1.1 (Arquitetura CSS / Grid Responsivo & Split-View)**: Criar o arquivo [`src/presentation/styles/layout.css`](../../src/presentation/styles/layout.css) contendo o sistema de grid, container responsivo, regras de quebra para `< 768px` (coluna única) e `>= 768px` (`.charge-page--split` em 2 colunas CSS Grid de até 960px).
+  - [x] **TASK-04.1.2 (Arquitetura CSS / Estilos BEM da Casca Global)**: Criar o arquivo [`src/presentation/styles/app-shell.css`](../../src/presentation/styles/app-shell.css) definindo os estilos BEM para `.app-root`, `.app-header`, `.app-main`, `.app-footer`, `.app-footer__status`, `.app-footer__dot` e `.app-footer__link`, consumindo [`tokens.css`](../../src/presentation/styles/tokens.css).
+  - [x] **TASK-04.1.3 (Marcação Semântica no `index.html` & Vinculação de Folhas de Estilo)**: Atualizar [`index.html`](../../index.html) importando `layout.css` e `app-shell.css`, e estruturando os landmarks `<main id="app" class="app-root">`, casca inicial com `<header class="app-header">`, `<div id="router-outlet" class="app-main">` e `<footer class="app-footer">` alinhado ao protótipo visual.
+  - [x] **TASK-04.1.4 (TDD / Testes Automatizados de DOM e Acessibilidade da Casca)**: Criar testes automatizados em [`src/presentation/styles/app-shell.test.js`](../../src/presentation/styles/app-shell.test.js) (ou equivalente DOM em Vitest) validando a estrutura semântica dos elementos, classes BEM esperadas e landmarks de acessibilidade da casca.
+  - [x] **TASK-04.1.5 (Qualidade, Linters & Documentação)**: Validar conformidade de formatação e tipagem com `npm run lint`, `npm run format:check` e `npm test`, e atualizar a documentação de arquitetura de apresentação em [`docs/design/modules.md`](../design/modules.md).
 
 #### `US-04.2` — Componente `<app-header>` com Botão Destacado "Instalar" (`RN06`) e Atalho "Sobre" (`RN07`) (`⏳ Pendente`)
 

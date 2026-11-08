@@ -1,0 +1,77 @@
+/* ==========================================================================
+   ARQUITETURA DE LAYOUT & GRID RESPONSIVO (layout.css)
+   Manda um PIX — Mobile-First & Desktop Split-View (TASK-04.1.1)
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   UTILITÁRIOS GLOBAIS DE LAYOUT
+   ----------------------------------------------------------------------------- */
+.hidden {
+  display: none;
+}
+
+/* -----------------------------------------------------------------------------
+   CONTAINER RESPONSIVO PRINCIPAL (.app-container)
+   ----------------------------------------------------------------------------- */
+.app-container {
+  width: 100%;
+  max-width: 440px;
+  margin-inline: auto;
+  padding-inline: var(--space-md, 1rem);
+  box-sizing: border-box;
+}
+
+/* -----------------------------------------------------------------------------
+   GRADE DA PÁGINA DE COBRANÇA (.charge-page) — MOBILE-FIRST (< 768px)
+   Coluna única otimizada para ergonomia de alcance com uma mão (thumb-zone)
+   ----------------------------------------------------------------------------- */
+.charge-page {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md, 1rem);
+  align-items: start;
+  width: 100%;
+}
+
+/* Painel de formulário e seleção de chave */
+.charge-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 1rem);
+  width: 100%;
+}
+
+/* Painel de exibição do resultado e distribuição do QR Code */
+.charge-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 1rem);
+  width: 100%;
+}
+
+/* Cartão de superfície para blocos da página */
+.card {
+  background-color: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-md, 1rem);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(11, 24, 52, 0.08));
+  box-sizing: border-box;
+}
+
+/* -----------------------------------------------------------------------------
+   DESKTOP & TABLET SPLIT-VIEW (>= 768px)
+   Exibição lado a lado em 2 colunas com CSS Grid até 960px
+   ----------------------------------------------------------------------------- */
+@media (min-width: 768px) {
+  .app-container {
+    max-width: 960px;
+    padding-inline: var(--space-lg, 1.5rem);
+  }
+
+  .charge-page--split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-lg, 1.5rem);
+    align-items: start;
+  }
+}
