@@ -956,16 +956,117 @@ flowchart LR
     T6 & T7 --> T8["TASK-06.2.8: Documentação Viva"]
 ```
 
-#### `US-06.3` — Ações de Distribuição da Cobrança: Copiar, Compartilhar (WhatsApp) e Salvar PNG (`⏳ Pendente`)
+#### `US-06.3` — Ações de Distribuição da Cobrança: Copiar, Compartilhar (WhatsApp) e Salvar PNG (`⏳ Pendente` · `3 Story Points`)
 
-- **História**: Como **Recebedor**, quero copiar a chave de cobrança com um toque, compartilhá-la pelo WhatsApp ou baixar a imagem PNG do QR Code no meu dispositivo.
-- **Regras de Negócio**: `RN05`.
-- **Critérios de Aceite**:
-  - [ ] Integrar no `<pix-charge-result>` a grade tripla de botões (`.charge-result__actions`):
-    1. **Copiar (`.charge-result__btn--copy`)**: copia o `brCode`, alterna o ícone `<vector-icon name="copy">` para `<vector-icon name="check">` com rótulo _"Copiado!"_ e anuncia em região `aria-live="polite"`.
-    2. **WhatsApp / Compartilhar (`.charge-result__btn--share`)**: aciona `<vector-icon name="share">` invocando `navigator.share` ou fallback direto para o WhatsApp (`https://wa.me/?text=...`).
-    3. **Salvar PNG (`.charge-result__btn--download`)**: aciona `<vector-icon name="download">` gerando e baixando localmente o arquivo `mandaumpix-qrcode.png`.
-  - [ ] Criar testes unitários validando o acionamento de cada ação e o feedback visual de cópia.
+- **História (Narrativa Canônica)**:
+  > **Como** **Recebedor** que gerou uma cobrança no Manda um PIX,
+  > **Quero** acionar com um toque as opções de saída (copiar o código PIX Copia e Cola com feedback visual imediato, compartilhar via Web Share API ou WhatsApp, e baixar a imagem PNG em alta resolução do QR Code),
+  > **Para que** eu envie a cobrança instantaneamente ao pagador pelo canal mais conveniente ou arquive a imagem para impressão e exibição física, sem atrito e com confirmação acessível.
+- **Estimativa de Complexidade**: **`3 Story Points`** (Complexidade Técnica: Média · Esforço: Médio · Incerteza: Baixa).
+- **Regras de Negócio e Invariantes**: `RN05` ([Modelo de Domínio](./domain_model.md), [Especificações e Contratos](../design/api_specs.md) e [Proposta de Interface](../design/ui_proposal.md)).
+  - **INV-01 (Semântica e Composição BEM Canônica na Grade de Ações)**: A grade estrutural `.charge-result__actions` de `<pix-charge-result>` incorpora três botões de ação interativos:
+    - `.charge-result__btn.charge-result__btn--copy` (Copiar)
+    - `.charge-result__btn.charge-result__btn--share` (WhatsApp / Compartilhar)
+    - `.charge-result__btn.charge-result__btn--download` (Salvar PNG)
+      Cada botão deve possuir `type="button"`, ícone vetorial temático via `<vector-icon>` e rótulo textual semântico legível.
+  - **INV-02 (Ação Copiar e Feedback Visual Temporário — `RN05`)**:
+    - O botão `.charge-result__btn--copy` inicia com o ícone `<vector-icon name="copy">` e o texto `"Copiar"`.
+    - Ao ser acionado (clique ou teclado), executa o caso de uso `DistributePixChargeUseCase` com a ação `COPY` e a cobrança ativa (`cobranca.chave_cobranca`).
+    - Em caso de sucesso, transita imediatamente para o estado copiado:
+      - Aplica a classe modificadora `.charge-result__btn--copied`.
+      - Alterna o ícone para `<vector-icon name="check">` e o texto para `"Copiado!"`.
+      - Anuncia a mensagem `"Código PIX Copia e Cola copiado para a área de transferência!"` na região `aria-live="polite"`.
+      - Dispara o evento customizado borbulhante `CustomEvent("charge-copied", { bubbles: true, composed: true, detail: { cobranca, chave_cobranca } })`.
+    - Após um intervalo de `2500ms` (configurável via constante), o botão reverte automaticamente para o estado inicial (`"Copiar"` e ícone `"copy"`). Caso um novo clique ocorra antes da expiração, o timer anterior deve ser cancelado e reiniciado de forma idempotente.
+  - **INV-03 (Tratamento Resiliente de Falha na Área de Transferência)**:
+    - Caso a API de área de transferência falhe ou seja bloqueada pelo navegador (`COPY_FAILED` / `CLIPBOARD_UNAVAILABLE`), o componente seleciona automaticamente todo o texto do container `.charge-result__brcode` (`window.getSelection()`) e anuncia em `aria-live="polite"` a mensagem `"Não foi possível copiar automaticamente. O código foi selecionado para cópia manual."`.
+  - **INV-04 (Ação Compartilhar / WhatsApp — `RN05`)**:
+    - O botão `.charge-result__btn--share` exibe o ícone `<vector-icon name="share">` e o rótulo `"WhatsApp"`.
+    - Ao ser acionado, executa `DistributePixChargeUseCase` com a ação `SHARE` (priorizando Web Share API quando disponível ou fallback determinístico para `https://wa.me/?text=${encodeURIComponent(cobranca.chave_cobranca)}`).
+    - Despacha o evento `CustomEvent("charge-shared", { bubbles: true, composed: true, detail: { cobranca, channel, result } })` e anuncia a conclusão em `aria-live="polite"`.
+  - **INV-05 (Ação Salvar Imagem PNG — `RN05`)**:
+    - O botão `.charge-result__btn--download` exibe o ícone `<vector-icon name="download">` e o rótulo `"Salvar PNG"`.
+    - Ao ser acionado, executa `DistributePixChargeUseCase` com a ação `DOWNLOAD_QR` (gerando/baixando localmente o arquivo `"mandaumpix-qrcode.png"` em dimensões `512x512px`).
+    - Despacha o evento `CustomEvent("charge-downloaded", { bubbles: true, composed: true, detail: { cobranca, fileName: "mandaumpix-qrcode.png" } })` e anuncia em `aria-live="polite"`.
+  - **INV-06 (Injeção de Dependências e Desacoplamento)**:
+    - O componente resolve `DistributePixChargeUseCase` via `this.useInjectable("distribute-pix-charge-use-case")` ou via propriedade `distributePixChargeUseCase`.
+    - Caso nenhuma dependência seja injetada (ex.: Storybook isolado ou testes unitários sem DI), implementa fallback seguro que utiliza instâncias padrão ou emite os eventos de saída normalmente.
+  - **INV-07 (Acessibilidade WCAG 2.2 AA & Alvos de Toque)**:
+    - Cada um dos três botões possui altura mínima $\ge 48\text{px}$ e largura mínima $\ge 44\text{px}$, satisfazendo os critérios de alvo de toque para dispositivos móveis.
+    - Contraste cromático estrito ($\ge 4.5:1$) com tokens de cores do tema:
+      - Copiar: fundo `--color-brand-primary` (`#0b1834`), texto branco e acento verde.
+      - WhatsApp: fundo `--color-success` (`#059669`), texto branco.
+      - Salvar PNG: fundo `--color-surface-elevated` (`#ffffff`), borda `--color-border-strong` e texto `--color-text-primary`.
+    - Anéis de foco `:focus-visible` de alto contraste e suporte a navegação integral por teclado (`Tab`, `Enter`, `Space`).
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Cópia do Código Copia e Cola com Feedback Visual e Acessível — Happy Path)**:
+    - Dado que uma cobrança PIX válida está sendo exibida no componente `<pix-charge-result>`,
+    - Quando o usuário clicar no botão `.charge-result__btn--copy` (ou acioná-lo via tecla `Enter`/`Space`),
+    - Então o caso de uso `DistributePixChargeUseCase` deve ser executado com `{ action: "COPY", cobranca }`,
+    - E o payload `cobranca.chave_cobranca` deve ser enviado para a área de transferência do dispositivo,
+    - E o botão deve receber a classe `.charge-result__btn--copied`,
+    - E o ícone deve alternar para `<vector-icon name="check">` e o texto para `"Copiado!"`,
+    - E a região `aria-live="polite"` deve anunciar `"Código PIX Copia e Cola copiado para a área de transferência!"`,
+    - E o evento borbulhante `"charge-copied"` deve ser despachado.
+  - **Cenário 02 (Reversão Automática do Estado do Botão Copiar após Timeout)**:
+    - Dado que o botão Copiar está no estado transitório `"Copiado!"` (`.charge-result__btn--copied`),
+    - Quando transcorrer o tempo limite de `2500ms`,
+    - Então a classe `.charge-result__btn--copied` deve ser removida,
+    - E o rótulo do botão deve retornar para `"Copiar"`,
+    - E o ícone deve retornar para `<vector-icon name="copy">`.
+  - **Cenário 03 (Fallback de Cópia Manual em caso de Falha de Permissão ou Indisponibilidade do Clipboard)**:
+    - Dado que o navegador bloqueia o acesso à API Clipboard (`writeText` rejeita ou indisponível),
+    - Quando o usuário tentar copiar a cobrança,
+    - Então o erro deve ser capturado de forma resiliente sem quebrar a UI,
+    - E o texto dentro de `.charge-result__brcode` deve ser selecionado programaticamente,
+    - E a região `aria-live="polite"` deve anunciar `"Não foi possível copiar automaticamente. O código foi selecionado para cópia manual."`.
+  - **Cenário 04 (Compartilhamento via Web Share API e Fallback WhatsApp)**:
+    - Dado que uma cobrança PIX está ativa na interface,
+    - Quando o usuário clicar no botão `.charge-result__btn--share`,
+    - Então o caso de uso de distribuição deve acionar o gateway de compartilhamento,
+    - E se a Web Share API for suportada, deve invocar `navigator.share({ title, text: cobranca.chave_cobranca })`,
+    - E se a Web Share API não for suportada, deve abrir a URL `https://wa.me/?text=...` em nova aba,
+    - E deve despachar o evento customizado `"charge-shared"`,
+    - E a região `aria-live="polite"` deve anunciar `"Cobrança PIX aberta para compartilhamento."`.
+  - **Cenário 05 (Download Local do QR Code em Imagem PNG)**:
+    - Dado que uma cobrança PIX com QR Code está sendo exibida,
+    - Quando o usuário clicar no botão `.charge-result__btn--download`,
+    - Então o caso de uso deve solicitar o download do arquivo `"mandaumpix-qrcode.png"` em resolução `512x512px`,
+    - E o arquivo PNG deve ser baixado no sistema de arquivos local do dispositivo,
+    - E deve despachar o evento customizado `"charge-downloaded"`,
+    - E a região `aria-live="polite"` deve anunciar `"Download da imagem do QR Code em PNG iniciado."`.
+  - **Cenário 06 (Comportamento dos Botões no Estado Vazio / Aguardando Geração)**:
+    - Dado que o componente `<pix-charge-result>` está no estado aguardando (`charge = null`),
+    - Quando a interface for renderizada,
+    - Então a grade de ações não deve renderizar botões interativos (ou deve mantê-los desabilitados e inacessíveis por teclado),
+    - E tentativas de acionamento não devem disparar casos de uso nem eventos de distribuição.
+  - **Cenário 07 (Navegação por Teclado, Alvos de Toque e Acessibilidade — WCAG 2.2 AA)**:
+    - Dado que o usuário navega pelo resultado da cobrança utilizando navegação por teclado (`Tab`),
+    - Quando o foco atingir a grade de ações,
+    - Então os botões Copiar, WhatsApp e Salvar PNG devem ser focáveis sequencialmente,
+    - E cada botão deve apresentar anel de foco `:focus-visible` de alto contraste,
+    - E todos os botões devem ter altura mínima $\ge 48\text{px}$ e alvos de toque adequados para dispositivos móveis,
+    - E não deve haver violações de acessibilidade no `@storybook/addon-a11y`.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-06.3.1 (Constantes, Seletores BEM, Textos e Mensagens de Ação)**: Atualizar [`src/presentation/components/pix-charge-result/pix-charge-result.constants.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.constants.js) adicionando seletores BEM (`.charge-result__btn`, `.charge-result__btn--copy`, `.charge-result__btn--copied`, `.charge-result__btn--share`, `.charge-result__btn--download`), novos eventos (`charge-copied`, `charge-shared`, `charge-downloaded`), timeout de cópia (`COPY_FEEDBACK_DURATION_MS = 2500`), textos de feedback e mensagens `aria-live`.
+  - [ ] **TASK-06.3.2 (TDD / Testes Unitários de Constantes e Mensagens de Distribuição)**: Criar testes unitários em [`src/presentation/components/pix-charge-result/pix-charge-result.constants.test.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.constants.test.js) cobrindo as novas constantes, eventos, mensagens acessíveis e seletores.
+  - [ ] **TASK-06.3.3 (TDD / Testes Unitários de Renderização e Interação das Ações de Saída)**: Expandir [`src/presentation/components/pix-charge-result/pix-charge-result.test.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.test.js) cobrindo a renderização dos botões, injeção de dependência do caso de uso `DistributePixChargeUseCase`, clique em Copiar (feedback "Copiado!" e temporizador), fallback de seleção manual em falhas, acionamento de WhatsApp/Web Share, acionamento de Salvar PNG e emissão dos eventos customizados.
+  - [ ] **TASK-06.3.4 (Implementação / Integração das Ações no Web Component `PixChargeResultComponent`)**: Implementar a lógica de distribuição em [`src/presentation/components/pix-charge-result/pix-charge-result.component.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.component.js), integrando `this.useInjectable("distribute-pix-charge-use-case")`, renderização declarativa dos botões no container `.charge-result__actions`, gerenciamento do timer de feedback visual de cópia e anúncios em `aria-live="polite"`.
+  - [ ] **TASK-06.3.5 (Estilização CSS BEM, Cores dos Botões, Alvos de Toque e Estados Visuais)**: Atualizar [`src/presentation/components/pix-charge-result/pix-charge-result.css`](../../src/presentation/components/pix-charge-result/pix-charge-result.css) e [`src/presentation/components/pix-charge-result/pix-charge-result.css.test.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.css.test.js) estilizando `.charge-result__btn`, variações `--copy`, `--copied`, `--share`, `--download`, altura mínima $\ge 48\text{px}$, alinhamento flex vertical, estados `:hover` e `:focus-visible`.
+  - [ ] **TASK-06.3.6 (Catálogo Storybook & Auditoria a11y das Ações de Distribuição)**: Atualizar [`src/presentation/components/pix-charge-result/pix-charge-result.stories.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.stories.js) com stories interativas simulando as ações: _Cobrança com Ações Ativas_, _Estado Copiado Ativo ("Copiado!")_ e validação automatizada de acessibilidade `@storybook/addon-a11y`.
+  - [ ] **TASK-06.3.7 (Exportação Pública no Módulo Principal, Documentação Viva & Validação Geral)**: Reexportar novos identificadores e constantes em [`src/main.js`](../../src/main.js), atualizar [`docs/design/modules.md`](../design/modules.md) e [`docs/business/backlog.md`](./backlog.md), e validar suíte completa (`npm run lint`, `npm run format:check` e `npm test`).
+
+```mermaid
+flowchart LR
+    T1["TASK-06.3.1: Constantes & Textos de Ação"] --> T2["TASK-06.3.2: Testes Constantes (TDD)"]
+    T1 --> T5["TASK-06.3.5: Estilos CSS BEM dos Botões"]
+    T2 --> T3["TASK-06.3.3: Testes Unitários de Interação (TDD)"]
+    T3 --> T4["TASK-06.3.4: Integração de Ações no PixChargeResult"]
+    T5 --> T4
+    T4 --> T6["TASK-06.3.6: Storybook & Auditoria a11y"]
+    T4 --> T7["TASK-06.3.7: Exportação & Documentação"]
+    T6 & T7 --> T8["Validação Completa (Lint, Formato & Testes)"]
+```
 
 ---
 
