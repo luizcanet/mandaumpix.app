@@ -3,18 +3,33 @@ import {
   CHARGE_RESULT_CLASSES,
   CHARGE_RESULT_EVENT_NAMES,
   CHARGE_RESULT_ICONS,
+  COPY_FEEDBACK_DURATION_MS,
   DEFAULT_CHARGE_RESULT_ACCOUNT_FALLBACK,
   DEFAULT_CHARGE_RESULT_AMOUNT_OPEN,
   DEFAULT_CHARGE_RESULT_AMOUNT_PREFIX,
   DEFAULT_CHARGE_RESULT_ARIA_LABEL,
   DEFAULT_CHARGE_RESULT_BRCODE_ARIA_LABEL,
   DEFAULT_CHARGE_RESULT_BRCODE_TITLE,
+  DEFAULT_CHARGE_RESULT_BTN_COPY_ARIA_LABEL,
+  DEFAULT_CHARGE_RESULT_BTN_DOWNLOAD_ARIA_LABEL,
+  DEFAULT_CHARGE_RESULT_BTN_SHARE_ARIA_LABEL,
+  DEFAULT_CHARGE_RESULT_COPIED_LABEL,
+  DEFAULT_CHARGE_RESULT_COPY_LABEL,
+  DEFAULT_CHARGE_RESULT_DOWNLOAD_FILENAME,
+  DEFAULT_CHARGE_RESULT_DOWNLOAD_LABEL,
+  DEFAULT_CHARGE_RESULT_LIVE_COPIED,
+  DEFAULT_CHARGE_RESULT_LIVE_COPY_FALLBACK,
+  DEFAULT_CHARGE_RESULT_LIVE_DOWNLOADED,
+  DEFAULT_CHARGE_RESULT_LIVE_SHARED,
   DEFAULT_CHARGE_RESULT_MODE_FIXED,
   DEFAULT_CHARGE_RESULT_MODE_OPEN,
   DEFAULT_CHARGE_RESULT_QR_ALT,
   DEFAULT_CHARGE_RESULT_READY_BADGE,
+  DEFAULT_CHARGE_RESULT_SHARE_LABEL,
   DEFAULT_CHARGE_RESULT_WAITING_DESCRIPTION,
   DEFAULT_CHARGE_RESULT_WAITING_TITLE,
+  DEFAULT_COPY_FEEDBACK_DURATION_MS,
+  DISTRIBUTE_PIX_CHARGE_INJECTABLE_TOKEN,
   formatAccountSummary,
   formatChargeAmountBadge,
   formatCurrencyBRL,
@@ -92,6 +107,52 @@ describe("pix-charge-result.constants", () => {
         "Código PIX Copia e Cola",
       );
     });
+
+    it("deve definir os rótulos de texto padrão dos botões de ação (US-06.3 / RN05)", () => {
+      expect(DEFAULT_CHARGE_RESULT_COPY_LABEL).toBe("Copiar");
+      expect(DEFAULT_CHARGE_RESULT_COPIED_LABEL).toBe("Copiado!");
+      expect(DEFAULT_CHARGE_RESULT_SHARE_LABEL).toBe("WhatsApp");
+      expect(DEFAULT_CHARGE_RESULT_DOWNLOAD_LABEL).toBe("Salvar PNG");
+      expect(DEFAULT_CHARGE_RESULT_DOWNLOAD_FILENAME).toBe(
+        "mandaumpix-qrcode.png",
+      );
+    });
+
+    it("deve definir os rótulos de acessibilidade (aria-label) dos botões de ação", () => {
+      expect(DEFAULT_CHARGE_RESULT_BTN_COPY_ARIA_LABEL).toBe(
+        "Copiar código PIX Copia e Cola",
+      );
+      expect(DEFAULT_CHARGE_RESULT_BTN_SHARE_ARIA_LABEL).toBe(
+        "Compartilhar cobrança PIX via WhatsApp",
+      );
+      expect(DEFAULT_CHARGE_RESULT_BTN_DOWNLOAD_ARIA_LABEL).toBe(
+        "Baixar imagem do QR Code em formato PNG",
+      );
+    });
+
+    it("deve definir as mensagens de feedback acessível na região aria-live", () => {
+      expect(DEFAULT_CHARGE_RESULT_LIVE_COPIED).toContain(
+        "área de transferência",
+      );
+      expect(DEFAULT_CHARGE_RESULT_LIVE_COPY_FALLBACK).toContain(
+        "cópia manual",
+      );
+      expect(DEFAULT_CHARGE_RESULT_LIVE_SHARED).toContain("compartilhamento");
+      expect(DEFAULT_CHARGE_RESULT_LIVE_DOWNLOADED).toContain(
+        "Download da imagem",
+      );
+    });
+
+    it("deve definir a duração padrão do feedback transitório de cópia como 2500ms", () => {
+      expect(COPY_FEEDBACK_DURATION_MS).toBe(2500);
+      expect(DEFAULT_COPY_FEEDBACK_DURATION_MS).toBe(2500);
+    });
+
+    it("deve definir o token do caso de uso de distribuição no contêiner DI", () => {
+      expect(DISTRIBUTE_PIX_CHARGE_INJECTABLE_TOKEN).toBe(
+        "distribute-pix-charge-use-case",
+      );
+    });
   });
 
   describe("Mapeamento de classes BEM", () => {
@@ -150,6 +211,15 @@ describe("pix-charge-result.constants", () => {
       );
       expect(CHARGE_RESULT_CLASSES.BRCODE).toBe("charge-result__brcode");
       expect(CHARGE_RESULT_CLASSES.ACTIONS).toBe("charge-result__actions");
+      expect(CHARGE_RESULT_CLASSES.BTN).toBe("charge-result__btn");
+      expect(CHARGE_RESULT_CLASSES.BTN_COPY).toBe("charge-result__btn--copy");
+      expect(CHARGE_RESULT_CLASSES.BTN_COPIED).toBe(
+        "charge-result__btn--copied",
+      );
+      expect(CHARGE_RESULT_CLASSES.BTN_SHARE).toBe("charge-result__btn--share");
+      expect(CHARGE_RESULT_CLASSES.BTN_DOWNLOAD).toBe(
+        "charge-result__btn--download",
+      );
       expect(CHARGE_RESULT_CLASSES.LIVE_REGION).toBe(
         "charge-result__live-region",
       );
@@ -168,6 +238,11 @@ describe("pix-charge-result.constants", () => {
     it("deve expor os nomes dos eventos customizados do componente", () => {
       expect(CHARGE_RESULT_EVENT_NAMES.CHARGE_CHANGED).toBe("charge-changed");
       expect(CHARGE_RESULT_EVENT_NAMES.CHARGE_CLEARED).toBe("charge-cleared");
+      expect(CHARGE_RESULT_EVENT_NAMES.CHARGE_COPIED).toBe("charge-copied");
+      expect(CHARGE_RESULT_EVENT_NAMES.CHARGE_SHARED).toBe("charge-shared");
+      expect(CHARGE_RESULT_EVENT_NAMES.CHARGE_DOWNLOADED).toBe(
+        "charge-downloaded",
+      );
     });
   });
 
