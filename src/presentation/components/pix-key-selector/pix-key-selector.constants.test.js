@@ -127,4 +127,3 @@ describe("pix-key-selector.constants", () => {
     });
   });
 });
-

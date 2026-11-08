@@ -99,4 +99,3 @@ export const KEY_SELECTOR_INJECTABLES = Object.freeze({
   LIST_PIX_KEYS_USE_CASE: "list-pix-keys-use-case",
   PIX_KEY_REPOSITORY: "pix-key-repository",
 });
-
