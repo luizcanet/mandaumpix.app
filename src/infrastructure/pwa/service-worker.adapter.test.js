@@ -19,9 +19,9 @@ describe("ServiceWorkerAdapter & Helpers", () => {
     it("deve exportar valores padrão consistentes para scripts e escopos", () => {
       expect(DEFAULT_SW_SCRIPT_URL).toBe("./sw.js");
       expect(DEFAULT_SW_SCOPE).toBe("./");
-      expect(CACHE_VERSION).toBe("v1.0.1");
-      expect(PRECACHE_NAME).toBe("mandaumpix-v1.0.1-precache");
-      expect(RUNTIME_CACHE_NAME).toBe("mandaumpix-v1.0.1-runtime");
+      expect(CACHE_VERSION).toBe("1.0.0");
+      expect(PRECACHE_NAME).toBe("mandaumpix-1.0.0-precache");
+      expect(RUNTIME_CACHE_NAME).toBe("mandaumpix-1.0.0-runtime");
     });
 
     it("deve conter códigos de erro e status congelados", () => {
