@@ -169,6 +169,72 @@ describe("PixKeyDialogComponent (TASK-05.3.2: Testes Unitários de Renderizaçã
       expect(closeListener).toHaveBeenCalledTimes(1);
     });
 
+    it("deve fechar o modal ao clicar no backdrop externo", () => {
+      document.body.appendChild(dialogElement);
+      dialogElement.openModal();
+
+      const closeListener = vi.fn();
+      dialogElement.addEventListener(
+        KEY_DIALOG_EVENT_NAMES.CLOSE_KEY_DIALOG,
+        closeListener,
+      );
+
+      const dialog = dialogElement.querySelector("dialog");
+      vi.spyOn(dialog, "getBoundingClientRect").mockReturnValue({
+        top: 50,
+        bottom: 450,
+        left: 50,
+        right: 450,
+        width: 400,
+        height: 400,
+      });
+
+      // Clique fora dos limites da caixa modal
+      dialog.dispatchEvent(
+        new MouseEvent("click", {
+          clientX: 10,
+          clientY: 10,
+          bubbles: true,
+        }),
+      );
+
+      expect(dialogElement.open).toBe(false);
+      expect(closeListener).toHaveBeenCalledTimes(1);
+    });
+
+    it("deve fechar o modal ao clicar no backdrop externo", () => {
+      document.body.appendChild(dialogElement);
+      dialogElement.openModal();
+
+      const closeListener = vi.fn();
+      dialogElement.addEventListener(
+        KEY_DIALOG_EVENT_NAMES.CLOSE_KEY_DIALOG,
+        closeListener,
+      );
+
+      const dialog = dialogElement.querySelector("dialog");
+      vi.spyOn(dialog, "getBoundingClientRect").mockReturnValue({
+        top: 50,
+        bottom: 450,
+        left: 50,
+        right: 450,
+        width: 400,
+        height: 400,
+      });
+
+      // Clique fora dos limites da caixa modal
+      dialog.dispatchEvent(
+        new MouseEvent("click", {
+          clientX: 10,
+          clientY: 10,
+          bubbles: true,
+        }),
+      );
+
+      expect(dialogElement.open).toBe(false);
+      expect(closeListener).toHaveBeenCalledTimes(1);
+    });
+
     it("deve abrir o modal ao interceptar o evento global open-key-dialog", () => {
       document.body.appendChild(dialogElement);
       expect(dialogElement.open).toBe(false);
@@ -380,6 +446,58 @@ describe("PixKeyDialogComponent (TASK-05.3.2: Testes Unitários de Renderizaçã
 
       // Alterna o tipo
       dialogElement.selectedKeyType = PIX_KEY_TYPES.EMAIL;
+      expect(
+        dialogElement.querySelector(`.${KEY_DIALOG_CLASSES.ALERT}`),
+      ).toBeNull();
+      expect(dialogElement.errorMessage).toBeNull();
+    });
+
+    it("deve limpar o alerta de erro reativamente ao digitar em qualquer campo do formulário", async () => {
+      document.body.appendChild(dialogElement);
+      dialogElement.openModal();
+
+      const keyInput = dialogElement.querySelector(`input[name="valor_chave"]`);
+      keyInput.value = "123.456.789-00";
+
+      const form = dialogElement.querySelector(`.${KEY_DIALOG_CLASSES.FORM}`);
+      form.dispatchEvent(new Event("submit", { cancelable: true }));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(
+        dialogElement.querySelector(`.${KEY_DIALOG_CLASSES.ALERT}`),
+      ).not.toBeNull();
+
+      // Dispara evento de digitação no formulário atualizado
+      const currentForm = dialogElement.querySelector(`.${KEY_DIALOG_CLASSES.FORM}`);
+      currentForm.dispatchEvent(new Event("input", { bubbles: true }));
+
+      expect(
+        dialogElement.querySelector(`.${KEY_DIALOG_CLASSES.ALERT}`),
+      ).toBeNull();
+      expect(dialogElement.errorMessage).toBeNull();
+    });
+
+    it("deve limpar o alerta de erro reativamente ao digitar em qualquer campo do formulário", async () => {
+      document.body.appendChild(dialogElement);
+      dialogElement.openModal();
+
+      const keyInput = dialogElement.querySelector(`input[name="valor_chave"]`);
+      keyInput.value = "123.456.789-00";
+
+      const form = dialogElement.querySelector(`.${KEY_DIALOG_CLASSES.FORM}`);
+      form.dispatchEvent(new Event("submit", { cancelable: true }));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(
+        dialogElement.querySelector(`.${KEY_DIALOG_CLASSES.ALERT}`),
+      ).not.toBeNull();
+
+      // Dispara evento de digitação no formulário atualizado
+      const currentForm = dialogElement.querySelector(
+        `.${KEY_DIALOG_CLASSES.FORM}`,
+      );
+      currentForm.dispatchEvent(new Event("input", { bubbles: true }));
+
       expect(
         dialogElement.querySelector(`.${KEY_DIALOG_CLASSES.ALERT}`),
       ).toBeNull();

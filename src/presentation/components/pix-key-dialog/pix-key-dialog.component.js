@@ -511,6 +511,21 @@ export class PixKeyDialogComponent extends CustomElement {
       this.closeModal();
     });
 
+    // Fechar ao clicar no backdrop (fora da caixa do modal)
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) {
+        const rect = dialog.getBoundingClientRect();
+        const isInDialog =
+          rect.top <= event.clientY &&
+          event.clientY <= rect.top + rect.height &&
+          rect.left <= event.clientX &&
+          event.clientX <= rect.left + rect.width;
+        if (!isInDialog) {
+          this.closeModal();
+        }
+      }
+    });
+
     // Pílulas de tipo
     const typeButtons = dialog.querySelectorAll(
       `.${KEY_DIALOG_CLASSES.TYPE_BTN}`,
@@ -524,9 +539,24 @@ export class PixKeyDialogComponent extends CustomElement {
       });
     });
 
-    // Formulário Submit
+    // Formulário Submit e limpeza reativa de erros ao digitar
     const form = dialog.querySelector(`.${KEY_DIALOG_CLASSES.FORM}`);
     if (form) {
+      form.addEventListener("input", () => {
+        if (this.#errorMessage) {
+          this.#errorMessage = null;
+          this.#errorField = null;
+          const alert = dialog.querySelector(`.${KEY_DIALOG_CLASSES.ALERT}`);
+          if (alert) alert.remove();
+          const errorInputs = dialog.querySelectorAll(
+            `.${KEY_DIALOG_CLASSES.INPUT_ERROR}`,
+          );
+          errorInputs.forEach((el) =>
+            el.classList.remove(KEY_DIALOG_CLASSES.INPUT_ERROR),
+          );
+        }
+      });
+
       form.addEventListener("submit", (e) => this.handleFormSubmit(e));
     }
   }
