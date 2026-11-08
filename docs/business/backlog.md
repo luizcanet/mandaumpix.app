@@ -13,7 +13,7 @@ Este documento consolida o **Backlog do Produto e de Engenharia** do **Manda um 
 | **EP-01** | Fundação, Ferramental, Identidade Visual e CI/CD (`dev`)                   | Infraestrutura base, ESM/JSPM, Qualidade, Storybook |     `6 / 6`     | ✅ Concluído |
 | **EP-02** | Camada de Domínio e Casos de Uso (Clean Architecture)                      | `RN01`, `RN02`, `RN03`, `RN04`, `RN05`, `RN06`      |     `5 / 5`     | ✅ Concluído |
 | **EP-03** | Camada de Infraestrutura e Adaptadores Web APIs (Local-First)              | `RN01`, `RN05`, `RN06`, Offline/Service Worker      |     `4 / 4`     | ✅ Concluído |
-| **EP-04** | Casca da Aplicação, Roteamento SPA, Botão "Instalar" e Página "Sobre"      | `RN06`, `RN07`, `@modnes/router`, Layout Split-View |     `1 / 4`     | ⏳ Pendente  |
+| **EP-04** | Casca da Aplicação, Roteamento SPA, Botão "Instalar" e Página "Sobre"      | `RN06`, `RN07`, `@modnes/router`, Layout Split-View |     `4 / 4`     | ✅ Concluído |
 | **EP-05** | Gestão de Chaves PIX na Interface (`<pix-key-*>`)                          | `RN01`, `RN02`, `<dialog class="key-dialog">`       |     `0 / 3`     | ⏳ Pendente  |
 | **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")              | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas    |     `0 / 3`     | ⏳ Pendente  |
 | **EP-07** | Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA) e Deploy `stg`/`prd` | Testes de Integração, Storybook a11y, Releases      |     `0 / 3`     | ⏳ Pendente  |
@@ -26,8 +26,8 @@ Este documento consolida o **Backlog do Produto e de Engenharia** do **Manda um 
 flowchart TD
     EP01["✅ EP-01: Fundação, Identidade, JSPM, Testes & CI/CD (dev)"]
     EP02["✅ EP-02: Camada de Domínio & Casos de Uso<br/>(ChaveConta, CobrancaPix, Use Cases)"]
-    EP03["⏳ EP-03: Infraestrutura & Adaptadores Web APIs<br/>(IndexedDB, PWA Install, Clipboard/Share, SW)"]
-    EP04["⏳ EP-04: Casca Global, Roteador SPA (@modnes/router),<br/>Botão 'Instalar' (RN06) & Página 'Sobre' (RN07)"]
+    EP03["✅ EP-03: Infraestrutura & Adaptadores Web APIs<br/>(IndexedDB, PWA Install, Clipboard/Share, SW)"]
+    EP04["✅ EP-04: Casca Global, Roteador SPA (@modnes/router),<br/>Botão 'Instalar' (RN06) & Página 'Sobre' (RN07)"]
     EP05["⏳ EP-05: Gestão de Chaves PIX na UI<br/>(Empty State, Seletor Radio Cards, Modal &lt;dialog&gt;)"]
     EP06["⏳ EP-06: Geração e Distribuição 'Manda um PIX'<br/>(Formulário de Valor, QR Code SVG, Copiar/WhatsApp/PNG)"]
     EP07["⏳ EP-07: Testes Integrados, Catálogo Storybook Completo<br/>& Pipelines CD (staging / production)"]
@@ -469,7 +469,7 @@ flowchart TD
   - [x] **TASK-04.3.7 (Qualidade, Linters, Testes de Regressão & Integração)**: Executar suíte completa de testes (`npm test`), verificação de estilos e linting (`npm run lint`, `npm run format:check`).
   - [x] **TASK-04.3.8 (Documentação Viva & Diagramas de Arquitetura)**: Atualizar a documentação viva em [`docs/design/modules.md`](../design/modules.md) e [`docs/business/backlog.md`](./backlog.md) refletindo o roteamento e a tabela de injeções concluídos.
 
-#### `US-04.4` — Página Institucional `<about-page>` (`/sobre` — Autor, Projeto, Apoio e Divulgação) (`⏳ Pendente` · `3 Story Points`)
+#### `US-04.4` — Página Institucional `<about-page>` (`/sobre` — Autor, Projeto, Apoio e Divulgação) (`✅ Concluído` · `3 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Recebedor** que utiliza o Manda um PIX,
@@ -527,14 +527,14 @@ flowchart TD
     - Quando for anexado ao DOM sem provedores DI registrados,
     - Então deve renderizar perfeitamente utilizando fallbacks locais para o roteador, área de transferência e compartilhamento, sem lançar exceções não tratadas.
 - **Tarefas de Desenvolvimento (Dev Tasks)**:
-  - [ ] **TASK-04.4.1 (Constantes, Payloads & Contratos Institucionais)**: Criar [`src/presentation/pages/about-page/about-page.constants.js`](../../src/presentation/pages/about-page/about-page.constants.js) contendo as constantes canônicas da página (`ABOUT_AUTHOR`, `ABOUT_PROJECT`, `ABOUT_SUPPORT_PIX`, payload BR Code gerado para `eu@luizca.net`, links e textos amigáveis de apoio e divulgação).
-  - [ ] **TASK-04.4.2 (TDD / Testes Unitários de Renderização e Interação de `<about-page>`)**: Criar testes unitários em [`src/presentation/pages/about-page/about-page.test.js`](../../src/presentation/pages/about-page/about-page.test.js) cobrindo montagem no DOM, estrutura semântica BEM, renderização de cards, clique no botão "Início" (`Router.goTo`), cópia da chave copia e cola com feedback `aria-live`, compartilhamento/fallback e resolução de DI.
-  - [ ] **TASK-04.4.3 (Implementação / Web Component `AboutPageComponent`)**: Implementar a classe `AboutPageComponent` em [`src/presentation/pages/about-page/about-page.component.js`](../../src/presentation/pages/about-page/about-page.component.js) estendendo `CustomElement` (`@modnes/custom-element`), com template BEM declarativo, consumo dos ícones (`home`, `circle-info`, `qrcode`, `copy`, `share`, `check`), e handlers de eventos acessíveis.
-  - [ ] **TASK-04.4.4 (Estilização BEM e Responsividade)**: Implementar os estilos CSS correspondentes ao bloco `.about-page` (e modificadores `.about-page__box--support`, `.about-page__box--share`, etc.) em [`src/presentation/pages/about-page/about-page.css`](../../src/presentation/pages/about-page/about-page.css) ou integrados a [`src/presentation/styles/app-shell.css`](../../src/presentation/styles/app-shell.css), respeitando os tokens CSS de cor, tipografia e alvos de toque `>= 44x44px`.
-  - [ ] **TASK-04.4.5 (Integração no Roteador, Bootstrap & Exportação)**: Registrar e exportar `AboutPageComponent` e registrar o elemento customizado `customElements.define("about-page", AboutPageComponent)` em [`src/main.js`](../../src/main.js), garantindo a resolução automática na rota `/sobre` do `@modnes/router`.
-  - [ ] **TASK-04.4.6 (Catálogo Interativo no Storybook)**: Criar arquivo de stories [`src/presentation/pages/about-page/about-page.stories.js`](../../src/presentation/pages/about-page/about-page.stories.js) com documentação de props/slots e auditoria de acessibilidade `@storybook/addon-a11y`.
-  - [ ] **TASK-04.4.7 (Testes Integrados de Rota & Regressão)**: Atualizar testes de integração em [`src/main.test.js`](../../src/main.test.js) validando o ciclo completo de navegação `/` -> `/sobre` -> retorno via botão "Início" e verificação do `document.title`.
-  - [ ] **TASK-04.4.8 (Documentação Viva & Atualização do Backlog)**: Atualizar [`docs/design/modules.md`](../design/modules.md), [`docs/business/backlog.md`](./backlog.md) e [`docs/CHANGELOG.md`](../CHANGELOG.md) marcando a conclusão do refinamento e detalhamento de `US-04.4`.
+  - [x] **TASK-04.4.1 (Constantes, Payloads & Contratos Institucionais)**: Criar [`src/presentation/pages/about-page/about-page.constants.js`](../../src/presentation/pages/about-page/about-page.constants.js) contendo as constantes canônicas da página (`ABOUT_AUTHOR`, `ABOUT_PROJECT`, `ABOUT_SUPPORT_PIX`, payload BR Code gerado para `eu@luizca.net`, links e textos amigáveis de apoio e divulgação).
+  - [x] **TASK-04.4.2 (TDD / Testes Unitários de Renderização e Interação de `<about-page>`)**: Criar testes unitários em [`src/presentation/pages/about-page/about-page.test.js`](../../src/presentation/pages/about-page/about-page.test.js) cobrindo montagem no DOM, estrutura semântica BEM, renderização de cards, clique no botão "Início" (`Router.goTo`), cópia da chave copia e cola com feedback `aria-live`, compartilhamento/fallback e resolução de DI.
+  - [x] **TASK-04.4.3 (Implementação / Web Component `AboutPageComponent`)**: Implementar a classe `AboutPageComponent` em [`src/presentation/pages/about-page/about-page.component.js`](../../src/presentation/pages/about-page/about-page.component.js) estendendo `CustomElement` (`@modnes/custom-element`), com template BEM declarativo, consumo dos ícones (`home`, `circle-info`, `qrcode`, `copy`, `share`, `check`), e handlers de eventos acessíveis.
+  - [x] **TASK-04.4.4 (Estilização BEM e Responsividade)**: Implementar os estilos CSS correspondentes ao bloco `.about-page` (e modificadores `.about-page__box--support`, `.about-page__box--share`, etc.) em [`src/presentation/pages/about-page/about-page.css`](../../src/presentation/pages/about-page/about-page.css) ou integrados a [`src/presentation/styles/app-shell.css`](../../src/presentation/styles/app-shell.css), respeitando os tokens CSS de cor, tipografia e alvos de toque `>= 44x44px`.
+  - [x] **TASK-04.4.5 (Integração no Roteador, Bootstrap & Exportação)**: Registrar e exportar `AboutPageComponent` e registrar o elemento customizado `customElements.define("about-page", AboutPageComponent)` em [`src/main.js`](../../src/main.js), garantindo a resolução automática na rota `/sobre` do `@modnes/router`.
+  - [x] **TASK-04.4.6 (Catálogo Interativo no Storybook)**: Criar arquivo de stories [`src/presentation/pages/about-page/about-page.stories.js`](../../src/presentation/pages/about-page/about-page.stories.js) com documentação de props/slots e auditoria de acessibilidade `@storybook/addon-a11y`.
+  - [x] **TASK-04.4.7 (Testes Integrados de Rota & Regressão)**: Atualizar testes de integração em [`src/main.test.js`](../../src/main.test.js) validando o ciclo completo de navegação `/` -> `/sobre` -> retorno via botão "Início" e verificação do `document.title`.
+  - [x] **TASK-04.4.8 (Documentação Viva & Atualização do Backlog)**: Atualizar [`docs/design/modules.md`](../design/modules.md), [`docs/business/backlog.md`](./backlog.md) e [`docs/CHANGELOG.md`](../CHANGELOG.md) marcando a conclusão do refinamento e detalhamento de `US-04.4`.
 
 ---
 
