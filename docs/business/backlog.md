@@ -14,8 +14,8 @@ Este documento consolida o **Backlog do Produto e de Engenharia** do **Manda um 
 | **EP-02** | Camada de Domínio e Casos de Uso (Clean Architecture)                      | `RN01`, `RN02`, `RN03`, `RN04`, `RN05`, `RN06`      |     `5 / 5`     | ✅ Concluído |
 | **EP-03** | Camada de Infraestrutura e Adaptadores Web APIs (Local-First)              | `RN01`, `RN05`, `RN06`, Offline/Service Worker      |     `4 / 4`     | ✅ Concluído |
 | **EP-04** | Casca da Aplicação, Roteamento SPA, Botão "Instalar" e Página "Sobre"      | `RN06`, `RN07`, `@modnes/router`, Layout Split-View |     `4 / 4`     | ✅ Concluído |
-| **EP-05** | Gestão de Chaves PIX na Interface (`<pix-key-*>`)                          | `RN01`, `RN02`, `<dialog class="key-dialog">`       |     `2 / 3`     | ⏳ Pendente  |
-| **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")              | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas    |     `0 / 3`     | ⏳ Pendente  |
+| **EP-05** | Gestão de Chaves PIX na Interface (`<pix-key-*>`)                          | `RN01`, `RN02`, `<dialog class="key-dialog">`       |     `3 / 3`     | ✅ Concluído |
+| **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")              | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas    |     `2 / 3`     | ⏳ Pendente  |
 | **EP-07** | Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA) e Deploy `stg`/`prd` | Testes de Integração, Storybook a11y, Releases      |     `0 / 3`     | ⏳ Pendente  |
 
 ---
@@ -28,7 +28,7 @@ flowchart TD
     EP02["✅ EP-02: Camada de Domínio & Casos de Uso<br/>(ChaveConta, CobrancaPix, Use Cases)"]
     EP03["✅ EP-03: Infraestrutura & Adaptadores Web APIs<br/>(IndexedDB, PWA Install, Clipboard/Share, SW)"]
     EP04["✅ EP-04: Casca Global, Roteador SPA (@modnes/router),<br/>Botão 'Instalar' (RN06) & Página 'Sobre' (RN07)"]
-    EP05["⏳ EP-05: Gestão de Chaves PIX na UI<br/>(Empty State, Seletor Radio Cards, Modal &lt;dialog&gt;)"]
+    EP05["✅ EP-05: Gestão de Chaves PIX na UI<br/>(Empty State, Seletor Radio Cards, Modal &lt;dialog&gt;)"]
     EP06["⏳ EP-06: Geração e Distribuição 'Manda um PIX'<br/>(Formulário de Valor, QR Code SVG, Copiar/WhatsApp/PNG)"]
     EP07["⏳ EP-07: Testes Integrados, Catálogo Storybook Completo<br/>& Pipelines CD (staging / production)"]
 
@@ -863,7 +863,7 @@ flowchart LR
     T6 & T7 --> T8["TASK-06.1.8: Documentação Viva"]
 ```
 
-#### `US-06.2` — Componente `<pix-charge-result>` (Palco QR Code e PIX Copia e Cola) (`⏳ Pendente` · `3 Story Points`)
+#### `US-06.2` — Componente `<pix-charge-result>` (Palco QR Code e PIX Copia e Cola) (`✅ Concluído` · `3 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Recebedor** que gerou uma cobrança no Manda um PIX (ou que aguarda sua emissão),
@@ -940,9 +940,9 @@ flowchart LR
   - [x] **TASK-06.2.3 (TDD / Testes Unitários de Renderização e Ciclo de Vida)**: Criar suíte de testes em [`src/presentation/components/pix-charge-result/pix-charge-result.test.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.test.js) cobrindo montagem inicial no estado de espera, renderização com valor fixo, renderização com valor aberto, inserção do SVG, acessibilidade ARIA e métodos `setCharge` / `clearCharge`.
   - [x] **TASK-06.2.4 (Implementação / Web Component `PixChargeResultComponent`)**: Implementar a classe `PixChargeResultComponent` em [`src/presentation/components/pix-charge-result/pix-charge-result.component.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.component.js) estendendo `CustomElement` (`@modnes/custom-element`), com template BEM declarativo, renderização de SVG, ícones `<vector-icon name="check">` e `<vector-icon name="qrcode">`, getters/setters reativos e slot de ações.
   - [x] **TASK-06.2.5 (Estilização CSS BEM, Moldura Óptica e Responsividade)**: Implementar os estilos em [`src/presentation/components/pix-charge-result/pix-charge-result.css`](../../src/presentation/components/pix-charge-result/pix-charge-result.css) e testes de folha de estilos em [`src/presentation/components/pix-charge-result/pix-charge-result.css.test.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.css.test.js), garantindo moldura `#ffffff` com borda `#0b1834`, `--font-mono` para BR Code, badges e compatibilidade Dark/Light.
-  - [ ] **TASK-06.2.6 (Catálogo Interativo no Storybook & Auditoria a11y)**: Criar [`src/presentation/components/pix-charge-result/pix-charge-result.stories.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.stories.js) documentando os estados: _Aguardando Geração (Empty State)_, _Cobrança com Valor Fixo (R$ 45,90)_, _Cobrança com Valor Aberto_ e auditoria de acessibilidade `@storybook/addon-a11y`.
-  - [ ] **TASK-06.2.7 (Exportação Pública no Módulo Principal e Registro de Tag)**: Exportar `PixChargeResultComponent` e constantes em [`src/main.js`](../../src/main.js) e registrar o elemento customizado `customElements.define("pix-charge-result", PixChargeResultComponent)`.
-  - [ ] **TASK-06.2.8 (Documentação Viva & Atualização do Backlog e Módulos)**: Atualizar a tabela de módulos em [`docs/design/modules.md`](../design/modules.md) e registrar a conclusão do ciclo de refinamento da história.
+  - [x] **TASK-06.2.6 (Catálogo Interativo no Storybook & Auditoria a11y)**: Criar [`src/presentation/components/pix-charge-result/pix-charge-result.stories.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.stories.js) documentando os estados: _Aguardando Geração (Empty State)_, _Cobrança com Valor Fixo (R$ 45,90)_, _Cobrança com Valor Aberto_ e auditoria de acessibilidade `@storybook/addon-a11y`.
+  - [x] **TASK-06.2.7 (Exportação Pública no Módulo Principal e Registro de Tag)**: Exportar `PixChargeResultComponent` e constantes em [`src/main.js`](../../src/main.js) e registrar o elemento customizado `customElements.define("pix-charge-result", PixChargeResultComponent)`.
+  - [x] **TASK-06.2.8 (Documentação Viva & Atualização do Backlog e Módulos)**: Atualizar a tabela de módulos em [`docs/design/modules.md`](../design/modules.md) e registrar a conclusão do ciclo de refinamento da história.
 
 ```mermaid
 flowchart LR

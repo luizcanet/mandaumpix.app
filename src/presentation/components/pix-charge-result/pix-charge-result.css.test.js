@@ -155,4 +155,3 @@ describe("pix-charge-result.css (TASK-06.2.5: Estilização BEM, Moldura Óptica
     });
   });
 });
-
