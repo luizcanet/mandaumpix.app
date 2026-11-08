@@ -1608,5 +1608,59 @@ describe("main.js", () => {
 
       rootElement.remove();
     });
+
+    it("should mount <about-page> directly when booting up at /sobre, allow returning to / via app-header brand, and handle copy failure gracefully", async () => {
+      window.history.replaceState(null, "", "/sobre");
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const header = document.createElement("app-header");
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(header);
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      // 1. Inicialização direta em /sobre
+      expect(window.location.pathname).toBe("/sobre");
+      expect(document.title).toBe("Sobre o aplicativo — Manda um PIX");
+
+      const aboutPage = outlet.querySelector("about-page");
+      expect(aboutPage).not.toBeNull();
+
+      // 2. Falha de cópia gerenciada com evento de erro
+      writeTextMock.mockRejectedValueOnce(
+        new Error("Clipboard permission denied"),
+      );
+      const copyErrorListener = vi.fn();
+      aboutPage.addEventListener(
+        "support-brcode-copy-error",
+        copyErrorListener,
+      );
+
+      const copyButton = aboutPage.querySelector(".about-page__copy-btn");
+      expect(copyButton).not.toBeNull();
+      copyButton.click();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(copyErrorListener).toHaveBeenCalledTimes(1);
+
+      // 3. Retorno para home ("/") via clique na marca do <app-header>
+      const brandElement = header.querySelector(".app-header__brand");
+      expect(brandElement).not.toBeNull();
+      brandElement.click();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(window.location.pathname).toBe("/");
+      expect(document.title).toBe("Manda um PIX — Cobrança rápida");
+      expect(outlet.querySelector(".charge-page")).not.toBeNull();
+      expect(outlet.querySelector("about-page")).toBeNull();
+
+      rootElement.remove();
+    });
   });
 });
