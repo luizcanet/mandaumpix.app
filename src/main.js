@@ -144,6 +144,24 @@ export const APP_METADATA = Object.freeze({
   license: "AGPL-3.0-only",
 });
 
+export const APP_ROUTES = Object.freeze([
+  {
+    path: "/",
+    tagName: "div",
+    classes: ["charge-page", "charge-page--split"],
+  },
+  {
+    path: "/sobre",
+    tagName: "about-page",
+    classes: ["about-page"],
+  },
+  {
+    path: "/*",
+    tagName: "div",
+    classes: ["charge-page", "charge-page--split"],
+  },
+]);
+
 export function generatePixCharge({
   pixKey,
   merchantName = "Manda um PIX",
@@ -218,6 +236,8 @@ export function bootstrapApp(
     serviceWorkerAdapter = null,
     pwaInstallAdapter = null,
     installPwaUseCase = null,
+    appRouter = null,
+    routes = APP_ROUTES,
   } = {},
 ) {
   if (!rootElement) {
@@ -285,6 +305,13 @@ export function bootstrapApp(
   if (headerElement) {
     headerElement.installPwaUseCase = installUseCase;
   }
+
+  const outletElement = rootElement.querySelector("#router-outlet");
+  let router = appRouter;
+  if (!router && outletElement) {
+    router = new Router(outletElement, routes);
+  }
+  rootElement.__appRouter = router;
 
   return rootElement;
 }

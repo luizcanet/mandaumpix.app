@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   APP_METADATA,
+  APP_ROUTES,
   AccessController,
   AppHeaderComponent,
   BROWSER_SHARE_ADAPTER_ERROR_CODES,
@@ -870,6 +871,123 @@ describe("main.js", () => {
       expect(rootElement.__installPwaUseCase).toBeDefined();
       expect(header.installPwaUseCase).toBe(rootElement.__installPwaUseCase);
 
+      rootElement.remove();
+    });
+  });
+
+  describe("SPA routing with @modnes/router (TASK-04.3.1)", () => {
+    it("should export canonical APP_ROUTES with /, /sobre and wildcard fallback", () => {
+      expect(APP_ROUTES).toBeDefined();
+      expect(Array.isArray(APP_ROUTES)).toBe(true);
+      expect(Object.isFrozen(APP_ROUTES)).toBe(true);
+      expect(APP_ROUTES).toHaveLength(3);
+
+      expect(APP_ROUTES[0]).toEqual({
+        path: "/",
+        tagName: "div",
+        classes: ["charge-page", "charge-page--split"],
+      });
+
+      expect(APP_ROUTES[1]).toEqual({
+        path: "/sobre",
+        tagName: "about-page",
+        classes: ["about-page"],
+      });
+
+      expect(APP_ROUTES[2]).toEqual({
+        path: "/*",
+        tagName: "div",
+        classes: ["charge-page", "charge-page--split"],
+      });
+    });
+
+    it("should initialize Router on #router-outlet during bootstrapApp and expose __appRouter", () => {
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      expect(rootElement.__appRouter).toBeDefined();
+      expect(rootElement.__appRouter).toBeInstanceOf(Router);
+      expect(rootElement.__appRouter.wrapper).toBe(outlet);
+
+      rootElement.remove();
+    });
+
+    it("should allow injecting a custom appRouter or routes during bootstrapApp", () => {
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      const customRoutes = [{ path: "/", tagName: "custom-view" }];
+      const customRouter = new Router(outlet, customRoutes);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+        appRouter: customRouter,
+      });
+
+      expect(rootElement.__appRouter).toBe(customRouter);
+
+      rootElement.remove();
+    });
+
+    it("should navigate between / and /sobre and handle unknown paths via Router.goTo", async () => {
+      window.history.replaceState(null, "", "/");
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      // Rota inicial "/"
+      expect(outlet.querySelector(".charge-page")).not.toBeNull();
+      expect(outlet.querySelector("about-page")).toBeNull();
+
+      // Navegação para "/sobre"
+      Router.goTo("/sobre");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(window.location.pathname).toBe("/sobre");
+      expect(outlet.querySelector("about-page")).not.toBeNull();
+      expect(
+        outlet.querySelector("about-page").classList.contains("about-page"),
+      ).toBe(true);
+
+      // Navegação de volta para "/"
+      Router.goTo("/");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(window.location.pathname).toBe("/");
+      expect(outlet.querySelector(".charge-page")).not.toBeNull();
+      expect(outlet.querySelector("about-page")).toBeNull();
+
+      // Rota não mapeada (fallback "/*")
+      Router.goTo("/desconhecido");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(window.location.pathname).toBe("/desconhecido");
+      expect(outlet.querySelector(".charge-page")).not.toBeNull();
+
+      // Reset para a rota raiz
+      window.history.replaceState(null, "", "/");
       rootElement.remove();
     });
   });
