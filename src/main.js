@@ -32,6 +32,14 @@ import {
 } from "./presentation/di/container.js";
 import AppHeaderComponent from "./presentation/components/app-header/app-header.component.js";
 import VectorIconComponent from "./presentation/components/vector-icon/vector-icon.component.js";
+import AboutPageComponent from "./presentation/pages/about-page/about-page.component.js";
+import {
+  ABOUT_AUTHOR,
+  ABOUT_NAVIGATION,
+  ABOUT_PROJECT,
+  ABOUT_SHARE,
+  ABOUT_SUPPORT_PIX,
+} from "./presentation/pages/about-page/about-page.constants.js";
 
 // Camada de Infraestrutura
 import {
@@ -196,8 +204,15 @@ export {
   Router,
   SetInjectable,
   // Componentes de Apresentação
+  AboutPageComponent,
   AppHeaderComponent,
   VectorIconComponent,
+  // Metadados e Constantes da Página Sobre (/sobre)
+  ABOUT_AUTHOR,
+  ABOUT_NAVIGATION,
+  ABOUT_PROJECT,
+  ABOUT_SHARE,
+  ABOUT_SUPPORT_PIX,
   // Roteamento & Navegação
   APP_ROUTES,
   ROUTE_TITLES,

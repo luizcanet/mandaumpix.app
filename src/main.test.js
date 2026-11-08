@@ -1,7 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  ABOUT_AUTHOR,
+  ABOUT_NAVIGATION,
+  ABOUT_PROJECT,
+  ABOUT_SHARE,
+  ABOUT_SUPPORT_PIX,
   APP_METADATA,
   APP_ROUTES,
+  AboutPageComponent,
   AccessController,
   AppHeaderComponent,
   BROWSER_SHARE_ADAPTER_ERROR_CODES,
@@ -855,6 +861,16 @@ describe("main.js", () => {
       expect(DEFAULT_SW_TYPE).toBe("module");
     });
 
+    it("should re-export AboutPageComponent and institutional constants (TASK-04.4.5)", () => {
+      expect(AboutPageComponent).toBeDefined();
+      expect(ABOUT_AUTHOR).toBeDefined();
+      expect(ABOUT_PROJECT).toBeDefined();
+      expect(ABOUT_SUPPORT_PIX).toBeDefined();
+      expect(ABOUT_SHARE).toBeDefined();
+      expect(ABOUT_NAVIGATION).toBeDefined();
+      expect(customElements.get("about-page")).toBe(AboutPageComponent);
+    });
+
     it("should initialize PWA install adapter and use case on rootElement during bootstrapApp", () => {
       const rootElement = document.createElement("main");
       rootElement.id = "app";
@@ -980,6 +996,9 @@ describe("main.js", () => {
 
       expect(outlet.querySelector(".charge-page")).toBeNull();
       expect(outlet.querySelector("about-page")).not.toBeNull();
+      expect(
+        outlet.querySelector("about-page") instanceof AboutPageComponent,
+      ).toBe(true);
 
       window.history.replaceState(null, "", "/");
       rootElement.remove();
@@ -1009,6 +1028,9 @@ describe("main.js", () => {
 
       expect(window.location.pathname).toBe("/sobre");
       expect(outlet.querySelector("about-page")).not.toBeNull();
+      expect(
+        outlet.querySelector("about-page") instanceof AboutPageComponent,
+      ).toBe(true);
       expect(
         outlet.querySelector("about-page").classList.contains("about-page"),
       ).toBe(true);
