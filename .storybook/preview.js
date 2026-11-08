@@ -1,5 +1,7 @@
 import "../src/presentation/styles/tokens.css";
 import "../src/presentation/styles/reset.css";
+import "../src/presentation/styles/layout.css";
+import "../src/presentation/styles/app-shell.css";
 import "../src/presentation/components/vector-icon/vector-icon.css";
 import "../src/presentation/components/vector-icon/vector-icon.component.js";
 
