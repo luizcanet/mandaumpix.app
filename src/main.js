@@ -236,6 +236,14 @@ export function bootstrapApp(
     serviceWorkerAdapter = null,
     pwaInstallAdapter = null,
     installPwaUseCase = null,
+    browserShareGateway = null,
+    pixKeyRepository = null,
+    generatePixChargeUseCase = null,
+    distributePixChargeUseCase = null,
+    savePixKeyUseCase = null,
+    listPixKeysUseCase = null,
+    selectPixKeyUseCase = null,
+    deletePixKeyUseCase = null,
     appRouter = null,
     routes = APP_ROUTES,
   } = {},
@@ -247,7 +255,7 @@ export function bootstrapApp(
   rootElement.dataset.initialized = "true";
 
   let swAdapter = serviceWorkerAdapter;
-  if (autoRegisterServiceWorker && !swAdapter) {
+  if (!swAdapter) {
     swAdapter = createServiceWorkerAdapter({
       windowTarget,
       navigatorTarget,
@@ -273,8 +281,6 @@ export function bootstrapApp(
     }
   }
 
-  rootElement.__serviceWorkerAdapter = swAdapter;
-
   let installAdapter = pwaInstallAdapter;
   if (!installAdapter) {
     installAdapter = createPwaInstallAdapter({
@@ -290,20 +296,63 @@ export function bootstrapApp(
     });
   }
 
-  const ownerDoc =
-    rootElement.ownerDocument ||
-    (typeof document !== "undefined" ? document : null);
-  if (ownerDoc) {
-    SetInjectable("install-pwa-use-case", installUseCase, ownerDoc);
-    SetInjectable("pwa-install-gateway", installAdapter, ownerDoc);
+  let shareGateway = browserShareGateway;
+  if (!shareGateway) {
+    shareGateway = createBrowserShareAdapter({
+      windowTarget,
+      navigatorTarget,
+    });
   }
 
-  rootElement.__pwaInstallAdapter = installAdapter;
-  rootElement.__installPwaUseCase = installUseCase;
+  let keyRepo = pixKeyRepository;
+  if (!keyRepo) {
+    keyRepo = createIndexedDbPixKeyRepository({
+      indexedDbFactory: windowTarget?.indexedDB || globalThis.indexedDB,
+      databaseName: DEFAULT_DB_NAME,
+      databaseVersion: DEFAULT_DB_VERSION,
+    });
+  }
 
-  const headerElement = rootElement.querySelector("app-header");
-  if (headerElement) {
-    headerElement.installPwaUseCase = installUseCase;
+  let genChargeUseCase = generatePixChargeUseCase;
+  if (!genChargeUseCase) {
+    genChargeUseCase = new GeneratePixChargeUseCase({
+      pixKeyRepository: keyRepo,
+    });
+  }
+
+  let distChargeUseCase = distributePixChargeUseCase;
+  if (!distChargeUseCase) {
+    distChargeUseCase = new DistributePixChargeUseCase({
+      chargeDistributionGateway: shareGateway,
+    });
+  }
+
+  let saveKeyUseCase = savePixKeyUseCase;
+  if (!saveKeyUseCase) {
+    saveKeyUseCase = new SavePixKeyUseCase({
+      pixKeyRepository: keyRepo,
+    });
+  }
+
+  let listKeysUseCase = listPixKeysUseCase;
+  if (!listKeysUseCase) {
+    listKeysUseCase = new ListPixKeysUseCase({
+      pixKeyRepository: keyRepo,
+    });
+  }
+
+  let selectKeyUseCase = selectPixKeyUseCase;
+  if (!selectKeyUseCase) {
+    selectKeyUseCase = new SelectPixKeyUseCase({
+      pixKeyRepository: keyRepo,
+    });
+  }
+
+  let deleteKeyUseCase = deletePixKeyUseCase;
+  if (!deleteKeyUseCase) {
+    deleteKeyUseCase = new DeletePixKeyUseCase({
+      pixKeyRepository: keyRepo,
+    });
   }
 
   const outletElement = rootElement.querySelector("#router-outlet");
@@ -312,7 +361,55 @@ export function bootstrapApp(
     outletElement.replaceChildren();
     router = new Router(outletElement, routes);
   }
+
+  const ownerDoc =
+    rootElement.ownerDocument ||
+    (typeof document !== "undefined" ? document : null);
+  if (ownerDoc) {
+    // Gateways / Adaptadores
+    SetInjectable("pwa-install-gateway", installAdapter, ownerDoc);
+    if (swAdapter) {
+      SetInjectable("service-worker-gateway", swAdapter, ownerDoc);
+    }
+    SetInjectable("browser-share-gateway", shareGateway, ownerDoc);
+    SetInjectable("pix-key-repository", keyRepo, ownerDoc);
+
+    // Casos de Uso
+    SetInjectable("install-pwa-use-case", installUseCase, ownerDoc);
+    SetInjectable("generate-pix-charge-use-case", genChargeUseCase, ownerDoc);
+    SetInjectable(
+      "distribute-pix-charge-use-case",
+      distChargeUseCase,
+      ownerDoc,
+    );
+    SetInjectable("save-pix-key-use-case", saveKeyUseCase, ownerDoc);
+    SetInjectable("list-pix-keys-use-case", listKeysUseCase, ownerDoc);
+    SetInjectable("select-pix-key-use-case", selectKeyUseCase, ownerDoc);
+    SetInjectable("delete-pix-key-use-case", deleteKeyUseCase, ownerDoc);
+
+    // Roteador
+    if (router) {
+      SetInjectable("app-router", router, ownerDoc);
+    }
+  }
+
+  rootElement.__serviceWorkerAdapter = swAdapter;
+  rootElement.__pwaInstallAdapter = installAdapter;
+  rootElement.__installPwaUseCase = installUseCase;
+  rootElement.__browserShareGateway = shareGateway;
+  rootElement.__pixKeyRepository = keyRepo;
+  rootElement.__generatePixChargeUseCase = genChargeUseCase;
+  rootElement.__distributePixChargeUseCase = distChargeUseCase;
+  rootElement.__savePixKeyUseCase = saveKeyUseCase;
+  rootElement.__listPixKeysUseCase = listKeysUseCase;
+  rootElement.__selectPixKeyUseCase = selectKeyUseCase;
+  rootElement.__deletePixKeyUseCase = deleteKeyUseCase;
   rootElement.__appRouter = router;
+
+  const headerElement = rootElement.querySelector("app-header");
+  if (headerElement) {
+    headerElement.installPwaUseCase = installUseCase;
+  }
 
   return rootElement;
 }

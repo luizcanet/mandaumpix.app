@@ -1127,7 +1127,10 @@ describe("main.js", () => {
           constructor() {
             super();
             this.addInjectable("pix-key-repository", "keyRepo");
-            this.addInjectable("generate-pix-charge-use-case", "generateCharge");
+            this.addInjectable(
+              "generate-pix-charge-use-case",
+              "generateCharge",
+            );
             this.addInjectable(
               "distribute-pix-charge-use-case",
               "distributeCharge",
