@@ -118,4 +118,3 @@ describe("Storybook Catalog & A11y Suite Integrity (US-07.1)", () => {
     },
   );
 });
-
