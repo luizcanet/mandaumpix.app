@@ -93,7 +93,7 @@ export class PixChargeResultComponent extends CustomElement {
   #liveRegionElement = null;
   #windowListener = null;
   #clickHandler = null;
-  #distributePixChargeUseCase = null;
+  #distributePixChargeUseCase = undefined;
   #isCopied = false;
   #copyTimeoutId = null;
 
@@ -307,12 +307,42 @@ export class PixChargeResultComponent extends CustomElement {
   }
 
   /**
+   * Resolve uma dependência fornecida por um ancestral via evento 'request-provider'.
+   *
+   * @param {string} name Identificador do serviço/caso de uso injetável
+   * @returns {*}
+   */
+  useInjectable(name) {
+    let resolved = null;
+    this.dispatchEvent(
+      new CustomEvent("request-provider", {
+        bubbles: true,
+        composed: true,
+        detail: {
+          name,
+          inject: (value) => {
+            resolved = value;
+          },
+        },
+      }),
+    );
+    return resolved;
+  }
+
+  /**
    * Obtém o caso de uso injetado ou atribuído para distribuição da cobrança.
    *
    * @returns {object|null}
    */
   get distributePixChargeUseCase() {
-    return this.#distributePixChargeUseCase;
+    if (this.#distributePixChargeUseCase !== undefined) {
+      return this.#distributePixChargeUseCase;
+    }
+    const resolved = this.useInjectable(DISTRIBUTE_PIX_CHARGE_INJECTABLE_TOKEN);
+    if (resolved) {
+      return resolved;
+    }
+    return null;
   }
 
   /**
@@ -321,7 +351,7 @@ export class PixChargeResultComponent extends CustomElement {
    * @param {object|null} value
    */
   set distributePixChargeUseCase(value) {
-    this.#distributePixChargeUseCase = value || null;
+    this.#distributePixChargeUseCase = value;
   }
 
   /**
