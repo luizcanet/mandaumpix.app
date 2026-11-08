@@ -542,14 +542,54 @@ flowchart TD
 
 > **Objetivo**: Implementar a experiência completa de cadastro, listagem, seleção e remoção de múltiplas chaves PIX diretamente na tela principal sem mudança de contexto.
 
-#### `US-05.1` — Componente `<pix-key-empty>` (Estado Inicial Sem Chaves) (`⏳ Pendente`)
+#### `US-05.1` — Componente `<pix-key-empty>` (Estado Inicial Sem Chaves) (`⏳ Pendente` · `2 Story Points`)
 
-- **História**: Como **Recebedor** abrindo o aplicativo pela primeira vez, quero ver uma instrução clara de que minhas chaves ficam salvas apenas no meu aparelho e um botão evidente para cadastrar minha primeira chave PIX.
-- **Regras de Negócio**: `RN01`, `RN02`.
-- **Critérios de Aceite**:
-  - [ ] Criar Web Component `src/presentation/components/pix-key-empty/pix-key-empty.component.js` (bloco BEM `.key-empty-state`).
-  - [ ] Exibir ícone `<vector-icon name="key">`, mensagem explicativa de armazenamento 100% local e botão CTA **"Adicionar Minha Primeira Chave"** (`<vector-icon name="plus">`) que dispara a abertura do modal `<pix-key-dialog>`.
-  - [ ] Criar testes unitários e story no Storybook.
+- **História (Narrativa Canônica)**:
+  > **Como** **Recebedor** abrindo o aplicativo pela primeira vez (ou que não possui nenhuma chave PIX cadastrada),
+  > **Quero** visualizar uma interface de estado vazio acolhedora e informativa que explique com clareza que meus dados bancários e chaves ficam armazenados exclusivamente no meu próprio dispositivo e disponha de um botão de ação destacado para cadastrar minha primeira chave,
+  > **Para que** eu me sinta seguro em relação à minha privacidade e possa iniciar a configuração da minha conta em apenas um toque sem fricção.
+- **Regras de Negócio e Invariantes**: `RN01`, `RN02` ([Modelo de Domínio](./domain_model.md), [Especificações e Contratos](../design/api_specs.md) e [Proposta de Interface](../design/ui_proposal.md)).
+  - **INV-01 (Semântica e Bloco BEM Canônico)**: Implementado como Web Component autônomo `<pix-key-empty>` estendendo `CustomElement` (`@modnes/custom-element`) sob o bloco BEM `.key-empty-state`, encapsulado semanticamente em `<section class="card key-empty-state" aria-label="Primeiro acesso sem chaves">`.
+  - **INV-02 (Identidade Visual e Ícone de Destaque)**: Exibe ícone temático de chave (`<vector-icon name="key">`) dentro de um contêiner estilizado `.key-empty-state__icon`, com fundo nas cores de marca (`--color-brand-primary`) e contraste adequado.
+  - **INV-03 (Mensagem Institucional de Privacidade 100% Local)**: Exibe título hierárquico `<h2>` (`"Cadastre sua primeira chave PIX"`) e mensagem descritiva enfatizando que os dados são salvos **100% localmente no aparelho**, sem envio para servidores externos ou nuvem.
+  - **INV-04 (Ação Primária / Botão CTA com Disparo de Evento Desacoplado)**: Botão de ação primária destacado (`.charge-cta` / `.key-empty-state__cta`) contendo o ícone `<vector-icon name="plus">` e rótulo `"Adicionar Minha Primeira Chave"`, que dispara o evento customizado borbulhante `CustomEvent("open-key-dialog", { bubbles: true, composed: true })` ao ser acionado, permitindo que a tela ou o contêiner orquestrador abra o modal `<pix-key-dialog>` sem acoplamento direto.
+  - **INV-05 (Reatividade e Customização via Atributos Observados)**: Suporta os atributos `title-text`, `description-text` e `cta-text` com valores padrão amigáveis, atualizando a visualização de forma reativa caso modificados programaticamente.
+  - **INV-06 (Acessibilidade WCAG 2.2 AA & Gestão de Teclado)**: Alvo de toque mínimo de `44x44px`, contraste de cores em conformidade com WCAG AA, suporte integral ao acionamento via teclado (`Enter` e `Space`) e compatibilidade total com leitores de tela.
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Renderização Padrão do Estado Vazio — Happy Path)**:
+    - Dado que o componente `<pix-key-empty>` é montado no DOM sem atributos customizados,
+    - Quando a renderização for concluída,
+    - Então deve conter a seção semântica com classes `.card.key-empty-state` e atributo `aria-label="Primeiro acesso sem chaves"`,
+    - E deve renderizar o ícone `<vector-icon name="key">` dentro do bloco `.key-empty-state__icon`,
+    - E deve exibir o título padrão `"Cadastre sua primeira chave PIX"` e o texto informativo de armazenamento 100% local,
+    - E deve renderizar o botão CTA contendo o ícone `<vector-icon name="plus">` e o texto `"Adicionar Minha Primeira Chave"`.
+  - **Cenário 02 (Disparo do Evento `open-key-dialog` ao Clicar no Botão CTA)**:
+    - Dado que o componente `<pix-key-empty>` está visível na tela,
+    - E um listener para o evento `"open-key-dialog"` está anexado a um elemento ancestral no DOM,
+    - Quando o usuário clicar no botão CTA `"Adicionar Minha Primeira Chave"`,
+    - Então o evento `"open-key-dialog"` deve ser despachado com as propriedades `bubbles: true` e `composed: true`.
+  - **Cenário 03 (Navegação e Acionamento Exclusivo via Teclado)**:
+    - Dado que o foco de navegação está posicionado no botão CTA do `<pix-key-empty>`,
+    - Quando o usuário pressionar a tecla `Enter` ou a tecla `Space`,
+    - Então o evento `"open-key-dialog"` deve ser despachado da mesma forma que no clique com o mouse.
+  - **Cenário 04 (Reatividade e Parametrização via Atributos Observados)**:
+    - Dado que o componente `<pix-key-empty>` já está instanciado no DOM,
+    - Quando os atributos `title-text`, `description-text` ou `cta-text` forem alterados,
+    - Então o template interno do componente deve refletir imediatamente os novos textos parametrizados sem necessidade de reinicialização.
+  - **Cenário 05 (Acessibilidade, Alvos de Toque e Conformidade WCAG AA)**:
+    - Dado que o componente é inspecionado para conformidade de acessibilidade,
+    - Quando avaliadas as dimensões do botão CTA e a árvore de acessibilidade,
+    - Então o botão interativo deve possuir altura mínima `>= 44px` e área de toque confortável,
+    - E o elemento deve apresentar anel de foco visível durante navegação por teclado (`:focus-visible`),
+    - E não deve apresentar violações de acessibilidade no teste automatizado `@storybook/addon-a11y`.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-05.1.1 (Constantes & Textos Padronizados do Empty State)**: Criar [`src/presentation/components/pix-key-empty/pix-key-empty.constants.js`](../../src/presentation/components/pix-key-empty/pix-key-empty.constants.js) contendo as constantes canônicas (`DEFAULT_EMPTY_STATE_TITLE`, `DEFAULT_EMPTY_STATE_DESCRIPTION`, `DEFAULT_EMPTY_STATE_CTA`, `KEY_EMPTY_EVENT_NAMES`).
+  - [ ] **TASK-05.1.2 (TDD / Testes Unitários de Renderização e Eventos)**: Criar testes unitários em [`src/presentation/components/pix-key-empty/pix-key-empty.test.js`](../../src/presentation/components/pix-key-empty/pix-key-empty.test.js) cobrindo renderização padrão, verificação semântica BEM, reação a atributos observados, clique no CTA e emissão do evento `open-key-dialog`.
+  - [ ] **TASK-05.1.3 (Implementação / Web Component `PixKeyEmptyComponent`)**: Implementar a classe `PixKeyEmptyComponent` em [`src/presentation/components/pix-key-empty/pix-key-empty.component.js`](../../src/presentation/components/pix-key-empty/pix-key-empty.component.js) estendendo `CustomElement` (`@modnes/custom-element`), com template declarativo BEM, binding reativo de propriedades e disparo seguro de evento.
+  - [ ] **TASK-05.1.4 (Estilização BEM, Tokens de Cor e Responsividade)**: Implementar os estilos do bloco `.key-empty-state` em [`src/presentation/components/pix-key-empty/pix-key-empty.css`](../../src/presentation/components/pix-key-empty/pix-key-empty.css) consumindo os tokens de design (`--color-brand-primary`, `--color-brand-accent`, `--space-xl`, `--radius-lg`), com alvos de toque mínimos de `44px` e animação suave de foco.
+  - [ ] **TASK-05.1.5 (Catálogo Interativo no Storybook & Auditoria a11y)**: Criar arquivo de stories [`src/presentation/components/pix-key-empty/pix-key-empty.stories.js`](../../src/presentation/components/pix-key-empty/pix-key-empty.stories.js) com stories cobrindo o estado padrão, textos customizados e validação de acessibilidade com `@storybook/addon-a11y`.
+  - [ ] **TASK-05.1.6 (Exportação Pública no Módulo Principal e Registro de Tag)**: Exportar `PixKeyEmptyComponent` e constantes em [`src/main.js`](../../src/main.js) e registrar a tag `customElements.define("pix-key-empty", PixKeyEmptyComponent)` para disponibilização global.
+  - [ ] **TASK-05.1.7 (Documentação Viva & Atualização do Backlog)**: Atualizar a tabela de módulos em [`docs/design/modules.md`](../design/modules.md) e registrar a conclusão do ciclo de refinamento da história.
 
 #### `US-05.2` — Componente `<pix-key-selector>` (Lista de Radio Cards de Chaves) (`⏳ Pendente`)
 
