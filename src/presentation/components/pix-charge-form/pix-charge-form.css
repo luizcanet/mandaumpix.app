@@ -1,0 +1,350 @@
+/* ==========================================================================
+   ESTILOS DO GERADOR DE COBRANÇA (pix-charge-form.css)
+   Manda um PIX — Bloco BEM .charge-form, .amount-field e .charge-cta (TASK-06.1.5)
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   BLOCO PRINCIPAL (.charge-form)
+   Contêiner vertical do formulário gerador de cobrança
+   ----------------------------------------------------------------------------- */
+.charge-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 1rem);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* -----------------------------------------------------------------------------
+   SEÇÃO DO CAMPO DE VALOR (.amount-field)
+   Estrutura de passo 2 encapsulada no cartão de superfície
+   ----------------------------------------------------------------------------- */
+.amount-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs, 0.5rem);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Cabeçalho da Etapa (.section-header) */
+.amount-field .section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs, 0.5rem);
+  margin-bottom: var(--space-2xs, 0.25rem);
+}
+
+.amount-field .section-header__title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs, 0.5rem);
+  min-width: 0;
+}
+
+.amount-field .step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-pill, 9999px);
+  background-color: var(--color-brand-primary, #0b1834);
+  color: var(--color-brand-accent, #00d37f);
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.75rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.amount-field .section-header__title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--color-text-primary, #0f172a);
+  letter-spacing: -0.01em;
+  cursor: pointer;
+}
+
+.amount-field__optional-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, #475569);
+  white-space: nowrap;
+}
+
+/* -----------------------------------------------------------------------------
+   CAIXA DE ENTRADA MONETÁRIA (.amount-field__box)
+   Agrupa o prefixo R$, o input decimal amplo e o botão de limpeza rápida
+   ----------------------------------------------------------------------------- */
+.amount-field__box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--color-surface-muted, #f8fafc);
+  border: 2px solid var(--color-border-strong, #cbd5e1);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.6rem 0.85rem;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.amount-field__box:focus-within {
+  border-color: var(--color-focus, #00d37f);
+  background-color: var(--color-surface, #ffffff);
+}
+
+.amount-field__currency {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--color-text-secondary, #475569);
+  margin-right: var(--space-xs, 0.5rem);
+}
+
+.amount-field__input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-text-primary, #0f172a);
+  text-align: right;
+  outline: none;
+  padding: 0;
+}
+
+.amount-field__input::placeholder {
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.amount-field__input--error {
+  color: var(--color-danger, #ef4444);
+}
+
+/* Botão de Limpeza Rápida (.amount-field__clear-btn) */
+.amount-field__clear-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary, #475569);
+  padding: 0.35rem;
+  margin-left: var(--space-xs, 0.5rem);
+  border-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.amount-field__clear-btn:hover {
+  background-color: #e2e8f0;
+  color: var(--color-text-primary, #0f172a);
+}
+
+.amount-field__clear-btn:focus-visible {
+  outline: 2px solid var(--color-brand-accent, #00d37f);
+  outline-offset: 2px;
+}
+
+.amount-field__clear-btn--hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* -----------------------------------------------------------------------------
+   RODAPÉ DO CAMPO (.amount-field__footer)
+   Pílula reativa de status (Aberto vs. Fixo) e atalhos rápidos (Presets)
+   ----------------------------------------------------------------------------- */
+.amount-field__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs, 0.5rem);
+  margin-top: var(--space-sm, 0.75rem);
+}
+
+.amount-field__status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill, 9999px);
+  display: inline-flex;
+  align-items: center;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.amount-field__status--fixed {
+  background-color: #ecfdf5;
+  color: var(--color-success, #059669);
+  border: 1px solid #a7f3d0;
+}
+
+.amount-field__status--open {
+  background-color: #fffbeb;
+  color: var(--color-warning, #d97706);
+  border: 1px solid #fde68a;
+}
+
+.amount-field__shortcuts {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.amount-field__preset {
+  appearance: none;
+  border: 1px solid var(--color-border, #e2e8f0);
+  background-color: var(--color-surface-elevated, #f8fafc);
+  color: var(--color-text-secondary, #475569);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 0.65rem;
+  min-height: 44px;
+  min-width: 44px;
+  border-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.amount-field__preset:hover {
+  background-color: #e2e8f0;
+  color: var(--color-text-primary, #0f172a);
+  border-color: #cbd5e1;
+}
+
+.amount-field__preset:focus-visible {
+  outline: 2px solid var(--color-brand-accent, #00d37f);
+  outline-offset: 2px;
+}
+
+.amount-field__preset--active {
+  background-color: #ecfdf5;
+  color: var(--color-success, #059669);
+  border-color: rgba(0, 211, 127, 0.5);
+}
+
+/* -----------------------------------------------------------------------------
+   ALERTA DE VALIDAÇÃO (.charge-form__alert)
+   Mensagem de erro de domínio com ícone e semântica role="alert"
+   ----------------------------------------------------------------------------- */
+.charge-form__alert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs, 0.5rem);
+  padding: 0.75rem var(--space-md, 1rem);
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md, 8px);
+  color: var(--color-danger, #ef4444);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+
+.charge-form__alert-icon {
+  flex-shrink: 0;
+  color: var(--color-danger, #ef4444);
+}
+
+.charge-form__alert-text {
+  flex: 1;
+}
+
+/* -----------------------------------------------------------------------------
+   BOTÃO CTA PRINCIPAL 'MANDA UM PIX' (.charge-cta)
+   Botão destacado de largura total com gradiente Verde PIX
+   ----------------------------------------------------------------------------- */
+.charge-cta {
+  width: 100%;
+  min-height: 52px;
+  padding: 0.9rem var(--space-lg, 1.5rem);
+  border: none;
+  border-radius: var(--radius-lg, 12px);
+  background: linear-gradient(
+    135deg,
+    var(--color-brand-accent, #00d37f) 0%,
+    var(--color-brand-accent-hover, #00be72) 100%
+  );
+  color: var(--color-brand-primary-dark, #060d1e);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs, 0.5rem);
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 211, 127, 0.32);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.15s ease,
+    filter 0.15s ease;
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
+.charge-cta:hover:not(:disabled):not(.charge-cta--disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0, 211, 127, 0.44);
+}
+
+.charge-cta:active:not(:disabled):not(.charge-cta--disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(0, 211, 127, 0.28);
+}
+
+.charge-cta:focus-visible {
+  outline: 3px solid var(--color-brand-primary, #0b1834);
+  outline-offset: 3px;
+}
+
+.charge-cta--disabled,
+.charge-cta:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(40%);
+  box-shadow: none;
+  transform: none;
+}
+
+/* -----------------------------------------------------------------------------
+   ACESSIBILIDADE: MOVIMENTO REDUZIDO (prefers-reduced-motion: reduce)
+   ----------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .charge-form,
+  .amount-field__box,
+  .amount-field__clear-btn,
+  .amount-field__status,
+  .amount-field__preset,
+  .charge-cta {
+    transition: none;
+    transform: none;
+  }
+}
