@@ -863,16 +863,98 @@ flowchart LR
     T6 & T7 --> T8["TASK-06.1.8: Documentação Viva"]
 ```
 
-#### `US-06.2` — Componente `<pix-charge-result>` (Palco QR Code e PIX Copia e Cola) (`⏳ Pendente`)
+#### `US-06.2` — Componente `<pix-charge-result>` (Palco QR Code e PIX Copia e Cola) (`⏳ Pendente` · `3 Story Points`)
 
-- **História**: Como **Recebedor**, quero visualizar na tela o QR Code nítido de alto contraste junto com o código PIX Copia e Cola assim que clicar em **"Manda um PIX"**.
-- **Regras de Negócio**: `RN04`.
-- **Critérios de Aceite**:
-  - [ ] Criar Web Component `src/presentation/components/pix-charge-result/pix-charge-result.component.js` (bloco BEM `.charge-result`).
-  - [ ] Exibir resumo da cobrança (rótulo da chave selecionada, nome/cidade do recebedor e badge com o valor formatado em BRL ou _"Valor Aberto"_).
-  - [ ] Renderizar o SVG vetorial do QR Code dentro do palco de superfície clara (`.charge-result__qr-stage`, fundo `#ffffff` e moldura `#0b1834`) garantindo contraste óptico para leitura por câmeras bancárias.
-  - [ ] Exibir o payload EMV (`brCode`) em caixa monoespaçada (`.charge-result__brcode`) selecionável.
-  - [ ] Criar testes unitários e stories no Storybook (estados _Aguardando Geração_, _Cobrança com Valor Fixo_ e _Cobrança com Valor Aberto_).
+- **História (Narrativa Canônica)**:
+  > **Como** **Recebedor** que gerou uma cobrança no Manda um PIX (ou que aguarda sua emissão),
+  > **Quero** visualizar na tela o palco de exibição com o QR Code vetorial nítido de alto contraste, o resumo completo da transação (conta, recebedor, cidade e valor formatado ou aberto) e o código PIX Copia e Cola selecionável,
+  > **Para que** eu possa apresentar o QR Code diretamente para leitura óptica da câmera do pagador ou conferir os dados da cobrança com clareza e segurança antes de distribuí-la.
+- **Estimativa de Complexidade**: **`3 Story Points`** (Complexidade Técnica: Média · Esforço: Médio · Incerteza: Baixa).
+- **Regras de Negócio e Invariantes**: `RN03`, `RN04` ([Modelo de Domínio](./domain_model.md), [Especificações e Contratos](../design/api_specs.md) e [Proposta de Interface](../design/ui_proposal.md)).
+  - **INV-01 (Semântica e Bloco BEM Canônico)**: Implementado como Web Component autônomo `<pix-charge-result>` estendendo `CustomElement` (`@modnes/custom-element`) sob o bloco BEM `.charge-result`, encapsulado semanticamente em `<section class="card charge-result" aria-label="Cobrança PIX gerada">`.
+  - **INV-02 (Estado Inicial / Aguardando Cobrança — Empty State)**: Quando nenhuma cobrança estiver atribuída (`charge = null` ou ausente):
+    - Renderiza o estado aguardando `.charge-result--empty` / `.charge-result__waiting` com ícone temático `<vector-icon name="qrcode">`, título de instrução `"Aguardando geração"` e texto de orientação amigável incentivando o preenchimento do formulário ao lado/acima.
+    - Oculta ou não renderiza o palco do QR Code e a caixa de código Copia e Cola até que uma cobrança válida seja fornecida.
+  - **INV-03 (Resumo da Cobrança no Cabeçalho — `.charge-result__header`)**:
+    - Exibe o selo de sucesso `.charge-result__badge-ready` contendo o ícone `<vector-icon name="check">` e o texto `"Cobrança pronta"`.
+    - Exibe o identificador da conta / recebedor `.charge-result__account` formatado (ex.: `"Nubank • JOAO DA SILVA"` ou rótulo da chave ativa acompanhado do titular).
+    - Exibe a pílula de modalidade de valor `.charge-result__amount-pill`:
+      - **Valor Fixo**: `.charge-result__amount-pill` exibindo o valor monetário formatado no padrão brasileiro (`"R$ 45,90"`).
+      - **Valor Aberto**: `.charge-result__amount-pill--open` exibindo o texto `"Valor Aberto"`.
+  - **INV-04 (Palco do QR Code de Alto Contraste Óptico — `.charge-result__qr-stage`)**:
+    - O contêiner `.charge-result__qr-stage` centraliza a moldura `.charge-result__qr-frame`.
+    - A moldura possui fundo branco puro (`#ffffff`), borda de alto contraste `#0b1834` (ou `--color-brand-primary`) e sombra suave, assegurando que o código bidimensional seja perfeitamente legível por qualquer câmera de aplicativo bancário, mesmo quando o dispositivo estiver utilizando modo escuro (Dark Mode).
+    - O SVG vetorial da imagem (`cobranca.imagem_qrcode.svg`) é renderizado de forma segura dentro de `.charge-result__qr-svg` (dimensões responsivas `168x168px`, preservando aspect ratio).
+    - Exibe a legenda de metadados `.charge-result__meta` contendo o tipo de chave, valor mascarado/resumido e cidade do recebedor (ex.: `"Chave CPF: ***.456.789-** (Curitiba)"`).
+  - **INV-05 (Bloco PIX Copia e Cola — `.charge-result__brcode`)**:
+    - O cabeçalho `.charge-result__brcode-label` identifica `"PIX Copia e Cola"` e o selo de modo (`"Valor Fixo"` ou `"Valor Dinâmico"`).
+    - O contêiner de código `.charge-result__brcode` exibe o payload EMV integral (`cobranca.chave_cobranca` / `brCode`) em fonte monoespaçada (`--font-mono`), quebra de palavras segura (`word-break: break-all`), com `user-select: all` para seleção instantânea em um clique ou toque, `tabindex="0"`, `role="region"` e `aria-label="Código PIX Copia e Cola"`.
+  - **INV-06 (Área de Ações de Distribuição — Slot / Contêiner `.charge-result__actions`)**:
+    - Disponibiliza a grade estrutural `.charge-result__actions` pronta para acomodar as 3 ações de saída da história complementar `US-06.3` (`Copiar`, `WhatsApp`, `Salvar PNG`), permitindo projeção via slot ou composição direta sem quebra de layout.
+  - **INV-07 (Reatividade, Propriedades e Métodos Públicos)**:
+    - Expõe a propriedade reativa `charge` (e método `setCharge(cobrancaPix)`), aceitando instâncias de `CobrancaPix` ou objetos serializados compatíveis.
+    - Suporta método `clearCharge()` para retornar ao estado de espera.
+    - Escuta automaticamente ou permite vinculação com o evento `charge-generated` disparado por `<pix-charge-form>`.
+  - **INV-08 (Acessibilidade WCAG 2.2 AA & Leitor de Tela)**:
+    - Anúncio acessível de transição de estado via região `aria-live="polite"` quando a cobrança for gerada e renderizada.
+    - Contraste visual de texto e palco do QR Code em conformidade estrita com o padrão WCAG 2.2 AA (relação $\ge 4.5:1$).
+    - Total navegabilidade por teclado com indicadores `:focus-visible` visíveis para caixas e botões.
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Estado Inicial Aguardando Geração — Empty State)**:
+    - Dado que o componente `<pix-charge-result>` é montado no DOM sem cobrança atribuída (`charge = null`),
+    - Quando a renderização for concluída,
+    - Então deve renderizar o container `.charge-result--empty` / `.charge-result__waiting`,
+    - E deve exibir o ícone `<vector-icon name="qrcode">` e mensagem de instrução `"Aguardando geração"`,
+    - E não deve renderizar o palco do QR Code nem a caixa de código Copia e Cola.
+  - **Cenário 02 (Renderização de Cobrança com Valor Fixo — Happy Path)**:
+    - Dado que uma cobrança PIX com valor fixo (`valor_opcional = 45.9`, `valor_dinamico = false`, chave Nubank CPF, titular `"JOAO DA SILVA"`, cidade `"CURITIBA"`) é fornecida ao componente via propriedade `charge`,
+    - Quando o componente renderizar o resultado,
+    - Então deve exibir o selo `"Cobrança pronta"` com o ícone `<vector-icon name="check">`,
+    - E deve exibir o rótulo da conta e titular em `.charge-result__account`,
+    - E deve renderizar a pílula de valor `.charge-result__amount-pill` com o texto `"R$ 45,90"`,
+    - E deve renderizar a moldura de alto contraste `.charge-result__qr-frame` contendo o SVG vetorial do QR Code,
+    - E a caixa `.charge-result__brcode` deve conter o código EMV BR Code com `user-select: all`.
+  - **Cenário 03 (Renderização de Cobrança com Valor Aberto/Dinâmico — `RN03`)**:
+    - Dado que uma cobrança PIX com valor aberto (`valor_opcional = null`, `valor_dinamico = true`) é atribuída ao componente,
+    - Quando o componente renderizar,
+    - Então a pílula de valor deve possuir a classe modificadora `.charge-result__amount-pill--open` e o texto `"Valor Aberto"`,
+    - E o metadado no cabeçalho do código deve indicar `"Valor Dinâmico"`.
+  - **Cenário 04 (Atualização Reativa ao Receber Nova Cobrança ou Limpeza)**:
+    - Dado que o componente já está exibindo uma cobrança anterior,
+    - Quando o método `setCharge()` for invocado com uma nova cobrança de outra conta,
+    - Então a interface deve atualizar reativamente o QR Code, valor e código Copia e Cola anunciando a atualização em `aria-live="polite"`,
+    - E quando `clearCharge()` for invocado, deve retornar imediatamente ao estado aguardando.
+  - **Cenário 05 (Acessibilidade, Contraste e Navegação por Teclado — WCAG AA)**:
+    - Dado que o componente renderizou uma cobrança,
+    - Quando um usuário navegar via tecla `Tab`,
+    - Então o foco deve alcançar a caixa de código Copia e Cola `.charge-result__brcode`,
+    - E o elemento deve possuir indicação de foco `:focus-visible` de alto contraste,
+    - E o contraste entre o QR Code, a moldura branca e os elementos de texto deve atender ao índice mínimo de 4.5:1 da WCAG AA.
+  - **Cenário 06 (Resiliência e Execução Autônoma no Storybook / Sem Dependências Externas)**:
+    - Dado que o componente `<pix-charge-result>` é instanciado em modo isolado (Storybook ou teste unitário puro),
+    - Quando for alimentado com mocks de `CobrancaPix` ou strings puras de SVG e BR Code,
+    - Então deve renderizar perfeitamente todos os estados sem erros no console ou dependência de contexto global.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-06.2.1 (Constantes, Seletores BEM, Textos e Estrutura do Resultado)**: Criar [`src/presentation/components/pix-charge-result/pix-charge-result.constants.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.constants.js) contendo seletores BEM (`.charge-result`, `.charge-result__header`, `.charge-result__qr-stage`, `.charge-result__brcode`, etc.), nomes de eventos, identificadores acessíveis e textos padrão.
+  - [ ] **TASK-06.2.2 (TDD / Testes Unitários de Constantes e Formatadores)**: Criar testes unitários em [`src/presentation/components/pix-charge-result/pix-charge-result.constants.test.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.constants.test.js) cobrindo formatação de moeda BRL, fallbacks de título, metadados de chave e constantes.
+  - [ ] **TASK-06.2.3 (TDD / Testes Unitários de Renderização e Ciclo de Vida)**: Criar suíte de testes em [`src/presentation/components/pix-charge-result/pix-charge-result.test.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.test.js) cobrindo montagem inicial no estado de espera, renderização com valor fixo, renderização com valor aberto, inserção do SVG, acessibilidade ARIA e métodos `setCharge` / `clearCharge`.
+  - [ ] **TASK-06.2.4 (Implementação / Web Component `PixChargeResultComponent`)**: Implementar a classe `PixChargeResultComponent` em [`src/presentation/components/pix-charge-result/pix-charge-result.component.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.component.js) estendendo `CustomElement` (`@modnes/custom-element`), com template BEM declarativo, renderização de SVG, ícones `<vector-icon name="check">` e `<vector-icon name="qrcode">`, getters/setters reativos e slot de ações.
+  - [ ] **TASK-06.2.5 (Estilização CSS BEM, Moldura Óptica e Responsividade)**: Implementar os estilos em [`src/presentation/components/pix-charge-result/pix-charge-result.css`](../../src/presentation/components/pix-charge-result/pix-charge-result.css) e testes de folha de estilos em [`src/presentation/components/pix-charge-result/pix-charge-result.css.test.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.css.test.js), garantindo moldura `#ffffff` com borda `#0b1834`, `--font-mono` para BR Code, badges e compatibilidade Dark/Light.
+  - [ ] **TASK-06.2.6 (Catálogo Interativo no Storybook & Auditoria a11y)**: Criar [`src/presentation/components/pix-charge-result/pix-charge-result.stories.js`](../../src/presentation/components/pix-charge-result/pix-charge-result.stories.js) documentando os estados: _Aguardando Geração (Empty State)_, _Cobrança com Valor Fixo (R$ 45,90)_, _Cobrança com Valor Aberto_ e auditoria de acessibilidade `@storybook/addon-a11y`.
+  - [ ] **TASK-06.2.7 (Exportação Pública no Módulo Principal e Registro de Tag)**: Exportar `PixChargeResultComponent` e constantes em [`src/main.js`](../../src/main.js) e registrar o elemento customizado `customElements.define("pix-charge-result", PixChargeResultComponent)`.
+  - [ ] **TASK-06.2.8 (Documentação Viva & Atualização do Backlog e Módulos)**: Atualizar a tabela de módulos em [`docs/design/modules.md`](../design/modules.md) e registrar a conclusão do ciclo de refinamento da história.
+
+```mermaid
+flowchart LR
+    T1["TASK-06.2.1: Constantes & Seletores"] --> T2["TASK-06.2.2: Testes Constantes (TDD)"]
+    T1 --> T5["TASK-06.2.5: Estilos CSS BEM"]
+    T2 --> T3["TASK-06.2.3: Testes Unitários (TDD)"]
+    T3 --> T4["TASK-06.2.4: Web Component PixChargeResult"]
+    T5 --> T4
+    T4 --> T6["TASK-06.2.6: Storybook & a11y"]
+    T4 --> T7["TASK-06.2.7: Exportação & main.js"]
+    T6 & T7 --> T8["TASK-06.2.8: Documentação Viva"]
+```
 
 #### `US-06.3` — Ações de Distribuição da Cobrança: Copiar, Compartilhar (WhatsApp) e Salvar PNG (`⏳ Pendente`)
 
