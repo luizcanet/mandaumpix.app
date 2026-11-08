@@ -388,7 +388,7 @@ flowchart TD
   - [x] **TASK-04.2.4 (Integração na Casca Global `index.html`, Exportação em `src/main.js` & Bootstrap)**: Atualizar [`index.html`](../../index.html) substituindo o cabeçalho estático pelo Web Component `<app-header></app-header>`, reexportar o componente em [`src/main.js`](../../src/main.js) e inicializá-lo com injeção segura de dependências no `bootstrapApp`.
   - [x] **TASK-04.2.5 (Qualidade, Linters, Testes de Regressão & Documentação)**: Executar validações com `npm test`, `npm run lint` e `npm run format:check`, e atualizar a documentação de arquitetura de apresentação em [`docs/design/modules.md`](../design/modules.md).
 
-#### `US-04.3` — Roteamento SPA (`@modnes/router`) e Injeção de Dependências (`SetInjectable`) (`⏳ Pendente`)
+#### `US-04.3` — Roteamento SPA (`@modnes/router`) e Injeção de Dependências (`SetInjectable`) (`✅ Concluído` · `3 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Recebedor** ou usuário do Manda um PIX,
@@ -460,14 +460,14 @@ flowchart TD
     - Então o contêiner `#router-outlet` deve possuir `tabindex="-1"` e receber foco acessível,
     - E leitores de tela devem ser capazes de navegar pelo novo conteúdo renderizado.
 - **Tarefas de Desenvolvimento (Dev Tasks)**:
-  - [ ] **TASK-04.3.1 (TDD / Testes Unitários de Rotas & Router SPA)**: Criar testes unitários em [`src/main.test.js`](../../src/main.test.js) cobrindo a inicialização do roteador no `#router-outlet`, registro das rotas `/`, `/sobre` e wildcard `/*`, e navegação programática com `Router.goTo()`.
-  - [ ] **TASK-04.3.2 (Implementação / Roteador SPA e Mapeamento de Rotas no `bootstrapApp`)**: Implementar em [`src/main.js`](../../src/main.js) a exportação das constantes de rotas (`APP_ROUTES`), criação e retorno da instância do `Router` dentro de `bootstrapApp()`, vinculando-a à propriedade `rootElement.__appRouter`.
-  - [ ] **TASK-04.3.3 (TDD / Testes Unitários do Contêiner `SetInjectable`)**: Criar testes unitários validando o registro de todos os casos de uso (`generate`, `distribute`, `install`, `keys`) e adaptadores via `SetInjectable` no `ownerDocument`, confirmando a resolução de dependências através do evento `request-provider`.
-  - [ ] **TASK-04.3.4 (Implementação / Registro de Casos de Uso e Gateways no DI)**: Expandir a inicialização do `bootstrapApp()` em [`src/main.js`](../../src/main.js) para instanciar (com fallbacks resilientes) os gateways e use cases da aplicação e registrá-los no contêiner DI via `SetInjectable`.
-  - [ ] **TASK-04.3.5 (Navegação SPA Fluida nos Links & Interceptação de Cliques)**: Integrar interceptação de cliques em links internos de navegação SPA (`app-header__about-link`, links de marca e links de rodapé) utilizando `Router.goTo()` ou custom anchor `is="router-anchor"`.
-  - [ ] **TASK-04.3.6 (Acessibilidade na Troca de Rota — Gestão de Foco & `document.title`)**: Implementar listener do evento `pathChanged` no `bootstrapApp` para atualizar dinamicamente o `document.title` e direcionar o foco acessível para `#router-outlet` (`tabindex="-1"`).
-  - [ ] **TASK-04.3.7 (Qualidade, Linters, Testes de Regressão & Integração)**: Executar suíte completa de testes (`npm test`), verificação de estilos e linting (`npm run lint`, `npm run format:check`).
-  - [ ] **TASK-04.3.8 (Documentação Viva & Diagramas de Arquitetura)**: Atualizar a documentação viva em [`docs/design/modules.md`](../design/modules.md) e [`docs/business/backlog.md`](./backlog.md) refletindo o roteamento e a tabela de injeções concluídos.
+  - [x] **TASK-04.3.1 (TDD / Testes Unitários de Rotas & Router SPA)**: Criar testes unitários em [`src/main.test.js`](../../src/main.test.js) cobrindo a inicialização do roteador no `#router-outlet`, registro das rotas `/`, `/sobre` e wildcard `/*`, e navegação programática com `Router.goTo()`.
+  - [x] **TASK-04.3.2 (Implementação / Roteador SPA e Mapeamento de Rotas no `bootstrapApp`)**: Implementar em [`src/main.js`](../../src/main.js) a exportação das constantes de rotas (`APP_ROUTES`), criação e retorno da instância do `Router` dentro de `bootstrapApp()`, vinculando-a à propriedade `rootElement.__appRouter`.
+  - [x] **TASK-04.3.3 (TDD / Testes Unitários do Contêiner `SetInjectable`)**: Criar testes unitários validando o registro de todos os casos de uso (`generate`, `distribute`, `install`, `keys`) e adaptadores via `SetInjectable` no `ownerDocument`, confirmando a resolução de dependências através do evento `request-provider`.
+  - [x] **TASK-04.3.4 (Implementação / Registro de Casos de Uso e Gateways no DI)**: Expandir a inicialização do `bootstrapApp()` em [`src/main.js`](../../src/main.js) para instanciar (com fallbacks resilientes) os gateways e use cases da aplicação e registrá-los no contêiner DI via `SetInjectable`.
+  - [x] **TASK-04.3.5 (Navegação SPA Fluida nos Links & Interceptação de Cliques)**: Integrar interceptação de cliques em links internos de navegação SPA (`app-header__about-link`, links de marca e links de rodapé) utilizando `Router.goTo()` ou custom anchor `is="router-anchor"`.
+  - [x] **TASK-04.3.6 (Acessibilidade na Troca de Rota — Gestão de Foco & `document.title`)**: Implementar listener do evento `pathChanged` no `bootstrapApp` para atualizar dinamicamente o `document.title` e direcionar o foco acessível para `#router-outlet` (`tabindex="-1"`).
+  - [x] **TASK-04.3.7 (Qualidade, Linters, Testes de Regressão & Integração)**: Executar suíte completa de testes (`npm test`), verificação de estilos e linting (`npm run lint`, `npm run format:check`).
+  - [x] **TASK-04.3.8 (Documentação Viva & Diagramas de Arquitetura)**: Atualizar a documentação viva em [`docs/design/modules.md`](../design/modules.md) e [`docs/business/backlog.md`](./backlog.md) refletindo o roteamento e a tabela de injeções concluídos.
 
 #### `US-04.4` — Página Institucional `<about-page>` (`/sobre` — Autor, Projeto, Apoio e Divulgação) (`⏳ Pendente`)
 

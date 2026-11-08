@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   APP_METADATA,
+  APP_ROUTES,
   AccessController,
   AppHeaderComponent,
   BROWSER_SHARE_ADAPTER_ERROR_CODES,
@@ -870,6 +871,596 @@ describe("main.js", () => {
       expect(rootElement.__installPwaUseCase).toBeDefined();
       expect(header.installPwaUseCase).toBe(rootElement.__installPwaUseCase);
 
+      rootElement.remove();
+    });
+  });
+
+  describe("SPA routing with @modnes/router (TASK-04.3.1)", () => {
+    it("should export canonical APP_ROUTES with /, /sobre and wildcard fallback", () => {
+      expect(APP_ROUTES).toBeDefined();
+      expect(Array.isArray(APP_ROUTES)).toBe(true);
+      expect(Object.isFrozen(APP_ROUTES)).toBe(true);
+      expect(APP_ROUTES).toHaveLength(3);
+
+      expect(APP_ROUTES[0]).toEqual({
+        path: "/",
+        tagName: "div",
+        classes: ["charge-page", "charge-page--split"],
+      });
+
+      expect(APP_ROUTES[1]).toEqual({
+        path: "/sobre",
+        tagName: "about-page",
+        classes: ["about-page"],
+      });
+
+      expect(APP_ROUTES[2]).toEqual({
+        path: "/*",
+        tagName: "div",
+        classes: ["charge-page", "charge-page--split"],
+      });
+    });
+
+    it("should initialize Router on #router-outlet during bootstrapApp and expose __appRouter", () => {
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      expect(rootElement.__appRouter).toBeDefined();
+      expect(rootElement.__appRouter).toBeInstanceOf(Router);
+      expect(rootElement.__appRouter.wrapper).toBe(outlet);
+
+      rootElement.remove();
+    });
+
+    it("should allow injecting a custom appRouter or routes during bootstrapApp", () => {
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      const customRoutes = [{ path: "/", tagName: "custom-view" }];
+      const customRouter = new Router(outlet, customRoutes);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+        appRouter: customRouter,
+      });
+
+      expect(rootElement.__appRouter).toBe(customRouter);
+
+      rootElement.remove();
+    });
+
+    it("should mount initial route cleanly without duplicating children in #router-outlet", () => {
+      window.history.replaceState(null, "", "/");
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      outlet.innerHTML = `<div class="charge-page charge-page--split"><!-- placeholder --></div>`;
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      expect(outlet.querySelectorAll(".charge-page")).toHaveLength(1);
+
+      rootElement.remove();
+    });
+
+    it("should mount <about-page> directly when initial URL is /sobre without leaving placeholder", () => {
+      window.history.replaceState(null, "", "/sobre");
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      outlet.innerHTML = `<div class="charge-page charge-page--split"><!-- placeholder --></div>`;
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      expect(outlet.querySelector(".charge-page")).toBeNull();
+      expect(outlet.querySelector("about-page")).not.toBeNull();
+
+      window.history.replaceState(null, "", "/");
+      rootElement.remove();
+    });
+
+    it("should navigate between / and /sobre and handle unknown paths via Router.goTo", async () => {
+      window.history.replaceState(null, "", "/");
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      // Rota inicial "/"
+      expect(outlet.querySelector(".charge-page")).not.toBeNull();
+      expect(outlet.querySelector("about-page")).toBeNull();
+
+      // Navegação para "/sobre"
+      Router.goTo("/sobre");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(window.location.pathname).toBe("/sobre");
+      expect(outlet.querySelector("about-page")).not.toBeNull();
+      expect(
+        outlet.querySelector("about-page").classList.contains("about-page"),
+      ).toBe(true);
+
+      // Navegação de volta para "/"
+      Router.goTo("/");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(window.location.pathname).toBe("/");
+      expect(outlet.querySelector(".charge-page")).not.toBeNull();
+      expect(outlet.querySelector("about-page")).toBeNull();
+
+      // Rota não mapeada (fallback "/*")
+      Router.goTo("/desconhecido");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(window.location.pathname).toBe("/desconhecido");
+      expect(outlet.querySelector(".charge-page")).not.toBeNull();
+
+      // Reset para a rota raiz
+      window.history.replaceState(null, "", "/");
+      rootElement.remove();
+    });
+  });
+
+  describe("Dependency Injection container with SetInjectable (TASK-04.3.3)", () => {
+    function resolveDependency(target, name) {
+      let resolvedValue = null;
+      target.dispatchEvent(
+        new CustomEvent("request-provider", {
+          bubbles: true,
+          composed: true,
+          detail: {
+            name,
+            inject: (val) => {
+              resolvedValue = val;
+            },
+          },
+        }),
+      );
+      return resolvedValue;
+    }
+
+    it("should register all core gateways, use cases and app-router via SetInjectable in ownerDocument", () => {
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      // Gateways
+      expect(
+        resolveDependency(rootElement, "pwa-install-gateway"),
+      ).toBeInstanceOf(PwaInstallAdapter);
+      expect(
+        resolveDependency(rootElement, "service-worker-gateway"),
+      ).toBeInstanceOf(ServiceWorkerAdapter);
+      expect(
+        resolveDependency(rootElement, "browser-share-gateway"),
+      ).toBeInstanceOf(BrowserShareAdapter);
+      expect(
+        resolveDependency(rootElement, "pix-key-repository"),
+      ).toBeInstanceOf(IndexedDbPixKeyRepository);
+
+      // Casos de Uso
+      expect(
+        resolveDependency(rootElement, "install-pwa-use-case"),
+      ).toBeInstanceOf(InstallPwaUseCase);
+      expect(
+        resolveDependency(rootElement, "generate-pix-charge-use-case"),
+      ).toBeInstanceOf(GeneratePixChargeUseCase);
+      expect(
+        resolveDependency(rootElement, "distribute-pix-charge-use-case"),
+      ).toBeInstanceOf(DistributePixChargeUseCase);
+      expect(
+        resolveDependency(rootElement, "save-pix-key-use-case"),
+      ).toBeInstanceOf(SavePixKeyUseCase);
+      expect(
+        resolveDependency(rootElement, "list-pix-keys-use-case"),
+      ).toBeInstanceOf(ListPixKeysUseCase);
+      expect(
+        resolveDependency(rootElement, "select-pix-key-use-case"),
+      ).toBeInstanceOf(SelectPixKeyUseCase);
+      expect(
+        resolveDependency(rootElement, "delete-pix-key-use-case"),
+      ).toBeInstanceOf(DeletePixKeyUseCase);
+
+      // Router
+      expect(resolveDependency(rootElement, "app-router")).toBe(
+        rootElement.__appRouter,
+      );
+
+      rootElement.remove();
+    });
+
+    it("should resolve injectables in a CustomElement child via this.addInjectable() upon connection", () => {
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      const tagName = "test-consumer-element";
+      if (!customElements.get(tagName)) {
+        class TestConsumerElement extends CustomElement {
+          constructor() {
+            super();
+            this.addInjectable("pix-key-repository", "keyRepo");
+            this.addInjectable(
+              "generate-pix-charge-use-case",
+              "generateCharge",
+            );
+            this.addInjectable(
+              "distribute-pix-charge-use-case",
+              "distributeCharge",
+            );
+            this.addInjectable("app-router", "router");
+          }
+        }
+        customElements.define(tagName, TestConsumerElement);
+      }
+
+      const consumer = document.createElement(tagName);
+      rootElement.appendChild(consumer);
+
+      expect(consumer.keyRepo).toBeInstanceOf(IndexedDbPixKeyRepository);
+      expect(consumer.generateCharge).toBeInstanceOf(GeneratePixChargeUseCase);
+      expect(consumer.distributeCharge).toBeInstanceOf(
+        DistributePixChargeUseCase,
+      );
+      expect(consumer.router).toBe(rootElement.__appRouter);
+
+      rootElement.remove();
+    });
+
+    it("should allow passing custom use case and gateway instances in bootstrapApp options", () => {
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      const customKeyRepo = { findById: vi.fn(), findAll: vi.fn() };
+      const customGenerateUseCase = { execute: vi.fn() };
+      const customDistributeUseCase = { execute: vi.fn() };
+      const customShareGateway = { share: vi.fn(), canShare: vi.fn() };
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+        pixKeyRepository: customKeyRepo,
+        generatePixChargeUseCase: customGenerateUseCase,
+        distributePixChargeUseCase: customDistributeUseCase,
+        browserShareGateway: customShareGateway,
+      });
+
+      expect(resolveDependency(rootElement, "pix-key-repository")).toBe(
+        customKeyRepo,
+      );
+      expect(
+        resolveDependency(rootElement, "generate-pix-charge-use-case"),
+      ).toBe(customGenerateUseCase);
+      expect(
+        resolveDependency(rootElement, "distribute-pix-charge-use-case"),
+      ).toBe(customDistributeUseCase);
+      expect(resolveDependency(rootElement, "browser-share-gateway")).toBe(
+        customShareGateway,
+      );
+
+      rootElement.remove();
+    });
+  });
+
+  describe("SPA link navigation and click interception (TASK-04.3.5)", () => {
+    it("should intercept clicks on internal links within rootElement and call Router.goTo", () => {
+      const goToSpy = vi.spyOn(Router, "goTo").mockImplementation(() => {});
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+
+      const link = document.createElement("a");
+      link.href = "/sobre";
+      link.className = "app-header__about-link";
+      link.textContent = "Sobre";
+      rootElement.appendChild(link);
+
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      const clickEvent = new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+      });
+      link.dispatchEvent(clickEvent);
+
+      expect(clickEvent.defaultPrevented).toBe(true);
+      expect(goToSpy).toHaveBeenCalledWith("/sobre");
+
+      goToSpy.mockRestore();
+      rootElement.remove();
+    });
+
+    it("should navigate to / when clicking or pressing Enter on .app-header__brand", () => {
+      const goToSpy = vi.spyOn(Router, "goTo").mockImplementation(() => {});
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+
+      const brand = document.createElement("div");
+      brand.className = "app-header__brand";
+      brand.setAttribute("role", "button");
+      brand.setAttribute("tabindex", "0");
+      rootElement.appendChild(brand);
+
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      // Clique no brand
+      const clickEvent = new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+      });
+      brand.dispatchEvent(clickEvent);
+      expect(goToSpy).toHaveBeenCalledWith("/");
+
+      goToSpy.mockClear();
+
+      // Tecla Enter no brand
+      const enterEvent = new KeyboardEvent("keydown", {
+        key: "Enter",
+        bubbles: true,
+        cancelable: true,
+      });
+      brand.dispatchEvent(enterEvent);
+      expect(goToSpy).toHaveBeenCalledWith("/");
+
+      goToSpy.mockRestore();
+      rootElement.remove();
+    });
+
+    it("should intercept clicks on footer links such as .app-footer__link", () => {
+      const goToSpy = vi.spyOn(Router, "goTo").mockImplementation(() => {});
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+
+      const footer = document.createElement("footer");
+      footer.className = "app-footer";
+      const footerLink = document.createElement("a");
+      footerLink.href = "/sobre";
+      footerLink.className = "app-footer__link";
+      footer.appendChild(footerLink);
+      rootElement.appendChild(footer);
+
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      const clickEvent = new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+      });
+      footerLink.dispatchEvent(clickEvent);
+
+      expect(clickEvent.defaultPrevented).toBe(true);
+      expect(goToSpy).toHaveBeenCalledWith("/sobre");
+
+      goToSpy.mockRestore();
+      rootElement.remove();
+    });
+
+    it("should NOT intercept external links, mailto, target=_blank, or download links", () => {
+      const goToSpy = vi.spyOn(Router, "goTo").mockImplementation(() => {});
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+
+      const externalLink = document.createElement("a");
+      externalLink.href = "https://github.com/luizcanet/mandaumpix.app";
+      externalLink.target = "_blank";
+      rootElement.appendChild(externalLink);
+
+      const mailtoLink = document.createElement("a");
+      mailtoLink.href = "mailto:eu@luizca.net";
+      rootElement.appendChild(mailtoLink);
+
+      const downloadLink = document.createElement("a");
+      downloadLink.href = "/qr.png";
+      downloadLink.setAttribute("download", "qr.png");
+      rootElement.appendChild(downloadLink);
+
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      // External link
+      const extClick = new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+      });
+      externalLink.dispatchEvent(extClick);
+      expect(extClick.defaultPrevented).toBe(false);
+      expect(goToSpy).not.toHaveBeenCalled();
+
+      // Mailto link
+      const mailClick = new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+      });
+      mailtoLink.dispatchEvent(mailClick);
+      expect(mailClick.defaultPrevented).toBe(false);
+      expect(goToSpy).not.toHaveBeenCalled();
+
+      // Download link
+      const dlClick = new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+      });
+      downloadLink.dispatchEvent(dlClick);
+      expect(dlClick.defaultPrevented).toBe(false);
+      expect(goToSpy).not.toHaveBeenCalled();
+
+      goToSpy.mockRestore();
+      rootElement.remove();
+    });
+  });
+
+  describe("Accessibility on route change — Focus management & document.title (TASK-04.3.6)", () => {
+    it("should set tabindex=-1 on #router-outlet during bootstrapApp and move focus on route change", async () => {
+      window.history.replaceState(null, "", "/");
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      const focusSpy = vi.spyOn(outlet, "focus");
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      expect(outlet.getAttribute("tabindex")).toBe("-1");
+
+      // Navegação para "/sobre"
+      Router.goTo("/sobre");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(focusSpy).toHaveBeenCalled();
+
+      focusSpy.mockRestore();
+      window.history.replaceState(null, "", "/");
+      rootElement.remove();
+    });
+
+    it("should update document.title when navigating to /sobre and returning to /", async () => {
+      window.history.replaceState(null, "", "/");
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      expect(document.title).toBe("Manda um PIX — Cobrança rápida");
+
+      // Navega para "/sobre"
+      Router.goTo("/sobre");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(document.title).toBe("Sobre o aplicativo — Manda um PIX");
+
+      // Retorna para "/"
+      Router.goTo("/");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(document.title).toBe("Manda um PIX — Cobrança rápida");
+
+      // Rota não mapeada (fallback "/*")
+      Router.goTo("/qualquer-coisa");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(document.title).toBe("Manda um PIX — Cobrança rápida");
+
+      window.history.replaceState(null, "", "/");
+      rootElement.remove();
+    });
+
+    it("should update title and focus on popstate event (browser back/forward button)", async () => {
+      window.history.replaceState(null, "", "/sobre");
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      const focusSpy = vi.spyOn(outlet, "focus");
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      expect(document.title).toBe("Sobre o aplicativo — Manda um PIX");
+
+      // Simula o usuário clicando no botão "Voltar" do navegador
+      window.history.replaceState(null, "", "/");
+      window.dispatchEvent(new PopStateEvent("popstate"));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(document.title).toBe("Manda um PIX — Cobrança rápida");
+      expect(focusSpy).toHaveBeenCalled();
+
+      focusSpy.mockRestore();
+      window.history.replaceState(null, "", "/");
       rootElement.remove();
     });
   });
