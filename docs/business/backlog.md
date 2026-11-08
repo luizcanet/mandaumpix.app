@@ -762,7 +762,7 @@ flowchart LR
 
 > **Objetivo**: Entregar o fluxo central em 3 toques (**Selecionar chave → Informar valor opcional → Clicar em "Manda um PIX"**) e o cartão de resultado com QR Code de alto contraste e ações de saída (`Copiar`, `WhatsApp`, `Salvar PNG`).
 
-#### `US-06.1` — Componente `<pix-charge-form>` (Valor Opcional + Botão "Manda um PIX") (`⏳ Pendente` · `3 Story Points`)
+#### `US-06.1` — Componente `<pix-charge-form>` (Valor Opcional + Botão "Manda um PIX") (`✅ Concluído` · `3 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Recebedor** que já possui uma conta ou chave selecionada para recebimento,
@@ -849,7 +849,7 @@ flowchart LR
   - [x] **TASK-06.1.5 (Estilização CSS BEM, Tokens de Cor e Responsividade)**: Implementar os estilos em [`src/presentation/components/pix-charge-form/pix-charge-form.css`](../../src/presentation/components/pix-charge-form/pix-charge-form.css) e testes de estilo em [`src/presentation/components/pix-charge-form/pix-charge-form.css.test.js`](../../src/presentation/components/pix-charge-form/pix-charge-form.css.test.js), consumindo os tokens de design (`--color-brand-accent`, `--color-surface-muted`, `--radius-lg`), garantindo alvos de toque $\ge 44\text{px}$ e estados `:focus-visible`.
   - [x] **TASK-06.1.6 (Catálogo Interativo no Storybook & Auditoria a11y)**: Criar arquivo de stories [`src/presentation/components/pix-charge-form/pix-charge-form.stories.js`](../../src/presentation/components/pix-charge-form/pix-charge-form.stories.js) com cenários: _Formulário com Valor Aberto_, _Valor Fixo Preenchido_, _Botão CTA Desabilitado (Sem Chave)_, e auditoria `@storybook/addon-a11y`.
   - [x] **TASK-06.1.7 (Exportação Pública no Módulo Principal e Registro de Tag)**: Exportar `PixChargeFormComponent` e constantes em [`src/main.js`](../../src/main.js) e registrar `customElements.define("pix-charge-form", PixChargeFormComponent)`.
-  - [ ] **TASK-06.1.8 (Documentação Viva & Atualização do Backlog)**: Atualizar a matriz de módulos em [`docs/design/modules.md`](../design/modules.md) e [`docs/business/backlog.md`](./backlog.md) documentando o contrato do componente gerador.
+  - [x] **TASK-06.1.8 (Documentação Viva & Atualização do Backlog)**: Atualizar a matriz de módulos em [`docs/design/modules.md`](../design/modules.md) e [`docs/business/backlog.md`](./backlog.md) documentando o contrato do componente gerador.
 
 ```mermaid
 flowchart LR
