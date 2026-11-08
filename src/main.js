@@ -411,6 +411,69 @@ export function bootstrapApp(
     headerElement.installPwaUseCase = installUseCase;
   }
 
+  const handleNavigationClick = (event) => {
+    const brandElement = event.target?.closest?.(".app-header__brand");
+    if (brandElement && rootElement.contains(brandElement)) {
+      event.preventDefault();
+      Router.goTo("/");
+      return;
+    }
+
+    const anchor = event.target?.closest?.("a[href]");
+    if (!anchor || !rootElement.contains(anchor)) {
+      return;
+    }
+
+    if (
+      anchor.target === "_blank" ||
+      anchor.hasAttribute("download") ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+
+    const href = anchor.getAttribute("href");
+    if (!href) {
+      return;
+    }
+
+    if (href.startsWith("/") && !href.startsWith("//")) {
+      event.preventDefault();
+      Router.goTo(href);
+    }
+  };
+
+  const handleBrandKeydown = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      const brandElement = event.target?.closest?.(".app-header__brand");
+      if (brandElement && rootElement.contains(brandElement)) {
+        event.preventDefault();
+        Router.goTo("/");
+      }
+    }
+  };
+
+  if (rootElement.__navigationClickHandler) {
+    rootElement.removeEventListener(
+      "click",
+      rootElement.__navigationClickHandler,
+    );
+  }
+  if (rootElement.__navigationKeydownHandler) {
+    rootElement.removeEventListener(
+      "keydown",
+      rootElement.__navigationKeydownHandler,
+    );
+  }
+
+  rootElement.__navigationClickHandler = handleNavigationClick;
+  rootElement.__navigationKeydownHandler = handleBrandKeydown;
+  rootElement.addEventListener("click", handleNavigationClick);
+  rootElement.addEventListener("keydown", handleBrandKeydown);
+
   return rootElement;
 }
 
