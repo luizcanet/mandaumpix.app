@@ -3,6 +3,7 @@ import "../src/presentation/styles/reset.css";
 import "../src/presentation/styles/layout.css";
 import "../src/presentation/styles/app-shell.css";
 import "../src/presentation/pages/about-page/about-page.css";
+import "../src/presentation/components/pix-key-empty/pix-key-empty.css";
 import "../src/presentation/components/vector-icon/vector-icon.css";
 import "../src/presentation/components/vector-icon/vector-icon.component.js";
 

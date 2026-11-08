@@ -542,7 +542,7 @@ flowchart TD
 
 > **Objetivo**: Implementar a experiência completa de cadastro, listagem, seleção e remoção de múltiplas chaves PIX diretamente na tela principal sem mudança de contexto.
 
-#### `US-05.1` — Componente `<pix-key-empty>` (Estado Inicial Sem Chaves) (`⏳ Pendente` · `2 Story Points`)
+#### `US-05.1` — Componente `<pix-key-empty>` (Estado Inicial Sem Chaves) (`✅ Concluído` · `2 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Recebedor** abrindo o aplicativo pela primeira vez (ou que não possui nenhuma chave PIX cadastrada),
@@ -583,13 +583,13 @@ flowchart TD
     - E o elemento deve apresentar anel de foco visível durante navegação por teclado (`:focus-visible`),
     - E não deve apresentar violações de acessibilidade no teste automatizado `@storybook/addon-a11y`.
 - **Tarefas de Desenvolvimento (Dev Tasks)**:
-  - [ ] **TASK-05.1.1 (Constantes & Textos Padronizados do Empty State)**: Criar [`src/presentation/components/pix-key-empty/pix-key-empty.constants.js`](../../src/presentation/components/pix-key-empty/pix-key-empty.constants.js) contendo as constantes canônicas (`DEFAULT_EMPTY_STATE_TITLE`, `DEFAULT_EMPTY_STATE_DESCRIPTION`, `DEFAULT_EMPTY_STATE_CTA`, `KEY_EMPTY_EVENT_NAMES`).
-  - [ ] **TASK-05.1.2 (TDD / Testes Unitários de Renderização e Eventos)**: Criar testes unitários em [`src/presentation/components/pix-key-empty/pix-key-empty.test.js`](../../src/presentation/components/pix-key-empty/pix-key-empty.test.js) cobrindo renderização padrão, verificação semântica BEM, reação a atributos observados, clique no CTA e emissão do evento `open-key-dialog`.
-  - [ ] **TASK-05.1.3 (Implementação / Web Component `PixKeyEmptyComponent`)**: Implementar a classe `PixKeyEmptyComponent` em [`src/presentation/components/pix-key-empty/pix-key-empty.component.js`](../../src/presentation/components/pix-key-empty/pix-key-empty.component.js) estendendo `CustomElement` (`@modnes/custom-element`), com template declarativo BEM, binding reativo de propriedades e disparo seguro de evento.
-  - [ ] **TASK-05.1.4 (Estilização BEM, Tokens de Cor e Responsividade)**: Implementar os estilos do bloco `.key-empty-state` em [`src/presentation/components/pix-key-empty/pix-key-empty.css`](../../src/presentation/components/pix-key-empty/pix-key-empty.css) consumindo os tokens de design (`--color-brand-primary`, `--color-brand-accent`, `--space-xl`, `--radius-lg`), com alvos de toque mínimos de `44px` e animação suave de foco.
-  - [ ] **TASK-05.1.5 (Catálogo Interativo no Storybook & Auditoria a11y)**: Criar arquivo de stories [`src/presentation/components/pix-key-empty/pix-key-empty.stories.js`](../../src/presentation/components/pix-key-empty/pix-key-empty.stories.js) com stories cobrindo o estado padrão, textos customizados e validação de acessibilidade com `@storybook/addon-a11y`.
-  - [ ] **TASK-05.1.6 (Exportação Pública no Módulo Principal e Registro de Tag)**: Exportar `PixKeyEmptyComponent` e constantes em [`src/main.js`](../../src/main.js) e registrar a tag `customElements.define("pix-key-empty", PixKeyEmptyComponent)` para disponibilização global.
-  - [ ] **TASK-05.1.7 (Documentação Viva & Atualização do Backlog)**: Atualizar a tabela de módulos em [`docs/design/modules.md`](../design/modules.md) e registrar a conclusão do ciclo de refinamento da história.
+  - [x] **TASK-05.1.1 (Constantes & Textos Padronizados do Empty State)**: Criar [`src/presentation/components/pix-key-empty/pix-key-empty.constants.js`](../../src/presentation/components/pix-key-empty/pix-key-empty.constants.js) contendo as constantes canônicas (`DEFAULT_EMPTY_STATE_TITLE`, `DEFAULT_EMPTY_STATE_DESCRIPTION`, `DEFAULT_EMPTY_STATE_CTA`, `KEY_EMPTY_EVENT_NAMES`).
+  - [x] **TASK-05.1.2 (TDD / Testes Unitários de Renderização e Eventos)**: Criar testes unitários em [`src/presentation/components/pix-key-empty/pix-key-empty.test.js`](../../src/presentation/components/pix-key-empty/pix-key-empty.test.js) cobrindo renderização padrão, verificação semântica BEM, reação a atributos observados, clique no CTA e emissão do evento `open-key-dialog`.
+  - [x] **TASK-05.1.3 (Implementação / Web Component `PixKeyEmptyComponent`)**: Implementar a classe `PixKeyEmptyComponent` em [`src/presentation/components/pix-key-empty/pix-key-empty.component.js`](../../src/presentation/components/pix-key-empty/pix-key-empty.component.js) estendendo `CustomElement` (`@modnes/custom-element`), com template declarativo BEM, binding reativo de propriedades e disparo seguro de evento.
+  - [x] **TASK-05.1.4 (Estilização BEM, Tokens de Cor e Responsividade)**: Implementar os estilos do bloco `.key-empty-state` em [`src/presentation/components/pix-key-empty/pix-key-empty.css`](../../src/presentation/components/pix-key-empty/pix-key-empty.css) consumindo os tokens de design (`--color-brand-primary`, `--color-brand-accent`, `--space-xl`, `--radius-lg`), com alvos de toque mínimos de `44px` e animação suave de foco.
+  - [x] **TASK-05.1.5 (Catálogo Interativo no Storybook & Auditoria a11y)**: Criar arquivo de stories [`src/presentation/components/pix-key-empty/pix-key-empty.stories.js`](../../src/presentation/components/pix-key-empty/pix-key-empty.stories.js) com stories cobrindo o estado padrão, textos customizados e validação de acessibilidade com `@storybook/addon-a11y`.
+  - [x] **TASK-05.1.6 (Exportação Pública no Módulo Principal e Registro de Tag)**: Exportar `PixKeyEmptyComponent` e constantes em [`src/main.js`](../../src/main.js) e registrar a tag `customElements.define("pix-key-empty", PixKeyEmptyComponent)` para disponibilização global.
+  - [x] **TASK-05.1.7 (Documentação Viva & Atualização do Backlog)**: Atualizar a tabela de módulos em [`docs/design/modules.md`](../design/modules.md) e registrar a conclusão do ciclo de refinamento da história.
 
 #### `US-05.2` — Componente `<pix-key-selector>` (Lista de Radio Cards de Chaves) (`⏳ Pendente`)
 

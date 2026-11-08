@@ -32,6 +32,15 @@ import {
 } from "./presentation/di/container.js";
 import AppHeaderComponent from "./presentation/components/app-header/app-header.component.js";
 import VectorIconComponent from "./presentation/components/vector-icon/vector-icon.component.js";
+import PixKeyEmptyComponent from "./presentation/components/pix-key-empty/pix-key-empty.component.js";
+import {
+  DEFAULT_EMPTY_STATE_ARIA_LABEL,
+  DEFAULT_EMPTY_STATE_CTA,
+  DEFAULT_EMPTY_STATE_DESCRIPTION,
+  DEFAULT_EMPTY_STATE_TITLE,
+  KEY_EMPTY_EVENT_NAMES,
+  KEY_EMPTY_ICONS,
+} from "./presentation/components/pix-key-empty/pix-key-empty.constants.js";
 import AboutPageComponent from "./presentation/pages/about-page/about-page.component.js";
 import {
   ABOUT_AUTHOR,
@@ -206,7 +215,15 @@ export {
   // Componentes de Apresentação
   AboutPageComponent,
   AppHeaderComponent,
+  PixKeyEmptyComponent,
   VectorIconComponent,
+  // Metadados e Constantes do Estado Vazio de Chaves PIX (<pix-key-empty>)
+  DEFAULT_EMPTY_STATE_ARIA_LABEL,
+  DEFAULT_EMPTY_STATE_CTA,
+  DEFAULT_EMPTY_STATE_DESCRIPTION,
+  DEFAULT_EMPTY_STATE_TITLE,
+  KEY_EMPTY_EVENT_NAMES,
+  KEY_EMPTY_ICONS,
   // Metadados e Constantes da Página Sobre (/sobre)
   ABOUT_AUTHOR,
   ABOUT_NAVIGATION,

@@ -19,6 +19,10 @@ import {
   CustomElement,
   DEFAULT_DB_NAME,
   DEFAULT_DB_VERSION,
+  DEFAULT_EMPTY_STATE_ARIA_LABEL,
+  DEFAULT_EMPTY_STATE_CTA,
+  DEFAULT_EMPTY_STATE_DESCRIPTION,
+  DEFAULT_EMPTY_STATE_TITLE,
   DEFAULT_PIX_CHARGE_TXID,
   DEFAULT_PIX_KEY_LABELS,
   DEFAULT_QR_IMAGE_FILENAME,
@@ -33,6 +37,8 @@ import {
   GeneratePixChargeUseCase,
   IndexedDbPixKeyRepository,
   InstallPwaUseCase,
+  KEY_EMPTY_EVENT_NAMES,
+  KEY_EMPTY_ICONS,
   ListPixKeysUseCase,
   MAX_PIX_CHARGE_ADDITIONAL_INFO_LENGTH,
   MAX_PIX_CHARGE_AMOUNT,
@@ -55,6 +61,7 @@ import {
   PixChargeDistributionError,
   PixChargeEntity,
   PixChargeValidationError,
+  PixKeyEmptyComponent,
   PixKeyEntity,
   PixKeyManagementError,
   PixKeyStorageError,
@@ -869,6 +876,17 @@ describe("main.js", () => {
       expect(ABOUT_SHARE).toBeDefined();
       expect(ABOUT_NAVIGATION).toBeDefined();
       expect(customElements.get("about-page")).toBe(AboutPageComponent);
+    });
+
+    it("should re-export PixKeyEmptyComponent and empty-state constants (TASK-05.1.6)", () => {
+      expect(PixKeyEmptyComponent).toBeDefined();
+      expect(DEFAULT_EMPTY_STATE_TITLE).toBeDefined();
+      expect(DEFAULT_EMPTY_STATE_DESCRIPTION).toBeDefined();
+      expect(DEFAULT_EMPTY_STATE_CTA).toBeDefined();
+      expect(DEFAULT_EMPTY_STATE_ARIA_LABEL).toBeDefined();
+      expect(KEY_EMPTY_EVENT_NAMES).toBeDefined();
+      expect(KEY_EMPTY_ICONS).toBeDefined();
+      expect(customElements.get("pix-key-empty")).toBe(PixKeyEmptyComponent);
     });
 
     it("should initialize PWA install adapter and use case on rootElement during bootstrapApp", () => {
