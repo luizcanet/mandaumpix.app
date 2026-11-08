@@ -78,4 +78,3 @@ export const ABOUT_NAVIGATION = Object.freeze({
   homeButtonText: "Início",
   logoSrc: "./src/assets/icons/icon.svg",
 });
-
