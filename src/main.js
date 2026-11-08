@@ -41,6 +41,20 @@ import {
   KEY_EMPTY_EVENT_NAMES,
   KEY_EMPTY_ICONS,
 } from "./presentation/components/pix-key-empty/pix-key-empty.constants.js";
+import PixKeySelectorComponent from "./presentation/components/pix-key-selector/pix-key-selector.component.js";
+import {
+  DEFAULT_KEY_SELECTOR_ADD_BTN_LABEL,
+  DEFAULT_KEY_SELECTOR_DELETE_TITLE,
+  DEFAULT_KEY_SELECTOR_LIST_LABEL,
+  DEFAULT_KEY_SELECTOR_STEP,
+  DEFAULT_KEY_SELECTOR_TITLE,
+  DEFAULT_KEY_SELECTOR_TITLE_ID,
+  KEY_SELECTOR_CLASSES,
+  KEY_SELECTOR_EVENT_NAMES,
+  KEY_SELECTOR_ICONS,
+  KEY_SELECTOR_INJECTABLES,
+  formatKeyDeleteAriaLabel,
+} from "./presentation/components/pix-key-selector/pix-key-selector.constants.js";
 import AboutPageComponent from "./presentation/pages/about-page/about-page.component.js";
 import {
   ABOUT_AUTHOR,
@@ -216,6 +230,7 @@ export {
   AboutPageComponent,
   AppHeaderComponent,
   PixKeyEmptyComponent,
+  PixKeySelectorComponent,
   VectorIconComponent,
   // Metadados e Constantes do Estado Vazio de Chaves PIX (<pix-key-empty>)
   DEFAULT_EMPTY_STATE_ARIA_LABEL,
@@ -224,6 +239,18 @@ export {
   DEFAULT_EMPTY_STATE_TITLE,
   KEY_EMPTY_EVENT_NAMES,
   KEY_EMPTY_ICONS,
+  // Metadados e Constantes do Seletor de Chaves PIX (<pix-key-selector>)
+  DEFAULT_KEY_SELECTOR_ADD_BTN_LABEL,
+  DEFAULT_KEY_SELECTOR_DELETE_TITLE,
+  DEFAULT_KEY_SELECTOR_LIST_LABEL,
+  DEFAULT_KEY_SELECTOR_STEP,
+  DEFAULT_KEY_SELECTOR_TITLE,
+  DEFAULT_KEY_SELECTOR_TITLE_ID,
+  KEY_SELECTOR_CLASSES,
+  KEY_SELECTOR_EVENT_NAMES,
+  KEY_SELECTOR_ICONS,
+  KEY_SELECTOR_INJECTABLES,
+  formatKeyDeleteAriaLabel,
   // Metadados e Constantes da Página Sobre (/sobre)
   ABOUT_AUTHOR,
   ABOUT_NAVIGATION,
