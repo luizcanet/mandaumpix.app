@@ -55,6 +55,18 @@ export default {
             id: "color-contrast",
             enabled: true,
           },
+          {
+            id: "button-name",
+            enabled: true,
+          },
+          {
+            id: "target-size",
+            enabled: true,
+          },
+          {
+            id: "aria-required-children",
+            enabled: true,
+          },
         ],
       },
     },
