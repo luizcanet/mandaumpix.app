@@ -135,6 +135,45 @@ describe("pix-charge-result.css (TASK-06.2.5: Estilização BEM, Moldura Óptica
         /\.charge-result__actions\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*1fr\)/,
       );
     });
+
+    it("deve definir os botões de ação com dimensões mínimas de toque acessível (48px / 44px)", () => {
+      expect(cssContent).toMatch(
+        /\.charge-result__btn\s*\{[^}]*min-height:\s*48px/,
+      );
+      expect(cssContent).toMatch(
+        /\.charge-result__btn\s*\{[^}]*min-width:\s*44px/,
+      );
+    });
+
+    it("deve definir anel de foco de alto contraste para botões com :focus-visible", () => {
+      expect(cssContent).toMatch(
+        /\.charge-result__btn:focus-visible\s*\{[^}]*border-color:\s*var\(--color-focus/,
+      );
+    });
+
+    it("deve estilizar a variação de botão Copiar com brand-primary", () => {
+      expect(cssContent).toMatch(
+        /\.charge-result__btn--copy\s*\{[^}]*background-color:\s*var\(--color-brand-primary/,
+      );
+    });
+
+    it("deve estilizar a variação de botão Copiado com success", () => {
+      expect(cssContent).toMatch(
+        /\.charge-result__btn--copied\s*\{[^}]*background-color:\s*var\(--color-success/,
+      );
+    });
+
+    it("deve estilizar a variação de botão Compartilhar com success", () => {
+      expect(cssContent).toMatch(
+        /\.charge-result__btn--share\s*\{[^}]*background-color:\s*var\(--color-success/,
+      );
+    });
+
+    it("deve estilizar a variação de botão Salvar PNG com surface elevado e borda", () => {
+      expect(cssContent).toMatch(
+        /\.charge-result__btn--download\s*\{[^}]*background-color:\s*var\(--color-surface-elevated/,
+      );
+    });
   });
 
   describe("Acessibilidade e Compatibilidade Dark Mode", () => {

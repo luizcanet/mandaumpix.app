@@ -68,6 +68,49 @@ export const DEFAULT_CHARGE_RESULT_BRCODE_ARIA_LABEL =
   "Código PIX Copia e Cola";
 
 /**
+ * Duração padrão em milissegundos para manter o estado visual transitório "Copiado!" no botão de cópia.
+ */
+export const COPY_FEEDBACK_DURATION_MS = 2500;
+export const DEFAULT_COPY_FEEDBACK_DURATION_MS = COPY_FEEDBACK_DURATION_MS;
+
+/**
+ * Textos e rótulos padrão dos botões de ação de distribuição da cobrança (US-06.3 / RN05).
+ */
+export const DEFAULT_CHARGE_RESULT_COPY_LABEL = "Copiar";
+export const DEFAULT_CHARGE_RESULT_COPIED_LABEL = "Copiado!";
+export const DEFAULT_CHARGE_RESULT_SHARE_LABEL = "WhatsApp";
+export const DEFAULT_CHARGE_RESULT_DOWNLOAD_LABEL = "Salvar PNG";
+export const DEFAULT_CHARGE_RESULT_DOWNLOAD_FILENAME = "mandaumpix-qrcode.png";
+
+/**
+ * Rótulos acessíveis (aria-label) dos botões de ação de distribuição.
+ */
+export const DEFAULT_CHARGE_RESULT_BTN_COPY_ARIA_LABEL =
+  "Copiar código PIX Copia e Cola";
+export const DEFAULT_CHARGE_RESULT_BTN_SHARE_ARIA_LABEL =
+  "Compartilhar cobrança PIX via WhatsApp";
+export const DEFAULT_CHARGE_RESULT_BTN_DOWNLOAD_ARIA_LABEL =
+  "Baixar imagem do QR Code em formato PNG";
+
+/**
+ * Mensagens de feedback acessível anunciadas via região aria-live="polite".
+ */
+export const DEFAULT_CHARGE_RESULT_LIVE_COPIED =
+  "Código PIX Copia e Cola copiado para a área de transferência!";
+export const DEFAULT_CHARGE_RESULT_LIVE_COPY_FALLBACK =
+  "Não foi possível copiar automaticamente. O código foi selecionado para cópia manual.";
+export const DEFAULT_CHARGE_RESULT_LIVE_SHARED =
+  "Cobrança PIX aberta para compartilhamento.";
+export const DEFAULT_CHARGE_RESULT_LIVE_DOWNLOADED =
+  "Download da imagem do QR Code em PNG iniciado.";
+
+/**
+ * Identificador do serviço injetável do caso de uso de distribuição no contêiner DI.
+ */
+export const DISTRIBUTE_PIX_CHARGE_INJECTABLE_TOKEN =
+  "distribute-pix-charge-use-case";
+
+/**
  * Mapeamento das classes BEM utilizadas na estrutura do palco de resultado da cobrança.
  */
 export const CHARGE_RESULT_CLASSES = Object.freeze({
@@ -94,6 +137,11 @@ export const CHARGE_RESULT_CLASSES = Object.freeze({
   BRCODE_MODE: "charge-result__brcode-mode",
   BRCODE: "charge-result__brcode",
   ACTIONS: "charge-result__actions",
+  BTN: "charge-result__btn",
+  BTN_COPY: "charge-result__btn--copy",
+  BTN_COPIED: "charge-result__btn--copied",
+  BTN_SHARE: "charge-result__btn--share",
+  BTN_DOWNLOAD: "charge-result__btn--download",
   LIVE_REGION: "charge-result__live-region",
 });
 
@@ -114,6 +162,9 @@ export const CHARGE_RESULT_ICONS = Object.freeze({
 export const CHARGE_RESULT_EVENT_NAMES = Object.freeze({
   CHARGE_CHANGED: "charge-changed",
   CHARGE_CLEARED: "charge-cleared",
+  CHARGE_COPIED: "charge-copied",
+  CHARGE_SHARED: "charge-shared",
+  CHARGE_DOWNLOADED: "charge-downloaded",
 });
 
 /**

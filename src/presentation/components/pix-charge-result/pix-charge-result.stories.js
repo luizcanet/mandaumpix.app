@@ -5,6 +5,7 @@ import {
   CHARGE_RESULT_EVENT_NAMES,
   DEFAULT_CHARGE_RESULT_WAITING_DESCRIPTION,
   DEFAULT_CHARGE_RESULT_WAITING_TITLE,
+  DISTRIBUTE_PIX_CHARGE_INJECTABLE_TOKEN,
 } from "./pix-charge-result.constants.js";
 
 const SAMPLE_KEY = {
@@ -51,6 +52,26 @@ const SAMPLE_OPEN_CHARGE = {
   gerado_em: new Date().toISOString(),
 };
 
+/**
+ * Mock do caso de uso de distribuição de cobrança PIX para Storybook.
+ */
+const mockDistributePixChargeUseCase = {
+  copyChargeCode: async () => ({
+    action: "COPY",
+    copied: true,
+  }),
+  shareCharge: async () => ({
+    action: "SHARE",
+    shared: true,
+    channel: "WEB_SHARE",
+  }),
+  downloadQrImage: async () => ({
+    action: "DOWNLOAD_QR",
+    downloaded: true,
+    fileName: "mandaumpix-qrcode.png",
+  }),
+};
+
 /** @type { import('@storybook/html-vite').Meta } */
 export default {
   title: "Components/PixChargeResult",
@@ -60,7 +81,7 @@ export default {
     docs: {
       description: {
         component:
-          'Web Component `<pix-charge-result>` construído sobre `@modnes/custom-element`. Palco de exibição de alto contraste do QR Code e código PIX Copia e Cola. Suporta o estado inicial de espera (aguardando geração), cobrança com valor fixo formatado em BRL (`RN04`) e cobrança com valor aberto/dinâmico (`RN03`). Apresenta moldura centralizada estritamente branca (`#ffffff`) com borda de alto contraste `#0b1834` para perfeita leitura óptica por câmeras de aplicativos bancários, mesmo em telas OLED ou modo escuro. Inclui região acessível `aria-live="polite"` e slot para ações de distribuição da história complementar `US-06.3`.',
+          'Web Component `<pix-charge-result>` construído sobre `@modnes/custom-element`. Palco de exibição de alto contraste do QR Code e código PIX Copia e Cola. Suporta o estado inicial de espera (aguardando geração), cobrança com valor fixo formatado em BRL (`RN04`) e cobrança com valor aberto/dinâmico (`RN03`). Apresenta moldura centralizada estritamente branca (`#ffffff`) com borda de alto contraste `#0b1834` para perfeita leitura óptica por câmeras de aplicativos bancários. Inclui ações integradas de distribuição (Copiar código com feedback visual e acessível de 2,5s, Compartilhar via WhatsApp / Web Share e Salvar imagem PNG do QR Code) em conformidade com a história `US-06.3` e `RN05`, botões com alvo de toque de 48px e região acessível `aria-live="polite"`.',
       },
     },
     a11y: {
@@ -68,6 +89,10 @@ export default {
         rules: [
           {
             id: "color-contrast",
+            enabled: true,
+          },
+          {
+            id: "button-name",
             enabled: true,
           },
         ],
@@ -97,14 +122,29 @@ export default {
 /**
  * Cria o contêiner responsivo com largura e espaçamento padronizados.
  */
-function createContainer(charge = null) {
+function createContainer(
+  charge = null,
+  { mockUseCase = mockDistributePixChargeUseCase } = {},
+) {
   const container = document.createElement("div");
   container.style.width = "100%";
   container.style.maxWidth = "440px";
   container.style.padding = "1rem";
   container.style.boxSizing = "border-box";
 
+  container.addEventListener("request-provider", (event) => {
+    if (
+      event.detail?.token === DISTRIBUTE_PIX_CHARGE_INJECTABLE_TOKEN &&
+      mockUseCase
+    ) {
+      event.detail.callback(mockUseCase);
+    }
+  });
+
   const result = document.createElement("pix-charge-result");
+  if (mockUseCase) {
+    result.distributePixChargeUseCase = mockUseCase;
+  }
   if (charge) {
     result.charge = charge;
   }
@@ -125,7 +165,7 @@ export const WaitingState = {
 };
 
 /**
- * Cenário 2: Cobrança Gerada com Valor Fixo (R$ 45,90 - Happy Path).
+ * Cenário 2: Cobrança Gerada com Valor Fixo (R$ 45,90 - Happy Path com Ações Integradas).
  */
 export const FixedAmount = {
   name: "2. Cobrança com Valor Fixo (R$ 45,90)",
@@ -147,54 +187,89 @@ export const OpenAmount = {
 };
 
 /**
- * Cenário 4: Com Ações de Saída Projetadas via Slot (US-06.3 Preview).
+ * Cenário 4: Estado Copiado Ativo ("Copiado!" com temporizador de 2,5s e botão para re-disparar).
  */
-export const WithActionButtons = {
-  name: "4. Com Ações de Distribuição (Copiar, WhatsApp, PNG)",
+export const CopiedState = {
+  name: "4. Estado Copiado Ativo ('Copiado!')",
   render: () => {
     const { container, result } = createContainer(SAMPLE_FIXED_CHARGE);
 
-    const actionsSlot = document.createElement("div");
-    actionsSlot.setAttribute("slot", "actions");
-    actionsSlot.style.display = "contents";
+    const controls = document.createElement("div");
+    controls.style.display = "flex";
+    controls.style.justifyContent = "center";
+    controls.style.marginBottom = "0.75rem";
 
-    actionsSlot.innerHTML = `
-      <button
-        type="button"
-        class="charge-result__btn charge-result__btn--copy"
-        style="min-height: 48px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; background-color: var(--color-brand-primary, #0b1834); color: #fff; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.3rem;"
-      >
-        <vector-icon name="copy"></vector-icon>
-        <span>Copiar</span>
-      </button>
-      <button
-        type="button"
-        class="charge-result__btn charge-result__btn--share"
-        style="min-height: 48px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; background-color: var(--color-success, #059669); color: #fff; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.3rem;"
-      >
-        <vector-icon name="share"></vector-icon>
-        <span>WhatsApp</span>
-      </button>
-      <button
-        type="button"
-        class="charge-result__btn charge-result__btn--download"
-        style="min-height: 48px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; background-color: var(--color-surface-elevated, #ffffff); color: var(--color-text-primary, #0f172a); border: 1px solid var(--color-border-strong, #cbd5e1); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.3rem;"
-      >
-        <vector-icon name="download"></vector-icon>
-        <span>Salvar PNG</span>
-      </button>
-    `;
+    const triggerBtn = document.createElement("button");
+    triggerBtn.type = "button";
+    triggerBtn.textContent = "Disparar Ação Copiar";
+    triggerBtn.style.padding = "0.45rem 0.85rem";
+    triggerBtn.style.borderRadius = "6px";
+    triggerBtn.style.fontSize = "0.75rem";
+    triggerBtn.style.fontWeight = "700";
+    triggerBtn.style.cursor = "pointer";
+    triggerBtn.style.border = "1px solid #cbd5e1";
+    triggerBtn.style.backgroundColor = "#f8fafc";
+    triggerBtn.onclick = () => result.copyChargeCode();
 
-    result.appendChild(actionsSlot);
+    controls.appendChild(triggerBtn);
+    container.insertBefore(controls, result);
+
+    // Dispara automaticamente para exibir o estado copiado inicial na montagem
+    setTimeout(() => {
+      result.copyChargeCode();
+    }, 100);
+
     return container;
   },
 };
 
 /**
- * Cenário 5: Interativo para teste de alternância dinâmica e limpeza de estado.
+ * Cenário 5: Ações de Distribuição com Log de Eventos (Copiar, Compartilhar e Salvar PNG).
+ */
+export const InteractiveActions = {
+  name: "5. Ações de Distribuição (Interativo com Eventos)",
+  render: () => {
+    const { container, result } = createContainer(SAMPLE_FIXED_CHARGE);
+
+    const logBox = document.createElement("div");
+    logBox.style.marginTop = "0.75rem";
+    logBox.style.padding = "0.6rem 0.85rem";
+    logBox.style.borderRadius = "6px";
+    logBox.style.backgroundColor = "#f1f5f9";
+    logBox.style.border = "1px solid #e2e8f0";
+    logBox.style.fontSize = "0.75rem";
+    logBox.style.fontFamily = "monospace";
+    logBox.textContent =
+      "Log de eventos: clique em Copiar, WhatsApp ou Salvar PNG...";
+
+    result.addEventListener(CHARGE_RESULT_EVENT_NAMES.CHARGE_COPIED, () => {
+      logBox.textContent = `[${new Date().toLocaleTimeString()}] Evento: 'charge-copied' disparado com sucesso!`;
+    });
+
+    result.addEventListener(
+      CHARGE_RESULT_EVENT_NAMES.CHARGE_SHARED,
+      (event) => {
+        logBox.textContent = `[${new Date().toLocaleTimeString()}] Evento: 'charge-shared' (canal: ${event.detail?.result?.channel || "WEB_SHARE"})`;
+      },
+    );
+
+    result.addEventListener(
+      CHARGE_RESULT_EVENT_NAMES.CHARGE_DOWNLOADED,
+      (event) => {
+        logBox.textContent = `[${new Date().toLocaleTimeString()}] Evento: 'charge-downloaded' (arquivo: ${event.detail?.result?.fileName || "mandaumpix-qrcode.png"})`;
+      },
+    );
+
+    container.appendChild(logBox);
+    return container;
+  },
+};
+
+/**
+ * Cenário 6: Interativo para teste de alternância dinâmica e limpeza de estado.
  */
 export const InteractiveToggle = {
-  name: "5. Interativo (Alternar Valor Fixo, Aberto e Limpar)",
+  name: "6. Interativo (Alternar Valor Fixo, Aberto e Limpar)",
   render: () => {
     const { container, result } = createContainer(null);
 
