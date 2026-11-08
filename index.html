@@ -13,6 +13,11 @@
     <link rel="icon" type="image/png" sizes="192x192" href="./src/assets/icons/icon-192.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./src/assets/icons/apple-touch-icon.png" />
     <link rel="manifest" href="./manifest.json" />
+    <link rel="stylesheet" href="./src/presentation/styles/tokens.css" />
+    <link rel="stylesheet" href="./src/presentation/styles/reset.css" />
+    <link rel="stylesheet" href="./src/presentation/styles/layout.css" />
+    <link rel="stylesheet" href="./src/presentation/styles/app-shell.css" />
+    <link rel="stylesheet" href="./src/presentation/components/vector-icon/vector-icon.css" />
     <script async src="https://ga.jspm.io/npm:es-module-shims@2.8.4/dist/es-module-shims.js" crossorigin="anonymous" integrity="sha384-0bdb7F9U10QF2R23CYCgvGdsStkMEEjDOVhWxFXpTlArSrMLKtrnsYtk21d8cBUc"></script>
     <script type="importmap">
     {
@@ -212,19 +217,63 @@
   </head>
   <body>
     <main id="app" class="app-root">
-      <header class="app-root__header">
-        <img
-          class="app-root__logo"
-          src="./src/assets/icons/icon.svg"
-          alt="Logotipo do Manda um PIX"
-          width="64"
-          height="64"
-        />
-        <h1 class="app-root__title">Manda um PIX</h1>
-        <p class="app-root__subtitle">
-          Gere cobranças via PIX com QR Code e PIX Copia e Cola diretamente no navegador.
-        </p>
+      <header class="app-header">
+        <div class="app-header__brand">
+          <img
+            class="app-header__logo"
+            src="./src/assets/icons/icon.svg"
+            alt="Logotipo do Manda um PIX"
+            width="42"
+            height="42"
+          />
+          <div>
+            <span class="app-header__title">Manda um PIX</span>
+            <span class="app-header__subtitle">Cobrança rápida via PIX</span>
+          </div>
+        </div>
+        <div class="app-header__actions">
+          <button
+            type="button"
+            class="app-header__install-btn hidden"
+            aria-label="Instalar aplicativo"
+          >
+            <vector-icon name="download"></vector-icon>
+            <span>Instalar</span>
+          </button>
+          <a
+            href="/sobre"
+            class="app-header__about-link"
+            aria-label="Sobre o aplicativo"
+          >
+            <vector-icon name="circle-info"></vector-icon>
+            <span>Sobre</span>
+          </a>
+        </div>
       </header>
+
+      <div
+        id="router-outlet"
+        class="app-main"
+        role="region"
+        aria-label="Conteúdo Principal"
+      >
+        <div class="charge-page charge-page--split">
+          <!-- Coluna Esquerda: Formulário e Chaves (EP-05 e EP-06) -->
+          <!-- Coluna Direita: Cartão do QR Code e Compartilhamento (EP-06) -->
+        </div>
+      </div>
+
+      <footer class="app-footer">
+        <div class="app-footer__status">
+          <span class="app-footer__dot" aria-hidden="true"></span>
+          <span>100% Local &amp; Offline-Ready</span>
+        </div>
+        <div class="app-footer__info">
+          <a href="/sobre" class="app-footer__link">Sobre</a>
+          <span aria-hidden="true">·</span>
+          <span class="app-footer__license">AGPL-3.0-only</span>
+        </div>
+      </footer>
     </main>
   </body>
 </html>
