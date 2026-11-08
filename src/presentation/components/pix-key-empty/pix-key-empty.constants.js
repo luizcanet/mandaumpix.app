@@ -38,4 +38,3 @@ export const KEY_EMPTY_ICONS = Object.freeze({
   KEY: "key",
   PLUS: "plus",
 });
-
