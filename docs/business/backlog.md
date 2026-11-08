@@ -665,17 +665,96 @@ flowchart LR
     T5 & T6 --> T7["TASK-05.2.7: Documentação Viva"]
 ```
 
-#### `US-05.3` — Componente `<pix-key-dialog>` (Modal `<dialog>` de Cadastro de Chave) (`⏳ Pendente`)
+#### `US-05.3` — Componente `<pix-key-dialog>` (Modal `<dialog>` de Cadastro de Chave) (`⏳ Pendente` · `5 Story Points`)
 
-- **História**: Como **Recebedor**, quero cadastrar uma nova chave PIX em um modal rápido sem sair da tela de cobrança, informando o tipo de chave, a chave, um apelido para a conta e os dados de beneficiário.
-- **Regras de Negócio**: `RN01`.
-- **Critérios de Aceite**:
-  - [ ] Criar Web Component `src/presentation/components/pix-key-dialog/pix-key-dialog.component.js` (bloco BEM `.key-dialog`) utilizando o elemento semântico nativo `<dialog>`.
-  - [ ] Implementar pílulas seletoras de tipo (`CPF`, `CNPJ`, `E-mail`, `Celular`, `Aleatória EVP`) que ajustam dinamicamente o `placeholder` e a validação do input `valor_chave`.
-  - [ ] Incluir campos para `rotulo` (apelido da conta), `nome_recebedor` (`maxlength="25"`) e `cidade_recebedor` (`maxlength="15"`).
-  - [ ] Exibir feedback visual e acessível (`role="alert"`) em caso de chave inválida usando `<vector-icon name="circle-exclamation">`.
-  - [ ] Ao salvar com sucesso, fechar o `<dialog>`, persistir localmente e selecionar automaticamente a chave recém-criada.
-  - [ ] Criar testes unitários e story interativa no Storybook.
+- **História (Narrativa Canônica)**:
+  > **Como** **Recebedor** que deseja receber pagamentos via PIX ou cadastrar uma nova conta bancária no Manda um PIX,
+  > **Quero** abrir um modal rápido (`<dialog>`) sem sair da tela principal de cobrança, selecionar visualmente o tipo de chave (`CPF`, `CNPJ`, `E-mail`, `Celular`, `Aleatória EVP`), preencher os dados com validação imediata e salvar a nova conta com persistência 100% local,
+  > **Para que** a nova chave seja instantaneamente cadastrada e selecionada como a conta ativa de recebimento, permitindo emitir cobranças em poucos segundos sem fricção ou perda de contexto.
+- **Estimativa de Complexidade**: **`5 Story Points`** (Complexidade Técnica: Alta · Esforço: Alto · Incerteza: Baixa).
+- **Regras de Negócio e Invariantes**: `RN01`, `RN02` ([Modelo de Domínio](./domain_model.md), [Especificações e Contratos](../design/api_specs.md) e [Proposta de Interface](../design/ui_proposal.md)).
+  - **INV-01 (Semântica Nativa `<dialog>` e Bloco BEM Canônico)**: Implementado como Web Component autônomo `<pix-key-dialog>` estendendo `CustomElement` (`@modnes/custom-element`) sob o bloco BEM `.key-dialog`. O contêiner de diálogo utiliza o elemento semântico nativo `<dialog class="key-dialog">` operado via métodos padrão do navegador (`.showModal()` e `.close()`), garantindo isolamento de modal e aprisionamento acessível de foco.
+  - **INV-02 (Seletor de Tipo de Chave com Pílulas Reativas)**: O cabeçalho do formulário deve disponibilizar uma barra de botões/pílulas (`.key-dialog__types`) com os 5 tipos de chave canônicos definidos em `PIX_KEY_TYPES` (`CPF`, `CNPJ`, `EMAIL`, `TELEFONE`, `EVP`), identificados por `data-type` e `aria-pressed="true|false"`. A seleção da pílula ativa (`.key-dialog__type-btn--active`) ajusta dinamicamente o `placeholder`, o tipo de teclado virtual (`inputmode="numeric" | "email" | "text"`), o comprimento máximo (`maxlength`) e a validação específica do input `valor_chave`.
+  - **INV-03 (Composição do Formulário e Campos Obrigatórios)**: O formulário interno `<form method="dialog" class="key-dialog__form">` deve conter os seguintes campos:
+    - **Tipo de Chave** (`tipo_chave`): Definido pelas pílulas seletoras (padrão inicial: `CPF`).
+    - **Chave PIX** (`valor_chave`): Campo obrigatório com rótulo descritivo e placeholder dinâmico por tipo.
+    - **Apelido da Conta** (`rotulo`): Campo opcional (`maxlength="40"`), com fallback automático para `DEFAULT_PIX_KEY_LABELS[tipo_chave]` (ex.: `"Conta CPF"`) se deixado em branco.
+    - **Nome do Recebedor / Titular** (`nome_recebedor`): Campo obrigatório (`maxlength="25"`), sanitizado e restrito aos padrões do Banco Central (EMV).
+    - **Cidade do Recebedor** (`cidade_recebedor`): Campo obrigatório (`maxlength="15"`), sanitizado e restrito aos padrões do Banco Central (EMV).
+  - **INV-04 (Feedback Visual de Erros e Região de Alerta Acessível — `role="alert"`)**: Em caso de validação inválida local ou lançada pelo domínio (`PixKeyValidationError` ou conflito de chave duplicada `DUPLICATE_PIX_KEY`), o componente deve exibir um bloco de alerta visual `.key-dialog__alert` contendo o ícone `<vector-icon name="circle-exclamation">`, semântica `role="alert"` e `aria-live="assertive"`, adicionando a classe `.key-dialog__input--error` ao campo causador do erro para orientação imediata do usuário.
+  - **INV-05 (Submissão, Persistência Local e Seleção Automática — `SavePixKeyUseCase`)**: Ao submeter o formulário (clique no botão primário `.key-dialog__btn-save` com ícone `<vector-icon name="check">` ou acionamento de `Enter` nos campos de texto), o componente deve validar os dados e invocar `SavePixKeyUseCase.execute({ chave_conta: { tipo_chave, valor_chave, rotulo, nome_recebedor, cidade_recebedor }, selectAsActive: true })`. Ao salvar com sucesso:
+    - O modal é fechado automaticamente via `.close()`.
+    - Os campos do formulário e estados de erro são resetados para os valores padrão.
+    - É despachado o evento borbulhante `CustomEvent("key-saved", { bubbles: true, composed: true, detail: { chaveConta, selectedKeyId } })`.
+  - **INV-06 (Fechamento Seguro e Prevenção de Perda Acidental)**: O modal pode ser fechado sem salvar via botão de cancelamento (`.key-dialog__btn-cancel`), botão de fechar no cabeçalho (`.key-dialog__close-btn` com ícone `<vector-icon name="xmark">`), acionamento da tecla `Escape` (evento nativo `cancel` de `<dialog>`), ou clique na área externa/backdrop (`::backdrop`). O fechamento despacha o evento customizado `CustomEvent("close-key-dialog", { bubbles: true, composed: true })`.
+  - **INV-07 (Injeção de Dependências Desacoplada e Execução Autônoma)**: Registra injeção de dependências via `this.addInjectable()` (`save-pix-key-use-case`, `pix-key-repository`), mantendo total resiliência caso instanciado isoladamente no Storybook ou em testes unitários.
+  - **INV-08 (Acessibilidade WCAG 2.2 AA & Gestão de Teclado)**: Conformidade com critérios WCAG AA: armadilha de foco nativa proporcionada pelo `<dialog>.showModal()`, foco automático no primeiro campo interativo ao abrir, restauração de foco ao elemento chamador após fechamento, alvos de toque $\ge 44\times 44\text{px}$ para todos os botões e pílulas, e contraste rigoroso de cores.
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Abertura do Modal de Cadastro com Estado Padrão — Happy Path)**:
+    - Dado que o componente `<pix-key-dialog>` está inserido no DOM,
+    - Quando o método `.openModal()` for invocado (ou o componente receber a notificação do evento `"open-key-dialog"`),
+    - Então o elemento nativo `<dialog>` deve ser aberto no modo modal via `.showModal()`,
+    - E o tipo de chave `CPF` deve estar selecionado por padrão com a classe `.key-dialog__type-btn--active` e `aria-pressed="true"`,
+    - E o campo de valor da chave deve exibir o placeholder `"000.000.000-00"`,
+    - E o foco inicial deve ser direcionado para o campo de entrada da chave.
+  - **Cenário 02 (Alternância Dinâmica entre Tipos de Chave PIX)**:
+    - Dado que o modal de cadastro está aberto,
+    - Quando o usuário clicar na pílula correspondente ao tipo `"E-mail"`,
+    - Então a pílula `"E-mail"` deve receber a classe `.key-dialog__type-btn--active`,
+    - E as demais pílulas devem ter `aria-pressed="false"`,
+    - E o input de chave deve atualizar seu `placeholder` para `"seu.email@exemplo.com"` e `inputmode="email"`,
+    - E quando o usuário alternar para `"Celular"`, deve atualizar para `"+55 11 99999-9999"` e `inputmode="tel"`.
+  - **Cenário 03 (Validação de Dados e Exibição de Alerta de Erro — `role="alert"`)**:
+    - Dado que o modal está aberto com o tipo `"CPF"` selecionado,
+    - Quando o usuário informar um CPF com dígitos verificadores inválidos (`"123.456.789-00"`) e acionar o botão `"Salvar Chave"`,
+    - Então o modal não deve ser fechado,
+    - E deve renderizar o container `.key-dialog__alert` com `role="alert"` e `<vector-icon name="circle-exclamation">`,
+    - E deve exibir a mensagem explicativa `"Chave CPF com dígitos verificadores inválidos."`,
+    - E o campo de chave deve receber a classe modificadora `.key-dialog__input--error`.
+  - **Cenário 04 (Cadastro com Sucesso, Persistência Local e Seleção Automática — `RN01`, `RN02`)**:
+    - Dado que o usuário preencheu corretamente todos os campos obrigatórios (tipo `"EMAIL"`, chave `"pagamentos@minhaempresa.com.br"`, titular `"Minha Empresa"`, cidade `"Curitiba"` e rótulo `"Conta Principal"`),
+    - Quando o usuário clicar no botão primário `"Salvar Chave"` (ou pressionar `Enter` no formulário),
+    - Então o caso de uso `SavePixKeyUseCase` deve ser executado com os dados informados e `selectAsActive: true`,
+    - E a nova chave deve ser persistida localmente no repositório,
+    - E o modal deve ser fechado via `.close()`,
+    - E o evento `"key-saved"` deve ser despachado contendo a entidade criada e a confirmação de que foi ativada como a chave selecionada.
+  - **Cenário 05 (Tratamento de Chave Já Existente — Erro de Duplicidade)**:
+    - Dado que a chave `"chave@pix.com.br"` já se encontra cadastrada no banco de dados local,
+    - Quando o usuário tentar cadastrar exatamente a mesma chave para outra conta,
+    - Então o caso de uso deve acusar erro `DUPLICATE_PIX_KEY`,
+    - E o modal deve exibir o alerta com a mensagem `"Esta chave PIX já está cadastrada em outra conta."`,
+    - E o modal deve permanecer aberto para correção.
+  - **Cenário 06 (Fechamento sem Salvar via Teclado, Backdrop ou Botão Cancelar)**:
+    - Dado que o modal de cadastro está aberto com campos parcialmente preenchidos,
+    - Quando o usuário pressionar a tecla `Escape` (ou clicar no botão `"Cancelar"`, ou clicar no botão de fechar `xmark`),
+    - Então o modal nativo deve ser fechado via `.close()`,
+    - E nenhuma alteração deve ser persistida no repositório de chaves,
+    - E o evento `"close-key-dialog"` deve ser despachado.
+  - **Cenário 07 (Acessibilidade WCAG 2.2 AA e Alvos de Toque)**:
+    - Dado que o modal `<pix-key-dialog>` é inspecionado para requisitos de acessibilidade,
+    - Quando avaliados os botões de ação, pílulas de tipo e campos de formulário,
+    - Então todos os botões e controles interativos devem possuir área de toque mínima $\ge 44\times 44\text{px}$,
+    - E a navegação por tecla `Tab` deve ficar restrita aos elementos internos do diálogo enquanto aberto (Focus Trap nativo),
+    - E não deve apresentar violações no teste automatizado `@storybook/addon-a11y`.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-05.3.1 (Constantes, Tipos, Seletores BEM e Textos Canônicos do Dialog)**: Criar [`src/presentation/components/pix-key-dialog/pix-key-dialog.constants.js`](../../src/presentation/components/pix-key-dialog/pix-key-dialog.constants.js) contendo as constantes canônicas (`KEY_DIALOG_EVENT_NAMES`, `KEY_DIALOG_ICONS`, `KEY_DIALOG_CLASSES`, `KEY_DIALOG_TYPES_CONFIG`, placeholders por tipo, limites de tamanho e mensagens padrão).
+  - [ ] **TASK-05.3.2 (TDD / Testes Unitários de Renderização, Validação e Interação)**: Criar testes unitários em [`src/presentation/components/pix-key-dialog/pix-key-dialog.test.js`](../../src/presentation/components/pix-key-dialog/pix-key-dialog.test.js) cobrindo abertura/fechamento modal, alternância de pílulas de tipo, validação de inputs, exibição do alerta `role="alert"`, submissão com sucesso chamando `SavePixKeyUseCase`, tecla `Escape` e disparo do evento `key-saved`.
+  - [ ] **TASK-05.3.3 (Implementação / Web Component `PixKeyDialogComponent`)**: Implementar a classe `PixKeyDialogComponent` em [`src/presentation/components/pix-key-dialog/pix-key-dialog.component.js`](../../src/presentation/components/pix-key-dialog/pix-key-dialog.component.js) estendendo `CustomElement` (`@modnes/custom-element`), com template declarativo `<dialog class="key-dialog">`, pílulas seletoras, formulário BEM, consumo de `<vector-icon>` (`xmark`, `check`, `circle-exclamation`), injeção de dependências e manipulação de erros de domínio.
+  - [ ] **TASK-05.3.4 (Estilização CSS BEM, Modal Backdrop, Tokens e Responsividade)**: Implementar os estilos do bloco `.key-dialog` e pseudo-elemento `::backdrop` em [`src/presentation/components/pix-key-dialog/pix-key-dialog.css`](../../src/presentation/components/pix-key-dialog/pix-key-dialog.css) consumindo os tokens de design (`--color-surface`, `--color-brand-primary`, `--color-brand-accent`, `--color-danger`, `--color-border-strong`), garantindo alvos de toque $\ge 44\text{px}$, suporte a tema escuro/claro e visual limpo em telas móveis e desktop.
+  - [ ] **TASK-05.3.5 (Catálogo Interativo no Storybook & Auditoria a11y)**: Criar arquivo de stories [`src/presentation/components/pix-key-dialog/pix-key-dialog.stories.js`](../../src/presentation/components/pix-key-dialog/pix-key-dialog.stories.js) cobrindo os estados: _Modal Aberto Padrão (CPF)_, _Seleção de E-mail / Celular_, _Estado com Alerta de Validação_, _Formulário Preenchido_ e auditoria de acessibilidade automatizada com `@storybook/addon-a11y`.
+  - [ ] **TASK-05.3.6 (Exportação Pública no Módulo Principal e Registro de Tag)**: Exportar `PixKeyDialogComponent` e constantes em [`src/main.js`](../../src/main.js) e registrar o custom element `customElements.define("pix-key-dialog", PixKeyDialogComponent)`.
+  - [ ] **TASK-05.3.7 (Integração com Telas/Eventos, Documentação Viva & Atualização do Backlog)**: Atualizar a tabela de módulos em [`docs/design/modules.md`](../design/modules.md) e [`docs/business/backlog.md`](./backlog.md), documentando o contrato do componente e a orquestração dos eventos `"open-key-dialog"` e `"key-saved"`.
+
+```mermaid
+flowchart LR
+    T1["TASK-05.3.1: Constantes & Configurações"] --> T2["TASK-05.3.2: Testes Unitários (TDD)"]
+    T1 --> T4["TASK-05.3.4: Estilos CSS BEM & Backdrop"]
+    T2 --> T3["TASK-05.3.3: Web Component PixKeyDialog"]
+    T4 --> T3
+    T3 --> T5["TASK-05.3.5: Storybook & a11y"]
+    T3 --> T6["TASK-05.3.6: Exportação & main.js"]
+    T5 & T6 --> T7["TASK-05.3.7: Integração & Documentação"]
+```
 
 ---
 
