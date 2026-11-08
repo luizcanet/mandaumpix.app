@@ -23,6 +23,12 @@ import {
   DEFAULT_EMPTY_STATE_CTA,
   DEFAULT_EMPTY_STATE_DESCRIPTION,
   DEFAULT_EMPTY_STATE_TITLE,
+  DEFAULT_KEY_SELECTOR_ADD_BTN_LABEL,
+  DEFAULT_KEY_SELECTOR_DELETE_TITLE,
+  DEFAULT_KEY_SELECTOR_LIST_LABEL,
+  DEFAULT_KEY_SELECTOR_STEP,
+  DEFAULT_KEY_SELECTOR_TITLE,
+  DEFAULT_KEY_SELECTOR_TITLE_ID,
   DEFAULT_PIX_CHARGE_TXID,
   DEFAULT_PIX_KEY_LABELS,
   DEFAULT_QR_IMAGE_FILENAME,
@@ -39,6 +45,10 @@ import {
   InstallPwaUseCase,
   KEY_EMPTY_EVENT_NAMES,
   KEY_EMPTY_ICONS,
+  KEY_SELECTOR_CLASSES,
+  KEY_SELECTOR_EVENT_NAMES,
+  KEY_SELECTOR_ICONS,
+  KEY_SELECTOR_INJECTABLES,
   ListPixKeysUseCase,
   MAX_PIX_CHARGE_ADDITIONAL_INFO_LENGTH,
   MAX_PIX_CHARGE_AMOUNT,
@@ -62,6 +72,7 @@ import {
   PixChargeEntity,
   PixChargeValidationError,
   PixKeyEmptyComponent,
+  PixKeySelectorComponent,
   PixKeyEntity,
   PixKeyManagementError,
   PixKeyStorageError,
@@ -99,6 +110,7 @@ import {
   executeSavePixKey,
   executeSelectPixKey,
   extractChargeDistributionTarget,
+  formatKeyDeleteAriaLabel,
   generatePixCharge,
   hydrateChaveContaList,
   isOnline,
@@ -887,6 +899,24 @@ describe("main.js", () => {
       expect(KEY_EMPTY_EVENT_NAMES).toBeDefined();
       expect(KEY_EMPTY_ICONS).toBeDefined();
       expect(customElements.get("pix-key-empty")).toBe(PixKeyEmptyComponent);
+    });
+
+    it("should re-export PixKeySelectorComponent and key-selector constants (TASK-05.2.6)", () => {
+      expect(PixKeySelectorComponent).toBeDefined();
+      expect(DEFAULT_KEY_SELECTOR_STEP).toBeDefined();
+      expect(DEFAULT_KEY_SELECTOR_TITLE).toBeDefined();
+      expect(DEFAULT_KEY_SELECTOR_TITLE_ID).toBeDefined();
+      expect(DEFAULT_KEY_SELECTOR_ADD_BTN_LABEL).toBeDefined();
+      expect(DEFAULT_KEY_SELECTOR_LIST_LABEL).toBeDefined();
+      expect(DEFAULT_KEY_SELECTOR_DELETE_TITLE).toBeDefined();
+      expect(KEY_SELECTOR_CLASSES).toBeDefined();
+      expect(KEY_SELECTOR_EVENT_NAMES).toBeDefined();
+      expect(KEY_SELECTOR_ICONS).toBeDefined();
+      expect(KEY_SELECTOR_INJECTABLES).toBeDefined();
+      expect(formatKeyDeleteAriaLabel).toBeDefined();
+      expect(customElements.get("pix-key-selector")).toBe(
+        PixKeySelectorComponent,
+      );
     });
 
     it("should initialize PWA install adapter and use case on rootElement during bootstrapApp", () => {

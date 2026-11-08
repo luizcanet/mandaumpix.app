@@ -1,0 +1,307 @@
+/* ==========================================================================
+   ESTILOS DO SELETOR DE CHAVES (pix-key-selector.css)
+   Manda um PIX — Bloco BEM .key-selector e Radio Cards (TASK-05.2.4)
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   BLOCO PRINCIPAL (.key-selector)
+   Container de cartões de seleção de chaves com espaçamentos padronizados
+   ----------------------------------------------------------------------------- */
+.key-selector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs, 0.5rem);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* -----------------------------------------------------------------------------
+   CABEÇALHO DA SEÇÃO (.section-header)
+   Alinhamento horizontal entre título da etapa e botão de adicionar nova chave
+   ----------------------------------------------------------------------------- */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs, 0.5rem);
+  margin-bottom: var(--space-2xs, 0.25rem);
+}
+
+.section-header__title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs, 0.5rem);
+  min-width: 0;
+}
+
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-pill, 9999px);
+  background-color: var(--color-brand-primary, #0b1834);
+  color: var(--color-brand-accent, #00d37f);
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.75rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.section-header__title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--color-text-primary, #0f172a);
+  letter-spacing: -0.01em;
+}
+
+/* -----------------------------------------------------------------------------
+   BOTÃO SECUNDÁRIO '+ NOVA CHAVE' (.key-selector__add-btn)
+   Botão compacto com ícone de plus, fundo esmeralda claro e foco acessível
+   ----------------------------------------------------------------------------- */
+.key-selector__add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 36px;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-pill, 9999px);
+  background-color: #ecfdf5;
+  border: 1px solid rgba(0, 211, 127, 0.45);
+  color: var(--color-success, #059669);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.key-selector__add-btn:hover {
+  background-color: #d1fae5;
+  border-color: var(--color-brand-accent, #00d37f);
+}
+
+.key-selector__add-btn:focus-visible {
+  outline: 2px solid var(--color-brand-accent, #00d37f);
+  outline-offset: 2px;
+}
+
+/* -----------------------------------------------------------------------------
+   LISTA DE RÁDIOS (.key-selector__list)
+   Contêiner semântico vertical com espaçamento entre cartões
+   ----------------------------------------------------------------------------- */
+.key-selector__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs, 0.5rem);
+  width: 100%;
+}
+
+/* -----------------------------------------------------------------------------
+   CARTÃO DE CHAVE / RADIO (.key-selector__card)
+   Alvo de toque ergonômico, borda sutil e estados interativos
+   ----------------------------------------------------------------------------- */
+.key-selector__card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm, 0.75rem);
+  min-height: 56px;
+  padding: var(--space-xs, 0.5rem) var(--space-md, 1rem);
+  border: 1.5px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-md, 10px);
+  background-color: var(--color-surface-muted, #f8fafc);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.key-selector__card:hover {
+  background-color: var(--color-surface, #ffffff);
+  border-color: var(--color-border-strong, #cbd5e1);
+}
+
+.key-selector__card:focus-visible {
+  outline: 2px solid var(--color-brand-accent, #00d37f);
+  outline-offset: 2px;
+}
+
+/* -----------------------------------------------------------------------------
+   CARTÃO ATIVO / SELECIONADO (.key-selector__card--selected)
+   Destaque com a cor de acento da marca e sombra suave
+   ----------------------------------------------------------------------------- */
+.key-selector__card--selected {
+  border-color: var(--color-brand-accent, #00d37f);
+  background-color: #f0fdf8;
+  box-shadow: 0 0 0 2px rgba(0, 211, 127, 0.22);
+}
+
+.key-selector__card--selected:hover {
+  background-color: #e6fcf2;
+}
+
+/* -----------------------------------------------------------------------------
+   CONTEÚDO À ESQUERDA (.key-selector__card-left)
+   Alinhamento horizontal entre indicador de rádio e metadados da conta
+   ----------------------------------------------------------------------------- */
+.key-selector__card-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm, 0.75rem);
+  min-width: 0;
+  flex: 1;
+}
+
+/* -----------------------------------------------------------------------------
+   INDICADOR ÓPTICO DE RÁDIO (.key-selector__radio)
+   ----------------------------------------------------------------------------- */
+.key-selector__radio {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-pill, 9999px);
+  border: 2px solid #94a3b8;
+  background-color: var(--color-surface, #ffffff);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.key-selector__card--selected .key-selector__radio {
+  border-color: var(--color-success, #059669);
+  background-color: var(--color-brand-accent, #00d37f);
+}
+
+.key-selector__radio-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill, 9999px);
+  background-color: var(--color-brand-primary-dark, #060d1e);
+}
+
+/* -----------------------------------------------------------------------------
+   METADADOS DA CONTA (.key-selector__meta)
+   ----------------------------------------------------------------------------- */
+.key-selector__meta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.key-selector__title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.key-selector__label {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--color-text-primary, #0f172a);
+  line-height: 1.2;
+}
+
+.key-selector__type-badge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background-color: var(--color-brand-primary, #0b1834);
+  color: var(--color-brand-accent, #00d37f);
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+
+.key-selector__value {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary, #475569);
+  word-break: break-all;
+  line-height: 1.3;
+}
+
+/* -----------------------------------------------------------------------------
+   BOTÃO DE EXCLUSÃO DEDICADO (.key-selector__delete-btn)
+   Área de toque mínima >= 44x44px (WCAG 2.2 AA Target Size), transição e foco
+   ----------------------------------------------------------------------------- */
+.key-selector__delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+    outline-color 0.15s ease;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.key-selector__delete-btn:hover {
+  color: var(--color-danger, #e11d48);
+  background-color: #ffe4e6;
+}
+
+.key-selector__delete-btn:focus-visible {
+  outline: 2px solid var(--color-danger, #e11d48);
+  outline-offset: 2px;
+}
+
+/* -----------------------------------------------------------------------------
+   ACELERAÇÃO E PREFERÊNCIA POR REDUÇÃO DE MOVIMENTO (prefers-reduced-motion)
+   ----------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .key-selector__card,
+  .key-selector__add-btn,
+  .key-selector__delete-btn,
+  .key-selector__radio {
+    transition: none;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   RESPONSIVIDADE PARA TELAS COMPACTAS (<= 360px)
+   ----------------------------------------------------------------------------- */
+@media (max-width: 360px) {
+  .section-header {
+    flex-wrap: wrap;
+  }
+
+  .key-selector__card {
+    padding: var(--space-xs, 0.5rem);
+    gap: var(--space-xs, 0.5rem);
+  }
+
+  .key-selector__label {
+    font-size: 0.8125rem;
+  }
+
+  .key-selector__value {
+    font-size: 0.6875rem;
+  }
+}
