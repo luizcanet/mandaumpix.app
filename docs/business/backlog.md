@@ -1246,7 +1246,7 @@ flowchart LR
 - **Regras de Negócio e Invariantes**:
   - **INV-01 (Mapeamento Estrito Git Flow e Disparos por Ambiente)**:
     - O workflow de staging (`deploy-stg.yml`) deve ser disparado automaticamente em eventos de `push` nas branches `release/*` e `hotfix/*`, além de suporte a acionamento manual (`workflow_dispatch`).
-    - O workflow de produção (`deploy-prd.yml`) deve ser disparado automaticamente em eventos de `push` na branch `main` e em tags de release `v*` (`refs/tags/v*`), além de suporte a acionamento manual (`workflow_dispatch`).
+    - O workflow de produção (`deploy-prd.yml`) deve ser disparado exclusivamente no evento de release publicada no GitHub (`release: types: [published]`).
     - Commits nas branches `feature/*`, `bugfix/*` ou `develop` nunca devem acionar publicação nos ambientes de staging ou produção.
   - **INV-02 (Quality Gates Obrigatórios Pré-Deploy)**:
     - Antes de qualquer publicação no Firebase Hosting, ambos os pipelines devem executar e passar com sucesso na cadeia estrita de validação:
@@ -1281,9 +1281,9 @@ flowchart LR
     - Quando o mantenedor realizar o push da branch para o repositório remoto,
     - Então o workflow `CD - Deploy Staging` deve ser acionado para validação prévia em homologação,
     - E após a passagem de todos os quality gates, a versão corrigida deve ser publicada em `https://stg.mandaumpix.app`.
-  - **Cenário 03 (Deploy Automatizado em Produção via Push na Branch Main ou Tag de Release — Happy Path)**:
-    - Dado que a release homologada foi mesclada na branch `main` e anotada com a tag `v1.0.0`,
-    - Quando o evento de push ocorrer na branch `main` ou na tag `v*`,
+  - **Cenário 03 (Deploy Automatizado em Produção via Release Publicada — Happy Path)**:
+    - Dado que uma versão homologada teve uma release oficial publicada no GitHub,
+    - Quando o GitHub Actions receber o evento "release" do tipo "published",
     - Então o workflow `CD - Deploy Production` (`.github/workflows/deploy-prd.yml`) deve ser iniciado automaticamente,
     - E deve executar toda a suíte de testes e validações estáticas,
     - E deve gerar o build estático otimizado de produção em `dist/`,
@@ -1301,7 +1301,7 @@ flowchart LR
     - Então a esteira de CD deve ser executada no contexto da branch selecionada e publicar a aplicação no ambiente respectivo.
 - **Tarefas de Desenvolvimento (Dev Tasks)**:
   - [x] **TASK-07.3.1 (Construção do Workflow CD Staging `.github/workflows/deploy-stg.yml`)**: Criar o workflow de implantação contínua para homologação com gatilhos para `release/*`, `hotfix/*` e `workflow_dispatch`, environment `staging`, steps de qualidade, build da aplicação (`npm run build`), build do Storybook (`dist/storybook`), publicação no projeto `mandaumpix-app-stg` e canal `live` via secret `FIREBASE_SERVICE_ACCOUNT_STG`.
-  - [ ] **TASK-07.3.2 (Construção do Workflow CD Production `.github/workflows/deploy-prd.yml`)**: Criar o workflow de implantação contínua para produção com gatilhos para `main`, tags `v*` e `workflow_dispatch`, environment `production`, steps de qualidade, build otimizado da aplicação (`npm run build`), publicação no projeto `mandaumpix-app-prd` e canal `live` via secret `FIREBASE_SERVICE_ACCOUNT_PRD`.
+  - [x] **TASK-07.3.2 (Construção do Workflow CD Production `.github/workflows/deploy-prd.yml`)**: Criar o workflow de implantação contínua para produção com gatilho exclusivo para release publicada (`release: types: [published]`), environment `production`, steps de qualidade, build otimizado da aplicação (`npm run build`), publicação no projeto `mandaumpix-app-prd` e canal `live` via secret `FIREBASE_SERVICE_ACCOUNT_PRD`.
   - [ ] **TASK-07.3.3 (Validação Sintática, Linting dos Workflows e Simulação Local)**: Validar a sintaxe dos arquivos YAML criados utilizando o ESLint v10 (`npm run lint`), formatador Prettier (`npm run format:check`) e validar localmente que os comandos de build e paths referenciados nos workflows correspondem exatamente aos scripts do `package.json` e ao `firebase.json`.
   - [ ] **TASK-07.3.4 (Atualização da Matriz de Implantação e Documentação Técnica)**: Atualizar a matriz de status em [`docs/deployment/pipeline.md`](../deployment/pipeline.md) apontando os novos workflows de homologação e produção com seus respectivos links, detalhar o fluxo operacional de promoção e sincronizar o Backlog.
 
