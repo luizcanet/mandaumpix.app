@@ -297,14 +297,48 @@ flowchart TD
 
 > **Objetivo**: Construir a estrutura global da interface (`.app-root`, `<app-header>`, `.app-footer`), configurar as rotas `/` e `/sobre` com `@modnes/router` e entregar os requisitos completos do botão destacado **"Instalar"** (`RN06`) e da página **"Sobre"** (`RN07`).
 
-#### `US-04.1` — Casca Semântica Global e Layout Responsivo (Mobile-First & Desktop Split-View) (`⏳ Pendente`)
+#### `US-04.1` — Casca Semântica Global e Layout Responsivo (Mobile-First & Desktop Split-View) (`⏳ Pendente` · `3 Story Points`)
 
-- **História**: Como **Recebedor**, quero uma interface rápida, ergonômica para uso com uma mão no celular e organizada em duas colunas no computador.
-- **Referência Visual**: [Proposta de Interface (UI)](../design/ui_proposal.md) e [`docs/design/ui_prototype.html`](../design/ui_prototype.html).
-- **Critérios de Aceite**:
-  - [ ] Atualizar [`index.html`](../../index.html) e criar folhas de estilo modulares em `src/presentation/styles/` seguindo estritamente a metodologia **BEM** (`.app-root`, `.app-header`, `.app-main`, `.app-footer`, `.charge-page`).
-  - [ ] Implementar layout Mobile-First (`< 768px` em coluna única otimizada para polegar) e Desktop Split-View (`>= 768px` em `CSS Grid` de 2 colunas lado a lado).
-  - [ ] Incluir rodapé minimalista (`.app-footer`) com selo _"100% Local & Offline-Ready"_, link para `/sobre` e referência à licença `AGPL-3.0-only`.
+- **História (Narrativa Canônica)**:
+  > **Como** **Recebedor** que acessa o Manda um PIX pelo smartphone ou computador,
+  > **Quero** uma casca semântica global (`index.html`) com arquitetura CSS modular e responsiva (Mobile-First em coluna única para alcance do polegar e Desktop Split-View em 2 colunas lado a lado) e um rodapé informativo com status local e licença AGPLv3,
+  > **Para que** eu tenha uma experiência visual rápida, fluida, acessível e confortável em qualquer dispositivo, preparando a casca da aplicação para acomodar o cabeçalho dinâmico e o roteamento de telas.
+- **Referência Visual & Protótipo**:
+  - [Proposta de Interface (UI)](../design/ui_proposal.md) e protótipo interativo [`docs/design/ui_prototype.html`](../design/ui_prototype.html).
+- **Regras de Negócio e Invariantes**:
+  - **INV-01 (Semântica W3C & Landmarks de Acessibilidade)**: A casca global no [`index.html`](../../index.html) deve estruturar a página utilizando marcos semânticos W3C (`<main id="app" class="app-root">`, `<header class="app-header">`, `<div id="router-outlet" class="app-main">` e `<footer class="app-footer">`), garantindo navegação lógica por teclado e leitores de tela sem elementos anônimos desnecessários.
+  - **INV-02 (Arquitetura CSS Modular & Padrão BEM)**: Os estilos devem ser desacoplados em folhas de estilo em [`src/presentation/styles/`](../../src/presentation/styles/) (`layout.css` e `app-shell.css`), consumindo exclusivamente os tokens oficiais de cor, tipografia e espaçamento de [`tokens.css`](../../src/presentation/styles/tokens.css) e respeitando o reset de [`reset.css`](../../src/presentation/styles/reset.css). Todas as classes devem seguir estritamente o padrão BEM (`.app-root`, `.app-header`, `.app-main`, `.app-footer`, `.charge-page`).
+  - **INV-03 (Ergonomia Mobile-First & Alcance do Polegar)**: Em visualizações com largura inferior a `768px` (`< 768px`), o layout deve operar em coluna única com área de conteúdo centrada e fluida, priorizando zonas de toque confortáveis (mínimo de 36px a 44px de altura) e posicionando ações em posições ergonômicas.
+  - **INV-04 (Desktop Split-View em 2 Colunas via CSS Grid)**: Em resoluções iguais ou superiores a `768px` (`@media (min-width: 768px)`), o container da página de cobrança (`.charge-page`) deve transicionar para **CSS Grid de 2 colunas lado a lado** (`.charge-page--split`), reservando a coluna esquerda para o formulário gerador/chaves e a coluna direita para o cartão de visualização do QR Code/PIX Copia e Cola, com largura total contida de até `960px`.
+  - **INV-05 (Rodapé Institucional, Privacidade & Licença AGPL-3.0-only)**: O rodapé (`.app-footer`) deve exibir um indicador visual de status local (`.app-footer__dot` com cor `--color-brand-accent: #00d37f`) acompanhado do texto _"100% Local & Offline-Ready"_, atalho textual ou link para `/sobre` (`.app-footer__link`) e referência explícita à licença livre `AGPL-3.0-only`.
+  - **INV-06 (Acessibilidade & Aprimoramento Progressivo)**: A casca deve respeitar preferências do sistema (`prefers-reduced-motion: reduce`), garantir contraste mínimo WCAG AA em todas as superfícies e manter estilos de foco visíveis (`:focus-visible`).
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Estrutura Semântica da Casca Global no `index.html`)**:
+    - Dado que o usuário carrega o aplicativo no navegador,
+    - Quando o documento HTML for parseado,
+    - Então deve existir um elemento container `<main id="app" class="app-root">` contendo o cabeçalho `.app-header`, o container de conteúdo principal `.app-main` e o rodapé `.app-footer`.
+  - **Cenário 02 (Comportamento Responsivo Mobile-First em Coluna Única)**:
+    - Dado um viewport de tela estreita com largura inferior a `768px`,
+    - Quando a página for renderizada,
+    - Então a classe `.charge-page` deve dispor seus blocos filhos em coluna única vertical fluida, com espaçamentos otimizados para toque.
+  - **Cenário 03 (Comportamento Desktop Split-View em 2 Colunas com CSS Grid)**:
+    - Dado um viewport amplo com largura igual ou superior a `768px`,
+    - Quando a classe modificadora `.charge-page--split` estiver ativa,
+    - Então a área principal deve exibir as seções de formulário e visualização organizadas em duas colunas paralelas via CSS Grid com largura máxima de container de até `960px`.
+  - **Cenário 04 (Exibição do Rodapé Minimalista com Selo Offline e Licença AGPL-3.0)**:
+    - Dado que a casca da aplicação foi montada,
+    - Quando o rodapé `.app-footer` for exibido,
+    - Então deve conter o elemento `.app-footer__status` com o ponto verde `.app-footer__dot` e texto _"100% Local & Offline-Ready"_, link acessível `.app-footer__link` apontando para `/sobre` e menção à licença `AGPL-3.0-only`.
+  - **Cenário 05 (Acessibilidade Semântica e Estados de Foco)**:
+    - Dado que o usuário navega na casca via teclado utilizando a tecla `Tab`,
+    - Quando os elementos interativos do rodapé ou links receberem foco,
+    - Então deve ser aplicado o indicador de foco `:focus-visible` com contraste adequado conforme definido nos tokens.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-04.1.1 (Arquitetura CSS / Grid Responsivo & Split-View)**: Criar o arquivo [`src/presentation/styles/layout.css`](../../src/presentation/styles/layout.css) contendo o sistema de grid, container responsivo, regras de quebra para `< 768px` (coluna única) e `>= 768px` (`.charge-page--split` em 2 colunas CSS Grid de até 960px).
+  - [ ] **TASK-04.1.2 (Arquitetura CSS / Estilos BEM da Casca Global)**: Criar o arquivo [`src/presentation/styles/app-shell.css`](../../src/presentation/styles/app-shell.css) definindo os estilos BEM para `.app-root`, `.app-header`, `.app-main`, `.app-footer`, `.app-footer__status`, `.app-footer__dot` e `.app-footer__link`, consumindo [`tokens.css`](../../src/presentation/styles/tokens.css).
+  - [ ] **TASK-04.1.3 (Marcação Semântica no `index.html` & Vinculação de Folhas de Estilo)**: Atualizar [`index.html`](../../index.html) importando `layout.css` e `app-shell.css`, e estruturando os landmarks `<main id="app" class="app-root">`, casca inicial com `<header class="app-header">`, `<div id="router-outlet" class="app-main">` e `<footer class="app-footer">` alinhado ao protótipo visual.
+  - [ ] **TASK-04.1.4 (TDD / Testes Automatizados de DOM e Acessibilidade da Casca)**: Criar testes automatizados em [`src/presentation/styles/app-shell.test.js`](../../src/presentation/styles/app-shell.test.js) (ou equivalente DOM em Vitest) validando a estrutura semântica dos elementos, classes BEM esperadas e landmarks de acessibilidade da casca.
+  - [ ] **TASK-04.1.5 (Qualidade, Linters & Documentação)**: Validar conformidade de formatação e tipagem com `npm run lint`, `npm run format:check` e `npm test`, e atualizar a documentação de arquitetura de apresentação em [`docs/design/modules.md`](../design/modules.md).
 
 #### `US-04.2` — Componente `<app-header>` com Botão Destacado "Instalar" (`RN06`) e Atalho "Sobre" (`RN07`) (`⏳ Pendente`)
 
