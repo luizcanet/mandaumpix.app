@@ -162,6 +162,19 @@ export const APP_ROUTES = Object.freeze([
   },
 ]);
 
+export const ROUTE_TITLES = Object.freeze({
+  "/": "Manda um PIX — Cobrança rápida",
+  "/sobre": "Sobre o aplicativo — Manda um PIX",
+  default: "Manda um PIX — Cobrança rápida",
+});
+
+export function resolveRouteTitle(pathname = "/") {
+  if (pathname === "/sobre") {
+    return ROUTE_TITLES["/sobre"];
+  }
+  return ROUTE_TITLES["/"] || ROUTE_TITLES.default;
+}
+
 export function generatePixCharge({
   pixKey,
   merchantName = "Manda um PIX",
@@ -356,6 +369,9 @@ export function bootstrapApp(
   }
 
   const outletElement = rootElement.querySelector("#router-outlet");
+  if (outletElement && !outletElement.hasAttribute("tabindex")) {
+    outletElement.setAttribute("tabindex", "-1");
+  }
   let router = appRouter;
   if (!router && outletElement) {
     outletElement.replaceChildren();
@@ -473,6 +489,43 @@ export function bootstrapApp(
   rootElement.__navigationKeydownHandler = handleBrandKeydown;
   rootElement.addEventListener("click", handleNavigationClick);
   rootElement.addEventListener("keydown", handleBrandKeydown);
+
+  const syncRouteAccessibility = () => {
+    const targetDoc =
+      ownerDoc ||
+      windowTarget?.document ||
+      (typeof document !== "undefined" ? document : null);
+    const currentPath =
+      windowTarget?.location?.pathname ||
+      (typeof location !== "undefined" ? location.pathname : "/");
+
+    const title = resolveRouteTitle(currentPath);
+    if (targetDoc && title) {
+      targetDoc.title = title;
+    }
+
+    if (outletElement && typeof outletElement.focus === "function") {
+      outletElement.focus();
+    }
+  };
+
+  syncRouteAccessibility();
+
+  if (windowTarget?.addEventListener) {
+    if (rootElement.__routeAccessibilityHandler) {
+      windowTarget.removeEventListener(
+        "pathChanged",
+        rootElement.__routeAccessibilityHandler,
+      );
+      windowTarget.removeEventListener(
+        "popstate",
+        rootElement.__routeAccessibilityHandler,
+      );
+    }
+    rootElement.__routeAccessibilityHandler = syncRouteAccessibility;
+    windowTarget.addEventListener("pathChanged", syncRouteAccessibility);
+    windowTarget.addEventListener("popstate", syncRouteAccessibility);
+  }
 
   return rootElement;
 }

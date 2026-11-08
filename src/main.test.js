@@ -1367,4 +1367,101 @@ describe("main.js", () => {
       rootElement.remove();
     });
   });
+
+  describe("Accessibility on route change — Focus management & document.title (TASK-04.3.6)", () => {
+    it("should set tabindex=-1 on #router-outlet during bootstrapApp and move focus on route change", async () => {
+      window.history.replaceState(null, "", "/");
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      const focusSpy = vi.spyOn(outlet, "focus");
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      expect(outlet.getAttribute("tabindex")).toBe("-1");
+
+      // Navegação para "/sobre"
+      Router.goTo("/sobre");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(focusSpy).toHaveBeenCalled();
+
+      focusSpy.mockRestore();
+      window.history.replaceState(null, "", "/");
+      rootElement.remove();
+    });
+
+    it("should update document.title when navigating to /sobre and returning to /", async () => {
+      window.history.replaceState(null, "", "/");
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      expect(document.title).toBe("Manda um PIX — Cobrança rápida");
+
+      // Navega para "/sobre"
+      Router.goTo("/sobre");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(document.title).toBe("Sobre o aplicativo — Manda um PIX");
+
+      // Retorna para "/"
+      Router.goTo("/");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(document.title).toBe("Manda um PIX — Cobrança rápida");
+
+      // Rota não mapeada (fallback "/*")
+      Router.goTo("/qualquer-coisa");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(document.title).toBe("Manda um PIX — Cobrança rápida");
+
+      window.history.replaceState(null, "", "/");
+      rootElement.remove();
+    });
+
+    it("should update title and focus on popstate event (browser back/forward button)", async () => {
+      window.history.replaceState(null, "", "/sobre");
+
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      const outlet = document.createElement("div");
+      outlet.id = "router-outlet";
+      rootElement.appendChild(outlet);
+      document.body.appendChild(rootElement);
+
+      const focusSpy = vi.spyOn(outlet, "focus");
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      expect(document.title).toBe("Sobre o aplicativo — Manda um PIX");
+
+      // Simula o usuário clicando no botão "Voltar" do navegador
+      window.history.replaceState(null, "", "/");
+      window.dispatchEvent(new PopStateEvent("popstate"));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(document.title).toBe("Manda um PIX — Cobrança rápida");
+      expect(focusSpy).toHaveBeenCalled();
+
+      focusSpy.mockRestore();
+      window.history.replaceState(null, "", "/");
+      rootElement.remove();
+    });
+  });
 });
