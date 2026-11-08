@@ -1,0 +1,395 @@
+/* ==========================================================================
+   ESTILOS DO MODAL DE CADASTRO DE CHAVES (pix-key-dialog.css)
+   Manda um PIX — Bloco BEM .key-dialog e Pseudo-elemento ::backdrop (TASK-05.3.4)
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   PSEUDO-ELEMENTO BACKDROP (::backdrop) & CLASSE BACKDROP FALLBACK
+   Fundo escuro semitransparente com efeito de desfoque (blur)
+   ----------------------------------------------------------------------------- */
+dialog.key-dialog::backdrop {
+  background-color: rgba(6, 13, 30, 0.7);
+}
+
+.key-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(6, 13, 30, 0.7);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md, 1rem);
+  box-sizing: border-box;
+}
+
+@supports (backdrop-filter: blur(4px)) {
+  dialog.key-dialog::backdrop {
+    backdrop-filter: blur(4px);
+  }
+
+  .key-dialog-backdrop {
+    backdrop-filter: blur(4px);
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   BLOCO PRINCIPAL (<dialog class="key-dialog">)
+   Contêiner modal nativo isolado, centralizado e com cantos arredondados
+   ----------------------------------------------------------------------------- */
+dialog.key-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: calc(100% - var(--space-md, 1rem) * 2);
+  max-width: 420px;
+  background-color: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border-strong, #cbd5e1);
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--space-md, 1rem);
+  box-shadow: var(--shadow-xl, 0 20px 25px -5px rgba(0, 0, 0, 0.15));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm, 0.75rem);
+  box-sizing: border-box;
+  color: var(--color-text-primary, #0f172a);
+  font-family: var(--font-sans, system-ui, sans-serif);
+  z-index: 1000;
+}
+
+dialog.key-dialog:not([open]) {
+  display: none;
+}
+
+dialog.key-dialog[open] {
+  display: flex;
+  animation: keyDialogFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes keyDialogFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   CABEÇALHO (.key-dialog__header)
+   Título descritivo e botão de fechamento com alvo de toque acessível
+   ----------------------------------------------------------------------------- */
+.key-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs, 0.5rem);
+  padding-bottom: var(--space-xs, 0.5rem);
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+}
+
+.key-dialog__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--color-text-primary, #0f172a);
+  letter-spacing: -0.01em;
+}
+
+.key-dialog__close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: var(--radius-md, 8px);
+  border: none;
+  background-color: transparent;
+  color: var(--color-text-secondary, #475569);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+  padding: 0;
+}
+
+.key-dialog__close-btn:hover {
+  background-color: var(--color-surface-muted, #f8fafc);
+  color: var(--color-text-primary, #0f172a);
+}
+
+.key-dialog__close-btn:focus-visible {
+  outline: 2px solid var(--color-brand-accent, #00d37f);
+  outline-offset: 2px;
+}
+
+/* -----------------------------------------------------------------------------
+   FORMULÁRIO INTERNO (.key-dialog__form)
+   ----------------------------------------------------------------------------- */
+.key-dialog__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm, 0.75rem);
+  margin: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   GRADE DE PÍLULAS DE TIPO (.key-dialog__types & .key-dialog__type-btn)
+   5 colunas uniformes com seleção de alto contraste
+   ----------------------------------------------------------------------------- */
+.key-dialog__types {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.35rem;
+}
+
+.key-dialog__type-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.45rem 0.2rem;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--color-border-strong, #cbd5e1);
+  background-color: var(--color-surface-muted, #f8fafc);
+  color: var(--color-text-secondary, #475569);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.key-dialog__type-btn:hover {
+  background-color: var(--color-surface, #ffffff);
+  border-color: var(--color-brand-primary, #0b1834);
+  color: var(--color-text-primary, #0f172a);
+}
+
+.key-dialog__type-btn:focus-visible {
+  outline: 2px solid var(--color-brand-accent, #00d37f);
+  outline-offset: 2px;
+}
+
+.key-dialog__type-btn--active {
+  background-color: var(--color-brand-primary, #0b1834);
+  color: var(--color-brand-accent, #00d37f);
+  border-color: var(--color-brand-primary, #0b1834);
+  font-weight: 800;
+}
+
+.key-dialog__type-btn--active:hover {
+  background-color: var(--color-brand-primary-dark, #060d1e);
+  border-color: var(--color-brand-primary-dark, #060d1e);
+  color: var(--color-brand-accent, #00d37f);
+}
+
+/* -----------------------------------------------------------------------------
+   ALERTA DE ERRO ACESSÍVEL (.key-dialog__alert)
+   ----------------------------------------------------------------------------- */
+.key-dialog__alert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs, 0.5rem);
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-md, 8px);
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: var(--color-danger, #ef4444);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.35;
+  box-sizing: border-box;
+}
+
+.key-dialog__alert-icon {
+  color: var(--color-danger, #ef4444);
+  font-size: 1.125rem;
+  flex-shrink: 0;
+}
+
+.key-dialog__alert-text {
+  flex: 1;
+  overflow-wrap: break-word;
+}
+
+/* -----------------------------------------------------------------------------
+   CAMPOS DE ENTRADA (.key-dialog__field, .key-dialog__label, .key-dialog__input)
+   ----------------------------------------------------------------------------- */
+.key-dialog__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.key-dialog__label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #0f172a);
+}
+
+.key-dialog__input {
+  min-height: 44px;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--color-border-strong, #cbd5e1);
+  background-color: var(--color-surface-muted, #f8fafc);
+  color: var(--color-text-primary, #0f172a);
+  font-family: inherit;
+  font-size: 0.875rem;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.key-dialog__input::placeholder {
+  color: var(--color-text-secondary, #475569);
+  opacity: 0.65;
+}
+
+.key-dialog__input:focus {
+  outline: none;
+  background-color: var(--color-surface, #ffffff);
+  border-color: var(--color-brand-accent, #00d37f);
+  box-shadow: 0 0 0 3px rgba(0, 211, 127, 0.2);
+}
+
+.key-dialog__input#key-dialog-input-key {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  letter-spacing: 0.02em;
+}
+
+.key-dialog__input--error {
+  border-color: var(--color-danger, #ef4444);
+  background-color: #fffaf0;
+}
+
+.key-dialog__input--error:focus {
+  border-color: var(--color-danger, #ef4444);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+/* -----------------------------------------------------------------------------
+   LINHA COM DUAS COLUNAS (.key-dialog__row)
+   ----------------------------------------------------------------------------- */
+.key-dialog__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xs, 0.5rem);
+}
+
+/* -----------------------------------------------------------------------------
+   AÇÕES DO MODAL (.key-dialog__actions, .key-dialog__btn-cancel, .key-dialog__btn-save)
+   ----------------------------------------------------------------------------- */
+.key-dialog__actions {
+  display: flex;
+  gap: var(--space-xs, 0.5rem);
+  padding-top: var(--space-2xs, 0.25rem);
+}
+
+.key-dialog__btn-cancel {
+  flex: 1;
+  min-height: 48px;
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--color-border-strong, #cbd5e1);
+  background-color: var(--color-surface, #ffffff);
+  color: var(--color-text-secondary, #475569);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+  padding: 0 0.75rem;
+}
+
+.key-dialog__btn-cancel:hover {
+  background-color: var(--color-surface-muted, #f8fafc);
+  color: var(--color-text-primary, #0f172a);
+}
+
+.key-dialog__btn-cancel:focus-visible {
+  outline: 2px solid var(--color-brand-accent, #00d37f);
+  outline-offset: 2px;
+}
+
+.key-dialog__btn-save {
+  flex: 2;
+  min-height: 48px;
+  border-radius: var(--radius-md, 8px);
+  border: none;
+  background-color: var(--color-brand-primary, #0b1834);
+  color: var(--color-brand-accent, #00d37f);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+  padding: 0 1rem;
+}
+
+.key-dialog__btn-save:hover {
+  background-color: var(--color-brand-primary-dark, #060d1e);
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+}
+
+.key-dialog__btn-save:focus-visible {
+  outline: 2px solid var(--color-brand-accent, #00d37f);
+  outline-offset: 2px;
+}
+
+/* -----------------------------------------------------------------------------
+   RESPONSIVIDADE E ACESSIBILIDADE COMPLEMENTAR
+   ----------------------------------------------------------------------------- */
+@media (max-width: 420px) {
+  dialog.key-dialog {
+    width: calc(100% - 1rem);
+    padding: var(--space-sm, 0.75rem);
+  }
+
+  .key-dialog__row {
+    grid-template-columns: 1fr;
+  }
+
+  .key-dialog__type-btn {
+    font-size: 0.6875rem;
+    padding: 0.35rem 0.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog.key-dialog[open] {
+    animation: none;
+  }
+
+  .key-dialog__close-btn,
+  .key-dialog__type-btn,
+  .key-dialog__input,
+  .key-dialog__btn-cancel,
+  .key-dialog__btn-save {
+    transition: none;
+  }
+}

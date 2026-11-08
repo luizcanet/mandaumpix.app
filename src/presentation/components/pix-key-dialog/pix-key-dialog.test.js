@@ -468,7 +468,9 @@ describe("PixKeyDialogComponent (TASK-05.3.2: Testes Unitários de Renderizaçã
       ).not.toBeNull();
 
       // Dispara evento de digitação no formulário atualizado
-      const currentForm = dialogElement.querySelector(`.${KEY_DIALOG_CLASSES.FORM}`);
+      const currentForm = dialogElement.querySelector(
+        `.${KEY_DIALOG_CLASSES.FORM}`,
+      );
       currentForm.dispatchEvent(new Event("input", { bubbles: true }));
 
       expect(
