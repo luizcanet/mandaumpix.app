@@ -1147,14 +1147,94 @@ flowchart LR
     T5 --> T6["TASK-07.1.6: Build Estático & Validação Final"]
 ```
 
-#### `US-07.2` — Suíte de Testes de Integração das Jornadas Completas (Vitest + JSDOM) (`⏳ Pendente`)
+#### `US-07.2` — Suíte de Testes de Integração das Jornadas Completas (Vitest + JSDOM) (`⏳ Pendente` · `5 Story Points`)
 
-- **História**: Como **Mantenedor**, quero testes automatizados que exercitem as jornadas completas do usuário de ponta a ponta para prevenir regressões.
-- **Critérios de Aceite**:
-  - [ ] Teste de integração da **Jornada Principal**: primeiro acesso (Empty State) → cadastro de chave no `<dialog>` → seleção de chave → geração de cobrança com valor fixo e com valor aberto → cópia, compartilhamento e download.
-  - [ ] Teste de integração da **Jornada de Instalação (`RN06`)**: exibição do botão **"Instalar"** quando não instalado → disparo do prompt → ocultação após `appinstalled`.
-  - [ ] Teste de integração da **Jornada Institucional (`RN07`)**: clique no atalho **"Sobre"** → renderização da rota `/sobre` com informação de software gratuito, livre e de código aberto, dados do autor (**Luiz Henrique Canet Filho** — `<me@luizca.net>`), do projeto (`AGPL-3.0-only`), seção descontraída com emojis (**"Manda um PIX"**) com QR Code de valor dinâmico e Chave copia e cola para **`eu@luizca.net`**, e incentivo à divulgação → retorno à tela inicial (`/`).
-  - [ ] Sincronizar `npm run importmap`, `npm run lint`, `npm run format:check`, `npm run test:coverage` e `npm run build`.
+- **História (Narrativa Canônica)**:
+  > **Como** **Mantenedor e Desenvolvedor Front-end** do Manda um PIX,
+  > **Quero** uma suíte automatizada de testes de integração executada em ambiente Vitest com JSDOM cobrindo as jornadas completas do usuário (Primeiro Acesso & Geração de Cobrança, Instalação PWA e Navegação Institucional "Sobre"),
+  > **Para que** todas as camadas da aplicação (Domínio, Casos de Uso, Adaptadores de Infraestrutura e Componentes Custom Elements) operem de forma integrada e resiliente, prevenindo regressões de fluxos ponta a ponta e garantindo estabilidade antes de promoções em homologação e produção.
+- **Estimativa de Complexidade**: **`5 Story Points`** (Complexidade Técnica: Média · Esforço: Alto · Incerteza: Baixa).
+- **Regras de Negócio e Invariantes**:
+  - **INV-01 (Cobertura Integral das 3 Jornadas de Negócio)**:
+    1. **Jornada Principal (EP-05 & EP-06 / RN01 a RN05)**: Primeiro acesso sem chaves (`<pix-key-empty>`) → abertura do modal (`<pix-key-dialog>`) → cadastro e persistência de chave no IndexedDB → sincronização no seletor (`<pix-key-selector>`) → emissão de cobrança com valor fixo e com valor aberto (`<pix-charge-form>`) → renderização de QR Code e Copia e Cola (`<pix-charge-result>`) → distribuição via cópia para clipboard, acionamento do WhatsApp e download da imagem PNG → adição de segunda chave e alternância/exclusão com retorno gracioso.
+    2. **Jornada de Instalação PWA (`RN06`)**: Aplicação em navegador convencional → interceptação do evento nativo `beforeinstallprompt` → exibição destacada do botão "Instalar" no `<app-header>` → acionamento do clique disparando o prompt nativo de instalação → ocultação do botão após evento `appinstalled` ou detecção do modo `standalone`.
+    3. **Jornada Institucional "Sobre" (`RN07`)**: Acionamento do atalho "Sobre" no `<app-header>` ou `.app-footer__link` → navegação e interceptação SPA para `/sobre` → validação do carregamento do `<about-page>` com informações do autor (**Luiz Henrique Canet Filho** — `<me@luizca.net>`), do projeto (`AGPL-3.0-only`), seção descontraída com emojis (**"Manda um PIX"**) com QR Code de valor dinâmico e Chave copia e cola para **`eu@luizca.net`**, opções de divulgação → navegação de volta para a rota inicial (`/`) via logo ou atalho.
+  - **INV-02 (Execução 100% Determinística e Headless em JSDOM)**:
+    - Todos os testes de integração devem executar de forma determinística no ambiente JSDOM configurado no Vitest (`npm test`), sem necessidade de inicialização de navegadores pesados ou servidores HTTP externos, completando em poucos segundos e com taxa de sucesso de 100%.
+  - **INV-03 (Isolamento Hermético de Estado entre Cenários)**:
+    - Cada cenário de teste deve inicializar em um DOM limpo (`document.body.replaceChildren()`), banco IndexedDB isolado/zerado e contêiner de injeção de dependências (`createAppServices`) redefinido, garantindo independência absoluta (`Independent` de INVEST) sem efeitos colaterais entre suítes.
+  - **INV-04 (Comunicação Canônica via Custom Events e DOM Events)**:
+    - As transições de estado entre componentes devem ocorrer através do ciclo real de eventos da aplicação (`key-saved`, `key-selected`, `key-deleted`, `charge-generated`, `charge-copied`, `charge-shared`, `charge-downloaded`, `pathChanged`, `appinstalled`), validando o desacoplamento arquitetural provido por `@modnes/custom-element` e `@modnes/data-controller`.
+  - **INV-05 (Mocks Controlados de APIs Externas do Navegador)**:
+    - APIs nativas de plataforma (`navigator.clipboard`, `navigator.share`, `URL.createObjectURL`, `window.matchMedia`, `beforeinstallprompt`) devem ser simuladas com espiões (`vi.fn()`) controlados e verificáveis para atestar a chamada com os parâmetros corretos.
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Jornada Principal — Primeiro Acesso, Cadastro de Chave e Cobrança com Valor Fixo — Happy Path)**:
+    - Dado que o usuário acessa o aplicativo pela primeira vez sem chaves PIX cadastradas,
+    - Quando o aplicativo for inicializado via `bootstrapApp`,
+    - Então deve ser exibido o componente `<pix-key-empty>` com o CTA "Cadastrar chave PIX",
+    - E o formulário de cobrança `<pix-charge-form>` e o palco de resultado `<pix-charge-result>` devem estar desabilitados ou em estado de espera,
+    - E quando o usuário aciona o cadastro de uma nova chave do tipo CPF com valor `"123.456.788-00"`,
+    - Então o modal `<pix-key-dialog>` deve fechar, a chave deve ser persistida e selecionada no `<pix-key-selector>`,
+    - E quando o usuário preenche o valor `"50,00"` e aciona "Manda um PIX",
+    - Então o componente `<pix-charge-result>` deve exibir o QR Code em imagem PNG/SVG, o BR Code Copia e Cola gerado e o badge de valor `"R$ 50,00"`.
+  - **Cenário 02 (Jornada Principal — Cobrança de Valor Aberto e Ações de Distribuição: Copiar, WhatsApp e Download)**:
+    - Dado que uma chave PIX válida está cadastrada e selecionada no aplicativo,
+    - Quando o usuário clica em "Manda um PIX" com o campo de valor monetário em branco,
+    - Então a cobrança gerada deve apresentar o badge `"Valor dinâmico (aberto)"` e payload BR Code estático sem montante pré-definido,
+    - E quando o usuário clica no botão "Copiar",
+    - Então a chave Copia e Cola deve ser enviada para a área de transferência (`navigator.clipboard.writeText`) e o botão deve exibir feedback `"Copiado!"`,
+    - E quando o usuário clica no botão "WhatsApp",
+    - Então a API de compartilhamento ou URL universal do WhatsApp (`api.whatsapp.com/send`) deve ser acionada com o texto formatado da cobrança,
+    - E quando o usuário clica no botão "Salvar PNG",
+    - Então um link de download de imagem com o nome `"pix-[identificador].png"` deve ser criado e disparado.
+  - **Cenário 03 (Jornada Principal — Múltiplas Chaves PIX, Alternância de Seleção Ativa e Exclusão)**:
+    - Dado que o usuário possui uma chave cadastrada,
+    - Quando o usuário cadastra uma segunda chave (ex: E-mail `"pix@exemplo.com"`),
+    - Então o componente `<pix-key-selector>` deve listar ambas as chaves,
+    - E quando o usuário seleciona a segunda chave,
+    - Então a nova seleção deve se tornar ativa e atualizar o formulário de cobrança,
+    - E quando a primeira chave for excluída através do botão de exclusão,
+    - Então a lista deve ser atualizada mantendo a segunda chave como ativa,
+    - E quando a última chave for excluída,
+    - Então o aplicativo deve transitar imediatamente de volta para o estado vazio `<pix-key-empty>`.
+  - **Cenário 04 (Jornada de Instalação PWA — RN06)**:
+    - Dado que o aplicativo é carregado no navegador em modo não-standalone,
+    - Quando o evento de sistema `beforeinstallprompt` é disparado na janela (`window`),
+    - Então o botão `.app-header__install-btn` deve se tornar visível e habilitado,
+    - E quando o usuário clica no botão "Instalar",
+    - Então o método `prompt()` do evento de instalação capturado deve ser executado,
+    - E quando o evento `appinstalled` for emitido pelo navegador,
+    - Então o botão de instalação deve ser ocultado da interface.
+  - **Cenário 05 (Jornada Institucional "Sobre" — RN07)**:
+    - Dado que o usuário está na tela inicial (`/`),
+    - Quando o usuário clica no link "Sobre" no cabeçalho ou rodapé,
+    - Então a navegação SPA deve atualizar a URL para `/sobre` e atualizar o título da página para `"Sobre o aplicativo — Manda um PIX"`,
+    - E o componente `<about-page>` deve ser renderizado no outlet com as informações do autor (**Luiz Henrique Canet Filho** — `<me@luizca.net>`), licença (`AGPL-3.0-only`), seção "Manda um PIX" com QR Code dinâmico para `eu@luizca.net` e ações de divulgação,
+    - E quando o usuário aciona o retorno para a tela inicial (clicando no logotipo ou no atalho Voltar),
+    - Então a rota deve transitar de volta para `/` restaurando a visualização da tela de cobrança.
+  - **Cenário 06 (Integridade, Cobertura e Homologação de Qualidade dos Testes)**:
+    - Dado que todos os testes de integração das jornadas foram implementados,
+    - Quando forem executados os comandos `npm test`, `npm run test:coverage`, `npm run lint` e `npm run format:check`,
+    - Então todos os testes devem passar com 100% de sucesso sem timeouts ou vazamento de estado,
+    - E o build de produção `npm run build` deve compilar todos os módulos sem erros de resolução.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-07.2.1 (Harness e Utilitários de Inicialização dos Testes de Integração)**: Criar [`test/integration/helpers/setup-app.js`](../../test/integration/helpers/setup-app.js) estruturando o helper `mountTestApp()` responsável por: montar o DOM idêntico a `index.html` (`#app`, `<app-header>`, `#router-outlet`, `.app-footer`), configurar mocks do navegador (`navigator.clipboard`, `navigator.share`, `URL.createObjectURL`, `matchMedia`), instanciar repositório de teste isolado e inicializar `bootstrapApp` com cleanup automático em `afterEach`.
+  - [ ] **TASK-07.2.2 (Suíte de Testes de Integração da Jornada Principal — Empty State, Criação e Cobrança com Valor Fixo)**: Implementar [`test/integration/main-journey.integration.test.js`](../../test/integration/main-journey.integration.test.js) cobrindo o primeiro acesso (`<pix-key-empty>`), abertura do `<pix-key-dialog>`, preenchimento e persistência de chave PIX, transição automática para o seletor com chave selecionada, preenchimento de valor monetário fixo no `<pix-charge-form>`, geração da cobrança e validação dos elementos renderizados em `<pix-charge-result>`.
+  - [ ] **TASK-07.2.3 (Suíte de Testes de Integração das Ações de Distribuição e Cobrança de Valor Aberto)**: Expandir [`test/integration/main-journey.integration.test.js`](../../test/integration/main-journey.integration.test.js) testando a geração de cobrança com valor aberto (sem preenchimento do input), verificação do badge e status de valor dinâmico, acionamento do botão Copiar (escrita na clipboard e feedback visual), acionamento de Compartilhar (WhatsApp URL / `navigator.share`) e acionamento de Salvar Imagem (download do PNG).
+  - [ ] **TASK-07.2.4 (Suíte de Testes de Integração da Gestão e Chaveamento de Múltiplas Contas)**: Cobrir em [`test/integration/main-journey.integration.test.js`](../../test/integration/main-journey.integration.test.js) a adição de uma segunda chave PIX, alternância da seleção ativa entre as chaves cadastradas, exclusão da chave ativa e verificação de fallback para outra chave ou para o empty state quando não restar nenhuma chave.
+  - [ ] **TASK-07.2.5 (Suíte de Testes de Integração da Jornada de Instalação PWA — RN06)**: Implementar [`test/integration/pwa-install-journey.integration.test.js`](../../test/integration/pwa-install-journey.integration.test.js) validando a exibição do botão `.app-header__install-btn` após o evento `beforeinstallprompt`, a chamada a `prompt()` e `userChoice` após clique no botão, e a ocultação da ação após o disparo de `appinstalled` ou quando já em modo standalone.
+  - [ ] **TASK-07.2.6 (Suíte de Testes de Integração da Jornada Institucional e Navegação SPA — RN07)**: Implementar [`test/integration/about-journey.integration.test.js`](../../test/integration/about-journey.integration.test.js) exercitando o clique no link "Sobre", a interceptação e atualização de rota pelo `@modnes/router`, a renderização do `<about-page>`, verificação dos dados de autoria (Luiz Henrique Canet Filho, `<me@luizca.net>`), licença (`AGPL-3.0-only`), seção "Manda um PIX" de apoio voluntário com QR Code dinâmico e chave copia e cola `eu@luizca.net`, acionamento do botão de divulgação, e retorno seguro para `/` via logo do header ou link Voltar.
+  - [ ] **TASK-07.2.7 (Validação da Suíte Completa, Cobertura e Sincronização da Documentação)**: Executar a suíte de testes de integração (`npm test`), validar cobertura (`npm run test:coverage`), garantir conformidade com linter (`npm run lint`), formatação (`npm run format:check`), compilação (`npm run build`) e sincronizar a matriz de rastreabilidade em [`docs/business/backlog.md`](./backlog.md).
+
+```mermaid
+flowchart LR
+    T1["TASK-07.2.1: Test Harness & Setup Helpers"] --> T2["TASK-07.2.2: Jornada Principal (Empty State & Valor Fixo)"]
+    T2 --> T3["TASK-07.2.3: Cobrança Aberta & Ações Distribuição"]
+    T2 --> T4["TASK-07.2.4: Múltiplas Chaves & Alternância"]
+    T1 --> T5["TASK-07.2.5: Jornada Instalação PWA (RN06)"]
+    T1 --> T6["TASK-07.2.6: Jornada Institucional Sobre (RN07)"]
+    T3 & T4 & T5 & T6 --> T7["TASK-07.2.7: Cobertura, Lint, Build & Sincronização"]
+```
 
 #### `US-07.3` — Workflows de Entrega Contínua (CD) para `staging` e `production` (`⏳ Pendente`)
 
