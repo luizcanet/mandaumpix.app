@@ -66,12 +66,12 @@ describe("PixKeySelectorComponent (TASK-05.2.2: Testes Unitários de Renderizaç
     it("deve aplicar as classes .key-selector, .card e atributos acessíveis no connectedCallback", () => {
       document.body.appendChild(selectorElement);
 
-      expect(selectorElement.classList.contains(KEY_SELECTOR_CLASSES.ROOT)).toBe(
-        true,
-      );
-      expect(selectorElement.classList.contains(KEY_SELECTOR_CLASSES.CARD)).toBe(
-        true,
-      );
+      expect(
+        selectorElement.classList.contains(KEY_SELECTOR_CLASSES.ROOT),
+      ).toBe(true);
+      expect(
+        selectorElement.classList.contains(KEY_SELECTOR_CLASSES.CARD),
+      ).toBe(true);
       expect(selectorElement.getAttribute("role")).toBe("region");
       expect(selectorElement.getAttribute("aria-labelledby")).toBe(
         DEFAULT_KEY_SELECTOR_TITLE_ID,
@@ -547,6 +547,105 @@ describe("PixKeySelectorComponent (TASK-05.2.2: Testes Unitários de Renderizaç
       expect(mockListUseCase.execute).toHaveBeenCalledTimes(1);
       expect(selectorElement.keys.length).toBe(3);
       expect(selectorElement.selectedKeyId).toBe("key-3");
+    });
+
+    it("deve se inscrever no pixKeyRepository e atualizar reativamente quando os dados mudarem", () => {
+      let listenerCallback = null;
+      const mockUnsubscribe = vi.fn();
+      const mockRepo = {
+        subscribe: vi.fn((cb) => {
+          listenerCallback = cb;
+          return mockUnsubscribe;
+        }),
+      };
+
+      selectorElement.pixKeyRepository = mockRepo;
+      document.body.appendChild(selectorElement);
+
+      expect(mockRepo.subscribe).toHaveBeenCalledTimes(1);
+
+      // Simula emissão de dados do repositório
+      listenerCallback({
+        items: [mockKeys[0], mockKeys[1]],
+        selectedKeyId: "key-2",
+      });
+
+      expect(selectorElement.keys.length).toBe(2);
+      expect(selectorElement.selectedKeyId).toBe("key-2");
+
+      // Ao desconectar do DOM, deve cancelar a inscrição
+      selectorElement.remove();
+      expect(mockUnsubscribe).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("API Pública e Atributos Observados", () => {
+    it("deve disparar open-key-dialog ao invocar o método público openKeyDialog()", () => {
+      document.body.appendChild(selectorElement);
+
+      const eventListener = vi.fn();
+      selectorElement.addEventListener(
+        KEY_SELECTOR_EVENT_NAMES.OPEN_KEY_DIALOG,
+        eventListener,
+      );
+
+      selectorElement.openKeyDialog();
+
+      expect(eventListener).toHaveBeenCalledTimes(1);
+    });
+
+    it("deve atualizar os textos da UI ao alterar propriedades e atributos observados", () => {
+      document.body.appendChild(selectorElement);
+
+      selectorElement.setAttribute("step-text", "2");
+      selectorElement.setAttribute("title-text", "Escolha a conta");
+      selectorElement.setAttribute("add-btn-label", "+ Adicionar");
+      selectorElement.setAttribute("list-label", "Minhas contas salvas");
+      selectorElement.setAttribute("delete-title", "Excluir esta chave");
+
+      selectorElement.syncAttributes();
+      selectorElement.render();
+
+      expect(
+        selectorElement
+          .querySelector(`.${KEY_SELECTOR_CLASSES.STEP_BADGE}`)
+          .textContent.trim(),
+      ).toBe("2");
+      expect(
+        selectorElement
+          .querySelector(`.${KEY_SELECTOR_CLASSES.TITLE}`)
+          .textContent.trim(),
+      ).toBe("Escolha a conta");
+      expect(
+        selectorElement.querySelector(`button.${KEY_SELECTOR_CLASSES.ADD_BTN}`)
+          .textContent,
+      ).toContain("+ Adicionar");
+      expect(
+        selectorElement
+          .querySelector(`.${KEY_SELECTOR_CLASSES.LIST}`)
+          .getAttribute("aria-label"),
+      ).toBe("Minhas contas salvas");
+    });
+
+    it("deve escapar caracteres HTML perigosos para prevenir injeção de script", () => {
+      selectorElement.keys = [
+        {
+          id: "xss-1",
+          rotulo: '<script>alert("xss")</script>',
+          tipo_chave: "<b>CPF</b>",
+          valor_chave: '123" onfocus="alert(1)',
+        },
+      ];
+      document.body.appendChild(selectorElement);
+
+      const card = selectorElement.querySelector(
+        `.${KEY_SELECTOR_CLASSES.ITEM}`,
+      );
+      expect(card.innerHTML).not.toContain("<script>");
+      expect(card.innerHTML).toContain("&lt;script&gt;");
+      expect(
+        card.querySelector(`.${KEY_SELECTOR_CLASSES.LABEL}`).textContent,
+      ).toBe('<script>alert("xss")</script>');
     });
   });
 });

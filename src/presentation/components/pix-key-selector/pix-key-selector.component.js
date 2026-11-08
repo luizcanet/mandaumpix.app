@@ -14,6 +14,24 @@ import {
 } from "./pix-key-selector.constants.js";
 
 /**
+ * Escapa caracteres HTML para prevenir injeção de script em valores dinâmicos.
+ *
+ * @param {*} value
+ * @returns {string}
+ */
+function escapeHtml(value) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/**
  * Web Component <pix-key-selector>
  * Apresenta a lista de chaves PIX cadastradas sob o padrão W3C ARIA Radiogroup,
  * permitindo seleção da chave ativa com 1 toque/teclado, exclusão de chaves
@@ -22,14 +40,45 @@ import {
 export class PixKeySelectorComponent extends CustomElement {
   #keys = [];
   #selectedKeyId = null;
+  #stepText = DEFAULT_KEY_SELECTOR_STEP;
+  #titleText = DEFAULT_KEY_SELECTOR_TITLE;
+  #addBtnLabel = DEFAULT_KEY_SELECTOR_ADD_BTN_LABEL;
+  #listLabel = DEFAULT_KEY_SELECTOR_LIST_LABEL;
+  #deleteTitle = DEFAULT_KEY_SELECTOR_DELETE_TITLE;
 
-  selectPixKeyUseCase = null;
-  deletePixKeyUseCase = null;
-  listPixKeysUseCase = null;
-  pixKeyRepository = null;
+  #selectPixKeyUseCase = null;
+  #deletePixKeyUseCase = null;
+  #listPixKeysUseCase = null;
+  #pixKeyRepository = null;
+  #repositoryUnsubscribe = null;
+
+  static observedAttributes = [
+    "step-text",
+    "title-text",
+    "add-btn-label",
+    "list-label",
+    "delete-title",
+  ];
 
   constructor() {
     super();
+
+    this.addInjectable(
+      KEY_SELECTOR_INJECTABLES.SELECT_PIX_KEY_USE_CASE,
+      "selectPixKeyUseCase",
+    );
+    this.addInjectable(
+      KEY_SELECTOR_INJECTABLES.DELETE_PIX_KEY_USE_CASE,
+      "deletePixKeyUseCase",
+    );
+    this.addInjectable(
+      KEY_SELECTOR_INJECTABLES.LIST_PIX_KEYS_USE_CASE,
+      "listPixKeysUseCase",
+    );
+    this.addInjectable(
+      KEY_SELECTOR_INJECTABLES.PIX_KEY_REPOSITORY,
+      "pixKeyRepository",
+    );
 
     this.template = () => {
       const cardsHtml = this.#keys
@@ -40,6 +89,13 @@ export class PixKeySelectorComponent extends CustomElement {
             : "";
           const tabIndex = isSelected ? "0" : "-1";
           const ariaChecked = isSelected ? "true" : "false";
+          const escapedLabel = escapeHtml(item.rotulo);
+          const escapedType = escapeHtml(item.tipo_chave);
+          const escapedValue = escapeHtml(item.valor_chave);
+          const deleteAriaLabel = escapeHtml(
+            formatKeyDeleteAriaLabel(item.rotulo),
+          );
+          const deleteTitle = escapeHtml(this.#deleteTitle);
 
           return `
             <div
@@ -55,17 +111,17 @@ export class PixKeySelectorComponent extends CustomElement {
                 </span>
                 <div class="${KEY_SELECTOR_CLASSES.META}">
                   <div class="${KEY_SELECTOR_CLASSES.TITLE_ROW}">
-                    <span class="${KEY_SELECTOR_CLASSES.LABEL}">${item.rotulo}</span>
-                    <span class="${KEY_SELECTOR_CLASSES.TYPE_BADGE}">${item.tipo_chave}</span>
+                    <span class="${KEY_SELECTOR_CLASSES.LABEL}">${escapedLabel}</span>
+                    <span class="${KEY_SELECTOR_CLASSES.TYPE_BADGE}">${escapedType}</span>
                   </div>
-                  <div class="${KEY_SELECTOR_CLASSES.VALUE}">${item.valor_chave}</div>
+                  <div class="${KEY_SELECTOR_CLASSES.VALUE}">${escapedValue}</div>
                 </div>
               </div>
               <button
                 type="button"
                 class="${KEY_SELECTOR_CLASSES.DELETE_BTN}"
-                title="${DEFAULT_KEY_SELECTOR_DELETE_TITLE}"
-                aria-label="${formatKeyDeleteAriaLabel(item.rotulo)}"
+                title="${deleteTitle}"
+                aria-label="${deleteAriaLabel}"
                 data-action="delete"
                 data-key-id="${item.id}"
               >
@@ -79,9 +135,9 @@ export class PixKeySelectorComponent extends CustomElement {
       return `
         <div class="${KEY_SELECTOR_CLASSES.SECTION_HEADER}">
           <div class="${KEY_SELECTOR_CLASSES.HEADER_TITLE_GROUP}">
-            <span class="${KEY_SELECTOR_CLASSES.STEP_BADGE}">${DEFAULT_KEY_SELECTOR_STEP}</span>
+            <span class="${KEY_SELECTOR_CLASSES.STEP_BADGE}">${escapeHtml(this.#stepText)}</span>
             <h2 id="${DEFAULT_KEY_SELECTOR_TITLE_ID}" class="${KEY_SELECTOR_CLASSES.TITLE}">
-              ${DEFAULT_KEY_SELECTOR_TITLE}
+              ${escapeHtml(this.#titleText)}
             </h2>
           </div>
           <button
@@ -90,7 +146,7 @@ export class PixKeySelectorComponent extends CustomElement {
             data-action="open-key-dialog"
           >
             <vector-icon name="${KEY_SELECTOR_ICONS.PLUS}"></vector-icon>
-            <span>${DEFAULT_KEY_SELECTOR_ADD_BTN_LABEL}</span>
+            <span>${escapeHtml(this.#addBtnLabel)}</span>
           </button>
         </div>
 
@@ -98,7 +154,7 @@ export class PixKeySelectorComponent extends CustomElement {
           class="${KEY_SELECTOR_CLASSES.LIST}"
           role="radiogroup"
           aria-labelledby="${DEFAULT_KEY_SELECTOR_TITLE_ID}"
-          aria-label="${DEFAULT_KEY_SELECTOR_LIST_LABEL}"
+          aria-label="${escapeHtml(this.#listLabel)}"
         >
           ${cardsHtml}
         </div>
@@ -128,6 +184,104 @@ export class PixKeySelectorComponent extends CustomElement {
     }
   }
 
+  get stepText() {
+    return this.#stepText;
+  }
+
+  set stepText(value) {
+    this.#stepText = value || DEFAULT_KEY_SELECTOR_STEP;
+    if (this.isConnected) {
+      this.render();
+    }
+  }
+
+  get titleText() {
+    return this.#titleText;
+  }
+
+  set titleText(value) {
+    this.#titleText = value || DEFAULT_KEY_SELECTOR_TITLE;
+    if (this.isConnected) {
+      this.render();
+    }
+  }
+
+  get addBtnLabel() {
+    return this.#addBtnLabel;
+  }
+
+  set addBtnLabel(value) {
+    this.#addBtnLabel = value || DEFAULT_KEY_SELECTOR_ADD_BTN_LABEL;
+    if (this.isConnected) {
+      this.render();
+    }
+  }
+
+  get listLabel() {
+    return this.#listLabel;
+  }
+
+  set listLabel(value) {
+    this.#listLabel = value || DEFAULT_KEY_SELECTOR_LIST_LABEL;
+    if (this.isConnected) {
+      this.render();
+    }
+  }
+
+  get deleteTitle() {
+    return this.#deleteTitle;
+  }
+
+  set deleteTitle(value) {
+    this.#deleteTitle = value || DEFAULT_KEY_SELECTOR_DELETE_TITLE;
+    if (this.isConnected) {
+      this.render();
+    }
+  }
+
+  get selectPixKeyUseCase() {
+    return this.#selectPixKeyUseCase;
+  }
+
+  set selectPixKeyUseCase(useCase) {
+    this.#selectPixKeyUseCase = useCase || null;
+  }
+
+  get deletePixKeyUseCase() {
+    return this.#deletePixKeyUseCase;
+  }
+
+  set deletePixKeyUseCase(useCase) {
+    this.#deletePixKeyUseCase = useCase || null;
+  }
+
+  get listPixKeysUseCase() {
+    return this.#listPixKeysUseCase;
+  }
+
+  set listPixKeysUseCase(useCase) {
+    this.#listPixKeysUseCase = useCase || null;
+    if (
+      this.isConnected &&
+      this.#listPixKeysUseCase &&
+      this.#keys.length === 0
+    ) {
+      this.syncKeys();
+    }
+  }
+
+  get pixKeyRepository() {
+    return this.#pixKeyRepository;
+  }
+
+  set pixKeyRepository(repository) {
+    this.#teardownRepositorySubscription();
+    this.#pixKeyRepository = repository || null;
+    if (this.isConnected && this.#pixKeyRepository) {
+      this.#setupRepositorySubscription();
+    }
+  }
+
   connectedCallback() {
     if (!this.classList.contains(KEY_SELECTOR_CLASSES.ROOT)) {
       this.classList.add(KEY_SELECTOR_CLASSES.ROOT);
@@ -142,49 +296,54 @@ export class PixKeySelectorComponent extends CustomElement {
       this.setAttribute("aria-labelledby", DEFAULT_KEY_SELECTOR_TITLE_ID);
     }
 
-    this.addInjectable(
-      KEY_SELECTOR_INJECTABLES.SELECT_PIX_KEY_USE_CASE,
-      "selectPixKeyUseCase",
-    );
-    this.addInjectable(
-      KEY_SELECTOR_INJECTABLES.DELETE_PIX_KEY_USE_CASE,
-      "deletePixKeyUseCase",
-    );
-    this.addInjectable(
-      KEY_SELECTOR_INJECTABLES.LIST_PIX_KEYS_USE_CASE,
-      "listPixKeysUseCase",
-    );
-    this.addInjectable(
-      KEY_SELECTOR_INJECTABLES.PIX_KEY_REPOSITORY,
-      "pixKeyRepository",
-    );
-
+    this.syncAttributes();
     super.connectedCallback();
 
-    if (
-      this.listPixKeysUseCase &&
-      typeof this.listPixKeysUseCase.execute === "function"
-    ) {
-      Promise.resolve(this.listPixKeysUseCase.execute())
-        .then((result) => {
-          if (result && Array.isArray(result.items)) {
-            this.#keys = [...result.items];
-            this.#selectedKeyId = result.selectedKeyId || null;
-            this.render();
-          }
-        })
-        .catch(() => {});
+    if (this.#pixKeyRepository) {
+      this.#setupRepositorySubscription();
+    }
+
+    if (this.#listPixKeysUseCase && this.#keys.length === 0) {
+      this.syncKeys();
+    }
+  }
+
+  disconnectedCallback() {
+    this.#teardownRepositorySubscription();
+  }
+
+  syncAttributes() {
+    if (this.hasAttribute("step-text")) {
+      this.#stepText =
+        this.getAttribute("step-text") || DEFAULT_KEY_SELECTOR_STEP;
+    }
+    if (this.hasAttribute("title-text")) {
+      this.#titleText =
+        this.getAttribute("title-text") || DEFAULT_KEY_SELECTOR_TITLE;
+    }
+    if (this.hasAttribute("add-btn-label")) {
+      this.#addBtnLabel =
+        this.getAttribute("add-btn-label") ||
+        DEFAULT_KEY_SELECTOR_ADD_BTN_LABEL;
+    }
+    if (this.hasAttribute("list-label")) {
+      this.#listLabel =
+        this.getAttribute("list-label") || DEFAULT_KEY_SELECTOR_LIST_LABEL;
+    }
+    if (this.hasAttribute("delete-title")) {
+      this.#deleteTitle =
+        this.getAttribute("delete-title") || DEFAULT_KEY_SELECTOR_DELETE_TITLE;
     }
   }
 
   init() {
     const addBtn = this.querySelector(`button[data-action="open-key-dialog"]`);
     if (addBtn) {
-      addBtn.addEventListener("click", () => this.#emitOpenKeyDialog());
+      addBtn.addEventListener("click", () => this.openKeyDialog());
       addBtn.addEventListener("keydown", (event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          this.#emitOpenKeyDialog();
+          this.openKeyDialog();
         }
       });
     }
@@ -222,6 +381,11 @@ export class PixKeySelectorComponent extends CustomElement {
           event.stopPropagation();
           this.deleteKey(keyId);
         });
+        deleteBtn.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.stopPropagation();
+          }
+        });
       }
     });
   }
@@ -242,11 +406,11 @@ export class PixKeySelectorComponent extends CustomElement {
     );
 
     if (
-      this.selectPixKeyUseCase &&
-      typeof this.selectPixKeyUseCase.execute === "function"
+      this.#selectPixKeyUseCase &&
+      typeof this.#selectPixKeyUseCase.execute === "function"
     ) {
       try {
-        await this.selectPixKeyUseCase.execute({ id });
+        await this.#selectPixKeyUseCase.execute({ id });
       } catch {
         // use-case errors can be handled gracefully
       }
@@ -267,11 +431,11 @@ export class PixKeySelectorComponent extends CustomElement {
     );
 
     if (
-      this.deletePixKeyUseCase &&
-      typeof this.deletePixKeyUseCase.execute === "function"
+      this.#deletePixKeyUseCase &&
+      typeof this.#deletePixKeyUseCase.execute === "function"
     ) {
       try {
-        await this.deletePixKeyUseCase.execute({ id });
+        await this.#deletePixKeyUseCase.execute({ id });
       } catch {
         // use-case errors handled
       }
@@ -284,7 +448,7 @@ export class PixKeySelectorComponent extends CustomElement {
     this.render();
   }
 
-  #emitOpenKeyDialog() {
+  openKeyDialog() {
     this.dispatchEvent(
       new CustomEvent(KEY_SELECTOR_EVENT_NAMES.OPEN_KEY_DIALOG, {
         bubbles: true,
@@ -292,6 +456,48 @@ export class PixKeySelectorComponent extends CustomElement {
         detail: { source: "pix-key-selector" },
       }),
     );
+  }
+
+  async syncKeys() {
+    if (
+      this.#listPixKeysUseCase &&
+      typeof this.#listPixKeysUseCase.execute === "function"
+    ) {
+      try {
+        const result = await this.#listPixKeysUseCase.execute();
+        if (result && Array.isArray(result.items)) {
+          this.#keys = [...result.items];
+          this.#selectedKeyId = result.selectedKeyId || null;
+          this.render();
+        }
+      } catch {
+        // Handled gracefully
+      }
+    }
+  }
+
+  #setupRepositorySubscription() {
+    if (
+      this.#pixKeyRepository &&
+      typeof this.#pixKeyRepository.subscribe === "function"
+    ) {
+      this.#repositoryUnsubscribe = this.#pixKeyRepository.subscribe(
+        (state = {}) => {
+          if (Array.isArray(state.items)) {
+            this.#keys = [...state.items];
+            this.#selectedKeyId = state.selectedKeyId || null;
+            this.render();
+          }
+        },
+      );
+    }
+  }
+
+  #teardownRepositorySubscription() {
+    if (typeof this.#repositoryUnsubscribe === "function") {
+      this.#repositoryUnsubscribe();
+      this.#repositoryUnsubscribe = null;
+    }
   }
 }
 
