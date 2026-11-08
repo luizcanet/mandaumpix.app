@@ -24,13 +24,15 @@ mandaumpix.app/
 │   ├── domain/
 │   │   └── entities/      # Entidades de domínio e validadores puros (pix-key.entity.js, pix-charge.entity.js e testes)
 │   ├── infrastructure/
-│   │   ├── pwa/           # Adaptador de instalação do PWA (pwa-install.adapter.js e testes)
+│   │   ├── pwa/           # Adaptadores PWA (pwa-install.adapter.js, service-worker.adapter.js e testes)
+│   │   ├── share/         # Adaptador de saída e compartilhamento (browser-share.adapter.js e testes)
 │   │   └── storage/       # Repositório local de chaves PIX e preferências no IndexedDB (indexed-db-pix-key.repository.js e testes)
 │   ├── presentation/
 │   │   ├── components/
 │   │   │   └── vector-icon/ # Web Component compartilhado <vector-icon> (VectorIcon, sprite icon.svg, CSS, stories e testes)
 │   │   └── styles/        # Design tokens (:root) e reset CSS moderno
 │   └── main.js            # Ponto de entrada ESM da aplicação cliente
+├── sw.js                  # Service Worker com pré-cache da App Shell e estratégias de cache offline (Network-First / Stale-While-Revalidate)
 ├── index.html             # Casca HTML5 com Import Map W3C, es-module-shims, modulepreload, SRI e links de ícones/manifest
 ├── manifest.json          # Web App Manifest W3C com paleta azul/verde e ícones do aplicativo
 ├── importmap.js           # Script de injeção de Import Map gerenciado pelo JSPM
@@ -63,6 +65,8 @@ mandaumpix.app/
 | [`src/application/use-cases/distribute-pix-charge.use-case.js`](../../src/application/use-cases/distribute-pix-charge.use-case.js) | Caso de uso `DistributePixChargeUseCase` (`executeDistributePixCharge`), erro `PixChargeDistributionError` e helpers para cópia, compartilhamento nativo/WhatsApp e download PNG do QR Code (`RN05`).                                                                |
 | [`src/application/use-cases/install-pwa.use-case.js`](../../src/application/use-cases/install-pwa.use-case.js)                     | Caso de uso `InstallPwaUseCase` (`executeInstallPwa`), erro `PwaInstallError` e normalizadores para controle de visibilidade do botão destacado **"Instalar"** e disparo do prompt nativo de instalação do PWA (`RN06`).                                             |
 | [`src/infrastructure/pwa/pwa-install.adapter.js`](../../src/infrastructure/pwa/pwa-install.adapter.js)                             | Adaptador `PwaInstallAdapter` (`createPwaInstallAdapter`), erro `PwaInstallAdapterError`, detector de standalone e ciclo de eventos nativos do navegador (`beforeinstallprompt`, `appinstalled`) com reatividade `@modnes/data-controller` (`RN06`).                 |
+| [`src/infrastructure/pwa/service-worker.adapter.js`](../../src/infrastructure/pwa/service-worker.adapter.js)                       | Adaptador `ServiceWorkerAdapter` (`createServiceWorkerAdapter`), erro `ServiceWorkerAdapterError`, monitoramento de conectividade (`online`/`offline`) e gerenciamento de ciclo de vida e estado reativo do Service Worker com `@modnes/data-controller`.            |
+| [`sw.js`](../../sw.js)                                                                                                             | Script do Service Worker na raiz da aplicação contendo pré-cache da App Shell (`mandaumpix-v1.0.0-precache`), estratégias de cache (Network-First para páginas e Stale-While-Revalidate para CDN/ativos) e expurgo de caches legados na ativação (`claim`).          |
 | [`src/infrastructure/share/browser-share.adapter.js`](../../src/infrastructure/share/browser-share.adapter.js)                     | Adaptador `BrowserShareAdapter` (`createBrowserShareAdapter`), erro `BrowserShareAdapterError` e códigos `BROWSER_SHARE_ADAPTER_ERROR_CODES` para integração com Clipboard API, Web Share API (com fallback para WhatsApp) e download local de QR Code PNG (`RN05`). |
 | [`src/infrastructure/storage/indexed-db-pix-key.repository.js`](../../src/infrastructure/storage/indexed-db-pix-key.repository.js) | Adaptador `IndexedDbPixKeyRepository` (`createIndexedDbPixKeyRepository`), erro `PixKeyStorageError` e migração `openPixKeyDatabase` para persistência local no `IndexedDB` (`mandaumpix_db`) com `@modnes/data-controller`.                                         |
 | [`src/presentation/styles/`](../../src/presentation/styles/tokens.css)                                                             | Design Tokens globais (`tokens.css`) com paleta da marca (`#0b1834`, `#00d37f`), tipografia, espaçamentos e reset CSS (`reset.css`).                                                                                                                                 |

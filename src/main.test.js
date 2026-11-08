@@ -5,6 +5,7 @@ import {
   BROWSER_SHARE_ADAPTER_ERROR_CODES,
   BrowserShareAdapter,
   BrowserShareAdapterError,
+  CACHE_VERSION,
   ChaveConta,
   CobrancaPix,
   CustomElement,
@@ -15,6 +16,8 @@ import {
   DEFAULT_QR_IMAGE_FILENAME,
   DEFAULT_QR_IMAGE_SIZE,
   DEFAULT_SHARE_TITLE,
+  DEFAULT_SW_SCOPE,
+  DEFAULT_SW_SCRIPT_URL,
   DataController,
   DeletePixKeyUseCase,
   DistributePixChargeUseCase,
@@ -39,6 +42,7 @@ import {
   PWA_INSTALL_ADAPTER_ERROR_CODES,
   PWA_INSTALL_ERROR_CODES,
   PWA_INSTALL_OUTCOMES,
+  PRECACHE_NAME,
   PixChargeDistributionError,
   PixChargeEntity,
   PixChargeValidationError,
@@ -49,11 +53,16 @@ import {
   PwaInstallAdapter,
   PwaInstallAdapterError,
   PwaInstallError,
+  RUNTIME_CACHE_NAME,
   Router,
   SELECTED_KEY_SETTING_KEY,
   STANDALONE_MEDIA_QUERY,
+  SERVICE_WORKER_ADAPTER_ERROR_CODES,
+  SERVICE_WORKER_STATUS,
   SavePixKeyUseCase,
   SelectPixKeyUseCase,
+  ServiceWorkerAdapter,
+  ServiceWorkerAdapterError,
   assertChargeDistributionGateway,
   assertIndexedDbFactory,
   assertPixKeyRepository,
@@ -63,6 +72,7 @@ import {
   createBrowserShareAdapter,
   createIndexedDbPixKeyRepository,
   createPwaInstallAdapter,
+  createServiceWorkerAdapter,
   detectStandaloneMode,
   executeDeletePixKey,
   executeDistributePixCharge,
@@ -74,6 +84,8 @@ import {
   extractChargeDistributionTarget,
   generatePixCharge,
   hydrateChaveContaList,
+  isOnline,
+  isServiceWorkerSupported,
   mapStorageDomException,
   normalizeAdditionalInfo,
   normalizeMerchantCity,
@@ -158,7 +170,9 @@ describe("main.js", () => {
       const rootElement = document.createElement("div");
 
       // Act
-      const initialized = bootstrapApp(rootElement);
+      const initialized = bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
 
       // Assert
       expect(initialized).toBe(rootElement);
@@ -167,6 +181,68 @@ describe("main.js", () => {
 
     it("should return null when root element is not found", () => {
       expect(bootstrapApp(null)).toBeNull();
+    });
+
+    it("should auto-register service worker on load event or immediately if document is complete", async () => {
+      const rootElement = document.createElement("div");
+      const mockRegister = vi.fn().mockResolvedValue({ isRegistered: true });
+      const mockAdapter = {
+        register: mockRegister,
+      };
+
+      const windowTarget = new EventTarget();
+      windowTarget.document = { readyState: "complete" };
+
+      const initialized = bootstrapApp(rootElement, {
+        windowTarget,
+        serviceWorkerAdapter: mockAdapter,
+        autoRegisterServiceWorker: true,
+      });
+
+      expect(initialized).toBe(rootElement);
+      expect(mockRegister).toHaveBeenCalled();
+      expect(rootElement.__serviceWorkerAdapter).toBe(mockAdapter);
+    });
+
+    it("should register service worker when load event fires if readyState is loading", async () => {
+      const rootElement = document.createElement("div");
+      const mockRegister = vi.fn().mockResolvedValue({ isRegistered: true });
+      const mockAdapter = {
+        register: mockRegister,
+      };
+
+      const windowTarget = new EventTarget();
+      windowTarget.document = { readyState: "loading" };
+
+      bootstrapApp(rootElement, {
+        windowTarget,
+        serviceWorkerAdapter: mockAdapter,
+        autoRegisterServiceWorker: true,
+      });
+
+      expect(mockRegister).not.toHaveBeenCalled();
+
+      windowTarget.dispatchEvent(new Event("load"));
+      expect(mockRegister).toHaveBeenCalled();
+    });
+
+    it("should tolerate service worker registration failure without throwing", async () => {
+      const rootElement = document.createElement("div");
+      const mockRegister = vi.fn().mockRejectedValue(new Error("SW failed"));
+      const mockAdapter = {
+        register: mockRegister,
+      };
+
+      const windowTarget = new EventTarget();
+      windowTarget.document = { readyState: "complete" };
+
+      expect(() =>
+        bootstrapApp(rootElement, {
+          windowTarget,
+          serviceWorkerAdapter: mockAdapter,
+          autoRegisterServiceWorker: true,
+        }),
+      ).not.toThrow();
     });
   });
 
@@ -703,6 +779,68 @@ describe("main.js", () => {
         height: 512,
       });
       expect(revokedUrls).toContain("blob:http://localhost/test-uuid");
+    });
+  });
+
+  describe("infrastructure exports & ServiceWorkerAdapter integration (US-03.4)", () => {
+    it("should re-export ServiceWorkerAdapter, factory, constants, and error class", () => {
+      expect(ServiceWorkerAdapter).toBeDefined();
+      expect(createServiceWorkerAdapter).toBeTypeOf("function");
+      expect(SERVICE_WORKER_STATUS).toBeDefined();
+      expect(SERVICE_WORKER_STATUS.REGISTERED).toBe("REGISTERED");
+      expect(SERVICE_WORKER_ADAPTER_ERROR_CODES).toBeDefined();
+      expect(
+        SERVICE_WORKER_ADAPTER_ERROR_CODES.SERVICE_WORKER_UNSUPPORTED,
+      ).toBe("SERVICE_WORKER_UNSUPPORTED");
+      expect(ServiceWorkerAdapterError).toBeDefined();
+      expect(CACHE_VERSION).toBe("v1.0.0");
+      expect(PRECACHE_NAME).toBe("mandaumpix-v1.0.0-precache");
+      expect(RUNTIME_CACHE_NAME).toBe("mandaumpix-v1.0.0-runtime");
+      expect(DEFAULT_SW_SCRIPT_URL).toBe("./sw.js");
+      expect(DEFAULT_SW_SCOPE).toBe("./");
+      expect(isOnline).toBeTypeOf("function");
+      expect(isServiceWorkerSupported).toBeTypeOf("function");
+    });
+
+    it("should create and register ServiceWorkerAdapter with offline monitoring and state", async () => {
+      const mockRegistration = new EventTarget();
+      mockRegistration.scope = "./";
+      mockRegistration.waiting = null;
+      mockRegistration.update = vi.fn().mockResolvedValue(mockRegistration);
+      mockRegistration.unregister = vi.fn().mockResolvedValue(true);
+
+      const mockServiceWorker = new EventTarget();
+      mockServiceWorker.register = vi.fn().mockResolvedValue(mockRegistration);
+
+      const windowTarget = new EventTarget();
+      const navigatorTarget = {
+        serviceWorker: mockServiceWorker,
+        onLine: true,
+      };
+
+      const adapter = createServiceWorkerAdapter({
+        windowTarget,
+        navigatorTarget,
+      });
+
+      expect(adapter.isSupported()).toBe(true);
+      expect(adapter.isOnline()).toBe(true);
+      expect(adapter.isRegistered()).toBe(false);
+
+      const regResult = await adapter.register();
+      expect(regResult.isRegistered).toBe(true);
+      expect(adapter.isRegistered()).toBe(true);
+      expect(adapter.getRegistration()).toBe(mockRegistration);
+
+      // Offline event
+      windowTarget.dispatchEvent(new Event("offline"));
+      expect(adapter.isOnline()).toBe(false);
+
+      // Online event
+      windowTarget.dispatchEvent(new Event("online"));
+      expect(adapter.isOnline()).toBe(true);
+
+      adapter.destroy();
     });
   });
 });
