@@ -129,4 +129,3 @@ describe("pix-key-selector.css (TASK-05.2.4: Estilização BEM, Tokens de Cor e 
     });
   });
 });
-
