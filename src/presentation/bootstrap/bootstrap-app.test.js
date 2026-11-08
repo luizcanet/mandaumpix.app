@@ -81,4 +81,3 @@ describe("bootstrap-app.js", () => {
     root.remove();
   });
 });
-
