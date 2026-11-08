@@ -469,18 +469,72 @@ flowchart TD
   - [x] **TASK-04.3.7 (Qualidade, Linters, Testes de Regressão & Integração)**: Executar suíte completa de testes (`npm test`), verificação de estilos e linting (`npm run lint`, `npm run format:check`).
   - [x] **TASK-04.3.8 (Documentação Viva & Diagramas de Arquitetura)**: Atualizar a documentação viva em [`docs/design/modules.md`](../design/modules.md) e [`docs/business/backlog.md`](./backlog.md) refletindo o roteamento e a tabela de injeções concluídos.
 
-#### `US-04.4` — Página Institucional `<about-page>` (`/sobre` — Autor, Projeto, Apoio e Divulgação) (`⏳ Pendente`)
+#### `US-04.4` — Página Institucional `<about-page>` (`/sobre` — Autor, Projeto, Apoio e Divulgação) (`⏳ Pendente` · `3 Story Points`)
 
-- **História**: Como **Recebedor**, quero acessar facilmente uma página **"Sobre"** que explique que o aplicativo é gratuito, livre e de código aberto, apresente as informações sobre o **autor** e o **projeto**, permita contribuir voluntariamente com qualquer valor via **"Manda um PIX"** para `eu@luizca.net` (com QR Code de valor dinâmico e Chave copia e cola) e me incentive a divulgar o aplicativo para mais pessoas.
-- **Regras de Negócio**: `RN07` ([Modelo de Domínio](./domain_model.md) e [Especificações e Contratos](../design/api_specs.md)).
-- **Critérios de Aceite**:
-  - [ ] Criar Web Component `src/presentation/pages/about-page/about-page.component.js` (bloco BEM `.about-page`).
-  - [ ] Apresentar seção **Sobre o Aplicativo** destacando que o **Manda um PIX** é **gratuito, livre e de código aberto**, facilita a geração de cobranças sem abrir apps de banco com privacidade 100% local, e exibir o botão **"Início"** (`<vector-icon name="home">`) para retornar a `/`.
-  - [ ] Apresentar card **Sobre o Autor**: **Luiz Henrique Canet Filho**, e-mail `<me@luizca.net>` e GitHub [`@luizcanet`](https://github.com/luizcanet).
-  - [ ] Apresentar card **Sobre o Projeto e Licença**: domínio `mandaumpix.app` (`v1.0.0`), link oficial do código-fonte e issues ([`github.com/luizcanet/mandaumpix.app`](https://github.com/luizcanet/mandaumpix.app)) e licença **GNU Affero General Public License v3.0 (`AGPL-3.0-only`)**.
-  - [ ] Apresentar seção/card de **Contribuição Voluntária ("Manda um PIX")**: texto descontraído com emojis explicando que o app é gratuito, livre e de código aberto, mas que se o usuário achar que ele é útil para si e para outras pessoas, pode contribuir para ajudar a manter o projeto com qualquer valor usando a frase **"Manda um PIX"**, exibindo o **QR Code com valor dinâmico (aberto)** e a **Chave copia e cola** gerados para **`eu@luizca.net`** (com botão de cópia rápida).
-  - [ ] Apresentar seção/card de **Incentivo à Divulgação**: mensagem incentivando o usuário a divulgar e compartilhar o aplicativo (`https://mandaumpix.app`) para mais pessoas, acompanhada de botão de compartilhamento.
-  - [ ] Criar testes unitários (`about-page.test.js`) e story (`about-page.stories.js`).
+- **História (Narrativa Canônica)**:
+  > **Como** **Recebedor** que utiliza o Manda um PIX,
+  > **Quero** acessar facilmente uma página institucional **"Sobre"** (`/sobre`) que evidencie a natureza gratuita, livre e de código aberto do software, identifique o **autor** e o **projeto**, permita contribuir voluntariamente via **"Manda um PIX"** para `eu@luizca.net` (com QR Code de valor dinâmico e chave copia e cola) e ofereça ação rápida para **divulgar o aplicativo**,
+  > **Para que** eu compreenda a transparência e privacidade da solução, possa apoiar a continuidade do projeto com qualquer quantia e compartilhe a ferramenta com mais pessoas.
+- **Regras de Negócio e Invariantes**: `RN07` ([Modelo de Domínio](./domain_model.md), [Especificações e Contratos](../design/api_specs.md) e [Proposta de Interface](../design/ui_proposal.md)).
+  - **INV-01 (Componente Canônico e Rota SPA — `RN07`)**: Implementado como Web Component `<about-page>` estendendo `CustomElement` (`@modnes/custom-element`) sob o bloco BEM `.about-page`, associado à rota canônica `/sobre` e renderizado dentro do contêiner `#router-outlet`.
+  - **INV-02 (Seção Institucional "Sobre o Aplicativo" e Retorno à Rota Raiz)**: Apresenta cabeçalho com o logotipo oficial do Manda um PIX, título `"Sobre o Manda um PIX"`, versão `"mandaumpix.app • v1.0.0"`, botão de ação **"Início"** (`<vector-icon name="home">`) para retornar à rota `/` via `Router.goTo("/")`, e texto explicativo enfatizando que o aplicativo é **gratuito, livre e de código aberto** com execução e armazenamento 100% locais no dispositivo.
+  - **INV-03 (Card "Sobre o Autor")**: Exibe bloco estruturado identificando **Luiz Henrique Canet Filho**, e-mail de contato funcional com link `mailto:me@luizca.net` e link externo para o perfil no GitHub ([`github.com/luizcanet`](https://github.com/luizcanet)) com `target="_blank"` e `rel="noopener noreferrer"`.
+  - **INV-04 (Card "Sobre o Projeto & Licença Livre")**: Exibe bloco estruturado informando o domínio oficial `mandaumpix.app`, termos de licenciamento sob a **GNU Affero General Public License v3.0 (`AGPL-3.0-only`)** e link oficial do repositório/issues ([`github.com/luizcanet/mandaumpix.app`](https://github.com/luizcanet/mandaumpix.app)).
+  - **INV-05 (Card de Contribuição Voluntária — "Manda um PIX" para `eu@luizca.net`)**:
+    - Mensagem descontraída com emojis (`"☕🚀 Apoie o Projeto — Manda um PIX! 💚"`) explicando que o aplicativo é 100% gratuito e aberto, mas convidando a contribuir com **qualquer valor** para a manutenção do projeto.
+    - Exibe palco do QR Code em fundo de alto contraste (`#ffffff`), gerado deterministicamente para a chave **`eu@luizca.net`** na modalidade de **valor dinâmico (aberto)** com tag EMV `54` ausente (`role="img"`, `aria-label="QR Code PIX com valor dinâmico para eu@luizca.net"`).
+    - Exibe a identificação da chave (`eu@luizca.net`) e a caixa de texto com o payload BR Code canônico: `00020126350014br.gov.bcb.pix0113eu@luizca.net5204000053039865802BR5925LUIZ HENRIQUE CANET FILHO6008BRASILIA62070503***63043C63`.
+    - Disponibiliza botão **"Copiar Chave Copia e Cola"** (`<vector-icon name="copy">`), acionando a cópia via `navigator.clipboard.writeText` (ou `distributePixChargeUseCase.copyChargeCode`), com feedback visual imediato (ícone `<vector-icon name="check">` e rótulo `"Chave copiada!"`) e anúncio acessível em região `aria-live="polite"`.
+  - **INV-06 (Card de Incentivo à Divulgação)**:
+    - Convite caloroso com emojis (`"📣 Espalhe a Palavra e Divulgue! 🤝"`) para compartilhar o aplicativo com amigos, colegas, clientes e comerciantes.
+    - Botão **"Compartilhar e Divulgar o Aplicativo"** (`<vector-icon name="share">`), acionando a Web Share API (`navigator.share`) com título `"Manda um PIX"`, texto descritivo e URL `https://mandaumpix.app`, com fallback seguro para WhatsApp (`https://wa.me/?text=...`) ou cópia da URL caso a API nativa não esteja disponível.
+  - **INV-07 (Injeção de Dependências Desacoplada via `addInjectable`)**: Consome opcionalmente `app-router` e `distribute-pix-charge-use-case` registrados no `ownerDocument` via `SetInjectable`, mantendo fallbacks robustos para execução autônoma (Storybook / testes isolados).
+  - **INV-08 (Acessibilidade WCAG 2.2 AA & Semântica)**:
+    - Utiliza container semântico `<section class="card about-page" aria-label="Sobre o aplicativo">`.
+    - Alvos de toque com dimensão mínima de `44x44px` para todos os botões e links (`Início`, `Copiar`, `Compartilhar`, links de e-mail e GitHub).
+    - Feedback de cópia anunciado por `aria-live="polite"`.
+    - Suporte integral a navegação por teclado (`Tab`, `Enter`, `Space`).
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Renderização Completa da Página Institucional — Happy Path)**:
+    - Dado que o usuário navega para a rota `"/sobre"`,
+    - Quando o componente `<about-page>` for montado no `#router-outlet`,
+    - Então deve renderizar o cabeçalho institucional com versão `"mandaumpix.app • v1.0.0"` e o botão `"Início"`,
+    - E deve exibir os cards de Autor (**Luiz Henrique Canet Filho**), Projeto/Licença (**AGPL-3.0-only**), Contribuição Voluntária (**"Manda um PIX"** para `eu@luizca.net`) e Divulgação,
+    - E o `document.title` deve ser atualizado para `"Sobre o aplicativo — Manda um PIX"`.
+  - **Cenário 02 (Retorno para a Tela Inicial via Botão "Início")**:
+    - Dado que o usuário está visualizando a página `<about-page>`,
+    - Quando o usuário acionar o botão de ação rápida `"Início"`,
+    - Então deve invocar `Router.goTo("/")` ou método de navegação correspondente,
+    - E a URL deve transicionar para `"/"` sem recarregamento da página.
+  - **Cenário 03 (Cópia da Chave Copia e Cola de Apoio Voluntário com Feedback Visual e Acessível)**:
+    - Dado que a seção de contribuição voluntária está visível com a chave `eu@luizca.net`,
+    - Quando o usuário acionar o botão `"Copiar Chave Copia e Cola"`,
+    - Então o payload BR Code `"00020126350014br.gov.bcb.pix0113eu@luizca.net5204000053039865802BR5925LUIZ HENRIQUE CANET FILHO6008BRASILIA62070503***63043C63"` deve ser gravado na área de transferência,
+    - E o botão deve exibir feedback temporário com ícone `<vector-icon name="check">` e texto `"Chave copiada!"`,
+    - E a mensagem de confirmação deve ser anunciada na região `aria-live="polite"`.
+  - **Cenário 04 (Compartilhamento e Divulgação do Aplicativo com Fallback)**:
+    - Dado que a seção de divulgação está visível,
+    - Quando o usuário clicar em `"Compartilhar e Divulgar o Aplicativo"`,
+    - Então deve invocar a API de compartilhamento nativo (`navigator.share`) com URL `https://mandaumpix.app`;
+    - E se o compartilhamento nativo não estiver disponível ou for rejeitado, deve fornecer fallback imediato para envio via WhatsApp ou cópia do link.
+  - **Cenário 05 (Acessibilidade, Alvos de Toque e Navegação por Teclado — WCAG AA)**:
+    - Dado que um usuário navega na página institucional exclusivamente por teclado,
+    - Quando pressionar a tecla `Tab`,
+    - Então o foco deve percorrer sequencialmente o botão `"Início"`, links de e-mail e GitHub, link do repositório, botão de cópia do QR Code e botão de divulgação,
+    - E todos os elementos interativos devem possuir área clicável `>= 44x44px`, anéis de foco visíveis e contraste adequado.
+  - **Cenário 06 (Resiliência e Execução Autônoma no Storybook / Sem Dependências Injetadas)**:
+    - Dado que o elemento `<about-page>` é instanciado em ambiente isolado (Storybook ou teste unitário sem bootstrap global),
+    - Quando for anexado ao DOM sem provedores DI registrados,
+    - Então deve renderizar perfeitamente utilizando fallbacks locais para o roteador, área de transferência e compartilhamento, sem lançar exceções não tratadas.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-04.4.1 (Constantes, Payloads & Contratos Institucionais)**: Criar [`src/presentation/pages/about-page/about-page.constants.js`](../../src/presentation/pages/about-page/about-page.constants.js) contendo as constantes canônicas da página (`ABOUT_AUTHOR`, `ABOUT_PROJECT`, `ABOUT_SUPPORT_PIX`, payload BR Code gerado para `eu@luizca.net`, links e textos amigáveis de apoio e divulgação).
+  - [ ] **TASK-04.4.2 (TDD / Testes Unitários de Renderização e Interação de `<about-page>`)**: Criar testes unitários em [`src/presentation/pages/about-page/about-page.test.js`](../../src/presentation/pages/about-page/about-page.test.js) cobrindo montagem no DOM, estrutura semântica BEM, renderização de cards, clique no botão "Início" (`Router.goTo`), cópia da chave copia e cola com feedback `aria-live`, compartilhamento/fallback e resolução de DI.
+  - [ ] **TASK-04.4.3 (Implementação / Web Component `AboutPageComponent`)**: Implementar a classe `AboutPageComponent` em [`src/presentation/pages/about-page/about-page.component.js`](../../src/presentation/pages/about-page/about-page.component.js) estendendo `CustomElement` (`@modnes/custom-element`), com template BEM declarativo, consumo dos ícones (`home`, `circle-info`, `qrcode`, `copy`, `share`, `check`), e handlers de eventos acessíveis.
+  - [ ] **TASK-04.4.4 (Estilização BEM e Responsividade)**: Implementar os estilos CSS correspondentes ao bloco `.about-page` (e modificadores `.about-page__box--support`, `.about-page__box--share`, etc.) em [`src/presentation/pages/about-page/about-page.css`](../../src/presentation/pages/about-page/about-page.css) ou integrados a [`src/presentation/styles/app-shell.css`](../../src/presentation/styles/app-shell.css), respeitando os tokens CSS de cor, tipografia e alvos de toque `>= 44x44px`.
+  - [ ] **TASK-04.4.5 (Integração no Roteador, Bootstrap & Exportação)**: Registrar e exportar `AboutPageComponent` e registrar o elemento customizado `customElements.define("about-page", AboutPageComponent)` em [`src/main.js`](../../src/main.js), garantindo a resolução automática na rota `/sobre` do `@modnes/router`.
+  - [ ] **TASK-04.4.6 (Catálogo Interativo no Storybook)**: Criar arquivo de stories [`src/presentation/pages/about-page/about-page.stories.js`](../../src/presentation/pages/about-page/about-page.stories.js) com documentação de props/slots e auditoria de acessibilidade `@storybook/addon-a11y`.
+  - [ ] **TASK-04.4.7 (Testes Integrados de Rota & Regressão)**: Atualizar testes de integração em [`src/main.test.js`](../../src/main.test.js) validando o ciclo completo de navegação `/` -> `/sobre` -> retorno via botão "Início" e verificação do `document.title`.
+  - [ ] **TASK-04.4.8 (Documentação Viva & Atualização do Backlog)**: Atualizar [`docs/design/modules.md`](../design/modules.md), [`docs/business/backlog.md`](./backlog.md) e [`docs/CHANGELOG.md`](../CHANGELOG.md) marcando a conclusão do refinamento e detalhamento de `US-04.4`.
 
 ---
 
