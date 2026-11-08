@@ -24,14 +24,19 @@ mandaumpix.app/
 │   ├── domain/
 │   │   └── entities/      # Entidades de domínio e validadores puros (pix-key.entity.js, pix-charge.entity.js e testes)
 │   ├── infrastructure/
+│   │   ├── pix/           # Serviços de geração e parsing de BR Code e QR Code (pix-qr.service.js e testes)
 │   │   ├── pwa/           # Adaptadores PWA (pwa-install.adapter.js, service-worker.adapter.js e testes)
 │   │   ├── share/         # Adaptador de saída e compartilhamento (browser-share.adapter.js e testes)
 │   │   └── storage/       # Repositório local de chaves PIX e preferências no IndexedDB (indexed-db-pix-key.repository.js e testes)
 │   ├── presentation/
+│   │   ├── bootstrap/     # Orquestrador de inicialização e amarração da aplicação (bootstrap-app.js e testes)
 │   │   ├── components/
-│   │   │   └── vector-icon/ # Web Component compartilhado <vector-icon> (VectorIcon, sprite icon.svg, CSS, stories e testes)
+│   │   │   ├── app-header/  # Web Component <app-header>
+│   │   │   └── vector-icon/ # Web Component compartilhado <vector-icon>
+│   │   ├── di/            # Fábrica e contêiner de injeção de dependências SetInjectable (container.js e testes)
+│   │   ├── router/        # Roteamento SPA declarativo, interceptação e acessibilidade (app-router.js e testes)
 │   │   └── styles/        # Folhas de estilo modulares: Design tokens (tokens.css), reset moderno (reset.css), grid/split-view (layout.css), casca BEM (app-shell.css) e testes
-│   └── main.js            # Ponto de entrada ESM da aplicação cliente
+│   └── main.js            # Ponto de entrada ESM e API pública da aplicação cliente
 ├── sw.js                  # Service Worker com pré-cache da App Shell e estratégias de cache offline (Network-First / Stale-While-Revalidate)
 ├── index.html             # Casca HTML5 com Import Map W3C, es-module-shims, modulepreload, SRI e links de ícones/manifest
 ├── manifest.json          # Web App Manifest W3C com paleta azul/verde e ícones do aplicativo
