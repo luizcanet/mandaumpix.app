@@ -19,6 +19,23 @@ import {
   CustomElement,
   DEFAULT_DB_NAME,
   DEFAULT_DB_VERSION,
+  CHARGE_FORM_CLASSES,
+  CHARGE_FORM_EVENT_NAMES,
+  CHARGE_FORM_ICONS,
+  CHARGE_FORM_INJECTABLES,
+  CHARGE_FORM_PRESETS,
+  DEFAULT_CHARGE_FORM_CLEAR_LABEL,
+  DEFAULT_CHARGE_FORM_CTA_DISABLED_TITLE,
+  DEFAULT_CHARGE_FORM_CTA_LABEL,
+  DEFAULT_CHARGE_FORM_CURRENCY,
+  DEFAULT_CHARGE_FORM_INPUT_ID,
+  DEFAULT_CHARGE_FORM_OPTIONAL_BADGE,
+  DEFAULT_CHARGE_FORM_PLACEHOLDER,
+  DEFAULT_CHARGE_FORM_STATUS_FIXED_PREFIX,
+  DEFAULT_CHARGE_FORM_STATUS_OPEN,
+  DEFAULT_CHARGE_FORM_STEP,
+  DEFAULT_CHARGE_FORM_TITLE,
+  DEFAULT_CHARGE_FORM_TITLE_ID,
   DEFAULT_EMPTY_STATE_ARIA_LABEL,
   DEFAULT_EMPTY_STATE_CTA,
   DEFAULT_EMPTY_STATE_DESCRIPTION,
@@ -84,6 +101,7 @@ import {
   PRECACHE_NAME,
   PixChargeDistributionError,
   PixChargeEntity,
+  PixChargeFormComponent,
   PixChargeValidationError,
   PixKeyDialogComponent,
   PixKeyEmptyComponent,
@@ -125,6 +143,7 @@ import {
   executeSavePixKey,
   executeSelectPixKey,
   extractChargeDistributionTarget,
+  formatFixedAmountStatus,
   formatKeyDeleteAriaLabel,
   generatePixCharge,
   getKeyTypeConfig,
@@ -142,8 +161,10 @@ import {
   normalizeTransactionAmount,
   normalizeTxid,
   openPixKeyDatabase,
+  parseChargeAmount,
   parsePixCharge,
   resolveChaveConta,
+  resolveCtaTooltip,
   resolveRequiredPixKeyId,
   upgradePixKeyDatabaseSchema,
   validateAndNormalizePixKey,
@@ -953,6 +974,33 @@ describe("main.js", () => {
       expect(KEY_DIALOG_TYPES_CONFIG).toBeDefined();
       expect(getKeyTypeConfig).toBeDefined();
       expect(customElements.get("pix-key-dialog")).toBe(PixKeyDialogComponent);
+    });
+
+    it("should re-export PixChargeFormComponent and charge-form constants (TASK-06.1.7)", () => {
+      expect(PixChargeFormComponent).toBeDefined();
+      expect(DEFAULT_CHARGE_FORM_STEP).toBeDefined();
+      expect(DEFAULT_CHARGE_FORM_TITLE).toBeDefined();
+      expect(DEFAULT_CHARGE_FORM_TITLE_ID).toBeDefined();
+      expect(DEFAULT_CHARGE_FORM_INPUT_ID).toBeDefined();
+      expect(DEFAULT_CHARGE_FORM_OPTIONAL_BADGE).toBeDefined();
+      expect(DEFAULT_CHARGE_FORM_PLACEHOLDER).toBeDefined();
+      expect(DEFAULT_CHARGE_FORM_CURRENCY).toBeDefined();
+      expect(DEFAULT_CHARGE_FORM_CLEAR_LABEL).toBeDefined();
+      expect(DEFAULT_CHARGE_FORM_CTA_LABEL).toBeDefined();
+      expect(DEFAULT_CHARGE_FORM_CTA_DISABLED_TITLE).toBeDefined();
+      expect(DEFAULT_CHARGE_FORM_STATUS_OPEN).toBeDefined();
+      expect(DEFAULT_CHARGE_FORM_STATUS_FIXED_PREFIX).toBeDefined();
+      expect(CHARGE_FORM_PRESETS).toBeDefined();
+      expect(CHARGE_FORM_EVENT_NAMES).toBeDefined();
+      expect(CHARGE_FORM_ICONS).toBeDefined();
+      expect(CHARGE_FORM_CLASSES).toBeDefined();
+      expect(CHARGE_FORM_INJECTABLES).toBeDefined();
+      expect(formatFixedAmountStatus).toBeTypeOf("function");
+      expect(parseChargeAmount).toBeTypeOf("function");
+      expect(resolveCtaTooltip).toBeTypeOf("function");
+      expect(customElements.get("pix-charge-form")).toBe(
+        PixChargeFormComponent,
+      );
     });
 
     it("should initialize PWA install adapter and use case on rootElement during bootstrapApp", () => {
