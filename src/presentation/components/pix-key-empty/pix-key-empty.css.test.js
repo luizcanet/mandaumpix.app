@@ -79,4 +79,3 @@ describe("pix-key-empty.css (TASK-05.1.4: Estilização BEM, Tokens de Cor e Res
     });
   });
 });
-

@@ -120,4 +120,3 @@ export const Interactive = {
     return container;
   },
 };
-
