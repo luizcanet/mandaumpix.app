@@ -665,7 +665,7 @@ flowchart LR
     T5 & T6 --> T7["TASK-05.2.7: Documentação Viva"]
 ```
 
-#### `US-05.3` — Componente `<pix-key-dialog>` (Modal `<dialog>` de Cadastro de Chave) (`⏳ Pendente` · `5 Story Points`)
+#### `US-05.3` — Componente `<pix-key-dialog>` (Modal `<dialog>` de Cadastro de Chave) (`✅ Concluído` · `5 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Recebedor** que deseja receber pagamentos via PIX ou cadastrar uma nova conta bancária no Manda um PIX,
@@ -742,8 +742,8 @@ flowchart LR
   - [x] **TASK-05.3.3 (Implementação / Web Component `PixKeyDialogComponent`)**: Implementar a classe `PixKeyDialogComponent` em [`src/presentation/components/pix-key-dialog/pix-key-dialog.component.js`](../../src/presentation/components/pix-key-dialog/pix-key-dialog.component.js) estendendo `CustomElement` (`@modnes/custom-element`), com template declarativo `<dialog class="key-dialog">`, pílulas seletoras, formulário BEM, consumo de `<vector-icon>` (`xmark`, `check`, `circle-exclamation`), injeção de dependências e manipulação de erros de domínio.
   - [x] **TASK-05.3.4 (Estilização CSS BEM, Modal Backdrop, Tokens e Responsividade)**: Implementar os estilos do bloco `.key-dialog` e pseudo-elemento `::backdrop` em [`src/presentation/components/pix-key-dialog/pix-key-dialog.css`](../../src/presentation/components/pix-key-dialog/pix-key-dialog.css) consumindo os tokens de design (`--color-surface`, `--color-brand-primary`, `--color-brand-accent`, `--color-danger`, `--color-border-strong`), garantindo alvos de toque $\ge 44\text{px}$, suporte a tema escuro/claro e visual limpo em telas móveis e desktop.
   - [x] **TASK-05.3.5 (Catálogo Interativo no Storybook & Auditoria a11y)**: Criar arquivo de stories [`src/presentation/components/pix-key-dialog/pix-key-dialog.stories.js`](../../src/presentation/components/pix-key-dialog/pix-key-dialog.stories.js) cobrindo os estados: _Modal Aberto Padrão (CPF)_, _Seleção de E-mail / Celular_, _Estado com Alerta de Validação_, _Formulário Preenchido_ e auditoria de acessibilidade automatizada com `@storybook/addon-a11y`.
-  - [ ] **TASK-05.3.6 (Exportação Pública no Módulo Principal e Registro de Tag)**: Exportar `PixKeyDialogComponent` e constantes em [`src/main.js`](../../src/main.js) e registrar o custom element `customElements.define("pix-key-dialog", PixKeyDialogComponent)`.
-  - [ ] **TASK-05.3.7 (Integração com Telas/Eventos, Documentação Viva & Atualização do Backlog)**: Atualizar a tabela de módulos em [`docs/design/modules.md`](../design/modules.md) e [`docs/business/backlog.md`](./backlog.md), documentando o contrato do componente e a orquestração dos eventos `"open-key-dialog"` e `"key-saved"`.
+  - [x] **TASK-05.3.6 (Exportação Pública no Módulo Principal e Registro de Tag)**: Exportar `PixKeyDialogComponent` e constantes em [`src/main.js`](../../src/main.js) e registrar o custom element `customElements.define("pix-key-dialog", PixKeyDialogComponent)`.
+  - [x] **TASK-05.3.7 (Integração com Telas/Eventos, Documentação Viva & Atualização do Backlog)**: Atualizar a tabela de módulos em [`docs/design/modules.md`](../design/modules.md) e [`docs/business/backlog.md`](./backlog.md), documentando o contrato do componente e a orquestração dos eventos `"open-key-dialog"` e `"key-saved"`.
 
 ```mermaid
 flowchart LR
