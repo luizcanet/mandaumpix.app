@@ -4,14 +4,27 @@ import {
   CHARGE_RESULT_CLASSES,
   CHARGE_RESULT_EVENT_NAMES,
   CHARGE_RESULT_ICONS,
+  COPY_FEEDBACK_DURATION_MS,
   DEFAULT_CHARGE_RESULT_ACCOUNT_FALLBACK,
   DEFAULT_CHARGE_RESULT_AMOUNT_OPEN,
   DEFAULT_CHARGE_RESULT_ARIA_LABEL,
   DEFAULT_CHARGE_RESULT_BRCODE_ARIA_LABEL,
   DEFAULT_CHARGE_RESULT_BRCODE_TITLE,
+  DEFAULT_CHARGE_RESULT_BTN_COPY_ARIA_LABEL,
+  DEFAULT_CHARGE_RESULT_BTN_DOWNLOAD_ARIA_LABEL,
+  DEFAULT_CHARGE_RESULT_BTN_SHARE_ARIA_LABEL,
+  DEFAULT_CHARGE_RESULT_COPIED_LABEL,
+  DEFAULT_CHARGE_RESULT_COPY_LABEL,
+  DEFAULT_CHARGE_RESULT_DOWNLOAD_FILENAME,
+  DEFAULT_CHARGE_RESULT_DOWNLOAD_LABEL,
+  DEFAULT_CHARGE_RESULT_LIVE_COPIED,
+  DEFAULT_CHARGE_RESULT_LIVE_COPY_FALLBACK,
+  DEFAULT_CHARGE_RESULT_LIVE_DOWNLOADED,
+  DEFAULT_CHARGE_RESULT_LIVE_SHARED,
   DEFAULT_CHARGE_RESULT_MODE_FIXED,
   DEFAULT_CHARGE_RESULT_MODE_OPEN,
   DEFAULT_CHARGE_RESULT_READY_BADGE,
+  DEFAULT_CHARGE_RESULT_SHARE_LABEL,
   DEFAULT_CHARGE_RESULT_WAITING_DESCRIPTION,
   DEFAULT_CHARGE_RESULT_WAITING_TITLE,
 } from "./pix-charge-result.constants.js";
@@ -462,6 +475,354 @@ describe("PixChargeResultComponent (TASK-06.2.3: Testes Unitários de Renderiza�
         `.${CHARGE_RESULT_CLASSES.BRCODE}`,
       );
       expect(brCodeBox.textContent.trim()).toBe("");
+    });
+  });
+
+  describe("Ações de Distribuição da Cobrança (TASK-06.3.3 / RN05)", () => {
+    let mockDistributeUseCase;
+
+    beforeEach(() => {
+      mockDistributeUseCase = {
+        execute: vi.fn().mockResolvedValue({ success: true }),
+      };
+      resultElement.distributePixChargeUseCase = mockDistributeUseCase;
+      resultElement.charge = mockFixedCharge;
+      document.body.appendChild(resultElement);
+    });
+
+    describe("Renderização dos botões na grade de ações (.charge-result__actions)", () => {
+      it("deve renderizar os três botões de ação com ícones, textos e atributos acessíveis", () => {
+        const copyBtn = resultElement.querySelector(
+          `.${CHARGE_RESULT_CLASSES.BTN_COPY}`,
+        );
+        expect(copyBtn).not.toBeNull();
+        expect(copyBtn.getAttribute("type")).toBe("button");
+        expect(copyBtn.getAttribute("aria-label")).toBe(
+          DEFAULT_CHARGE_RESULT_BTN_COPY_ARIA_LABEL,
+        );
+        expect(copyBtn.textContent).toContain(DEFAULT_CHARGE_RESULT_COPY_LABEL);
+        expect(copyBtn.querySelector("vector-icon").getAttribute("name")).toBe(
+          CHARGE_RESULT_ICONS.COPY,
+        );
+
+        const shareBtn = resultElement.querySelector(
+          `.${CHARGE_RESULT_CLASSES.BTN_SHARE}`,
+        );
+        expect(shareBtn).not.toBeNull();
+        expect(shareBtn.getAttribute("type")).toBe("button");
+        expect(shareBtn.getAttribute("aria-label")).toBe(
+          DEFAULT_CHARGE_RESULT_BTN_SHARE_ARIA_LABEL,
+        );
+        expect(shareBtn.textContent).toContain(
+          DEFAULT_CHARGE_RESULT_SHARE_LABEL,
+        );
+        expect(shareBtn.querySelector("vector-icon").getAttribute("name")).toBe(
+          CHARGE_RESULT_ICONS.SHARE,
+        );
+
+        const downloadBtn = resultElement.querySelector(
+          `.${CHARGE_RESULT_CLASSES.BTN_DOWNLOAD}`,
+        );
+        expect(downloadBtn).not.toBeNull();
+        expect(downloadBtn.getAttribute("type")).toBe("button");
+        expect(downloadBtn.getAttribute("aria-label")).toBe(
+          DEFAULT_CHARGE_RESULT_BTN_DOWNLOAD_ARIA_LABEL,
+        );
+        expect(downloadBtn.textContent).toContain(
+          DEFAULT_CHARGE_RESULT_DOWNLOAD_LABEL,
+        );
+        expect(
+          downloadBtn.querySelector("vector-icon").getAttribute("name"),
+        ).toBe(CHARGE_RESULT_ICONS.DOWNLOAD);
+      });
+
+      it("não deve renderizar os botões interativos de ação quando o componente estiver no estado vazio", () => {
+        const emptyResult = document.createElement("pix-charge-result");
+        document.body.appendChild(emptyResult);
+
+        const copyBtn = emptyResult.querySelector(
+          `.${CHARGE_RESULT_CLASSES.BTN_COPY}`,
+        );
+        const shareBtn = emptyResult.querySelector(
+          `.${CHARGE_RESULT_CLASSES.BTN_SHARE}`,
+        );
+        const downloadBtn = emptyResult.querySelector(
+          `.${CHARGE_RESULT_CLASSES.BTN_DOWNLOAD}`,
+        );
+
+        expect(copyBtn).toBeNull();
+        expect(shareBtn).toBeNull();
+        expect(downloadBtn).toBeNull();
+
+        emptyResult.remove();
+      });
+    });
+
+    describe("Ação Copiar Chave / PIX Copia e Cola (copyChargeCode)", () => {
+      it("deve executar o caso de uso com action 'COPY' e despachar o evento 'charge-copied'", async () => {
+        const copiedListener = vi.fn();
+        resultElement.addEventListener(
+          CHARGE_RESULT_EVENT_NAMES.CHARGE_COPIED,
+          copiedListener,
+        );
+
+        const copyBtn = resultElement.querySelector(
+          `.${CHARGE_RESULT_CLASSES.BTN_COPY}`,
+        );
+        copyBtn.click();
+
+        await vi.waitFor(() => {
+          expect(mockDistributeUseCase.execute).toHaveBeenCalledWith({
+            action: "COPY",
+            cobranca: mockFixedCharge,
+          });
+        });
+
+        expect(copiedListener).toHaveBeenCalledTimes(1);
+        expect(copiedListener.mock.calls[0][0].detail).toEqual({
+          cobranca: mockFixedCharge,
+          chave_cobranca: mockFixedCharge.chave_cobranca,
+        });
+      });
+
+      it("deve alternar temporariamente para o estado copiado ('Copiado!' e ícone 'check') e reverter após 2500ms", async () => {
+        vi.useFakeTimers();
+
+        const copyBtn = resultElement.querySelector(
+          `.${CHARGE_RESULT_CLASSES.BTN_COPY}`,
+        );
+        copyBtn.click();
+
+        await vi.waitFor(() => {
+          expect(
+            copyBtn.classList.contains(CHARGE_RESULT_CLASSES.BTN_COPIED),
+          ).toBe(true);
+        });
+        expect(copyBtn.textContent).toContain(
+          DEFAULT_CHARGE_RESULT_COPIED_LABEL,
+        );
+        expect(copyBtn.querySelector("vector-icon").getAttribute("name")).toBe(
+          CHARGE_RESULT_ICONS.CHECK,
+        );
+
+        const liveRegion = resultElement.querySelector(
+          `.${CHARGE_RESULT_CLASSES.LIVE_REGION}`,
+        );
+        expect(liveRegion.textContent).toBe(DEFAULT_CHARGE_RESULT_LIVE_COPIED);
+
+        vi.advanceTimersByTime(COPY_FEEDBACK_DURATION_MS);
+
+        expect(
+          copyBtn.classList.contains(CHARGE_RESULT_CLASSES.BTN_COPIED),
+        ).toBe(false);
+        expect(copyBtn.textContent).toContain(DEFAULT_CHARGE_RESULT_COPY_LABEL);
+        expect(copyBtn.querySelector("vector-icon").getAttribute("name")).toBe(
+          CHARGE_RESULT_ICONS.COPY,
+        );
+
+        vi.useRealTimers();
+      });
+
+      it("deve reiniciar o temporizador se o usuário clicar em copiar novamente enquanto já copiado", async () => {
+        vi.useFakeTimers();
+
+        const copyBtn = resultElement.querySelector(
+          `.${CHARGE_RESULT_CLASSES.BTN_COPY}`,
+        );
+        copyBtn.click();
+        await vi.waitFor(() => {
+          expect(
+            copyBtn.classList.contains(CHARGE_RESULT_CLASSES.BTN_COPIED),
+          ).toBe(true);
+        });
+
+        vi.advanceTimersByTime(1500);
+
+        copyBtn.click();
+        await vi.waitFor(() => {
+          expect(
+            copyBtn.classList.contains(CHARGE_RESULT_CLASSES.BTN_COPIED),
+          ).toBe(true);
+        });
+
+        vi.advanceTimersByTime(1500);
+        expect(
+          copyBtn.classList.contains(CHARGE_RESULT_CLASSES.BTN_COPIED),
+        ).toBe(true);
+
+        vi.advanceTimersByTime(1000);
+        expect(
+          copyBtn.classList.contains(CHARGE_RESULT_CLASSES.BTN_COPIED),
+        ).toBe(false);
+
+        vi.useRealTimers();
+      });
+
+      it("deve realizar fallback selecionando o texto da caixa brcode e anunciando em aria-live quando a cópia falhar", async () => {
+        mockDistributeUseCase.execute.mockRejectedValueOnce(
+          new Error("Clipboard permission denied"),
+        );
+
+        const brCodeBox = resultElement.querySelector(
+          `.${CHARGE_RESULT_CLASSES.BRCODE}`,
+        );
+        const focusSpy = vi.spyOn(brCodeBox, "focus");
+
+        const copyBtn = resultElement.querySelector(
+          `.${CHARGE_RESULT_CLASSES.BTN_COPY}`,
+        );
+        copyBtn.click();
+
+        await vi.waitFor(() => {
+          expect(focusSpy).toHaveBeenCalled();
+        });
+
+        const liveRegion = resultElement.querySelector(
+          `.${CHARGE_RESULT_CLASSES.LIVE_REGION}`,
+        );
+        expect(liveRegion.textContent).toBe(
+          DEFAULT_CHARGE_RESULT_LIVE_COPY_FALLBACK,
+        );
+        expect(
+          copyBtn.classList.contains(CHARGE_RESULT_CLASSES.BTN_COPIED),
+        ).toBe(false);
+      });
+
+      it("não deve disparar cópia quando a cobrança for nula", async () => {
+        resultElement.clearCharge();
+        const result = await resultElement.copyChargeCode();
+        expect(result).toBeNull();
+        expect(mockDistributeUseCase.execute).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("Ação Compartilhar / WhatsApp (shareCharge)", () => {
+      it("deve executar o caso de uso com action 'SHARE', anunciar em aria-live e emitir evento 'charge-shared'", async () => {
+        mockDistributeUseCase.execute.mockResolvedValueOnce({
+          action: "SHARE",
+          channel: "WHATSAPP",
+          whatsappUrl: "https://wa.me/?text=...",
+        });
+
+        const shareListener = vi.fn();
+        resultElement.addEventListener(
+          CHARGE_RESULT_EVENT_NAMES.CHARGE_SHARED,
+          shareListener,
+        );
+
+        const shareBtn = resultElement.querySelector(
+          `.${CHARGE_RESULT_CLASSES.BTN_SHARE}`,
+        );
+        shareBtn.click();
+
+        await vi.waitFor(() => {
+          expect(mockDistributeUseCase.execute).toHaveBeenCalledWith({
+            action: "SHARE",
+            cobranca: mockFixedCharge,
+          });
+        });
+
+        expect(shareListener).toHaveBeenCalledTimes(1);
+        expect(shareListener.mock.calls[0][0].detail).toMatchObject({
+          cobranca: mockFixedCharge,
+          channel: "WHATSAPP",
+        });
+
+        const liveRegion = resultElement.querySelector(
+          `.${CHARGE_RESULT_CLASSES.LIVE_REGION}`,
+        );
+        expect(liveRegion.textContent).toBe(DEFAULT_CHARGE_RESULT_LIVE_SHARED);
+      });
+
+      it("não deve disparar compartilhamento quando a cobrança for nula", async () => {
+        resultElement.clearCharge();
+        const result = await resultElement.shareCharge();
+        expect(result).toBeNull();
+        expect(mockDistributeUseCase.execute).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("Ação Salvar PNG (downloadQrImage)", () => {
+      it("deve executar o caso de uso com action 'DOWNLOAD_QR', anunciar em aria-live e emitir evento 'charge-downloaded'", async () => {
+        mockDistributeUseCase.execute.mockResolvedValueOnce({
+          action: "DOWNLOAD_QR",
+          downloaded: true,
+          fileName: DEFAULT_CHARGE_RESULT_DOWNLOAD_FILENAME,
+        });
+
+        const downloadListener = vi.fn();
+        resultElement.addEventListener(
+          CHARGE_RESULT_EVENT_NAMES.CHARGE_DOWNLOADED,
+          downloadListener,
+        );
+
+        const downloadBtn = resultElement.querySelector(
+          `.${CHARGE_RESULT_CLASSES.BTN_DOWNLOAD}`,
+        );
+        downloadBtn.click();
+
+        await vi.waitFor(() => {
+          expect(mockDistributeUseCase.execute).toHaveBeenCalledWith({
+            action: "DOWNLOAD_QR",
+            cobranca: mockFixedCharge,
+            fileName: DEFAULT_CHARGE_RESULT_DOWNLOAD_FILENAME,
+          });
+        });
+
+        expect(downloadListener).toHaveBeenCalledTimes(1);
+        expect(downloadListener.mock.calls[0][0].detail).toMatchObject({
+          cobranca: mockFixedCharge,
+          fileName: DEFAULT_CHARGE_RESULT_DOWNLOAD_FILENAME,
+        });
+
+        const liveRegion = resultElement.querySelector(
+          `.${CHARGE_RESULT_CLASSES.LIVE_REGION}`,
+        );
+        expect(liveRegion.textContent).toBe(
+          DEFAULT_CHARGE_RESULT_LIVE_DOWNLOADED,
+        );
+      });
+
+      it("não deve disparar download quando a cobrança for nula", async () => {
+        resultElement.clearCharge();
+        const result = await resultElement.downloadQrImage();
+        expect(result).toBeNull();
+        expect(mockDistributeUseCase.execute).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("Injeção de Dependências e Fallback Resiliente", () => {
+      it("deve suportar getter e setter para distributePixChargeUseCase", () => {
+        const customUseCase = { execute: vi.fn() };
+        resultElement.distributePixChargeUseCase = customUseCase;
+        expect(resultElement.distributePixChargeUseCase).toBe(customUseCase);
+
+        resultElement.distributePixChargeUseCase = null;
+        expect(resultElement.distributePixChargeUseCase).toBeNull();
+      });
+
+      it("deve funcionar com fallback para navigator.clipboard quando o caso de uso não for injetado", async () => {
+        resultElement.distributePixChargeUseCase = null;
+
+        const writeTextMock = vi.fn().mockResolvedValue(undefined);
+        Object.assign(navigator, {
+          clipboard: {
+            writeText: writeTextMock,
+          },
+        });
+
+        await resultElement.copyChargeCode();
+
+        expect(writeTextMock).toHaveBeenCalledWith(
+          mockFixedCharge.chave_cobranca,
+        );
+        const copyBtn = resultElement.querySelector(
+          `.${CHARGE_RESULT_CLASSES.BTN_COPY}`,
+        );
+        expect(
+          copyBtn.classList.contains(CHARGE_RESULT_CLASSES.BTN_COPIED),
+        ).toBe(true);
+      });
     });
   });
 });
