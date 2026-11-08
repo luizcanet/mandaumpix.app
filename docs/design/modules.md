@@ -76,7 +76,7 @@ mandaumpix.app/
 | [`src/presentation/styles/app-shell.css`](../../src/presentation/styles/app-shell.css)                                             | Estilos BEM da casca global da aplicação: container raiz `.app-root`, cabeçalho `.app-header` com ações (`.app-header__install-btn`, `.app-header__about-link`), área principal `.app-main` e rodapé minimalista `.app-footer` com selo local e licença AGPLv3.                                                                                                    |
 | [`src/presentation/styles/*.test.js`](../../src/presentation/styles/layout.test.js)                                                | Suíte de testes automatizados (`layout.test.js`, `app-shell.test.js`) validando conformidade das regras CSS, marcos semânticos W3C (Landmarks) e acessibilidade no `index.html`.                                                                                                                                                                                   |
 | [`importmap.js`](../../importmap.js)                                                                                               | Mapa de importação gerado pelo JSPM (`jspm install`) que resolve `mandaumpix.app`, `@modnes/*`, `pix-utils`, `qr` e `qr/dom.js`.                                                                                                                                                                                                                                   |
-| [`src/main.js`](../../src/main.js)                                                                                                 | Ponto de entrada principal ESM integrando o ecossistema `@modnes/*`, `pix-utils` (`generatePixCharge`, `parsePixCharge`) e `qr` (`encodeQR`, `exportQrCodePng`).                                                                                                                                                                                                   |
+| [`src/main.js`](../../src/main.js)                                                                                                 | Ponto de entrada ESM e bootstrap da aplicação: roteamento SPA declarativo via `@modnes/router` (`APP_ROUTES`), contêiner de injeção de dependências via `SetInjectable` no `ownerDocument`, interceptação de links internos (`Router.goTo`), foco acessível no `#router-outlet` e sincronização de `document.title`.                                               |
 | [`package.json`](../../package.json)                                                                                               | Define o pacote `mandaumpix.app` (`1.0.0`, licença `AGPL-3.0-only`), habilita ES Modules nativos, declara `"exports"`, `"dependencies"` (`@modnes/*`, `pix-utils`, `qr`) e scripts JSPM.                                                                                                                                                                           |
 | [`LICENSE`](../../LICENSE)                                                                                                         | Termos oficiais da licença de código aberto **GNU Affero General Public License v3.0** (`AGPL-3.0-only`).                                                                                                                                                                                                                                                          |
 | [`eslint.config.js`](../../eslint.config.js)                                                                                       | Orquestra os plugins `@eslint/js`, `@eslint/json`, `@eslint/markdown`, `@eslint/css` e `eslint-config-prettier`, definindo variáveis globais de navegador (`globals.browser`).                                                                                                                                                                                     |
@@ -122,5 +122,77 @@ flowchart TD
    - Download local da imagem do QR Code.
 
 ---
+
+## 🧭 Roteamento SPA e Injeção de Dependências (`@modnes/router` & `SetInjectable`)
+
+Para viabilizar a arquitetura Single-Page Application (SPA) desacoplada, modular e sem recarregamento de página, a aplicação orquestra a navegação e o contêiner de dependências na função `bootstrapApp()` em [`src/main.js`](../../src/main.js).
+
+### 1. Roteador SPA Declarativo (`@modnes/router`)
+
+O roteamento da aplicação é configurado através da constante imutável `APP_ROUTES`, montada sobre o contêiner `#router-outlet` na casca HTML:
+
+| Rota     | Componente / Classe CSS Alvo     | Descrição                                                                                     |
+| :------- | :------------------------------- | :-------------------------------------------------------------------------------------------- |
+| `/`      | `charge-page charge-page--split` | Tela principal de cobrança PIX com layout split-view responsivo.                              |
+| `/sobre` | `about-page`                     | Página institucional com informações sobre o aplicativo, autor, licença, doação e divulgação. |
+| `/*`     | `/` (Wildcard Fallback)          | Rota curinga que redireciona qualquer URL não mapeada para a raiz `/`.                        |
+
+- **Limpeza Segura de Filhos**: Antes de instanciar `Router`, `bootstrapApp()` invoca `outletElement.replaceChildren()`, prevenindo duplicações de elementos ou acúmulo de placeholders ao acessar rotas diretamente via deep linking.
+- **Interceptação de Links Internos**: A navegação interna é interceptada por um listener delegado em nível de contêiner e no cabeçalho/marca, utilizando `Router.goTo(href)` para preservar a History API sem disparar requisições completas ao servidor.
+- **Acessibilidade e Gestão de Foco**: O contêiner de rota `#router-outlet` recebe `tabindex="-1"` e foco programático a cada transição (`pathChanged` / `popstate`), permitindo que leitores de tela anunciem o novo contexto.
+- **Sincronização de Título (`document.title`)**: O título da janela é atualizado dinamicamente via `resolveRouteTitle(pathname)` e `ROUTE_TITLES` (`"Manda um PIX — Cobrança rápida"` para `/` e `"Sobre o aplicativo — Manda um PIX"` para `/sobre`).
+
+---
+
+### 2. Contêiner de Injeção de Dependências (`SetInjectable`)
+
+Em conformidade com o padrão `@modnes/custom-element`, as dependências da aplicação (casos de uso e adaptadores de infraestrutura) são registradas no documento (`ownerDocument`) através do utilitário `SetInjectable(ownerDoc, name, provider)`.
+
+Qualquer Web Component descendente resolve suas dependências de forma declarativa e desacoplada em seu ciclo de vida (`connectedCallback`) disparando o evento DOM `request-provider` via `this.addInjectable(name, prop)`:
+
+| Nome do Provedor (`provider`)    | Contrato / Tipo                                     | Descrição                                                                                                |
+| :------------------------------- | :-------------------------------------------------- | :------------------------------------------------------------------------------------------------------- |
+| `pix-key-repository`             | `PixKeyRepository` (`IndexedDbPixKeyRepository`)    | Repositório local transacional no IndexedDB (`mandaumpix_db`) com reatividade `@modnes/data-controller`. |
+| `pwa-install-gateway`            | `PwaInstallGateway` (`PwaInstallAdapter`)           | Adaptador dos eventos nativos `beforeinstallprompt`, `appinstalled` e detecção de standalone.            |
+| `browser-share-gateway`          | `ChargeDistributionGateway` (`BrowserShareAdapter`) | Adaptador para Clipboard API, Web Share API, WhatsApp e exportação/download de QR Code PNG.              |
+| `service-worker-gateway`         | `ServiceWorkerGateway` (`ServiceWorkerAdapter`)     | Adaptador do Service Worker para monitoramento de conectividade (online/offline) e atualizações.         |
+| `generate-pix-charge-use-case`   | `GeneratePixChargeUseCase`                          | Caso de uso para validação e emissão de cobranças PIX (BR Code e QR Code).                               |
+| `distribute-pix-charge-use-case` | `DistributePixChargeUseCase`                        | Caso de uso para distribuição da cobrança (cópia, envio e download).                                     |
+| `install-pwa-use-case`           | `InstallPwaUseCase`                                 | Caso de uso para consulta de estado de instalação e acionamento do prompt nativo PWA.                    |
+| `save-pix-key-use-case`          | `SavePixKeyUseCase`                                 | Caso de uso para cadastro e persistência com auto-seleção de chave PIX.                                  |
+| `list-pix-keys-use-case`         | `ListPixKeysUseCase`                                | Caso de uso para listagem ordenada e hidratação de chaves PIX.                                           |
+| `select-pix-key-use-case`        | `SelectPixKeyUseCase`                               | Caso de uso para seleção e alteração da chave PIX ativa.                                                 |
+| `delete-pix-key-use-case`        | `DeletePixKeyUseCase`                               | Caso de uso para exclusão de chave PIX com reatribuição da chave ativa.                                  |
+| `app-router`                     | `Router` (`@modnes/router`)                         | Instância ativa do roteador SPA no cliente.                                                              |
+
+---
+
+### 3. Diagrama de Roteamento e Injeção de Dependências
+
+```mermaid
+flowchart TD
+    Boot["bootstrapApp()<br/>(src/main.js)"] --> DI["SetInjectable(ownerDoc)<br/>Registro no ownerDocument"]
+    Boot --> RouterInit["new Router(outlet, APP_ROUTES)<br/>#router-outlet"]
+
+    subgraph ContainerDI ["Contêiner de Injeção de Dependências"]
+        DI --> Gateways["Gateways & Adaptadores<br/>(IndexedDB, PWA, Share, SW)"]
+        DI --> UseCases["Casos de Uso da Aplicação<br/>(Generate, Distribute, Keys, Install)"]
+        DI --> AppRouterRef["app-router<br/>(Instância do Router)"]
+    end
+
+    subgraph UIComponents ["Componentes de Apresentação (Web Components)"]
+        CustomEl["CustomElement (@modnes/custom-element)<br/>ex.: &lt;app-header&gt;, &lt;about-page&gt;"]
+        CustomEl -- "request-provider<br/>(this.addInjectable)" --> DI
+    end
+
+    subgraph SPARouting ["Roteamento SPA (@modnes/router)"]
+        RouterInit --> RouteRoot["/ -> charge-page"]
+        RouterInit --> RouteAbout["/sobre -> about-page"]
+        RouterInit --> RouteWildcard["/* -> / (Fallback)"]
+
+        RouteEvents["pathChanged / popstate"] --> DocTitle["document.title<br/>(resolveRouteTitle)"]
+        RouteEvents --> FocusMgmt["#router-outlet.focus()<br/>(tabindex='-1')"]
+    end
+```
 
 ⬅️ **Anterior**: [ADR 0004](../architecture/decisions/0004-persistencia-local-indexeddb.md) | ➡️ **Próximo**: [Modelo de Dados](./data_models.md)
