@@ -227,8 +227,8 @@
 }
 
 /* -----------------------------------------------------------------------------
-   SLOT DE AÇÕES (.charge-result__actions)
-   Grade tripla preparada para receber os botões de distribuição (US-06.3)
+   SLOT E BOTÕES DE AÇÕES (.charge-result__actions e .charge-result__btn)
+   Grade tripla com botões de distribuição de alta acessibilidade (US-06.3 / RN05)
    ----------------------------------------------------------------------------- */
 .charge-result__actions {
   display: grid;
@@ -236,6 +236,77 @@
   gap: var(--space-xs, 0.5rem);
   width: 100%;
   box-sizing: border-box;
+}
+
+.charge-result__btn {
+  min-height: 48px;
+  min-width: 44px;
+  padding: 0.6rem 0.5rem;
+  border-radius: var(--radius-md, 8px);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  outline: none;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.15s ease;
+  box-sizing: border-box;
+}
+
+.charge-result__btn:hover {
+  opacity: 0.92;
+}
+
+.charge-result__btn:focus-visible {
+  outline: none;
+  border-color: var(--color-focus, #00d37f);
+  box-shadow: 0 0 0 2px var(--color-focus, #00d37f);
+}
+
+/* Variação Copiar (.charge-result__btn--copy) */
+.charge-result__btn--copy {
+  background-color: var(--color-brand-primary, #0b1834);
+  color: #ffffff;
+  border-color: var(--color-brand-primary, #0b1834);
+}
+
+.charge-result__btn--copy vector-icon {
+  color: var(--color-brand-accent, #00d37f);
+}
+
+/* Variação Copiado (.charge-result__btn--copied) */
+.charge-result__btn--copied {
+  background-color: var(--color-success, #059669);
+  color: #ffffff;
+  border-color: var(--color-success, #059669);
+}
+
+.charge-result__btn--copied vector-icon {
+  color: #ffffff;
+}
+
+/* Variação Compartilhar / WhatsApp (.charge-result__btn--share) */
+.charge-result__btn--share {
+  background-color: var(--color-success, #059669);
+  color: #ffffff;
+  border-color: var(--color-success, #059669);
+}
+
+/* Variação Salvar PNG (.charge-result__btn--download) */
+.charge-result__btn--download {
+  background-color: var(--color-surface-elevated, #ffffff);
+  color: var(--color-text-primary, #0f172a);
+  border: 1px solid var(--color-border-strong, #cbd5e1);
 }
 
 /* -----------------------------------------------------------------------------
@@ -262,5 +333,11 @@
   .charge-result__qr-frame {
     background-color: #ffffff;
     border-color: #0b1834;
+  }
+
+  .charge-result__btn--download {
+    background-color: var(--color-surface, #1e293b);
+    color: var(--color-text-primary, #f8fafc);
+    border-color: var(--color-border-strong, #334155);
   }
 }
