@@ -762,16 +762,106 @@ flowchart LR
 
 > **Objetivo**: Entregar o fluxo central em 3 toques (**Selecionar chave → Informar valor opcional → Clicar em "Manda um PIX"**) e o cartão de resultado com QR Code de alto contraste e ações de saída (`Copiar`, `WhatsApp`, `Salvar PNG`).
 
-#### `US-06.1` — Componente `<pix-charge-form>` (Valor Opcional + Botão "Manda um PIX") (`⏳ Pendente`)
+#### `US-06.1` — Componente `<pix-charge-form>` (Valor Opcional + Botão "Manda um PIX") (`⏳ Pendente` · `3 Story Points`)
 
-- **História**: Como **Recebedor**, quero informar opcionalmente o valor da cobrança (ou deixá-lo em aberto) e clicar no botão destacado **"Manda um PIX"** para gerar a cobrança instantaneamente.
-- **Regras de Negócio**: `RN02`, `RN03`, `RN04`.
-- **Critérios de Aceite**:
-  - [ ] Criar Web Component `src/presentation/components/pix-charge-form/pix-charge-form.component.js` (blocos BEM `.charge-form`, `.amount-field`, `.charge-cta`).
-  - [ ] Implementar campo monetário opcional (`inputmode="decimal"`) com botão de limpeza rápida (`<vector-icon name="xmark">`) e atalhos rápidos (`Valor aberto`, `R$ 25`, `R$ 50`).
-  - [ ] Atualizar reativamente a pílula de status entre _"Valor aberto (pagador define)"_ (quando vazio/`0`) e _"Valor fixo: R$ XX,XX"_ (quando `> 0`) (`RN03`).
-  - [ ] Implementar botão principal **"Manda um PIX"** (`.charge-cta`, `<vector-icon name="qrcode">`), desabilitando-o caso não haja nenhuma chave cadastrada/selecionada (`RN02`).
-  - [ ] Criar testes unitários e stories no Storybook.
+- **História (Narrativa Canônica)**:
+  > **Como** **Recebedor** que já possui uma conta ou chave selecionada para recebimento,
+  > **Quero** informar opcionalmente o valor monetário da cobrança (utilizando digitação direta ou atalhos rápidos) ou mantê-lo dinâmico em aberto, e acionar o botão destacado **"Manda um PIX"**,
+  > **Para que** a cobrança PIX (payload EMV Copia e Cola e QR Code) seja gerada instantaneamente de forma segura e sem atrito para visualização e compartilhamento.
+- **Estimativa de Complexidade**: **`3 Story Points`** (Complexidade Técnica: Média · Esforço: Médio · Incerteza: Baixa).
+- **Regras de Negócio e Invariantes**: `RN02`, `RN03`, `RN04` ([Modelo de Domínio](./domain_model.md), [Especificações e Contratos](../design/api_specs.md) e [Proposta de Interface](../design/ui_proposal.md)).
+  - **INV-01 (Semântica e Blocos BEM Canônicos)**: Implementado como Web Component autônomo `<pix-charge-form>` estendendo `CustomElement` (`@modnes/custom-element`) sob o bloco BEM `.charge-form`, encapsulado semanticamente em `<form class="charge-form" aria-label="Gerador de cobrança PIX" novalidate>` contendo os blocos internos `.amount-field` (Passo 2) e `.charge-cta` (Passo 3).
+  - **INV-02 (Cabeçalho de Passo e Rótulo Semântico)**: O cabeçalho do campo de valor exibe o identificador numérico de passo `<span class="step-badge">2</span>`, o rótulo semântico associado `<label for="charge-amount" class="section-header__title">Valor da cobrança</label>` e a tag informativa de valor opcional `<span class="amount-field__optional-badge">Opcional</span>`.
+  - **INV-03 (Caixa de Entrada Monetária e Sanitização)**: A caixa de entrada `.amount-field__box` agrupa:
+    - O prefixo monetário fixo `.amount-field__currency` (`R$`).
+    - O campo de texto amplo `.amount-field__input` (`id="charge-amount"`, `inputmode="decimal"`, `placeholder="0,00 (Valor aberto)"`), suportando formatação brasileira (`1.234,56` ou `1234.56`) e normalização compatível com `normalizeTransactionAmount` de `pix-charge.entity.js`.
+    - O botão de limpeza rápida `.amount-field__clear-btn` (`<vector-icon name="xmark">`, `aria-label="Limpar valor e manter aberto"`), visível ou ativo quando há conteúdo no campo, permitindo resetar o valor para em aberto com 1 toque.
+  - **INV-04 (Pílula de Status Reativa de Modalidade de Valor — `RN03`)**: O rodapé `.amount-field__footer` renderiza uma pílula de status reativa `.amount-field__status`:
+    - **Modo Valor Aberto**: Quando o campo estiver vazio, nulo ou com valor numérico igual a `0`, exibe a classe `.amount-field__status--open` e o texto `"Valor aberto (pagador define)"`.
+    - **Modo Valor Fixo**: Quando o campo contiver um valor monetário positivo válido (`> 0`), exibe a classe `.amount-field__status--fixed` e o texto `"Valor fixo: R$ XX,XX"`.
+    - A pílula deve possuir o atributo `aria-live="polite"` para que alterações de modalidade sejam anunciadas por tecnologias assistivas.
+  - **INV-05 (Atalhos Rápidos de Valor Predefinido)**: O grupo `.amount-field__shortcuts` disponibiliza botões compactos (`.amount-field__preset`):
+    - **"Aberto"**: Limpa o campo e redefine para valor dinâmico.
+    - **"R$ 25"**: Preenche com `"25,00"` e atualiza o status para fixo.
+    - **"R$ 50"**: Preenche com `"50,00"` e atualiza o status para fixo.
+  - **INV-06 (Botão de Ação Primária CTA "Manda um PIX" — `RN02`, `RN04`)**: O botão de submissão `.charge-cta` (Passo 3) exibe o ícone `<vector-icon name="qrcode">` e o rótulo `"Manda um PIX"`.
+    - Deve permanecer desabilitado (`disabled`, `aria-disabled="true"`) com estilo visual esmaecido quando não houver nenhuma chave PIX cadastrada ou selecionada no repositório/propriedade (`RN02`), acompanhado de dica acessível (`title="Selecione ou cadastre uma chave PIX para gerar a cobrança"`).
+    - Quando houver chave selecionada válida, torna-se habilitado e interativo com gradiente verde da marca (`--color-brand-accent`).
+  - **INV-07 (Submissão, Execução do Caso de Uso e Eventos Desacoplados)**: Ao submeter o formulário (clique no botão CTA ou acionamento de `Enter` no input):
+    - Se houver chave ativa, invoca o caso de uso injetado `GeneratePixChargeUseCase.execute({ chave_conta, valor_opcional })`.
+    - Despacha o evento customizado borbulhante `CustomEvent("charge-generated", { bubbles: true, composed: true, detail: { cobrancaPix, rawAmount, chaveConta } })`.
+    - Se a geração falhar ou o valor for inválido (`PixChargeValidationError`), exibe alerta acessível `role="alert"` com a mensagem de erro.
+  - **INV-08 (Injeção de Dependências e Reatividade)**: Registra injeção de dependências via `this.addInjectable()` (`generate-pix-charge-use-case`, `pix-key-repository`), permitindo também vinculação reativa de propriedades (`selectedKey`, `amount`) e inscrição automática em mudanças do repositório de chaves.
+  - **INV-09 (Acessibilidade WCAG 2.2 AA & Gestão de Teclado)**: Alvos de toque $\ge 44\times 44\text{px}$ para todos os botões (limpar, presets e CTA principal), indicação visual de foco `:focus-visible` de alto contraste, associação correta entre `<label>` e `<input>`, e suporte a `prefers-reduced-motion`.
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Renderização Padrão com Valor Aberto e Chave Ativa — Happy Path)**:
+    - Dado que o componente `<pix-charge-form>` está inserido no DOM,
+    - E existe uma chave PIX ativa selecionada no contexto da aplicação,
+    - Quando o formulário for renderizado,
+    - Então o campo de valor monetário deve estar vazio com placeholder `"0,00 (Valor aberto)"`,
+    - E a pílula de status deve exibir `"Valor aberto (pagador define)"` com a classe `.amount-field__status--open` e `aria-live="polite"`,
+    - E o botão CTA `"Manda um PIX"` deve estar habilitado (`disabled` falso) e pronto para acionamento.
+  - **Cenário 02 (Botão "Manda um PIX" Desabilitado sem Chave Selecionada — `RN02`)**:
+    - Dado que nenhuma chave PIX está cadastrada ou selecionada no repositório,
+    - Quando o componente `<pix-charge-form>` renderizar ou receber `selectedKey = null`,
+    - Então o botão CTA `.charge-cta` deve possuir o atributo `disabled` e `aria-disabled="true"`,
+    - E deve aplicar a classe visual de desativação correspondente,
+    - E o acionamento via clique ou tecla `Enter` não deve submeter nem disparar geração de cobrança.
+  - **Cenário 03 (Preenchimento Manual de Valor Monetário e Atualização da Pílula — `RN03`)**:
+    - Dado que o formulário está visível com valor aberto,
+    - Quando o usuário digitar `"45,90"` no campo de valor monetário,
+    - Então a pílula de status deve atualizar reativamente seu texto para `"Valor fixo: R$ 45,90"`,
+    - E deve aplicar a classe modificadora `.amount-field__status--fixed`.
+  - **Cenário 04 (Uso dos Atalhos Rápidos de Valor Predefinido)**:
+    - Dado que o usuário deseja definir um valor comum sem digitar,
+    - Quando o usuário clicar no botão de preset `"R$ 25"`,
+    - Então o valor do input deve ser atualizado para `"25,00"`,
+    - E a pílula de status deve exibir `"Valor fixo: R$ 25,00"`,
+    - E quando o usuário clicar em `"Aberto"`, o campo deve ser esvaziado e o status retornar para `"Valor aberto (pagador define)"`.
+  - **Cenário 05 (Limpeza Rápida do Valor via Botão Limpar)**:
+    - Dado que o campo de valor contém `"150,00"`,
+    - Quando o usuário acionar o botão de limpeza rápida `.amount-field__clear-btn` (`xmark`),
+    - Então o valor do input deve ser limpo imediatamente,
+    - E o foco deve retornar para o campo de entrada,
+    - E a pílula de status deve alternar para `"Valor aberto (pagador define)"`.
+  - **Cenário 06 (Submissão e Geração da Cobrança com Sucesso — `RN04`)**:
+    - Dado que há uma chave PIX válida selecionada (`chaveConta`) e o valor `"75,00"` informado,
+    - Quando o usuário clicar no botão destacado `"Manda um PIX"` (ou pressionar `Enter` no input),
+    - Então o caso de uso `GeneratePixChargeUseCase` deve ser executado com a chave selecionada e o valor `75.00`,
+    - E deve ser despachado o evento borbulhante `"charge-generated"` contendo a entidade `CobrancaPix` resultante em `detail`,
+    - E o formulário não deve recarregar a página (comportamento SPA `event.preventDefault()`).
+  - **Cenário 07 (Tratamento de Valor Acima do Limite Máximo ou Inválido)**:
+    - Dado que o usuário digitou um valor superior ao limite suportado (`> 999.999.999,99`) ou caracteres corrompidos,
+    - Quando o usuário tentar gerar a cobrança,
+    - Então o caso de uso deve lançar erro `INVALID_AMOUNT`,
+    - E o componente deve exibir alerta com `role="alert"` indicando o erro de validação,
+    - E o evento `"charge-generated"` não deve ser emitido.
+  - **Cenário 08 (Acessibilidade WCAG 2.2 AA e Navegação por Teclado)**:
+    - Dado que um usuário navega pelo formulário exclusivamente por teclado,
+    - Quando navegar por tecla `Tab`,
+    - Então a ordem de foco deve percorrer sequencialmente: campo de valor → botão limpar (se ativo) → atalhos rápidos ("Aberto", "R$ 25", "R$ 50") → botão principal "Manda um PIX",
+    - E todos os botões devem possuir altura mínima $\ge 44\text{px}$ e anel de foco `:focus-visible` visível.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-06.1.1 (Constantes, Seletores BEM, Mensagens e Atalhos do Form)**: Criar [`src/presentation/components/pix-charge-form/pix-charge-form.constants.js`](../../src/presentation/components/pix-charge-form/pix-charge-form.constants.js) contendo seletores BEM (`.charge-form`, `.amount-field`, `.charge-cta`), presets de valor (`"Aberto"`, `"25,00"`, `"50,00"`), nomes de eventos (`"charge-generated"`, `"charge-amount-changed"`), identificadores de injeção e textos acessíveis.
+  - [ ] **TASK-06.1.2 (TDD / Testes Unitários de Constantes e Helpers)**: Criar testes unitários em [`src/presentation/components/pix-charge-form/pix-charge-form.constants.test.js`](../../src/presentation/components/pix-charge-form/pix-charge-form.constants.test.js) cobrindo estrutura de constantes, formatação de moeda e validações básicas.
+  - [ ] **TASK-06.1.3 (TDD / Testes Unitários de Renderização e Interação do Form)**: Criar suíte completa em [`src/presentation/components/pix-charge-form/pix-charge-form.test.js`](../../src/presentation/components/pix-charge-form/pix-charge-form.test.js) cobrindo montagem BEM, sincronização da pílula de status, presets de valor, botão de limpeza, bloqueio do CTA sem chave ativa, submissão com `GeneratePixChargeUseCase` e disparo de `charge-generated`.
+  - [ ] **TASK-06.1.4 (Implementação / Web Component `PixChargeFormComponent`)**: Implementar a classe `PixChargeFormComponent` em [`src/presentation/components/pix-charge-form/pix-charge-form.component.js`](../../src/presentation/components/pix-charge-form/pix-charge-form.component.js) estendendo `CustomElement` (`@modnes/custom-element`), com template declarativo BEM, injeção de dependências (`generate-pix-charge-use-case`, `pix-key-repository`), consumo de ícones `<vector-icon name="qrcode">` e `<vector-icon name="xmark">`, e métodos reativos.
+  - [ ] **TASK-06.1.5 (Estilização CSS BEM, Tokens de Cor e Responsividade)**: Implementar os estilos em [`src/presentation/components/pix-charge-form/pix-charge-form.css`](../../src/presentation/components/pix-charge-form/pix-charge-form.css) e testes de estilo em [`src/presentation/components/pix-charge-form/pix-charge-form.css.test.js`](../../src/presentation/components/pix-charge-form/pix-charge-form.css.test.js), consumindo os tokens de design (`--color-brand-accent`, `--color-surface-muted`, `--radius-lg`), garantindo alvos de toque $\ge 44\text{px}$ e estados `:focus-visible`.
+  - [ ] **TASK-06.1.6 (Catálogo Interativo no Storybook & Auditoria a11y)**: Criar arquivo de stories [`src/presentation/components/pix-charge-form/pix-charge-form.stories.js`](../../src/presentation/components/pix-charge-form/pix-charge-form.stories.js) com cenários: _Formulário com Valor Aberto_, _Valor Fixo Preenchido_, _Botão CTA Desabilitado (Sem Chave)_, e auditoria `@storybook/addon-a11y`.
+  - [ ] **TASK-06.1.7 (Exportação Pública no Módulo Principal e Registro de Tag)**: Exportar `PixChargeFormComponent` e constantes em [`src/main.js`](../../src/main.js) e registrar `customElements.define("pix-charge-form", PixChargeFormComponent)`.
+  - [ ] **TASK-06.1.8 (Documentação Viva & Atualização do Backlog)**: Atualizar a matriz de módulos em [`docs/design/modules.md`](../design/modules.md) e [`docs/business/backlog.md`](./backlog.md) documentando o contrato do componente gerador.
+
+```mermaid
+flowchart LR
+    T1["TASK-06.1.1: Constantes & Seletores"] --> T2["TASK-06.1.2: Testes Constantes (TDD)"]
+    T1 --> T5["TASK-06.1.5: Estilos CSS BEM"]
+    T2 --> T3["TASK-06.1.3: Testes Unitários (TDD)"]
+    T3 --> T4["TASK-06.1.4: Web Component PixChargeForm"]
+    T5 --> T4
+    T4 --> T6["TASK-06.1.6: Storybook & a11y"]
+    T4 --> T7["TASK-06.1.7: Exportação & main.js"]
+    T6 & T7 --> T8["TASK-06.1.8: Documentação Viva"]
+```
 
 #### `US-06.2` — Componente `<pix-charge-result>` (Palco QR Code e PIX Copia e Cola) (`⏳ Pendente`)
 
