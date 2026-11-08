@@ -591,16 +591,79 @@ flowchart TD
   - [x] **TASK-05.1.6 (Exportação Pública no Módulo Principal e Registro de Tag)**: Exportar `PixKeyEmptyComponent` e constantes em [`src/main.js`](../../src/main.js) e registrar a tag `customElements.define("pix-key-empty", PixKeyEmptyComponent)` para disponibilização global.
   - [x] **TASK-05.1.7 (Documentação Viva & Atualização do Backlog)**: Atualizar a tabela de módulos em [`docs/design/modules.md`](../design/modules.md) e registrar a conclusão do ciclo de refinamento da história.
 
-#### `US-05.2` — Componente `<pix-key-selector>` (Lista de Radio Cards de Chaves) (`⏳ Pendente`)
+#### `US-05.2` — Componente `<pix-key-selector>` (Lista de Radio Cards de Chaves) (`⏳ Pendente` · `3 Story Points`)
 
-- **História**: Como **Recebedor** que possui várias contas bancárias, quero selecionar com um único toque qual chave PIX cadastrada receberá o pagamento ou excluir chaves que não uso mais.
-- **Regras de Negócio**: `RN01`, `RN02`.
-- **Critérios de Aceite**:
-  - [ ] Criar Web Component `src/presentation/components/pix-key-selector/pix-key-selector.component.js` (bloco BEM `.key-selector`).
-  - [ ] Renderizar cartões selecionáveis com semântica acessível (`role="radiogroup"`, `role="radio"`, `aria-checked`) e classe modificadora `.key-selector__card--selected`.
-  - [ ] Exibir em cada cartão: apelido/rótulo da conta, badge do tipo (`CPF`, `CNPJ`, `EMAIL`, `TELEFONE`, `EVP`), valor da chave em `--font-mono` e botão de exclusão (`<vector-icon name="trash">`) com área de toque mínima de `44x44px`.
-  - [ ] Exibir no cabeçalho da seção o botão **"+ Nova chave"** (`<vector-icon name="plus">`).
-  - [ ] Criar testes unitários e stories no Storybook (com 1 chave, múltiplas chaves e seleção ativa).
+- **História (Narrativa Canônica)**:
+  > **Como** **Recebedor** que possui múltiplas contas bancárias cadastradas no Manda um PIX,
+  > **Quero** visualizar minhas chaves em uma lista de cartões interativos (Radio Cards), selecionar a conta ativa para recebimento com um único toque ou teclado, excluir chaves que não utilizo mais e dispor de um botão direto para adicionar novas chaves,
+  > **Para que** eu possa alternar instantaneamente para onde o pagamento será creditado sem redigitar dados e manter minha lista de contas organizada com autonomia e total privacidade local.
+- **Estimativa de Complexidade**: **`3 Story Points`** (Complexidade Técnica: Média · Esforço: Médio · Incerteza: Baixa).
+- **Regras de Negócio e Invariantes**: `RN01`, `RN02` ([Modelo de Domínio](./domain_model.md), [Especificações e Contratos](../design/api_specs.md) e [Proposta de Interface](../design/ui_proposal.md)).
+  - **INV-01 (Semântica e Bloco BEM Canônico)**: Implementado como Web Component autônomo `<pix-key-selector>` estendendo `CustomElement` (`@modnes/custom-element`) sob o bloco BEM `.key-selector`, encapsulado semanticamente em `<section class="card key-selector" aria-labelledby="key-selector-title">`.
+  - **INV-02 (Cabeçalho da Seção com Identificador de Passo e Botão "+ Nova chave")**: O cabeçalho da seção (`.section-header`) deve exibir o identificador numérico de passo `<span class="step-badge">1</span>`, o título da seção com ID semântico `<h2 id="key-selector-title" class="section-header__title">Chave para recebimento</h2>` e o botão de ação secundária **"+ Nova chave"** (`.key-selector__add-btn`), contendo o ícone `<vector-icon name="plus">` e disparando o evento customizado borbulhante `CustomEvent("open-key-dialog", { bubbles: true, composed: true })`.
+  - **INV-03 (Semântica de Acessibilidade W3C ARIA — Radiogroup & Radio Cards)**: O contêiner de lista `.key-selector__list` deve possuir `role="radiogroup"` e `aria-labelledby="key-selector-title"` (ou `aria-label="Chaves PIX cadastradas"`). Cada cartão filho `.key-selector__card` deve implementar `role="radio"`, `aria-checked="true|false"`, `tabindex="0"` (para o cartão ativo/selecionado) e `tabindex="-1"` (para os demais cartões não selecionados, seguindo a técnica de roving tabindex ou foco acessível).
+  - **INV-04 (Composição e Dados do Cartão de Chave)**: Cada cartão deve renderizar:
+    - Indicador óptico de rádio `.key-selector__radio` contendo o ponto interno `.key-selector__radio-dot` quando ativo.
+    - Metadados da conta `.key-selector__meta`:
+      - Linha de cabeçalho `.key-selector__title-row` com o apelido/rótulo amigável `.key-selector__label` (ex.: `"Nubank Pessoal"`) e o badge monoespaçado do tipo de chave `.key-selector__type-badge` (`CPF`, `CNPJ`, `EMAIL`, `TELEFONE`, `EVP`).
+      - Valor da chave `.key-selector__value` em fonte monoespaçada (`--font-mono`), exibindo a chave normalizada.
+    - Botão de exclusão dedicado `.key-selector__delete-btn` (`<vector-icon name="trash">`), com `type="button"`, `aria-label="Remover chave ${rotulo}"`, `title="Remover chave"` e área de toque mínima de `44x44px`.
+  - **INV-05 (Seleção Ativa e Modificador Visual)**: O cartão correspondente à chave ativa (`selectedKeyId === item.id`) deve aplicar a classe modificadora `.key-selector__card--selected` com borda `--color-brand-accent` (`#00d37f`), fundo sutilmente destacado e sombra suave de foco. O clique no cartão (ou acionamento via teclado `Space` / `Enter`) deve invocar `SelectPixKeyUseCase` (ou emitir o evento `"select-key"` com o `id` da chave selecionada).
+  - **INV-06 (Exclusão Segura com Prevenção de Seleção Indesejada — `stopPropagation`)**: O clique no botão `.key-selector__delete-btn` deve executar `event.stopPropagation()` para não disparar o evento de seleção do cartão, invocando `DeletePixKeyUseCase` (ou despachando o evento `"delete-key"` com o `id` correspondente). A exclusão aciona a auto-reatribuição automática da chave ativa conforme definido em `DeletePixKeyUseCase` (`RN01`, `RN02`).
+  - **INV-07 (Injeção de Dependências Desacoplada e Reatividade)**: O componente deve ser capaz de receber dependências via `addInjectable` (`select-pix-key-use-case`, `delete-pix-key-use-case`, `list-pix-keys-use-case`, `pix-key-repository`), permitindo também sincronização reativa via propriedade direta `keys` e `selectedKeyId` ou inscrição em `pixKeyRepository.subscribe()`.
+  - **INV-08 (Navegação Acessível por Teclado — WCAG 2.2 AA)**: Suporte completo à navegação por setas (`ArrowDown`, `ArrowUp`), `Tab`, `Space` e `Enter` para alternar a seleção entre os cartões sem uso do mouse, e `:focus-visible` destacado com anel de foco de alto contraste.
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Renderização dos Cartões de Chaves com Seleção Ativa — Happy Path)**:
+    - Dado que o usuário possui duas chaves cadastradas (`id: "k1"`, rótulo `"Nubank"`, tipo `"CPF"` e `id: "k2"`, rótulo `"Inter PJ"`, tipo `"CNPJ"`),
+    - E a chave `"k1"` está selecionada (`selectedKeyId = "k1"`),
+    - Quando o componente `<pix-key-selector>` renderizar no DOM,
+    - Então deve renderizar o container `role="radiogroup"` contendo 2 cartões `role="radio"`,
+    - E o cartão `"k1"` deve possuir a classe `.key-selector__card--selected`, `aria-checked="true"`, `tabindex="0"` e o ponto `.key-selector__radio-dot`,
+    - E o cartão `"k2"` deve possuir `aria-checked="false"`, `tabindex="-1"` e não conter a classe modificadora selecionada,
+    - E o botão "+ Nova chave" deve estar visível com ícone `<vector-icon name="plus">`.
+  - **Cenário 02 (Seleção de Nova Chave via Clique ou Teclado — `RN02`)**:
+    - Dado que o cartão `"k2"` não está selecionado,
+    - Quando o usuário clicar sobre o cartão `"k2"` ou pressionar `Enter` / `Space` sobre ele,
+    - Então o caso de uso `SelectPixKeyUseCase` deve ser invocado com `{ id: "k2" }` (ou despachado o evento `"select-key"`),
+    - E a classe `.key-selector__card--selected` e `aria-checked="true"` devem ser transferidos para `"k2"`.
+  - **Cenário 03 (Exclusão de Chave sem Disparar Seleção Indesejada — `RN01`, `RN02`)**:
+    - Dado que a lista exibe o cartão `"k2"` com seu botão de exclusão `.key-selector__delete-btn`,
+    - Quando o usuário clicar no botão de exclusão do cartão `"k2"`,
+    - Então o evento não deve propagar para o cartão (impedindo seleção indevida),
+    - E deve invocar `DeletePixKeyUseCase` com `{ id: "k2" }` (ou despachar o evento `"delete-key"`),
+    - E o cartão `"k2"` deve ser removido da visualização.
+  - **Cenário 04 (Disparo do Modal de Cadastro pelo Botão "+ Nova chave")**:
+    - Dado que o botão `.key-selector__add-btn` está visível no cabeçalho do seletor,
+    - Quando o usuário clicar no botão "+ Nova chave" ou acioná-lo via teclado,
+    - Então o evento `"open-key-dialog"` deve ser despachado com `bubbles: true` e `composed: true`.
+  - **Cenário 05 (Navegação Acessível entre Radios via Setas do Teclado — WCAG AA)**:
+    - Dado que o foco está no cartão selecionado `"k1"`,
+    - Quando o usuário pressionar a tecla `ArrowDown` (ou `ArrowRight`),
+    - Então o foco e a seleção devem navegar para o próximo cartão disponível (`"k2"`),
+    - E quando pressionar `ArrowUp` (ou `ArrowLeft`), deve retornar ao cartão anterior com foco gerenciado.
+  - **Cenário 06 (Resiliência e Execução Autônoma no Storybook / Estado de Atualização)**:
+    - Dado que o componente `<pix-key-selector>` é instanciado em modo isolado (Storybook ou testes sem DI global),
+    - Quando a propriedade `keys` for atualizada diretamente com um novo array de dados,
+    - Então o componente deve re-renderizar imediatamente a lista sem lançar exceções.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-05.2.1 (Constantes & Eventos do Seletor de Chaves)**: Criar [`src/presentation/components/pix-key-selector/pix-key-selector.constants.js`](../../src/presentation/components/pix-key-selector/pix-key-selector.constants.js) contendo as constantes canônicas (`KEY_SELECTOR_EVENT_NAMES`, `KEY_SELECTOR_ICONS`, classes BEM, textos padrão do cabeçalho e atributos acessíveis).
+  - [ ] **TASK-05.2.2 (TDD / Testes Unitários de Renderização e Interação)**: Criar testes unitários em [`src/presentation/components/pix-key-selector/pix-key-selector.test.js`](../../src/presentation/components/pix-key-selector/pix-key-selector.test.js) cobrindo estrutura BEM, `role="radiogroup"`, `role="radio"`, `aria-checked`, clique de seleção, teclado (`Enter`, `Space`, setas), acionamento de exclusão com `stopPropagation`, emissão de `"open-key-dialog"` e injeção de dependências.
+  - [ ] **TASK-05.2.3 (Implementação / Web Component `PixKeySelectorComponent`)**: Implementar a classe `PixKeySelectorComponent` em [`src/presentation/components/pix-key-selector/pix-key-selector.component.js`](../../src/presentation/components/pix-key-selector/pix-key-selector.component.js) estendendo `CustomElement` (`@modnes/custom-element`), com template declarativo BEM, roving tabindex, consumo dos ícones (`plus`, `trash`), integração com `SelectPixKeyUseCase` e `DeletePixKeyUseCase`, e métodos de sincronização de estado.
+  - [ ] **TASK-05.2.4 (Estilização BEM, Tokens de Cor e Responsividade)**: Implementar os estilos do bloco `.key-selector` em [`src/presentation/components/pix-key-selector/pix-key-selector.css`](../../src/presentation/components/pix-key-selector/pix-key-selector.css) consumindo os tokens de design (`--color-brand-primary`, `--color-brand-accent`, `--color-surface`, `--color-surface-muted`, `--color-danger`, `--font-mono`, `--radius-lg`), garantindo alvos de toque mínimos de `44x44px` para exclusão e anéis de foco acessíveis (`:focus-visible`).
+  - [ ] **TASK-05.2.5 (Catálogo Interativo no Storybook & Auditoria a11y)**: Criar arquivo de stories [`src/presentation/components/pix-key-selector/pix-key-selector.stories.js`](../../src/presentation/components/pix-key-selector/pix-key-selector.stories.js) cobrindo os estados: _Chave Única Selecionada_, _Múltiplas Chaves Cadastradas_, _Alternância Interativa de Seleção_ e validação automatizada de acessibilidade com `@storybook/addon-a11y`.
+  - [ ] **TASK-05.2.6 (Exportação Pública no Módulo Principal e Registro de Tag)**: Exportar `PixKeySelectorComponent` e constantes em [`src/main.js`](../../src/main.js) e registrar o custom element `customElements.define("pix-key-selector", PixKeySelectorComponent)`.
+  - [ ] **TASK-05.2.7 (Documentação Viva & Atualização do Backlog)**: Atualizar a tabela de módulos em [`docs/design/modules.md`](../design/modules.md) e [`docs/business/backlog.md`](./backlog.md) refletindo o status da história refinada.
+
+```mermaid
+flowchart LR
+    T1["TASK-05.2.1: Constantes & Eventos"] --> T2["TASK-05.2.2: Testes Unitários (TDD)"]
+    T1 --> T4["TASK-05.2.4: Estilos CSS BEM"]
+    T2 --> T3["TASK-05.2.3: Web Component"]
+    T4 --> T3
+    T3 --> T5["TASK-05.2.5: Storybook & a11y"]
+    T3 --> T6["TASK-05.2.6: Exportação & main.js"]
+    T5 & T6 --> T7["TASK-05.2.7: Documentação Viva"]
+```
 
 #### `US-05.3` — Componente `<pix-key-dialog>` (Modal `<dialog>` de Cadastro de Chave) (`⏳ Pendente`)
 
