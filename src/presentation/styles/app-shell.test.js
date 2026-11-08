@@ -83,8 +83,10 @@ describe("index.html (TASK-04.1.4: Validação Semântica do DOM & Acessibilidad
       expect(main).not.toBeNull();
     });
 
-    it("possui o cabeçalho <header class='app-header'> dentro de #app", () => {
-      const header = doc.querySelector("#app > header.app-header");
+    it("possui o cabeçalho <header class='app-header'> ou <app-header class='app-header'> dentro de #app", () => {
+      const header = doc.querySelector(
+        "#app > header.app-header, #app > app-header.app-header",
+      );
       expect(header).not.toBeNull();
     });
 

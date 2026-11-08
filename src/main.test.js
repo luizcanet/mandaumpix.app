@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   APP_METADATA,
   AccessController,
+  AppHeaderComponent,
   BROWSER_SHARE_ADAPTER_ERROR_CODES,
   BrowserShareAdapter,
   BrowserShareAdapterError,
@@ -841,6 +842,31 @@ describe("main.js", () => {
       expect(adapter.isOnline()).toBe(true);
 
       adapter.destroy();
+    });
+  });
+
+  describe("presentation components & bootstrapApp integration (TASK-04.2.4)", () => {
+    it("should re-export AppHeaderComponent", () => {
+      expect(AppHeaderComponent).toBeDefined();
+    });
+
+    it("should initialize PWA install adapter and use case on rootElement during bootstrapApp", () => {
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      document.body.appendChild(rootElement);
+
+      const header = document.createElement("app-header");
+      rootElement.appendChild(header);
+
+      bootstrapApp(rootElement, {
+        autoRegisterServiceWorker: false,
+      });
+
+      expect(rootElement.__pwaInstallAdapter).toBeDefined();
+      expect(rootElement.__installPwaUseCase).toBeDefined();
+      expect(header.installPwaUseCase).toBe(rootElement.__installPwaUseCase);
+
+      rootElement.remove();
     });
   });
 });

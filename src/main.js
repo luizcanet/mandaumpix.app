@@ -133,6 +133,7 @@ import {
   isOnline,
   isServiceWorkerSupported,
 } from "./infrastructure/pwa/service-worker.adapter.js";
+import AppHeaderComponent from "./presentation/components/app-header/app-header.component.js";
 
 export const APP_METADATA = Object.freeze({
   name: "Manda um PIX",
@@ -213,6 +214,8 @@ export function bootstrapApp(
       : globalThis.navigator,
     autoRegisterServiceWorker = true,
     serviceWorkerAdapter = null,
+    pwaInstallAdapter = null,
+    installPwaUseCase = null,
   } = {},
 ) {
   if (!rootElement) {
@@ -250,6 +253,37 @@ export function bootstrapApp(
 
   rootElement.__serviceWorkerAdapter = swAdapter;
 
+  let installAdapter = pwaInstallAdapter;
+  if (!installAdapter) {
+    installAdapter = createPwaInstallAdapter({
+      windowTarget,
+      navigatorTarget,
+    });
+  }
+
+  let installUseCase = installPwaUseCase;
+  if (!installUseCase) {
+    installUseCase = new InstallPwaUseCase({
+      pwaInstallGateway: installAdapter,
+    });
+  }
+
+  const ownerDoc =
+    rootElement.ownerDocument ||
+    (typeof document !== "undefined" ? document : null);
+  if (ownerDoc) {
+    SetInjectable("install-pwa-use-case", installUseCase, ownerDoc);
+    SetInjectable("pwa-install-gateway", installAdapter, ownerDoc);
+  }
+
+  rootElement.__pwaInstallAdapter = installAdapter;
+  rootElement.__installPwaUseCase = installUseCase;
+
+  const headerElement = rootElement.querySelector("app-header");
+  if (headerElement) {
+    headerElement.installPwaUseCase = installUseCase;
+  }
+
   return rootElement;
 }
 
@@ -259,6 +293,7 @@ if (typeof document !== "undefined") {
 
 export {
   AccessController,
+  AppHeaderComponent,
   ArrayHandler,
   BROWSER_SHARE_ADAPTER_ERROR_CODES,
   BrowserShareAdapter,
