@@ -10,7 +10,25 @@ export default {
     docs: {
       description: {
         component:
-          'Componente global `<app-header>` construído sobre `@modnes/custom-element`. Exibe a identidade da marca, atalho institucional para `/sobre` (`RN07`) e o botão destacado **"Instalar"** (`RN06`) exclusivamente quando o PWA for elegível para instalação.',
+          'Componente global `<app-header>` construído sobre `@modnes/custom-element`. Exibe a identidade da marca, atalho institucional para `/sobre` (`RN07`) e o botão destacado **"Instalar"** (`RN06`) exclusivamente quando o PWA for elegível para instalação. Em conformidade estrita com as diretrizes WCAG 2.2 AA para contraste cromático, navegação por teclado e alvos de toque.',
+      },
+    },
+    a11y: {
+      config: {
+        rules: [
+          {
+            id: "color-contrast",
+            enabled: true,
+          },
+          {
+            id: "button-name",
+            enabled: true,
+          },
+          {
+            id: "target-size",
+            enabled: true,
+          },
+        ],
       },
     },
   },

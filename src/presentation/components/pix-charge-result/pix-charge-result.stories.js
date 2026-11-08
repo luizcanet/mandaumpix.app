@@ -95,6 +95,10 @@ export default {
             id: "button-name",
             enabled: true,
           },
+          {
+            id: "target-size",
+            enabled: true,
+          },
         ],
       },
     },
