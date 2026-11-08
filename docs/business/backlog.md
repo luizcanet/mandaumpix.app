@@ -390,11 +390,84 @@ flowchart TD
 
 #### `US-04.3` — Roteamento SPA (`@modnes/router`) e Injeção de Dependências (`SetInjectable`) (`⏳ Pendente`)
 
-- **História**: Como **Recebedor**, quero alternar instantaneamente entre a tela principal de cobrança (`/`) e a página institucional (`/sobre`) sem recarregamento de página.
-- **Critérios de Aceite**:
-  - [ ] Configurar `@modnes/router` no bootstrap da aplicação ([`src/main.js`](../../src/main.js)) mapeando a rota `/` para a visualização de cobrança e `/sobre` para `<about-page>`.
-  - [ ] Registrar controladores de estado e casos de uso via `SetInjectable` (`@modnes/custom-element`) para consumo desacoplado pelos componentes.
-  - [ ] Garantir funcionamento com `rewrites` de SPA já configurados em [`firebase.json`](../../firebase.json).
+- **História (Narrativa Canônica)**:
+  > **Como** **Recebedor** ou usuário do Manda um PIX,
+  > **Quero** alternar de forma instantânea entre a tela principal de cobrança (`/`) e a página institucional (`/sobre`) sem recarregamento da página,
+  > **Para que** eu tenha uma navegação ágil, fluida e com transições instantâneas típicas de um PWA moderno, enquanto os componentes da interface obtêm seus casos de uso e gateways de forma desacoplada e segura através de injeção de dependências (`SetInjectable`).
+- **Estimativa de Complexidade**: **`3 Story Points`** (Complexidade Técnica: Média · Esforço: Médio · Incerteza: Baixa).
+- **Regras de Negócio e Invariantes**:
+  - **INV-01 (Inicialização do Roteador SPA `@modnes/router`)**: O `bootstrapApp` deve instanciar `new Router(outletElement, routes)` associando o contêiner `#router-outlet` da casca da aplicação às rotas declarativas do sistema.
+  - **INV-02 (Tabela de Rotas Canônica)**:
+    - Rota `/`: Apresenta a visualização da tela principal de cobrança (`.charge-page.charge-page--split`).
+    - Rota `/sobre`: Monta a página institucional através do elemento customizado `<about-page class="about-page">`.
+    - Rota `/*` (Fallback / Wildcard): Redireciona ou reconcilia qualquer caminho desconhecido para a rota raiz `/`.
+  - **INV-03 (Interceptação de Navegação SPA)**: Os links internos da interface (como o botão "Sobre" no `<app-header>` e o link no `.app-footer`, bem como links de retorno para `/`) não devem disparar requisição HTTP / recarregamento total da página, navegando via `Router.goTo(path)` ou custom anchor `is="router-anchor"`.
+  - **INV-04 (Injeção Centralizada de Dependências via `SetInjectable`)**: O bootstrap da aplicação deve registrar no `ownerDocument` todas as instâncias de casos de uso e adaptadores da aplicação para que qualquer componente filho estendendo `CustomElement` possa consumi-los via `this.addInjectable(serviceName, propertyName)` sem acoplamento direto:
+    - `install-pwa-use-case`: `InstallPwaUseCase`
+    - `pwa-install-gateway`: `PwaInstallAdapter`
+    - `service-worker-gateway`: `ServiceWorkerAdapter`
+    - `browser-share-gateway`: `BrowserShareAdapter`
+    - `pix-key-repository`: `IndexedDbPixKeyRepository`
+    - `generate-pix-charge-use-case`: `GeneratePixChargeUseCase`
+    - `distribute-pix-charge-use-case`: `DistributePixChargeUseCase`
+    - `save-pix-key-use-case`: `SavePixKeyUseCase`
+    - `list-pix-keys-use-case`: `ListPixKeysUseCase`
+    - `select-pix-key-use-case`: `SelectPixKeyUseCase`
+    - `delete-pix-key-use-case`: `DeletePixKeyUseCase`
+    - `app-router`: Instância ativa do `Router`
+  - **INV-05 (Acessibilidade na Navegação SPA — Focus Management & Document Title)**:
+    - Ao transicionar de rota (`pathChanged`), o título da janela (`document.title`) deve ser atualizado contextualmente (ex.: `"Manda um PIX — Cobrança rápida"` para `/` e `"Sobre o aplicativo — Manda um PIX"` para `/sobre`).
+    - O contêiner de rota `#router-outlet` deve receber foco programático acessível (`tabindex="-1"`) para permitir que leitores de tela anunciem a nova página.
+  - **INV-06 (Compatibilidade com Deep Linking e Rewrites de Hosting)**: O roteador deve reconhecer o `location.pathname` inicial no carregamento da página (inclusive em recarregamentos diretos em `/sobre`), suportado pelos rewrites já ativos em `firebase.json`.
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Inicialização do Router e Navegação para a Rota Raiz — Happy Path)**:
+    - Dado que a aplicação é inicializada através da função `bootstrapApp()`,
+    - E o elemento `#router-outlet` está presente no DOM,
+    - Quando a URL atual for `"/"`,
+    - Então a instância do `Router` deve estar associada ao contêiner `#router-outlet`,
+    - E a visualização da tela principal de cobrança deve ser mantida/exibida,
+    - E o `document.title` deve conter `"Manda um PIX"`.
+  - **Cenário 02 (Transição de Rota para "/sobre" sem Recarregamento de Página)**:
+    - Dado que o usuário está na tela inicial `"/"`,
+    - Quando o link ou botão para `"/sobre"` for acionado,
+    - Ou for executado `Router.goTo("/sobre")`,
+    - Então a URL do navegador deve transicionar para `"/sobre"` via History API (`pushState`),
+    - E o contêiner `#router-outlet` deve exibir o elemento `<about-page>`,
+    - E nenhum recarregamento completo de página deve ocorrer,
+    - E o `document.title` deve ser atualizado para `"Sobre o aplicativo — Manda um PIX"`.
+  - **Cenário 03 (Retorno para a Rota Raiz a partir da Página Institucional)**:
+    - Dado que a visualização ativa no roteador é `"/sobre"`,
+    - Quando o usuário acionar o botão de retorno para `"/"` (no cabeçalho ou na página sobre),
+    - Ou acionar o botão "Voltar" do navegador (evento `popstate`),
+    - Então o elemento `<about-page>` deve ser desmontado,
+    - E a tela principal de cobrança deve ser reexibida no `#router-outlet`,
+    - E a URL deve retornar para `"/"`.
+  - **Cenário 04 (Tratamento de Rotas Desconhecidas — Fallback / Wildcard)**:
+    - Dado que o usuário tenta navegar para uma rota não mapeada como `"/rota-inexistente"`,
+    - Quando o roteador processar a rota correspondente,
+    - Então deve redirecionar para a rota raiz `"/"` de forma transparente,
+    - E exibir a interface padrão de cobrança sem quebrar a aplicação.
+  - **Cenário 05 (Injeção Desacoplada de Casos de Uso e Gateways via `SetInjectable`)**:
+    - Dado que a aplicação concluiu a execução do `bootstrapApp()`,
+    - E registrou os casos de uso e gateways no documento através de `SetInjectable`,
+    - Quando um componente `CustomElement` filho disparar o evento `"request-provider"` para `"pix-key-repository"`,
+    - Ou para `"generate-pix-charge-use-case"`,
+    - Então o contêiner de injeção deve fornecer a instância correspondente,
+    - E atribuir a dependência diretamente à propriedade declarada no componente.
+  - **Cenário 06 (Acessibilidade e Gestão de Foco na Navegação SPA)**:
+    - Dado que uma transição de rota foi concluída com sucesso,
+    - Quando o evento `pathChanged` for finalizado,
+    - Então o contêiner `#router-outlet` deve possuir `tabindex="-1"` e receber foco acessível,
+    - E leitores de tela devem ser capazes de navegar pelo novo conteúdo renderizado.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-04.3.1 (TDD / Testes Unitários de Rotas & Router SPA)**: Criar testes unitários em [`src/main.test.js`](../../src/main.test.js) cobrindo a inicialização do roteador no `#router-outlet`, registro das rotas `/`, `/sobre` e wildcard `/*`, e navegação programática com `Router.goTo()`.
+  - [ ] **TASK-04.3.2 (Implementação / Roteador SPA e Mapeamento de Rotas no `bootstrapApp`)**: Implementar em [`src/main.js`](../../src/main.js) a exportação das constantes de rotas (`APP_ROUTES`), criação e retorno da instância do `Router` dentro de `bootstrapApp()`, vinculando-a à propriedade `rootElement.__appRouter`.
+  - [ ] **TASK-04.3.3 (TDD / Testes Unitários do Contêiner `SetInjectable`)**: Criar testes unitários validando o registro de todos os casos de uso (`generate`, `distribute`, `install`, `keys`) e adaptadores via `SetInjectable` no `ownerDocument`, confirmando a resolução de dependências através do evento `request-provider`.
+  - [ ] **TASK-04.3.4 (Implementação / Registro de Casos de Uso e Gateways no DI)**: Expandir a inicialização do `bootstrapApp()` em [`src/main.js`](../../src/main.js) para instanciar (com fallbacks resilientes) os gateways e use cases da aplicação e registrá-los no contêiner DI via `SetInjectable`.
+  - [ ] **TASK-04.3.5 (Navegação SPA Fluida nos Links & Interceptação de Cliques)**: Integrar interceptação de cliques em links internos de navegação SPA (`app-header__about-link`, links de marca e links de rodapé) utilizando `Router.goTo()` ou custom anchor `is="router-anchor"`.
+  - [ ] **TASK-04.3.6 (Acessibilidade na Troca de Rota — Gestão de Foco & `document.title`)**: Implementar listener do evento `pathChanged` no `bootstrapApp` para atualizar dinamicamente o `document.title` e direcionar o foco acessível para `#router-outlet` (`tabindex="-1"`).
+  - [ ] **TASK-04.3.7 (Qualidade, Linters, Testes de Regressão & Integração)**: Executar suíte completa de testes (`npm test`), verificação de estilos e linting (`npm run lint`, `npm run format:check`).
+  - [ ] **TASK-04.3.8 (Documentação Viva & Diagramas de Arquitetura)**: Atualizar a documentação viva em [`docs/design/modules.md`](../design/modules.md) e [`docs/business/backlog.md`](./backlog.md) refletindo o roteamento e a tabela de injeções concluídos.
 
 #### `US-04.4` — Página Institucional `<about-page>` (`/sobre` — Autor, Projeto, Apoio e Divulgação) (`⏳ Pendente`)
 
