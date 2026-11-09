@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="./src/presentation/components/vector-icon/vector-icon.css" />
     <link rel="stylesheet" href="./src/presentation/components/pix-key-empty/pix-key-empty.css" />
     <link rel="stylesheet" href="./src/presentation/components/pix-key-selector/pix-key-selector.css" />
+    <link rel="stylesheet" href="./src/presentation/components/pix-key-dialog/pix-key-dialog.css" />
     <link rel="stylesheet" href="./src/presentation/components/pix-charge-form/pix-charge-form.css" />
     <link rel="stylesheet" href="./src/presentation/components/pix-charge-result/pix-charge-result.css" />
     <link rel="stylesheet" href="./src/presentation/pages/about-page/about-page.css" />
@@ -170,6 +171,17 @@
         "https://ga.jspm.io/npm:qrcode@1.5.4/lib/renderer/utils.js": "sha384-KiqOAF/JukOvvPO3U0XFYsMYf6wtRBR6qdUCqah+3y86e6FVNcYUuwayz06GVwh2"
       }
     }
+    </script>
+    <script>
+      (function () {
+        const im = document.querySelector('script[type="importmap"]');
+        if (im && !document.querySelector('script[type="importmap-shim"]')) {
+          const shim = document.createElement("script");
+          shim.type = "importmap-shim";
+          shim.textContent = im.textContent;
+          im.after(shim);
+        }
+      })();
     </script>
     <link rel="modulepreload" href="./src/application/use-cases/delete-pix-key.use-case.js" integrity="sha384-krKbDLunpr6j9ZQbbqyWfIEVfCuvjawabC2I8gFg4hf+0zMDmK+ljAUWV6lsAh9L" />
     <link rel="modulepreload" href="./src/application/use-cases/distribute-pix-charge.use-case.js" integrity="sha384-hMWAEAdms4g/ACJNXSzrLuKjXt3Wxt4lNlb7TVsWuJO/MoGLP7dtpF2kVK+qtBEl" />
