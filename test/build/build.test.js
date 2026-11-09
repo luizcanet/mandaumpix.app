@@ -51,4 +51,3 @@ describe("Build Script (scripts/build.js)", () => {
     expect(stats.verifiedIntegrities).toBeGreaterThan(0);
   });
 });
-
