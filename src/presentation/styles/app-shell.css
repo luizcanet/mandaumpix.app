@@ -100,6 +100,11 @@
   text-decoration: none;
 }
 
+.app-header__install-btn.hidden,
+.app-header__install-btn[hidden] {
+  display: none;
+}
+
 .app-header__install-btn:hover {
   background-color: var(--color-brand-accent-hover, #00b36b);
 }

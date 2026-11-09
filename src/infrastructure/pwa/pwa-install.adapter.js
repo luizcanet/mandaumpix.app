@@ -81,6 +81,16 @@ export class PwaInstallAdapter extends EventTarget {
       return;
     }
 
+    if (this.windowTarget.__pwaInstalled) {
+      this.installedFlag = true;
+    }
+
+    if (this.windowTarget.__deferredPrompt && !this.isInstalled()) {
+      this.deferredPrompt = this.windowTarget.__deferredPrompt;
+      this.windowTarget.__deferredPrompt = null;
+      this.syncState();
+    }
+
     if (typeof this.windowTarget.addEventListener === "function") {
       this.windowTarget.addEventListener(
         "beforeinstallprompt",
@@ -297,6 +307,11 @@ export class PwaInstallAdapter extends EventTarget {
   destroy() {
     this.destroyed = true;
     this.deferredPrompt = null;
+    this.installedFlag = false;
+    if (this.windowTarget) {
+      this.windowTarget.__deferredPrompt = null;
+      this.windowTarget.__pwaInstalled = false;
+    }
 
     if (
       this.windowTarget &&

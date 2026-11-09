@@ -70,13 +70,13 @@
         "./src/domain/entities/pix-charge.entity.js": "sha384-apdRQcRsyQfyadI2Btnfu8n75qfQLV0nLNogV0lE3MtYqME1OonNK5x18PdhOLjf",
         "./src/domain/entities/pix-key.entity.js": "sha384-NWXWgFf5B31RDkjZUiEI9r0nVY+RJe0817XNX33GYk+K5bNX1M33l4vDtpP9li3Q",
         "./src/infrastructure/pix/pix-qr.service.js": "sha384-CuZANw7hxhOcvSYuvTKyBBND11kG1tnncWjr3L6g1gI2iFSXDpLs9EwIXAyCtaHa",
-        "./src/infrastructure/pwa/pwa-install.adapter.js": "sha384-XOk5WSXPeAXZRjOZKBDIfqFi4d/Y4Rat3hXM05jJqMGNd4OrGLvCdfDYxeJDEIk/",
+        "./src/infrastructure/pwa/pwa-install.adapter.js": "sha384-jJ46rcjkOn81TUYN6PRGOM7z4IrdODir0cg1k7zz+yY8C/onLkKv7jbn1PD8iQdw",
         "./src/infrastructure/pwa/service-worker.adapter.js": "sha384-b+4apZpw/PMwZqgFZXtzyqENprbdWW/aST4rhh/TfrW7VLvyYwrtAkv9Yx7YR276",
         "./src/infrastructure/share/browser-share.adapter.js": "sha384-7Sjp01hfs3Ffr9ErJCioJwtCAhPcYRUAMtrZC5qGBfEpyPEGWTG9dYoBmXBj1eL9",
         "./src/infrastructure/storage/indexed-db-pix-key.repository.js": "sha384-djuXXh00PTK15Qx/P8GeJdOVMFC74q1CtfAkHj2wRKYl3MVjZwixhGo6lUTBeYcK",
         "./src/main.js": "sha384-al36h99BPWyJ9zy13bgW7GA1zjOOcQ6F6+W2lcW7nPLZDJ+SF7plKsY3EKr8tBZj",
         "./src/presentation/bootstrap/bootstrap-app.js": "sha384-DcJZd7Cd0yWYNKwfppCgh5gt0o41mXEvBtLcqUNvQCEa64ZTMEfgkdtcbNryN5T2",
-        "./src/presentation/components/app-header/app-header.component.js": "sha384-HBqaLcqxBwsqpklYgal5XzZI4P3TbJUDXZZH1HaWImdnvWWVyYdIevodgImjMzVw",
+        "./src/presentation/components/app-header/app-header.component.js": "sha384-oLx10DRYEw5AgUZ/PJfQg/AAFhuca8bi+L9SFHS9dBDYZ3IwIUsN+WsGvxOG2c83",
         "./src/presentation/components/pix-charge-form/pix-charge-form.component.js": "sha384-QUmuOvQY0NJeosa3Gy2ghyGzEf6brpdkDuch2Uj2sLs97TUi1F5YOixW00/MF9bJ",
         "./src/presentation/components/pix-charge-form/pix-charge-form.constants.js": "sha384-CrqFuc+TsVeIGStp+6EybEybMDhi/ZiSvXc1Fdm9pu3GUXc8k1oyr4pAvv0Atjye",
         "./src/presentation/components/pix-charge-result/pix-charge-result.component.js": "sha384-vFOEJ3F2Yg9FtaOm7JQFRqXHgDDFU8tF1uF5IdapY7YovsG6C7TRn6GAau3e7n8K",
@@ -174,6 +174,14 @@
     </script>
     <script>
       (function () {
+        window.addEventListener("beforeinstallprompt", (e) => {
+          e.preventDefault();
+          window.__deferredPrompt = e;
+        });
+        window.addEventListener("appinstalled", () => {
+          window.__pwaInstalled = true;
+          window.__deferredPrompt = null;
+        });
         const im = document.querySelector('script[type="importmap"]');
         if (im && !document.querySelector('script[type="importmap-shim"]')) {
           const shim = document.createElement("script");
@@ -193,13 +201,13 @@
     <link rel="modulepreload" href="./src/domain/entities/pix-charge.entity.js" integrity="sha384-apdRQcRsyQfyadI2Btnfu8n75qfQLV0nLNogV0lE3MtYqME1OonNK5x18PdhOLjf" />
     <link rel="modulepreload" href="./src/domain/entities/pix-key.entity.js" integrity="sha384-NWXWgFf5B31RDkjZUiEI9r0nVY+RJe0817XNX33GYk+K5bNX1M33l4vDtpP9li3Q" />
     <link rel="modulepreload" href="./src/infrastructure/pix/pix-qr.service.js" integrity="sha384-CuZANw7hxhOcvSYuvTKyBBND11kG1tnncWjr3L6g1gI2iFSXDpLs9EwIXAyCtaHa" />
-    <link rel="modulepreload" href="./src/infrastructure/pwa/pwa-install.adapter.js" integrity="sha384-XOk5WSXPeAXZRjOZKBDIfqFi4d/Y4Rat3hXM05jJqMGNd4OrGLvCdfDYxeJDEIk/" />
+    <link rel="modulepreload" href="./src/infrastructure/pwa/pwa-install.adapter.js" integrity="sha384-jJ46rcjkOn81TUYN6PRGOM7z4IrdODir0cg1k7zz+yY8C/onLkKv7jbn1PD8iQdw" />
     <link rel="modulepreload" href="./src/infrastructure/pwa/service-worker.adapter.js" integrity="sha384-b+4apZpw/PMwZqgFZXtzyqENprbdWW/aST4rhh/TfrW7VLvyYwrtAkv9Yx7YR276" />
     <link rel="modulepreload" href="./src/infrastructure/share/browser-share.adapter.js" integrity="sha384-7Sjp01hfs3Ffr9ErJCioJwtCAhPcYRUAMtrZC5qGBfEpyPEGWTG9dYoBmXBj1eL9" />
     <link rel="modulepreload" href="./src/infrastructure/storage/indexed-db-pix-key.repository.js" integrity="sha384-djuXXh00PTK15Qx/P8GeJdOVMFC74q1CtfAkHj2wRKYl3MVjZwixhGo6lUTBeYcK" />
     <link rel="modulepreload" href="./src/main.js" integrity="sha384-al36h99BPWyJ9zy13bgW7GA1zjOOcQ6F6+W2lcW7nPLZDJ+SF7plKsY3EKr8tBZj" />
     <link rel="modulepreload" href="./src/presentation/bootstrap/bootstrap-app.js" integrity="sha384-DcJZd7Cd0yWYNKwfppCgh5gt0o41mXEvBtLcqUNvQCEa64ZTMEfgkdtcbNryN5T2" />
-    <link rel="modulepreload" href="./src/presentation/components/app-header/app-header.component.js" integrity="sha384-HBqaLcqxBwsqpklYgal5XzZI4P3TbJUDXZZH1HaWImdnvWWVyYdIevodgImjMzVw" />
+    <link rel="modulepreload" href="./src/presentation/components/app-header/app-header.component.js" integrity="sha384-oLx10DRYEw5AgUZ/PJfQg/AAFhuca8bi+L9SFHS9dBDYZ3IwIUsN+WsGvxOG2c83" />
     <link rel="modulepreload" href="./src/presentation/components/pix-charge-form/pix-charge-form.component.js" integrity="sha384-QUmuOvQY0NJeosa3Gy2ghyGzEf6brpdkDuch2Uj2sLs97TUi1F5YOixW00/MF9bJ" />
     <link rel="modulepreload" href="./src/presentation/components/pix-charge-form/pix-charge-form.constants.js" integrity="sha384-CrqFuc+TsVeIGStp+6EybEybMDhi/ZiSvXc1Fdm9pu3GUXc8k1oyr4pAvv0Atjye" />
     <link rel="modulepreload" href="./src/presentation/components/pix-charge-result/pix-charge-result.component.js" integrity="sha384-vFOEJ3F2Yg9FtaOm7JQFRqXHgDDFU8tF1uF5IdapY7YovsG6C7TRn6GAau3e7n8K" />
@@ -315,6 +323,7 @@
             type="button"
             class="app-header__install-btn hidden"
             aria-label="Instalar aplicativo"
+            hidden
           >
             <vector-icon name="download"></vector-icon>
             <span>Instalar</span>

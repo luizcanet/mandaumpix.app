@@ -50,6 +50,7 @@ export class AppHeaderComponent extends CustomElement {
         <button
           type="button"
           class="app-header__install-btn ${this.showInstallButton ? "" : "hidden"}"
+          ${this.showInstallButton ? "" : "hidden"}
           aria-label="Instalar aplicativo"
         >
           <vector-icon name="download"></vector-icon>
@@ -252,6 +253,7 @@ export class AppHeaderComponent extends CustomElement {
     const btn = this.querySelector(".app-header__install-btn");
     if (btn) {
       btn.classList.remove("hidden");
+      btn.removeAttribute("hidden");
     } else if (this.isConnected) {
       this.render();
     }
@@ -262,6 +264,7 @@ export class AppHeaderComponent extends CustomElement {
     const btn = this.querySelector(".app-header__install-btn");
     if (btn) {
       btn.classList.add("hidden");
+      btn.setAttribute("hidden", "");
     } else if (this.isConnected) {
       this.render();
     }
