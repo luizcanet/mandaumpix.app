@@ -35,14 +35,14 @@ flowchart TD
     Comp & Qual -->|"Aprovação e Merge"| Dev
     Dev -->|"Push Automatizado (deploy-dev.yml)"| EnvDev
     Dev -->|"Corte de Release"| Rel
-    Rel -->|"Deploy de Homologação"| EnvStg
+    Rel -->|"Deploy Automatizado (deploy-stg.yml)"| EnvStg
     Rel -->|"Merge + Tag SemVer"| Main
     Rel -.->|"Back-merge"| Dev
     Main -->|"Corte de Hotfix"| Hot
-    Hot -->|"Validação Prévia"| EnvStg
+    Hot -->|"Deploy Automatizado (deploy-stg.yml)"| EnvStg
     Hot -->|"Merge + Tag de Patch"| Main
     Hot -.->|"Back-merge"| Dev
-    Main -->|"Deploy de Produção"| EnvPrd
+    Main -->|"Release Publicada (deploy-prd.yml)"| EnvPrd
 ```
 
 ### 🌿 Convenção e Ciclo de Vida das Branches (Git Flow)
@@ -60,11 +60,11 @@ flowchart TD
 
 A entrega contínua direciona os artefatos estáticos gerados pelo build (`dist/`), mapeados via [`firebase.json`](../../firebase.json) e [`.firebaserc`](../../.firebaserc), para três ambientes isolados no **Firebase Hosting**, sob o domínio `mandaumpix.app` registrado e certificado no **Name.com** (detalhes em [Infraestrutura e Topologia](./infrastructure.md)):
 
-| Ambiente      | Sigla | Branch Git Flow Associada | Domínio de Destino   | Projeto no Firebase  | Workflow de Automação                                                        |
-| :------------ | :---: | :------------------------ | :------------------- | :------------------- | :--------------------------------------------------------------------------- |
-| `development` | `dev` | `develop`                 | `dev.mandaumpix.app` | `mandaumpix-app-dev` | [`.github/workflows/deploy-dev.yml`](../../.github/workflows/deploy-dev.yml) |
-| `staging`     | `stg` | `release/*` e `hotfix/*`  | `stg.mandaumpix.app` | `mandaumpix-app-stg` | Planejado (`deploy-stg.yml`)                                                 |
-| `production`  | `prd` | `main` (tags `v*`)        | `mandaumpix.app`     | `mandaumpix-app-prd` | Planejado (`deploy-prd.yml`)                                                 |
+| Ambiente      | Sigla | Branch / Evento Git Flow Associado | Domínio de Destino   | Projeto no Firebase  | Workflow de Automação                                                        |
+| :------------ | :---: | :--------------------------------- | :------------------- | :------------------- | :--------------------------------------------------------------------------- |
+| `development` | `dev` | `develop`                          | `dev.mandaumpix.app` | `mandaumpix-app-dev` | [`.github/workflows/deploy-dev.yml`](../../.github/workflows/deploy-dev.yml) |
+| `staging`     | `stg` | `release/*` e `hotfix/*`           | `stg.mandaumpix.app` | `mandaumpix-app-stg` | [`.github/workflows/deploy-stg.yml`](../../.github/workflows/deploy-stg.yml) |
+| `production`  | `prd` | Release publicada (`published`)    | `mandaumpix.app`     | `mandaumpix-app-prd` | [`.github/workflows/deploy-prd.yml`](../../.github/workflows/deploy-prd.yml) |
 
 ### 🚢 Implantação Automatizada em Development (`CD - Deploy Development`)
 
@@ -74,6 +74,24 @@ Configurado em [`.github/workflows/deploy-dev.yml`](../../.github/workflows/depl
   - Vinculado ao GitHub Environment `development` (`https://dev.mandaumpix.app`).
   - Executa `npm ci`, validação de formatação (`npm run format:check`), análise estática (`npm run lint`), suíte de testes (`npm test`), empacotamento de produção (`npm run build` gerando `dist/`) e build do catálogo de componentes (`npm run build-storybook -- -o dist/storybook`, acessível em `https://dev.mandaumpix.app/storybook`).
   - Publica os ativos no canal `live` do projeto `mandaumpix-app-dev` utilizando `FirebaseExtended/action-hosting-deploy@v0` autenticado via secret `FIREBASE_SERVICE_ACCOUNT_DEV`.
+
+### 🧪 Implantação Automatizada em Staging (`CD - Deploy Staging`)
+
+Configurado em [`.github/workflows/deploy-stg.yml`](../../.github/workflows/deploy-stg.yml), o workflow é disparado automaticamente em eventos de `push` nas branches `release/*` e `hotfix/*` do Git Flow, ou manualmente via `workflow_dispatch`:
+
+- **Job `deploy` (`Build e Deploy (Staging)`)**:
+  - Vinculado ao GitHub Environment `staging` (`https://stg.mandaumpix.app`).
+  - Executa a esteira estrita de qualidade: `npm ci`, validação de formatação (`npm run format:check`), análise estática (`npm run lint`), suíte de testes automatizados (`npm test`), empacotamento de produção (`npm run build` gerando `dist/`) e compilação do catálogo de componentes (`npm run build-storybook -- -o dist/storybook`, acessível em `https://stg.mandaumpix.app/storybook`).
+  - Publica os ativos no canal `live` do projeto `mandaumpix-app-stg` utilizando `FirebaseExtended/action-hosting-deploy@v0` autenticado via secret `FIREBASE_SERVICE_ACCOUNT_STG`.
+
+### 🚀 Implantação Automatizada em Production (`CD - Deploy Production`)
+
+Configurado em [`.github/workflows/deploy-prd.yml`](../../.github/workflows/deploy-prd.yml), o workflow possui como gatilho exclusivo a publicação oficial de uma release no GitHub (`release: types: [published]`):
+
+- **Job `deploy` (`Build e Deploy (Production)`)**:
+  - Vinculado ao GitHub Environment `production` (`https://mandaumpix.app`).
+  - Executa a esteira estrita de qualidade: `npm ci`, validação de formatação (`npm run format:check`), análise estática (`npm run lint`), suíte de testes automatizados (`npm test`) e empacotamento otimizado de produção (`npm run build` gerando `dist/` sem inclusão de assets de documentação).
+  - Publica os ativos no canal `live` do projeto `mandaumpix-app-prd` utilizando `FirebaseExtended/action-hosting-deploy@v0` autenticado via secret `FIREBASE_SERVICE_ACCOUNT_PRD`.
 
 ### 🛡️ Verificações Executadas no Workflow (`CI - Qualidade e Conformidade`)
 
