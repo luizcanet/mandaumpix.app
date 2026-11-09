@@ -1236,7 +1236,7 @@ flowchart LR
     T3 & T4 & T5 & T6 --> T7["TASK-07.2.7: Cobertura, Lint, Build & Sincronização"]
 ```
 
-#### `US-07.3` — Workflows de Entrega Contínua (CD) para `staging` e `production` (`⏳ Pendente` · `3 Story Points`)
+#### `US-07.3` — Workflows de Entrega Contínua (CD) para `staging` e `production` (`✅ Concluído` · `3 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Mantenedor e Engenheiro DevOps/Front-end** do Manda um PIX,
@@ -1303,7 +1303,7 @@ flowchart LR
   - [x] **TASK-07.3.1 (Construção do Workflow CD Staging `.github/workflows/deploy-stg.yml`)**: Criar o workflow de implantação contínua para homologação com gatilhos para `release/*`, `hotfix/*` e `workflow_dispatch`, environment `staging`, steps de qualidade, build da aplicação (`npm run build`), build do Storybook (`dist/storybook`), publicação no projeto `mandaumpix-app-stg` e canal `live` via secret `FIREBASE_SERVICE_ACCOUNT_STG`.
   - [x] **TASK-07.3.2 (Construção do Workflow CD Production `.github/workflows/deploy-prd.yml`)**: Criar o workflow de implantação contínua para produção com gatilho exclusivo para release publicada (`release: types: [published]`), environment `production`, steps de qualidade, build otimizado da aplicação (`npm run build`), publicação no projeto `mandaumpix-app-prd` e canal `live` via secret `FIREBASE_SERVICE_ACCOUNT_PRD`.
   - [x] **TASK-07.3.3 (Validação Sintática, Linting dos Workflows e Simulação Local)**: Validar a sintaxe dos arquivos YAML criados utilizando o ESLint v10 (`npm run lint`), formatador Prettier (`npm run format:check`) e validar localmente que os comandos de build e paths referenciados nos workflows correspondem exatamente aos scripts do `package.json` e ao `firebase.json`.
-  - [ ] **TASK-07.3.4 (Atualização da Matriz de Implantação e Documentação Técnica)**: Atualizar a matriz de status em [`docs/deployment/pipeline.md`](../deployment/pipeline.md) apontando os novos workflows de homologação e produção com seus respectivos links, detalhar o fluxo operacional de promoção e sincronizar o Backlog.
+  - [x] **TASK-07.3.4 (Atualização da Matriz de Implantação e Documentação Técnica)**: Atualizar a matriz de status em [`docs/deployment/pipeline.md`](../deployment/pipeline.md) apontando os novos workflows de homologação e produção com seus respectivos links, detalhar o fluxo operacional de promoção e sincronizar o Backlog.
 
 ```mermaid
 flowchart LR
