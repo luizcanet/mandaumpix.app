@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import Router from "@modnes/router";
-import { bootstrapApp } from "./bootstrap-app.js";
+import { bootstrapApp, populateChargePage } from "./bootstrap-app.js";
 
 describe("bootstrap-app.js", () => {
   it("should return null if rootElement is not provided", () => {
@@ -79,5 +79,117 @@ describe("bootstrap-app.js", () => {
     expect(mockRegister).toHaveBeenCalled();
 
     root.remove();
+  });
+
+  describe("populateChargePage (Visibility sync between pix-key-empty and pix-key-selector)", () => {
+    it("should return early when chargePageElement is null or undefined", () => {
+      expect(populateChargePage(null)).toBeUndefined();
+    });
+
+    it("should display pix-key-empty and hide pix-key-selector when there are 0 keys", async () => {
+      const chargePage = document.createElement("div");
+      chargePage.className = "charge-page";
+
+      const mockRepo = {
+        subscribe: vi.fn(),
+        getState: vi.fn().mockReturnValue({ items: [] }),
+      };
+      const mockListUseCase = {
+        execute: vi.fn().mockResolvedValue({ items: [] }),
+      };
+
+      populateChargePage(chargePage, {
+        pixKeyRepository: mockRepo,
+        listPixKeysUseCase: mockListUseCase,
+      });
+
+      const emptyEl = chargePage.querySelector("pix-key-empty");
+      const selectorEl = chargePage.querySelector("pix-key-selector");
+
+      expect(emptyEl).not.toBeNull();
+      expect(selectorEl).not.toBeNull();
+
+      expect(emptyEl.classList.contains("hidden")).toBe(false);
+      expect(emptyEl.hasAttribute("hidden")).toBe(false);
+
+      expect(selectorEl.classList.contains("hidden")).toBe(true);
+      expect(selectorEl.hasAttribute("hidden")).toBe(true);
+    });
+
+    it("should hide pix-key-empty and show pix-key-selector when keys are registered", async () => {
+      const chargePage = document.createElement("div");
+      chargePage.className = "charge-page";
+
+      const registeredKeys = [
+        { id: "key-1", tipo_chave: "email", valor_chave: "test@example.com" },
+      ];
+
+      const mockRepo = {
+        subscribe: vi.fn(),
+        getState: vi.fn().mockReturnValue({ items: registeredKeys }),
+      };
+      const mockListUseCase = {
+        execute: vi.fn().mockResolvedValue({ items: registeredKeys }),
+      };
+
+      populateChargePage(chargePage, {
+        pixKeyRepository: mockRepo,
+        listPixKeysUseCase: mockListUseCase,
+      });
+
+      // Wait for listPixKeysUseCase promise resolution
+      await new Promise((r) => setTimeout(r, 0));
+
+      const emptyEl = chargePage.querySelector("pix-key-empty");
+      const selectorEl = chargePage.querySelector("pix-key-selector");
+
+      expect(emptyEl.classList.contains("hidden")).toBe(true);
+      expect(emptyEl.hasAttribute("hidden")).toBe(true);
+
+      expect(selectorEl.classList.contains("hidden")).toBe(false);
+      expect(selectorEl.hasAttribute("hidden")).toBe(false);
+    });
+
+    it("should reactively toggle visibility when repository subscriber receives updates", () => {
+      const chargePage = document.createElement("div");
+      chargePage.className = "charge-page";
+
+      let subscriberCallback = null;
+      const mockRepo = {
+        subscribe: vi.fn((cb) => {
+          subscriberCallback = cb;
+        }),
+        getState: vi.fn().mockReturnValue({ items: [] }),
+      };
+
+      populateChargePage(chargePage, {
+        pixKeyRepository: mockRepo,
+      });
+
+      const emptyEl = chargePage.querySelector("pix-key-empty");
+      const selectorEl = chargePage.querySelector("pix-key-selector");
+
+      // Initial: 0 keys
+      expect(emptyEl.classList.contains("hidden")).toBe(false);
+      expect(selectorEl.classList.contains("hidden")).toBe(true);
+
+      // Simulate key saved
+      subscriberCallback({
+        items: [{ id: "key-1", valor_chave: "pix@test.com" }],
+      });
+
+      expect(emptyEl.classList.contains("hidden")).toBe(true);
+      expect(emptyEl.hasAttribute("hidden")).toBe(true);
+      expect(selectorEl.classList.contains("hidden")).toBe(false);
+      expect(selectorEl.hasAttribute("hidden")).toBe(false);
+
+      // Simulate key deleted (all keys removed)
+      subscriberCallback({ items: [] });
+
+      expect(emptyEl.classList.contains("hidden")).toBe(false);
+      expect(emptyEl.hasAttribute("hidden")).toBe(false);
+      expect(selectorEl.classList.contains("hidden")).toBe(true);
+      expect(selectorEl.hasAttribute("hidden")).toBe(true);
+    });
   });
 });

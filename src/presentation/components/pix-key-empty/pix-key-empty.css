@@ -18,6 +18,12 @@
   box-sizing: border-box;
 }
 
+.key-empty-state.hidden,
+pix-key-empty.hidden,
+pix-key-empty[hidden] {
+  display: none;
+}
+
 /* -----------------------------------------------------------------------------
    ÍCONE DE DESTAQUE (.key-empty-state__icon)
    Contêiner com fundo nas cores de marca e alto contraste

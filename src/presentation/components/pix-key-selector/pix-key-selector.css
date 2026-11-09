@@ -15,6 +15,12 @@
   box-sizing: border-box;
 }
 
+.key-selector.hidden,
+pix-key-selector.hidden,
+pix-key-selector[hidden] {
+  display: none;
+}
+
 /* -----------------------------------------------------------------------------
    CABEÇALHO DA SEÇÃO (.section-header)
    Alinhamento horizontal entre título da etapa e botão de adicionar nova chave

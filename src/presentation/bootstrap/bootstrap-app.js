@@ -172,6 +172,7 @@ export function populateChargePage(chargePageElement, services = {}) {
     emptyElement = document.createElement("pix-key-empty");
     selectorElement = document.createElement("pix-key-selector");
     selectorElement.className = "hidden";
+    selectorElement.setAttribute("hidden", "");
     formElement = document.createElement("pix-charge-form");
 
     formColumn.appendChild(emptyElement);
@@ -221,9 +222,19 @@ export function populateChargePage(chargePageElement, services = {}) {
     const hasKeys = Array.isArray(items) && items.length > 0;
     if (emptyElement) {
       emptyElement.classList.toggle("hidden", hasKeys);
+      if (hasKeys) {
+        emptyElement.setAttribute("hidden", "");
+      } else {
+        emptyElement.removeAttribute("hidden");
+      }
     }
     if (selectorElement) {
       selectorElement.classList.toggle("hidden", !hasKeys);
+      if (!hasKeys) {
+        selectorElement.setAttribute("hidden", "");
+      } else {
+        selectorElement.removeAttribute("hidden");
+      }
     }
   };
 
@@ -232,6 +243,10 @@ export function populateChargePage(chargePageElement, services = {}) {
       services.pixKeyRepository.subscribe((state = {}) => {
         syncVisibility(state.items);
       });
+    }
+    if (typeof services.pixKeyRepository.getState === "function") {
+      const currentState = services.pixKeyRepository.getState();
+      syncVisibility(currentState?.items);
     }
     if (services.listPixKeysUseCase) {
       services.listPixKeysUseCase
