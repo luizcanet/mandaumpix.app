@@ -21,7 +21,7 @@
     "start": "jspm serve",
     "serve": "jspm serve --watch",
     "importmap": "jspm install && jspm install -o index.html --preload --integrity",
-    "build": "jspm build -o dist",
+    "build": "node scripts/build.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

@@ -118,7 +118,7 @@ O workflow é disparado automaticamente em eventos de `pull_request` (`opened`, 
 | `npm start`               | `jspm serve`                                                       | ✅ Ativo — inicia o servidor de desenvolvimento baseado em padrões web na porta `5776`.        |
 | `npm run serve`           | `jspm serve --watch`                                               | ✅ Ativo — inicia o servidor local com monitoramento de alterações e live-reload.              |
 | `npm run importmap`       | `jspm install && jspm install -o index.html --preload --integrity` | ✅ Ativo — gera `importmap.js` e injeta Import Map, `modulepreload` e SRI no `index.html`.     |
-| `npm run build`           | `jspm build -o dist`                                               | ✅ Ativo — empacota e otimiza o projeto para produção no diretório `dist/`.                    |
+| `npm run build`           | `node scripts/build.js`                                            | ✅ Ativo — gera o pacote estático de produção em `dist/` com validação de SRI e preloads.      |
 | `npm run lint`            | `eslint .`                                                         | ✅ Ativo — valida arquivos `.js`, `.mjs`, `.cjs`, `.json`, `.jsonc`, `.json5`, `.md` e `.css`. |
 | `npm run format`          | `prettier --write .`                                               | ✅ Ativo — formata os arquivos do repositório com Prettier.                                    |
 | `npm run format:check`    | `prettier --check .`                                               | ✅ Ativo — verifica a formatação dos arquivos sem modificá-los (utilizado no CI).              |

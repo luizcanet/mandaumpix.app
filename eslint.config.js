@@ -22,6 +22,10 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
   },
   {
+    files: ["scripts/**/*.{js,mjs,cjs}", "test/build/**/*.{js,mjs,cjs}"],
+    languageOptions: { globals: globals.node },
+  },
+  {
     files: ["**/*.json"],
     plugins: { json },
     language: "json/json",
