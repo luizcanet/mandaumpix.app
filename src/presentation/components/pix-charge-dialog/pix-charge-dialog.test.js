@@ -79,9 +79,7 @@ describe("PixChargeDialogComponent (TASK-07.4.2: TDD / Testes Unitários de Comp
       expect(title.id).toBe(DEFAULT_CHARGE_DIALOG_TITLE_ID);
       expect(title.textContent).toContain(DEFAULT_CHARGE_DIALOG_TITLE);
       expect(
-        title.querySelector(
-          `vector-icon[name="${CHARGE_DIALOG_ICONS.CHECK}"]`,
-        ),
+        title.querySelector(`vector-icon[name="${CHARGE_DIALOG_ICONS.CHECK}"]`),
       ).not.toBeNull();
 
       const closeBtn = topBar.querySelector(

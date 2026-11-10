@@ -1,0 +1,221 @@
+/* ==========================================================================
+   ESTILOS DO MODAL DE RESULTADO DA COBRANÇA (pix-charge-dialog.css)
+   Manda um PIX — Bloco BEM .charge-dialog e Pseudo-elemento ::backdrop (TASK-07.4.4)
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   PSEUDO-ELEMENTO BACKDROP (::backdrop) & CLASSE BACKDROP FALLBACK
+   Fundo escurecido semitransparente rgba(6, 13, 30, 0.65) com efeito de desfoque (blur)
+   ----------------------------------------------------------------------------- */
+dialog.charge-dialog::backdrop {
+  background-color: rgba(6, 13, 30, 0.65);
+}
+
+.charge-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(6, 13, 30, 0.65);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md, 1rem);
+  box-sizing: border-box;
+}
+
+@supports (backdrop-filter: blur(4px)) {
+  dialog.charge-dialog::backdrop {
+    backdrop-filter: blur(4px);
+  }
+
+  .charge-dialog-backdrop {
+    backdrop-filter: blur(4px);
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   BLOCO PRINCIPAL (<dialog class="charge-dialog">)
+   Contêiner modal nativo isolado, centralizado, com borda e sombra profunda
+   ----------------------------------------------------------------------------- */
+dialog.charge-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: calc(100% - var(--space-md, 1rem) * 2);
+  max-width: 440px;
+  max-height: 90vh;
+  background-color: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border-strong, #cbd5e1);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-md, 1rem);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(11, 24, 52, 0.12));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 1rem);
+  box-sizing: border-box;
+  color: var(--color-text-primary, #0f172a);
+  font-family: var(--font-sans, system-ui, sans-serif);
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+dialog.charge-dialog:not([open]) {
+  display: none;
+}
+
+dialog.charge-dialog[open] {
+  display: flex;
+  animation: chargeDialogFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes chargeDialogFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   BARRA DE TOPO (.charge-dialog__top-bar)
+   Título acessível e botão de fechamento com alvo de toque mínimo >= 44x44px
+   ----------------------------------------------------------------------------- */
+.charge-dialog__top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs, 0.5rem);
+  padding-bottom: var(--space-xs, 0.5rem);
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+}
+
+.charge-dialog__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-text-primary, #0f172a);
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.charge-dialog__title vector-icon {
+  color: var(--color-success, #059669);
+  display: inline-flex;
+  align-items: center;
+}
+
+.charge-dialog__close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm, 6px);
+  color: var(--color-text-secondary, #475569);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.charge-dialog__close-btn:hover {
+  background-color: var(--color-surface-muted, #f8fafc);
+  color: var(--color-text-primary, #0f172a);
+}
+
+.charge-dialog__close-btn:focus-visible {
+  outline: 2px solid var(--color-focus, #2563eb);
+  outline-offset: 2px;
+}
+
+/* -----------------------------------------------------------------------------
+   CORPO DO DIÁLOGO (.charge-dialog__body)
+   Encapsula o componente de resultado <pix-charge-result> com rolagem contida
+   ----------------------------------------------------------------------------- */
+.charge-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm, 0.75rem);
+  min-height: 0;
+}
+
+.charge-dialog__body pix-charge-result {
+  display: block;
+  width: 100%;
+}
+
+/* -----------------------------------------------------------------------------
+   BOTÃO DE CONCLUSÃO INFERIOR (.charge-dialog__dismiss-btn)
+   Ação final de retorno com alvo de toque acessível (min-height: 48px)
+   ----------------------------------------------------------------------------- */
+.charge-dialog__dismiss-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs, 0.5rem);
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-xs, 0.5rem) var(--space-md, 1rem);
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-brand-primary, #0b1834);
+  background-color: var(--color-surface-elevated, #f1f5f9);
+  border: 1px solid var(--color-border-strong, #cbd5e1);
+  border-radius: var(--radius-md, 10px);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.charge-dialog__dismiss-btn:hover {
+  background-color: var(--color-surface-muted, #f8fafc);
+  border-color: var(--color-border, #e2e8f0);
+}
+
+.charge-dialog__dismiss-btn:focus-visible {
+  outline: 2px solid var(--color-focus, #2563eb);
+  outline-offset: 2px;
+}
+
+/* -----------------------------------------------------------------------------
+   PREFERÊNCIAS DO USUÁRIO & ACESSIBILIDADE (WCAG 2.2 AA)
+   ----------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  dialog.charge-dialog[open] {
+    animation: none;
+  }
+
+  .charge-dialog__close-btn,
+  .charge-dialog__dismiss-btn {
+    transition: none;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   RESPONSIVIDADE (MOBILE / TELAS COMPACTAS <= 480px)
+   ----------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  dialog.charge-dialog {
+    width: calc(100% - var(--space-xs, 0.5rem) * 2);
+    max-height: 94vh;
+    padding: var(--space-sm, 0.75rem);
+    gap: var(--space-sm, 0.75rem);
+  }
+
+  .charge-dialog-backdrop {
+    padding: var(--space-xs, 0.5rem);
+  }
+}
+
