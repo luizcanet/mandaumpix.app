@@ -76,9 +76,15 @@ flowchart LR
 ### 1. Monitoramento de Emissão de Certificados SSL/TLS (Certificate Transparency)
 
 - Todo certificado SSL/TLS emitido por autoridades certificadoras (Let's Encrypt, Cloudflare, DigiCert) é registrado publicamente em logs de **Certificate Transparency (CT)**.
-- **Rotina Automatizada**:
-  - Consulta periódica via API ao serviço `https://crt.sh/?q=%25mandaumpix%25&output=json` e `https://crt.sh/?q=%25manda-um-pix%25&output=json`.
-  - Disparo de notificação imediata via webhook (Discord, Telegram ou e-mail de segurança) quando um novo certificado for emitido para qualquer domínio não autorizado.
+- **Implementação Ativa**:
+  - Script em Node.js [`scripts/security/monitor-ct-logs.js`](../../scripts/security/monitor-ct-logs.js) com suíte de testes unitários em Vitest [`test/security/monitor-ct-logs.test.js`](../../test/security/monitor-ct-logs.test.js).
+  - Consulta automatizada via API ao serviço `https://crt.sh/?q=%25mandaumpix%25&output=json` e `https://crt.sh/?q=%25manda-um-pix%25&output=json` com mecanismo de resiliência e **exponential backoff** (até 3 tentativas) para tolerância a falhas `HTTP 503` ou instabilidade de rede.
+  - Filtragem estrita de origens oficiais (`mandaumpix.app`, `*.mandaumpix.app`, `mandaumpix-app-*.web.app`, `mandaumpix-app-*.firebaseapp.com`) garantindo **zero falsos positivos**.
+- **Automação GitHub Actions e Alertas ([`.github/workflows/security-ct-monitor.yml`](../../.github/workflows/security-ct-monitor.yml))**:
+  - Execução cron agendada diária (às 06:00 UTC / 03:00 BRT) e suporte a disparo manual (`workflow_dispatch`).
+  - Geração e retenção de relatório de auditoria `security-ct-report.json` como artefato de build por 30 dias.
+  - **Abertura automática de Issue**: Ao identificar novos domínios suspeitos, uma issue é criada no repositório com o label `security-incident` contendo tabela com domínios, autoridade emissora (CA), data e orientações de takedown (atualizando a thread se já existir issue aberta).
+  - **Notificação Webhook Instantânea**: Caso o segredo [`SECURITY_WEBHOOK_URL`](../configuration/environment.md#segredo-de-monitoramento-e-resposta-a-incidentes-security_webhook_url) esteja configurado no repositório, o workflow envia o relatório JSON diretamente para canais operacionais (Discord, Slack, Teams, Telegram ou SIEM).
 
 ### 2. Varredura Contínua de Typosquatting e Combosquatting
 

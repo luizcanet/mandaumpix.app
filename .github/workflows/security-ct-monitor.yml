@@ -172,4 +172,3 @@ jobs:
           curl -s -X POST -H "Content-Type: application/json" \
             -d "$REPORT_JSON" \
             "$SECURITY_WEBHOOK_URL" || echo "::warning::Falha no disparo do webhook de segurança."
-
