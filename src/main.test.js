@@ -3,6 +3,7 @@ import {
   ABOUT_AUTHOR,
   ABOUT_NAVIGATION,
   ABOUT_PROJECT,
+  ABOUT_SECURITY,
   ABOUT_SHARE,
   ABOUT_SUPPORT_PIX,
   APP_METADATA,
@@ -1010,10 +1011,14 @@ describe("main.js", () => {
       expect(DEFAULT_SW_TYPE).toBe("module");
     });
 
-    it("should re-export AboutPageComponent and institutional constants (TASK-04.4.5)", () => {
+    it("should re-export AboutPageComponent and institutional constants (TASK-04.4.5, TASK-08.2.3)", () => {
       expect(AboutPageComponent).toBeDefined();
       expect(ABOUT_AUTHOR).toBeDefined();
       expect(ABOUT_PROJECT).toBeDefined();
+      expect(ABOUT_SECURITY).toBeDefined();
+      expect(ABOUT_SECURITY.officialOrigin).toBe("https://mandaumpix.app");
+      expect(ABOUT_SECURITY.officialDomain).toBe("mandaumpix.app");
+      expect(ABOUT_SECURITY.badgeLabel).toBe("Origem Oficial: mandaumpix.app");
       expect(ABOUT_SUPPORT_PIX).toBeDefined();
       expect(ABOUT_SHARE).toBeDefined();
       expect(ABOUT_NAVIGATION).toBeDefined();

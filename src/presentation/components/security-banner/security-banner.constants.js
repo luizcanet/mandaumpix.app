@@ -79,4 +79,3 @@ export const SECURITY_BANNER_EVENTS = Object.freeze({
   DISMISS: "security-banner-dismiss",
   ORIGIN_CHECKED: "security-banner-origin-checked",
 });
-

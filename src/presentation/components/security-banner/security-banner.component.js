@@ -331,4 +331,3 @@ if (
 
 export const PixSecurityBannerComponent = SecurityBannerComponent;
 export default SecurityBannerComponent;
-

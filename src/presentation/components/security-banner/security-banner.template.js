@@ -62,4 +62,3 @@ export function securityBannerTemplate({
 }
 
 export default securityBannerTemplate;
-

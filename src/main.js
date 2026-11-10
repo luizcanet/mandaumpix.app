@@ -167,6 +167,7 @@ import {
   ABOUT_AUTHOR,
   ABOUT_NAVIGATION,
   ABOUT_PROJECT,
+  ABOUT_SECURITY,
   ABOUT_SHARE,
   ABOUT_SUPPORT_PIX,
 } from "./presentation/pages/about-page/about-page.constants.js";
@@ -478,6 +479,7 @@ export {
   ABOUT_AUTHOR,
   ABOUT_NAVIGATION,
   ABOUT_PROJECT,
+  ABOUT_SECURITY,
   ABOUT_SHARE,
   ABOUT_SUPPORT_PIX,
   // Roteamento & Navegação

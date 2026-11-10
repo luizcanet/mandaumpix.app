@@ -51,4 +51,3 @@ describe("security-banner.template.js — Renderização Semântica do Template 
     expect(markup).toContain('name="circle-exclamation"');
   });
 });
-

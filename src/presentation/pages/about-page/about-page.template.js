@@ -3,6 +3,7 @@ import {
   ABOUT_AUTHOR,
   ABOUT_NAVIGATION,
   ABOUT_PROJECT,
+  ABOUT_SECURITY,
   ABOUT_SHARE,
   ABOUT_SUPPORT_PIX,
 } from "./about-page.constants.js";
@@ -123,7 +124,33 @@ export function aboutPageTemplate({
         </div>
       </div>
 
-      <!-- CARD 3: APOIO VOLUNTÁRIO ("MANDA UM PIX") -->
+      <!-- CARD 3: AUTENTICIDADE E ARQUITETURA ZERO-CREDENTIAL (INV-03 / RN08) -->
+      <div
+        class="about-page__box about-page__box--security"
+        role="region"
+        aria-label="${ABOUT_SECURITY.zeroCredentialTitle}"
+      >
+        <div class="about-page__box-label">
+          <span aria-hidden="true">🛡️</span>
+          <span>${ABOUT_SECURITY.zeroCredentialTitle}</span>
+        </div>
+        <div
+          class="about-page__security-badge"
+          role="status"
+          aria-label="${ABOUT_SECURITY.badgeAriaLabel}"
+        >
+          <vector-icon name="${ABOUT_SECURITY.securityIcon}" class="about-page__security-badge-icon"></vector-icon>
+          <span class="about-page__security-badge-text">${ABOUT_SECURITY.badgeLabel}</span>
+        </div>
+        <p class="about-page__security-text">
+          <strong>Zero-Credential</strong>: ${ABOUT_SECURITY.zeroCredentialNotice}
+        </p>
+        <p class="about-page__security-notice">
+          ${ABOUT_SECURITY.beneficiaryNotice}
+        </p>
+      </div>
+
+      <!-- CARD 4: APOIO VOLUNTÁRIO ("MANDA UM PIX") -->
       <div class="about-page__box about-page__box--support">
         <div class="about-page__support-title">${ABOUT_SUPPORT_PIX.title}</div>
         <p class="about-page__support-message">${ABOUT_SUPPORT_PIX.message}</p>

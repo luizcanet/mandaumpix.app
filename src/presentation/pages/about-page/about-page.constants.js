@@ -1,7 +1,29 @@
+import {
+  CANONICAL_PRODUCTION_ORIGIN,
+  OFFICIAL_DOMAIN,
+  OFFICIAL_ORIGIN_BADGE_LABEL,
+  ZERO_CREDENTIAL_MESSAGE,
+} from "../../../domain/security/origin-validator.js";
+
 /**
  * Constantes canônicas e metadados institucionais da página "Sobre" (/sobre).
  * Alinhado à regra de negócio RN07 e às especificações técnicas em docs/design/api_specs.md.
  */
+
+/**
+ * Metadados e avisos de segurança, autenticidade canônica e arquitetura Zero-Credential (INV-03 / RN08).
+ */
+export const ABOUT_SECURITY = Object.freeze({
+  badgeLabel: OFFICIAL_ORIGIN_BADGE_LABEL,
+  officialOrigin: CANONICAL_PRODUCTION_ORIGIN,
+  officialDomain: OFFICIAL_DOMAIN,
+  zeroCredentialTitle: "Segurança & Arquitetura Zero-Credential",
+  zeroCredentialNotice: ZERO_CREDENTIAL_MESSAGE,
+  beneficiaryNotice:
+    "Confira sempre o nome do titular exibido na tela do seu banco antes de efetuar qualquer pagamento via PIX.",
+  badgeAriaLabel: "Selo de autenticidade de origem oficial verificada",
+  securityIcon: "check",
+});
 
 /**
  * Informações canônicas sobre o autor do projeto.
