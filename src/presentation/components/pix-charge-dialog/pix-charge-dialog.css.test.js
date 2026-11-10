@@ -91,16 +91,22 @@ describe("pix-charge-dialog.css (TASK-07.4.4: Estilização CSS BEM, Modal Backd
       );
     });
 
-    it("deve definir o corpo .charge-dialog__body com preenchimento e rolagem contida", () => {
+    it("deve definir o corpo .charge-dialog__body com flex-shrink 0 para prevenir compressão e sobreposição do botão", () => {
       expect(cssContent).toMatch(
         /\.charge-dialog__body\s*\{[^}]*display:\s*flex/,
       );
       expect(cssContent).toMatch(
         /\.charge-dialog__body\s*\{[^}]*flex-direction:\s*column/,
       );
+      expect(cssContent).toMatch(
+        /\.charge-dialog__body\s*\{[^}]*flex-shrink:\s*0/,
+      );
+      expect(cssContent).toMatch(
+        /\.charge-dialog pix-charge-result\.card\s*\{[^}]*border:\s*none/,
+      );
     });
 
-    it("deve estilizar o botão de conclusão/fechamento inferior .charge-dialog__dismiss-btn", () => {
+    it("deve estilizar o botão de conclusão/fechamento inferior .charge-dialog__dismiss-btn com flex-shrink 0", () => {
       expect(cssContent).toMatch(
         /\.charge-dialog__dismiss-btn\s*\{[^}]*min-height:\s*48px/,
       );
@@ -109,6 +115,9 @@ describe("pix-charge-dialog.css (TASK-07.4.4: Estilização CSS BEM, Modal Backd
       );
       expect(cssContent).toMatch(
         /\.charge-dialog__dismiss-btn\s*\{[^}]*justify-content:\s*center/,
+      );
+      expect(cssContent).toMatch(
+        /\.charge-dialog__dismiss-btn\s*\{[^}]*flex-shrink:\s*0/,
       );
     });
   });

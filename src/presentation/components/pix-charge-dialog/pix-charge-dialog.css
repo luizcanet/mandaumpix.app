@@ -44,6 +44,7 @@ dialog.charge-dialog {
   width: calc(100% - var(--space-md, 1rem) * 2);
   max-width: 440px;
   max-height: 90vh;
+  height: fit-content;
   background-color: var(--color-surface, #ffffff);
   border: 1px solid var(--color-border-strong, #cbd5e1);
   border-radius: var(--radius-lg, 16px);
@@ -90,6 +91,7 @@ dialog.charge-dialog[open] {
   gap: var(--space-xs, 0.5rem);
   padding-bottom: var(--space-xs, 0.5rem);
   border-bottom: 1px solid var(--color-border, #e2e8f0);
+  flex-shrink: 0;
 }
 
 .charge-dialog__title {
@@ -139,18 +141,30 @@ dialog.charge-dialog[open] {
 
 /* -----------------------------------------------------------------------------
    CORPO DO DIÁLOGO (.charge-dialog__body)
-   Encapsula o componente de resultado <pix-charge-result> com rolagem contida
+   Encapsula o componente de resultado <pix-charge-result> sem compressão ou sobreposição
    ----------------------------------------------------------------------------- */
 .charge-dialog__body {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm, 0.75rem);
-  min-height: 0;
+  width: 100%;
+  flex-shrink: 0;
 }
 
 .charge-dialog__body pix-charge-result {
   display: block;
   width: 100%;
+}
+
+/* Integração visual sem bordas ou paddings duplicados dentro do modal */
+.charge-dialog pix-charge-result.card {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 1rem);
 }
 
 /* -----------------------------------------------------------------------------
@@ -164,6 +178,7 @@ dialog.charge-dialog[open] {
   gap: var(--space-xs, 0.5rem);
   width: 100%;
   min-height: 48px;
+  flex-shrink: 0;
   padding: var(--space-xs, 0.5rem) var(--space-md, 1rem);
   font-family: var(--font-sans, system-ui, sans-serif);
   font-size: 0.95rem;
