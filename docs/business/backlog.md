@@ -1460,7 +1460,7 @@ flowchart TD
 - **Tarefas de Desenvolvimento (Dev Tasks)**:
   - [x] **TASK-08.1.1 (Script de Monitoramento de CT)**: Criar script Node.js [`scripts/security/monitor-ct-logs.js`](../../scripts/security/monitor-ct-logs.js) que consulta APIs de Certificate Transparency, filtra domínios autorizados e gera relatório JSON de certificados anômalos.
   - [x] **TASK-08.1.2 (Testes Unitários do Parser de CT)**: Criar suíte de testes unitários em Vitest validando a filtragem de domínios permitidos, identificação de anomalias e sanitização de dados.
-  - [ ] **TASK-08.1.3 (Workflow Agendado GitHub Actions)**: Criar workflow agendado [`.github/workflows/security-ct-monitor.yml`](../../.github/workflows/security-ct-monitor.yml) com execução cron diária e suporte a disparo manual (`workflow_dispatch`).
+  - [x] **TASK-08.1.3 (Workflow Agendado GitHub Actions)**: Criar workflow agendado [`.github/workflows/security-ct-monitor.yml`](../../.github/workflows/security-ct-monitor.yml) com execução cron diária e suporte a disparo manual (`workflow_dispatch`).
   - [ ] **TASK-08.1.4 (Documentação e Integração com Webhook)**: Documentar variáveis de ambiente seguras (`SECURITY_WEBHOOK_URL`) em [`docs/configuration/environment.md`](../configuration/environment.md) e [`docs/security/takedown_and_monitoring.md`](../security/takedown_and_monitoring.md).
 
 #### `US-08.2` — UX Defensiva: Alerta de Autenticidade Canônica e Validação de Origem no PWA (`📋 Planejado` · `2 Story Points`)

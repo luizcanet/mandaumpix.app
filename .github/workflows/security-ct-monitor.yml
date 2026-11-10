@@ -1,0 +1,175 @@
+name: Security - Monitoramento de Certificate Transparency
+
+on:
+  schedule:
+    # Executa diariamente às 06:00 UTC (03:00 BRT)
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      max_age_days:
+        description: "Janela máxima de dias para inspeção de certificados recentes"
+        required: false
+        default: "7"
+        type: string
+      queries:
+        description: "Consultas separadas por vírgula para buscar no crt.sh"
+        required: false
+        default: "%mandaumpix%,%manda-um-pix%"
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "24"
+
+jobs:
+  monitor-ct:
+    name: Inspeção de CT Logs e Typosquatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Instalar dependências (lockfile estrito)
+        run: npm ci
+
+      - name: Executar script de monitoramento de Certificate Transparency
+        id: run_monitor
+        run: |
+          MAX_AGE="${{ github.event.inputs.max_age_days || '7' }}"
+          QUERIES="${{ github.event.inputs.queries || '%mandaumpix%,%manda-um-pix%' }}"
+
+          node scripts/security/monitor-ct-logs.js \
+            --output=security-ct-report.json \
+            --max-age-days="$MAX_AGE" \
+            --queries="$QUERIES"
+
+      - name: Publicar relatório de auditoria como artefato
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-ct-report
+          path: security-ct-report.json
+          retention-days: 30
+
+      - name: Processar resultados e registrar sumário da execução
+        id: process_results
+        run: |
+          if [ ! -f security-ct-report.json ]; then
+            echo "::warning::Relatório security-ct-report.json não foi gerado."
+            exit 0
+          fi
+
+          ANOMALIES_COUNT=$(node -e 'const r = JSON.parse(require("fs").readFileSync("security-ct-report.json", "utf8")); console.log(r.anomaliesCount || 0);')
+          SCANNED_COUNT=$(node -e 'const r = JSON.parse(require("fs").readFileSync("security-ct-report.json", "utf8")); console.log(r.scannedCount || 0);')
+          STATUS=$(node -e 'const r = JSON.parse(require("fs").readFileSync("security-ct-report.json", "utf8")); console.log(r.status || "clean");')
+
+          echo "anomalies_count=$ANOMALIES_COUNT" >> "$GITHUB_OUTPUT"
+          echo "scanned_count=$SCANNED_COUNT" >> "$GITHUB_OUTPUT"
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+
+          echo "## 🛡️ Relatório de Monitoramento de Certificate Transparency" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Certificados Escaneados:** $SCANNED_COUNT" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Anomalias Identificadas:** $ANOMALIES_COUNT" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Status:** \`$STATUS\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$ANOMALIES_COUNT" -gt 0 ]; then
+            echo "### 🚨 Atenção: Certificados Suspeitos Detectados!" >> "$GITHUB_STEP_SUMMARY"
+            echo "Consulte o artefato \`security-ct-report.json\` e os detalhes da issue de incidente aberta automaticamente." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "### 🟢 Nenhuma réplica não autorizada ou anomalia detectada." >> "$GITHUB_STEP_SUMMARY"
+            echo "Todos os certificados emitidos correspondem às origens oficiais autorizadas." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Criar Issue de Incidente de Segurança (se anomalias detectadas)
+        uses: actions/github-script@v7
+        if: steps.process_results.outputs.anomalies_count > 0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync('security-ct-report.json', 'utf8'));
+
+            const issueTitle = `🚨 [SECURITY INCIDENT] Réplica maliciosa / Certificado não autorizado detectado (${report.anomaliesCount} ocorrência(s))`;
+
+            // Verificar se já existe uma issue aberta de incidente para evitar duplicação em massa
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'security-incident'
+            });
+
+            const alreadyOpen = existingIssues.data.find(issue => issue.title.includes('[SECURITY INCIDENT]'));
+
+            let body = `## 🛡️ Alerta Automatizado de Segurança (Certificate Transparency)\n\n`;
+            body += `A rotina de monitoramento agendada detectou **${report.anomaliesCount}** certificado(s) SSL/TLS recente(s) emitido(s) para domínios **não autorizados** relacionados ao **Manda um PIX**:\n\n`;
+            body += `| Domínio(s) | Emissor (CA) | Emitido em | Link crt.sh |\n`;
+            body += `| :--- | :--- | :--- | :--- |\n`;
+
+            for (const anomaly of report.anomalies) {
+              const domains = anomaly.unauthorizedDomains.join(', ');
+              const issuer = anomaly.issuerName.replace(/\|/g, '-');
+              const date = anomaly.entryTimestamp || anomaly.notBefore || 'N/A';
+              const crtshLink = anomaly.crtshUrl ? `[Ver no crt.sh](${anomaly.crtshUrl})` : 'N/A';
+              body += `| \`${domains}\` | ${issuer} | ${date} | ${crtshLink} |\n`;
+            }
+
+            body += `\n---\n\n`;
+            body += `### ⚡ Procedimento Operacional de Resposta (Takedown)\n\n`;
+            body += `Conforme documentado em [\`docs/security/takedown_and_monitoring.md\`](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/docs/security/takedown_and_monitoring.md), realize os seguintes passos de contenção imediata:\n\n`;
+            body += `1. **Classificação de Severidade**:\n`;
+            body += `   - **P1 (Crítico)**: Réplica ativa adulterando chaves PIX ou roubando credenciais.\n`;
+            body += `   - **P2 (Alto)**: Clone publicado usando marca/logotipo.\n`;
+            body += `   - **P3 (Médio)**: Domínio registrado sem conteúdo ativo.\n\n`;
+            body += `2. **Denúncia e Bloqueio de Navegador**:\n`;
+            body += `   - Submeter no [Google Safe Browsing](https://safebrowsing.google.com/safebrowsing/report_phish/)\n`;
+            body += `   - Submeter no [Microsoft SmartScreen](https://www.microsoft.com/wdsi/support/report-unsafe-site)\n\n`;
+            body += `3. **Notificação ao CSIRT Nacional**:\n`;
+            body += `   - Enviar notificação ao **CERT.br** (\`cert@cert.br\`) com o template oficial.\n\n`;
+            body += `4. **Abuse Report ao Provedor de Hospedagem / DNS**:\n`;
+            body += `   - Notificar o registrador ou provedor de nuvem (Cloudflare, Firebase, Vercel, AWS, Name.com).\n`;
+
+            if (alreadyOpen) {
+              console.log(`Issue de incidente já existe (#${alreadyOpen.number}). Adicionando comentário de atualização.`);
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: alreadyOpen.number,
+                body: `🔄 **Atualização da varredura de Certificate Transparency**:\n\n${body}`
+              });
+            } else {
+              console.log('Criando nova issue de incidente de segurança...');
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: issueTitle,
+                body: body,
+                labels: ['security-incident']
+              });
+            }
+
+      - name: Enviar notificação Webhook de Segurança (opcional)
+        if: steps.process_results.outputs.anomalies_count > 0 && env.SECURITY_WEBHOOK_URL != ''
+        env:
+          SECURITY_WEBHOOK_URL: ${{ secrets.SECURITY_WEBHOOK_URL }}
+        run: |
+          REPORT_JSON=$(cat security-ct-report.json)
+          curl -s -X POST -H "Content-Type: application/json" \
+            -d "$REPORT_JSON" \
+            "$SECURITY_WEBHOOK_URL" || echo "::warning::Falha no disparo do webhook de segurança."
+
