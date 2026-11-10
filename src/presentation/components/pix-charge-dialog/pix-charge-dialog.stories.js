@@ -237,4 +237,3 @@ export const InteractiveTrigger = {
     return container;
   },
 };
-
