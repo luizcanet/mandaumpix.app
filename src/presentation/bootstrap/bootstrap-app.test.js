@@ -191,5 +191,23 @@ describe("bootstrap-app.js", () => {
       expect(selectorEl.classList.contains("hidden")).toBe(true);
       expect(selectorEl.hasAttribute("hidden")).toBe(true);
     });
+
+    it("should mount pix-charge-dialog into charge-page and omit static waiting column (TASK-07.4.5)", () => {
+      const chargePage = document.createElement("div");
+      chargePage.className = "charge-page";
+
+      const mockDistribute = { execute: vi.fn() };
+
+      populateChargePage(chargePage, {
+        distributePixChargeUseCase: mockDistribute,
+      });
+
+      expect(
+        chargePage.querySelector(".charge-page__column--result"),
+      ).toBeNull();
+      const chargeDialog = chargePage.querySelector("pix-charge-dialog");
+      expect(chargeDialog).not.toBeNull();
+      expect(chargeDialog.distributePixChargeUseCase).toBe(mockDistribute);
+    });
   });
 });

@@ -1,6 +1,6 @@
 /* ==========================================================================
    ARQUITETURA DE LAYOUT & GRID RESPONSIVO (layout.css)
-   Manda um PIX — Mobile-First & Desktop Split-View (TASK-04.1.1)
+   Manda um PIX — Mobile-First & Coluna Única Centralizada (TASK-07.4.5)
    ========================================================================== */
 
 /* -----------------------------------------------------------------------------
@@ -19,22 +19,30 @@
    ----------------------------------------------------------------------------- */
 .app-container {
   width: 100%;
-  max-width: 440px;
+  max-width: 480px;
   margin-inline: auto;
   padding-inline: var(--space-md, 1rem);
   box-sizing: border-box;
 }
 
 /* -----------------------------------------------------------------------------
-   GRADE DA PÁGINA DE COBRANÇA (.charge-page) — MOBILE-FIRST (< 768px)
-   Coluna única otimizada para ergonomia de alcance com uma mão (thumb-zone)
+   GRADE DA PÁGINA DE COBRANÇA (.charge-page) — COLUNA ÚNICA CENTRALIZADA
+   Otimizada para ergonomia e remoção da coluna estática de espera (US-07.4)
    ----------------------------------------------------------------------------- */
 .charge-page {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--space-md, 1rem);
+  max-width: 460px;
+  margin-inline: auto;
   align-items: start;
   width: 100%;
+  box-sizing: border-box;
+}
+
+.charge-page--split {
+  max-width: 520px;
+  margin-inline: auto;
 }
 
 /* Painel de formulário e seleção de chave */
@@ -64,8 +72,8 @@
 }
 
 /* -----------------------------------------------------------------------------
-   DESKTOP & TABLET SPLIT-VIEW (>= 768px)
-   Exibição lado a lado em 2 colunas com CSS Grid até 960px
+   DESKTOP & TABLET CONTAINER (>= 768px)
+   Layout limpo e contido mantendo foco centralizado sem split-view ocioso
    ----------------------------------------------------------------------------- */
 @media (min-width: 768px) {
   .app-container {
@@ -73,9 +81,12 @@
     padding-inline: var(--space-lg, 1.5rem);
   }
 
+  .charge-page {
+    max-width: 480px;
+  }
+
   .charge-page--split {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-lg, 1.5rem);
-    align-items: start;
+    max-width: 520px;
+    margin-inline: auto;
   }
 }
