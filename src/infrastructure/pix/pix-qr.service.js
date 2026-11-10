@@ -95,8 +95,7 @@ export async function exportQrCodePng(
   brCode,
   { width = 512, height = 512, qrOptions = {}, svgToPngFn = svgToPng } = {},
 ) {
-  const isSvg =
-    typeof brCode === "string" && brCode.trim().startsWith("<svg");
+  const isSvg = typeof brCode === "string" && brCode.trim().startsWith("<svg");
   const svgMarkup = isSvg ? brCode : encodeQR(brCode, "svg", qrOptions);
 
   if (

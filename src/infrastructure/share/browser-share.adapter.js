@@ -322,13 +322,10 @@ export class BrowserShareAdapter {
       (chave_cobranca || payload.svg)
     ) {
       try {
-        const rawResult = await rasterizeFn(
-          chave_cobranca || payload.svg,
-          {
-            width: dimensions.width,
-            height: dimensions.height,
-          },
-        );
+        const rawResult = await rasterizeFn(chave_cobranca || payload.svg, {
+          width: dimensions.width,
+          height: dimensions.height,
+        });
 
         if (rawResult instanceof Blob) {
           blob = rawResult;
