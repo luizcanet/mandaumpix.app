@@ -1488,7 +1488,7 @@ flowchart TD
   - [x] **TASK-08.2.1 (Módulo de Validação de Origem Canônica)**: Implementar [`src/domain/security/origin-validator.js`](../../src/domain/security/origin-validator.js) contendo as regras de origens canônicas com testes unitários em [`src/domain/security/origin-validator.test.js`](../../src/domain/security/origin-validator.test.js).
   - [x] **TASK-08.2.2 (Web Component `<security-banner>`)**: Criar componente Web Component acessível (`role="alert"`, `aria-live="assertive"`) ativado sob origens não autorizadas com testes de renderização.
   - [x] **TASK-08.2.3 (Selo de Autenticidade na Página Sobre e Rodapé)**: Atualizar [`src/presentation/components/about/about.component.js`](../../src/presentation/components/about/about.component.js) e componentes de rodapé com selo de origem oficial e advertência Zero-Credential.
-  - [ ] **TASK-08.2.4 (Storybook & Acessibilidade)**: Adicionar stories no Storybook para o componente de banner de alerta e o badge de autenticidade, auditados com `@storybook/addon-a11y`.
+  - [x] **TASK-08.2.4 (Storybook & Acessibilidade)**: Adicionar stories no Storybook para o componente de banner de alerta e o badge de autenticidade, auditados com `@storybook/addon-a11y`.
 
 #### `US-08.3` — Canal Comunitário de Denúncia de Fraudes, `security.txt` e Diretrizes na Página "Sobre" (`📋 Planejado` · `2 Story Points`)
 

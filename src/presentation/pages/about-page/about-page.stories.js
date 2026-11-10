@@ -11,7 +11,7 @@ export default {
     docs: {
       description: {
         component:
-          "Página institucional `<about-page>` (`/sobre`) construída sobre `@modnes/custom-element`. Exibe informações sobre o aplicativo (software gratuito, livre e de código aberto), autor (**Luiz Henrique Canet Filho**), projeto (**GNU AGPLv3**), canal de apoio voluntário com QR Code dinâmico e chave copia e cola para `eu@luizca.net`, e ação de incentivo à divulgação.",
+          "Página institucional `<about-page>` (`/sobre`) construída sobre `@modnes/custom-element`. Exibe informações sobre o aplicativo (software gratuito, livre e de código aberto), autor (**Luiz Henrique Canet Filho**), projeto (**GNU AGPLv3**), selo de autenticidade canônica e advertência Zero-Credential (`INV-03`, `RN08`), canal de apoio voluntário com QR Code dinâmico e chave copia e cola para `eu@luizca.net`, e ação de incentivo à divulgação.",
       },
     },
     a11y: {
@@ -103,5 +103,21 @@ export const CustomVersionAndBrand = {
   args: {
     titleText: "Sobre o Manda um PIX — Preview",
     versionText: "mandaumpix.app • v1.1.0-beta",
+  },
+};
+
+/**
+ * Visualização focada no Card de Segurança e Selo de Origem Oficial (INV-03, RN08, TASK-08.2.3, TASK-08.2.4).
+ * Destaca o badge de autenticidade verificado e a advertência da arquitetura Zero-Credential.
+ */
+export const AuthenticityBadgeAndSecurity = {
+  name: "Selo de Origem Oficial & Aviso Zero-Credential (INV-03, RN08)",
+  play: async ({ canvasElement }) => {
+    const securityBox = canvasElement.querySelector(
+      ".about-page__box--security",
+    );
+    if (securityBox) {
+      securityBox.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
   },
 };
