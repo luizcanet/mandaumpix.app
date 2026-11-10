@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import * as aboutPageStories from "./pages/about-page/about-page.stories.js";
 import * as appHeaderStories from "./components/app-header/app-header.stories.js";
+import * as pixChargeDialogStories from "./components/pix-charge-dialog/pix-charge-dialog.stories.js";
 import * as pixChargeFormStories from "./components/pix-charge-form/pix-charge-form.stories.js";
 import * as pixChargeResultStories from "./components/pix-charge-result/pix-charge-result.stories.js";
 import * as pixKeyDialogStories from "./components/pix-key-dialog/pix-key-dialog.stories.js";
@@ -41,6 +42,11 @@ const STORY_MODULES = [
     module: pixChargeFormStories,
   },
   {
+    name: "PixChargeDialog",
+    category: "Components/PixChargeDialog",
+    module: pixChargeDialogStories,
+  },
+  {
     name: "PixChargeResult",
     category: "Components/PixChargeResult",
     module: pixChargeResultStories,
@@ -52,9 +58,9 @@ const STORY_MODULES = [
   },
 ];
 
-describe("Storybook Catalog & A11y Suite Integrity (US-07.1)", () => {
-  it("deve cobrir exaustivamente todos os 8 blocos de apresentação da aplicação", () => {
-    expect(STORY_MODULES).toHaveLength(8);
+describe("Storybook Catalog & A11y Suite Integrity (US-07.1 / US-07.4)", () => {
+  it("deve cobrir exaustivamente todos os 9 blocos de apresentação da aplicação", () => {
+    expect(STORY_MODULES).toHaveLength(9);
   });
 
   describe.each(STORY_MODULES)(
