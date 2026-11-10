@@ -78,4 +78,3 @@ describe("PixKeySelectorTemplate", () => {
     expect(html).toContain('role="radiogroup"');
   });
 });
-

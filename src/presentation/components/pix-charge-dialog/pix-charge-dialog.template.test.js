@@ -46,4 +46,3 @@ describe("PixChargeDialogTemplate", () => {
     expect(html).toContain("Concluir");
   });
 });
-

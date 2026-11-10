@@ -19,4 +19,3 @@ export function vectorIconTemplate({ name = "", spritePath = "" } = {}) {
 }
 
 export default vectorIconTemplate;
-

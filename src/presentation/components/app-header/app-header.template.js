@@ -54,4 +54,3 @@ export function appHeaderTemplate({
 }
 
 export default appHeaderTemplate;
-

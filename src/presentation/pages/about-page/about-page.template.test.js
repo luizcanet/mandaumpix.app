@@ -35,4 +35,3 @@ describe("AboutPageTemplate", () => {
     expect(html).toContain(ABOUT_SUPPORT_PIX.copiedFeedbackMessage);
   });
 });
-

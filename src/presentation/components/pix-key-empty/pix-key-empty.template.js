@@ -37,4 +37,3 @@ export function pixKeyEmptyTemplate({
 }
 
 export default pixKeyEmptyTemplate;
-

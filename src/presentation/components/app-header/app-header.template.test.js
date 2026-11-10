@@ -36,4 +36,3 @@ describe("AppHeaderTemplate", () => {
     expect(html).toContain("hidden");
   });
 });
-

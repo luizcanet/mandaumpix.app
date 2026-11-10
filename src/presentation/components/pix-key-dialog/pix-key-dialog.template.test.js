@@ -43,4 +43,3 @@ describe("PixKeyDialogTemplate", () => {
     expect(html).toContain(KEY_DIALOG_CLASSES.INPUT_ERROR);
   });
 });
-
