@@ -146,6 +146,22 @@ import {
   DEFAULT_CHARGE_DIALOG_TITLE,
   DEFAULT_CHARGE_DIALOG_TITLE_ID,
 } from "./presentation/components/pix-charge-dialog/pix-charge-dialog.constants.js";
+import SecurityBannerComponent, {
+  PixSecurityBannerComponent,
+} from "./presentation/components/security-banner/security-banner.component.js";
+import {
+  DEFAULT_SECURITY_BANNER_ARIA_LABEL,
+  DEFAULT_SECURITY_BANNER_DISMISS_LABEL,
+  DEFAULT_SECURITY_BANNER_LINK_LABEL,
+  DEFAULT_SECURITY_BANNER_MESSAGE,
+  DEFAULT_SECURITY_BANNER_OFFICIAL_DOMAIN,
+  DEFAULT_SECURITY_BANNER_OFFICIAL_URL,
+  DEFAULT_SECURITY_BANNER_TITLE,
+  SECURITY_BANNER_CLASSES,
+  SECURITY_BANNER_EVENTS,
+  SECURITY_BANNER_ICONS,
+} from "./presentation/components/security-banner/security-banner.constants.js";
+import { securityBannerTemplate } from "./presentation/components/security-banner/security-banner.template.js";
 import AboutPageComponent from "./presentation/pages/about-page/about-page.component.js";
 import {
   ABOUT_AUTHOR,
@@ -341,7 +357,21 @@ export {
   PixKeyDialogComponent,
   PixKeyEmptyComponent,
   PixKeySelectorComponent,
+  PixSecurityBannerComponent,
+  SecurityBannerComponent,
   VectorIconComponent,
+  // Metadados e Constantes do Banner de Segurança (<security-banner> / US-08.2)
+  DEFAULT_SECURITY_BANNER_ARIA_LABEL,
+  DEFAULT_SECURITY_BANNER_DISMISS_LABEL,
+  DEFAULT_SECURITY_BANNER_LINK_LABEL,
+  DEFAULT_SECURITY_BANNER_MESSAGE,
+  DEFAULT_SECURITY_BANNER_OFFICIAL_DOMAIN,
+  DEFAULT_SECURITY_BANNER_OFFICIAL_URL,
+  DEFAULT_SECURITY_BANNER_TITLE,
+  SECURITY_BANNER_CLASSES,
+  SECURITY_BANNER_EVENTS,
+  SECURITY_BANNER_ICONS,
+  securityBannerTemplate,
   // Metadados e Constantes do Estado Vazio de Chaves PIX (<pix-key-empty>)
   DEFAULT_EMPTY_STATE_ARIA_LABEL,
   DEFAULT_EMPTY_STATE_CTA,

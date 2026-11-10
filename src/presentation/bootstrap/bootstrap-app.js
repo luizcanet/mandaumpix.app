@@ -9,6 +9,7 @@ import {
   createAppServices,
   registerInjectables,
 } from "../di/container.js";
+import "../components/security-banner/security-banner.component.js";
 
 /**
  * Inicializa a aplicação Manda um PIX:
@@ -42,6 +43,8 @@ export function bootstrapApp(
     listPixKeysUseCase = null,
     selectPixKeyUseCase = null,
     deletePixKeyUseCase = null,
+    securityOriginValidator = null,
+    originTarget = null,
     appRouter = null,
     routes = APP_ROUTES,
   } = {},
@@ -104,6 +107,22 @@ export function bootstrapApp(
   }
 
   bindServicesToRoot(rootElement, services);
+
+  let bannerElement = rootElement.querySelector("security-banner");
+  if (!bannerElement) {
+    bannerElement = (rootElement.ownerDocument || document).createElement(
+      "security-banner",
+    );
+    rootElement.prepend(bannerElement);
+  }
+  if (bannerElement) {
+    if (securityOriginValidator) {
+      bannerElement.originValidator = securityOriginValidator;
+    }
+    if (originTarget) {
+      bannerElement.targetOrigin = originTarget;
+    }
+  }
 
   const headerElement = rootElement.querySelector("app-header");
   if (headerElement) {

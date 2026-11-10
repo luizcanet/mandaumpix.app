@@ -149,6 +149,19 @@ import {
   PixKeyEmptyComponent,
   PixKeySelectorComponent,
   PixKeyEntity,
+  PixSecurityBannerComponent,
+  SecurityBannerComponent,
+  DEFAULT_SECURITY_BANNER_ARIA_LABEL,
+  DEFAULT_SECURITY_BANNER_DISMISS_LABEL,
+  DEFAULT_SECURITY_BANNER_LINK_LABEL,
+  DEFAULT_SECURITY_BANNER_MESSAGE,
+  DEFAULT_SECURITY_BANNER_OFFICIAL_DOMAIN,
+  DEFAULT_SECURITY_BANNER_OFFICIAL_URL,
+  DEFAULT_SECURITY_BANNER_TITLE,
+  SECURITY_BANNER_CLASSES,
+  SECURITY_BANNER_EVENTS,
+  SECURITY_BANNER_ICONS,
+  securityBannerTemplate,
   PixKeyManagementError,
   PixKeyStorageError,
   PixKeyValidationError,
@@ -1175,6 +1188,31 @@ describe("main.js", () => {
       expect(DEFAULT_CHARGE_DIALOG_DISMISS_BTN_LABEL).toBe(
         "Concluir e fechar diálogo",
       );
+    });
+
+    it("should re-export SecurityBannerComponent and defensive UX constants (TASK-08.2.2)", () => {
+      expect(SecurityBannerComponent).toBeDefined();
+      expect(PixSecurityBannerComponent).toBe(SecurityBannerComponent);
+      expect(customElements.get("security-banner")).toBe(
+        SecurityBannerComponent,
+      );
+
+      expect(DEFAULT_SECURITY_BANNER_TITLE).toBe(
+        "Atenção: Endereço Não Oficial",
+      );
+      expect(DEFAULT_SECURITY_BANNER_MESSAGE).toBeDefined();
+      expect(DEFAULT_SECURITY_BANNER_OFFICIAL_URL).toBe(
+        "https://mandaumpix.app",
+      );
+      expect(DEFAULT_SECURITY_BANNER_OFFICIAL_DOMAIN).toBe("mandaumpix.app");
+      expect(DEFAULT_SECURITY_BANNER_LINK_LABEL).toBeDefined();
+      expect(DEFAULT_SECURITY_BANNER_DISMISS_LABEL).toBeDefined();
+      expect(DEFAULT_SECURITY_BANNER_ARIA_LABEL).toBeDefined();
+      expect(SECURITY_BANNER_CLASSES).toBeDefined();
+      expect(SECURITY_BANNER_CLASSES.BLOCK).toBe("security-warning-banner");
+      expect(SECURITY_BANNER_EVENTS).toBeDefined();
+      expect(SECURITY_BANNER_ICONS).toBeDefined();
+      expect(securityBannerTemplate).toBeTypeOf("function");
     });
 
     it("should initialize PWA install adapter and use case on rootElement during bootstrapApp", () => {
