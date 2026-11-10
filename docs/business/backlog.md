@@ -8,15 +8,15 @@ Este documento consolida o **Backlog do Produto e de Engenharia** do **Manda um 
 
 ## 📊 Visão Executiva e Progresso por Épico
 
-| ID        | Épico                                                                      | Regras / Escopo                                     | Progresso Atual | Status       |
-| :-------- | :------------------------------------------------------------------------- | :-------------------------------------------------- | :-------------: | :----------- |
-| **EP-01** | Fundação, Ferramental, Identidade Visual e CI/CD (`dev`)                   | Infraestrutura base, ESM/JSPM, Qualidade, Storybook |     `6 / 6`     | ✅ Concluído |
-| **EP-02** | Camada de Domínio e Casos de Uso (Clean Architecture)                      | `RN01`, `RN02`, `RN03`, `RN04`, `RN05`, `RN06`      |     `5 / 5`     | ✅ Concluído |
-| **EP-03** | Camada de Infraestrutura e Adaptadores Web APIs (Local-First)              | `RN01`, `RN05`, `RN06`, Offline/Service Worker      |     `4 / 4`     | ✅ Concluído |
-| **EP-04** | Casca da Aplicação, Roteamento SPA, Botão "Instalar" e Página "Sobre"      | `RN06`, `RN07`, `@modnes/router`, Layout Split-View |     `4 / 4`     | ✅ Concluído |
-| **EP-05** | Gestão de Chaves PIX na Interface (`<pix-key-*>`)                          | `RN01`, `RN02`, `<dialog class="key-dialog">`       |     `3 / 3`     | ✅ Concluído |
-| **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")              | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas    |     `3 / 3`     | ✅ Concluído |
-| **EP-07** | Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA) e Deploy `stg`/`prd` | Testes de Integração, Storybook a11y, Releases      |     `0 / 3`     | ⏳ Pendente  |
+| ID        | Épico                                                                                           | Regras / Escopo                                                        | Progresso Atual | Status          |
+| :-------- | :---------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------- | :-------------: | :-------------- |
+| **EP-01** | Fundação, Ferramental, Identidade Visual e CI/CD (`dev`)                                        | Infraestrutura base, ESM/JSPM, Qualidade, Storybook                    |     `6 / 6`     | ✅ Concluído    |
+| **EP-02** | Camada de Domínio e Casos de Uso (Clean Architecture)                                           | `RN01`, `RN02`, `RN03`, `RN04`, `RN05`, `RN06`                         |     `5 / 5`     | ✅ Concluído    |
+| **EP-03** | Camada de Infraestrutura e Adaptadores Web APIs (Local-First)                                   | `RN01`, `RN05`, `RN06`, Offline/Service Worker                         |     `4 / 4`     | ✅ Concluído    |
+| **EP-04** | Casca da Aplicação, Roteamento SPA, Botão "Instalar" e Página "Sobre"                           | `RN06`, `RN07`, `@modnes/router`, Layout Split-View                    |     `4 / 4`     | ✅ Concluído    |
+| **EP-05** | Gestão de Chaves PIX na Interface (`<pix-key-*>`)                                               | `RN01`, `RN02`, `<dialog class="key-dialog">`                          |     `3 / 3`     | ✅ Concluído    |
+| **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")                                   | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas                       |     `3 / 3`     | ✅ Concluído    |
+| **EP-07** | Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA), Deploy `stg`/`prd` e Diálogo de Cobrança | Testes de Integração, Storybook a11y, Releases, Caixa de Diálogo Modal |     `3 / 4`     | ⏳ Em Andamento |
 
 ---
 
@@ -30,7 +30,7 @@ flowchart TD
     EP04["✅ EP-04: Casca Global, Roteador SPA (@modnes/router),<br/>Botão 'Instalar' (RN06) & Página 'Sobre' (RN07)"]
     EP05["✅ EP-05: Gestão de Chaves PIX na UI<br/>(Empty State, Seletor Radio Cards, Modal &lt;dialog&gt;)"]
     EP06["✅ EP-06: Geração e Distribuição 'Manda um PIX'<br/>(Formulário de Valor, QR Code SVG, Copiar/WhatsApp/PNG)"]
-    EP07["⏳ EP-07: Testes Integrados, Catálogo Storybook Completo<br/>& Pipelines CD (staging / production)"]
+    EP07["⏳ EP-07: Testes Integrados, Catálogo Storybook Completo,<br/>Pipelines CD (stg / prd) & Caixa de Diálogo Modal (&lt;dialog&gt;)"]
 
     EP01 --> EP02
     EP01 --> EP03
@@ -1070,9 +1070,9 @@ flowchart LR
 
 ---
 
-### 🧪 Épico 07 — Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA) e Deploy `stg` / `prd`
+### 🧪 Épico 07 — Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA), Deploy `stg` / `prd` e Diálogo de Cobrança
 
-> **Objetivo**: Garantir cobertura de testes de integração de ponta a ponta, conformidade de acessibilidade WCAG 2.2 AA no Storybook e automação completa de deploy para os ambientes `staging` e `production`.
+> **Objetivo**: Garantir cobertura de testes de integração de ponta a ponta, conformidade de acessibilidade WCAG 2.2 AA no Storybook, automação completa de deploy para os ambientes `staging` e `production`, e apresentação do resultado da cobrança PIX em caixa de diálogo modal (`<dialog>`) eliminando a necessidade de mensagem ou espaço reservado para "Aguardando geração" na tela principal.
 
 #### `US-07.1` — Catálogo Completo no Storybook e Auditoria `@storybook/addon-a11y` (`✅ Concluído` · `3 Story Points`)
 
@@ -1312,6 +1312,96 @@ flowchart LR
     T3 --> T4["TASK-07.3.4: Docs Pipeline & Matriz"]
 ```
 
+#### `US-07.4` — Exibição do Resultado da Cobrança em Caixa de Diálogo Modal (`<dialog>`) e Eliminação do Estado Aguardando (`⏳ Pendente` · `3 Story Points`)
+
+- **História (Narrativa Canônica)**:
+  > **Como** **Recebedor** que gera uma cobrança no Manda um PIX após selecionar uma chave e opcionalmente definir o valor,
+  > **Quero** que o resultado completo da cobrança (QR Code vetorial em alto contraste, resumo da conta/titular, pílula de valor, código PIX Copia e Cola e botões de distribuição) seja apresentado em uma caixa de diálogo modal (`<dialog>`),
+  > **Para que** eu tenha foco total na apresentação óptica do QR Code e nas ações de distribuição imediata, eliminando a necessidade de exibir uma coluna estática com a mensagem de "Aguardando geração" na tela principal e simplificando a interface para uma visualização limpa e fluida em coluna única em qualquer dispositivo.
+- **Estimativa de Complexidade**: **`3 Story Points`** (Complexidade Técnica: Média · Esforço: Médio · Incerteza: Baixa).
+  - _Racional da Estimativa_:
+    - **Complexidade Técnica**: Média. Requer encapsular e orquestrar o componente `<pix-charge-result>` dentro do elemento nativo `<dialog class="charge-dialog">` (ou componente dedicado `<pix-charge-dialog>`), gerenciamento de foco acessível (WAI-ARIA Dialog Modal), abertura via `.showModal()`, aprisionamento de foco (_focus trap_), fechamento por tecla `Esc`, botão fechar e clique no backdrop com retorno de foco para o botão acionador.
+    - **Esforço / Volume**: Médio. Atualização do fluxo de apresentação da tela principal (`.charge-page`), simplificação do layout CSS (remoção da dependência do split-view com coluna ociosa de espera), refatoração dos cenários de espera de `<pix-charge-result>` (tornando o estado aguardando obsoleto na interface principal), atualização das stories no Storybook com auditoria de acessibilidade `@storybook/addon-a11y` e dos testes de integração de ponta a ponta.
+    - **Incerteza / Risco**: Baixa. O ecossistema de modais nativos W3C (`<dialog>`) com backdrop já está estabelecido e validado com sucesso no projeto no componente `<pix-key-dialog>`.
+- **Regras de Negócio e Invariantes**: `RN02`, `RN03`, `RN04`, `RN05` ([Modelo de Domínio](./domain_model.md), [Especificações de Interface](../design/ui_proposal.md), [Design de Módulos](../design/modules.md) e protótipo [`docs/design/ui_prototype.html`](../design/ui_prototype.html)).
+  - **INV-01 (Semântica W3C Nativa via `<dialog>` e Acessibilidade Modal)**:
+    - O resultado da cobrança deve ser encapsulado em um elemento semântico `<dialog class="charge-dialog" id="charge-dialog" aria-labelledby="charge-dialog-title" aria-modal="true">` (ou Web Component dedicado `<pix-charge-dialog>`).
+    - Deve conter uma barra de topo (`.charge-dialog__top-bar`) com o título acessível `.charge-dialog__title` e botão explícito de fechamento `.charge-dialog__close-btn` com ícone `<vector-icon name="xmark">` e atributo `aria-label="Fechar caixa de diálogo de cobrança"`.
+  - **INV-02 (Eliminação do Estado "Aguardando geração" e Simplificação da Tela Principal)**:
+    - A tela principal de cobrança (`.charge-page`) deixa de exibir o cartão estático de resultado ocioso com mensagem instrutiva _"Aguardando geração"_, passando a operar com foco absoluto no formulário de geração (seleção de chave, valor opcional e botão CTA "Manda um PIX") em coluna única responsiva centralizada (`max-width: 460px` a `520px`).
+    - O cartão de resultado `<pix-charge-result>` passa a existir e ser renderizado exclusivamente no interior da caixa de diálogo modal quando uma cobrança válida for emitida.
+  - **INV-03 (Abertura Reativa Imediata ao Acionar "Manda um PIX" — `RN04`)**:
+    - Ao submeter o formulário `<pix-charge-form>` (clique no botão `.charge-cta` ou `Enter`), após a emissão do evento `charge-generated`, a caixa de diálogo deve ser aberta imediatamente via API nativa `dialog.showModal()` (ou classe de ativação com backdrop).
+    - O modal apresenta o QR Code SVG com moldura branca `#ffffff` de alto contraste, resumo do recebedor, pílula de valor (fixo ou aberto) e o código EMV Copia e Cola.
+  - **INV-04 (Gestão Acessível de Foco e Fechamento — WCAG 2.2 AA)**:
+    - Ao abrir o diálogo, o foco deve ser movido automaticamente para o diálogo (ou para o primeiro elemento acionável, como o botão de fechamento ou o botão de cópia rápida).
+    - Enquanto o diálogo estiver aberto, a navegação por teclado (`Tab` / `Shift+Tab`) deve permanecer restrita aos elementos internos do modal (_focus trap_ nativo do `<dialog>`).
+    - O diálogo deve suportar fechamento imediato via:
+      1. Pressionamento da tecla `Esc` (evento `cancel` do `<dialog>`);
+      2. Clique no botão de fechar no cabeçalho (`.charge-dialog__close-btn`);
+      3. Clique no botão inferior de conclusão (`.charge-result__back-btn`);
+      4. Clique na área externa escurecida do backdrop (`::backdrop` ou backdrop container).
+    - Ao fechar o diálogo, o foco programático deve retornar com segurança para o botão CTA "Manda um PIX" (`.charge-cta`) na tela principal.
+  - **INV-05 (Ações de Distribuição Integradas no Contexto do Diálogo — `RN05`)**:
+    - O modal deve incorporar a grade de distribuição `.charge-result__actions` (`Copiar`, `WhatsApp`, `Salvar PNG`) e a notificação de toast de confirmação `.charge-result__toast` (`aria-live="polite"`), garantindo que todo o ciclo de distribuição ocorra sem fechar o diálogo prematuramente.
+  - **INV-06 (Ergonomia e Responsividade Mobile e Desktop)**:
+    - Em viewports móveis (`< 768px`), o diálogo opera centralizado ou em formato de folha (_bottom sheet_ / modal ergonômico com rolagem interna suave e alvos de toque $\ge 48\text{px}$).
+    - Em viewports amplas (`>= 768px`), o diálogo centraliza-se com largura contida (`max-width: 440px`), sombreamento destacado (`--shadow-lg`) e backdrop escurecido com desfoque (`background-color: rgba(6, 13, 30, 0.65); backdrop-filter: blur(2px)`).
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Abertura Automática da Caixa de Diálogo ao Gerar Cobrança — Happy Path)**:
+    - Dado que o usuário possui uma chave PIX selecionada no formulário de cobrança,
+    - Quando o usuário aciona o botão "Manda um PIX" (ou tecla `Enter`),
+    - Então a cobrança deve ser gerada via `GeneratePixChargeUseCase`,
+    - E a caixa de diálogo modal `<dialog class="charge-dialog">` deve ser aberta na tela via `showModal()`,
+    - E o diálogo deve exibir o QR Code em alta resolução, o resumo da conta, o valor e a chave PIX Copia e Cola,
+    - E a tela de fundo deve ficar esmaecida pelo backdrop.
+  - **Cenário 02 (Fechamento da Caixa de Diálogo via Botão Fechar ou Tecla Esc)**:
+    - Dado que a caixa de diálogo de resultado está aberta na tela,
+    - Quando o usuário pressiona a tecla `Esc` no teclado,
+    - Ou quando clica no botão de fechar (`.charge-dialog__close-btn` ou botão inferior de retorno),
+    - Então a caixa de diálogo deve ser fechada imediatamente (`dialog.close()`),
+    - E o foco do teclado deve retornar automaticamente para o botão CTA "Manda um PIX" na tela principal.
+  - **Cenário 03 (Fechamento via Clique no Backdrop Externo)**:
+    - Dado que a caixa de diálogo modal está visível sobre a tela,
+    - Quando o usuário clica na área escurecida do backdrop fora dos limites da caixa de diálogo,
+    - Então o modal deve ser fechado graciosamente,
+    - E o usuário deve visualizar o formulário pronto para nova cobrança.
+  - **Cenário 04 (Eliminação da Mensagem e do Cartão "Aguardando geração" na Tela Principal)**:
+    - Dado que o usuário acessa a tela principal (`/`) com chave selecionada,
+    - Quando a página for carregada ou quando uma cobrança anterior for fechada,
+    - Então a tela principal não deve exibir nenhum cartão estático contendo o texto `"Aguardando geração"`,
+    - E a tela deve exibir de forma limpa e centrada apenas a seleção de chaves, o campo de valor e o botão "Manda um PIX".
+  - **Cenário 05 (Acessibilidade, Focus Trap e Anúncios de Leitor de Tela — WCAG 2.2 AA)**:
+    - Dado que a caixa de diálogo modal foi aberta,
+    - Quando um usuário navega via teclado utilizando a tecla `Tab`,
+    - Então a ordem de foco deve transitar ciclicamente apenas entre os elementos interativos internos do diálogo (botão fechar, código, botões copiar, compartilhar, salvar PNG e botão concluir),
+    - E nenhum controle da página de fundo deve receber foco enquanto o modal estiver aberto,
+    - E o atributo `aria-modal="true"` deve assegurar que leitores de tela identifiquem a interface modal.
+  - **Cenário 06 (Execução das Ações de Distribuição sem Fechamento Prematuro do Diálogo)**:
+    - Dado que o modal de resultado está visível com a cobrança gerada,
+    - Quando o usuário clica em "Copiar",
+    - Então o código Copia e Cola deve ser copiado, o botão deve exibir feedback `"Copiado!"` e o anúncio `aria-live="polite"` deve ser emitido,
+    - E o diálogo modal deve permanecer aberto para que o usuário possa também compartilhar via WhatsApp ou salvar a imagem.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-07.4.1 (Constantes, Seletores BEM e Estrutura da Caixa de Diálogo de Cobrança)**: Criar constantes e seletores BEM para o diálogo (`.charge-dialog`, `.charge-dialog__top-bar`, `.charge-dialog__title`, `.charge-dialog__close-btn`, `.charge-dialog-backdrop`), identificadores acessíveis e eventos (`charge-dialog-opened`, `charge-dialog-closed`).
+  - [ ] **TASK-07.4.2 (TDD / Testes Unitários de Comportamento e Acessibilidade do Diálogo)**: Criar suíte de testes unitários em Vitest validando renderização de `<dialog>`, chamada a `showModal()` / `close()`, focus trap, fechamento por `Esc`, fechamento por clique no backdrop e restauração do foco no elemento anterior.
+  - [ ] **TASK-07.4.3 (Web Component de Diálogo de Cobrança e Integração com Resultado)**: Implementar componente `<pix-charge-dialog>` (ou integração declarativa do `<dialog>` com `<pix-charge-result>`) consumindo o evento `charge-generated` do `<pix-charge-form>`, encapsulando o resultado e as ações de distribuição.
+  - [ ] **TASK-07.4.4 (Estilização CSS BEM, Backdrop, Animação Suave e Responsividade)**: Implementar folha de estilos CSS BEM para o diálogo modal (`charge-dialog.css`), estilizando backdrop escurecido (`rgba(6, 13, 30, 0.65)` com blur), borda, sombra profunda (`--shadow-lg`), scroll interno e comportamento responsivo mobile/desktop.
+  - [ ] **TASK-07.4.5 (Refatoração da Tela Principal e Remoção do Estado "Aguardando geração")**: Atualizar [`src/presentation/styles/layout.css`](../../src/presentation/styles/layout.css) e componentes de página removendo o split-view com coluna de espera e tornando obsoleto o estado de espera "Aguardando geração" da tela principal.
+  - [ ] **TASK-07.4.6 (Catálogo Storybook e Auditoria A11y com Axe Core)**: Criar stories no Storybook cobrindo a caixa de diálogo modal aberta com valor fixo e valor aberto, auditoria estrita `@storybook/addon-a11y` e documentação automática (`autodocs`).
+  - [ ] **TASK-07.4.7 (Atualização dos Testes de Integração de Jornada e Sincronização de Documentação)**: Atualizar [`test/integration/main-journey.integration.test.js`](../../test/integration/main-journey.integration.test.js) para validar a abertura e fechamento do diálogo modal na jornada principal, garantindo 100% de sucesso nos testes (`npm test`, `npm run lint`, `npm run build`), e sincronizar [`docs/business/backlog.md`](./backlog.md), [`docs/design/modules.md`](../design/modules.md) e [`docs/design/ui_proposal.md`](../design/ui_proposal.md).
+
+```mermaid
+flowchart LR
+    T1["TASK-07.4.1: Constantes & Seletores Diálogo"] --> T2["TASK-07.4.2: Testes Unitários (TDD)"]
+    T1 --> T4["TASK-07.4.4: Estilos CSS BEM & Backdrop"]
+    T2 --> T3["TASK-07.4.3: Componente Diálogo & Integração"]
+    T4 --> T3
+    T3 --> T5["TASK-07.4.5: Refatoração Layout & Remoção Aguardando"]
+    T3 --> T6["TASK-07.4.6: Storybook & Auditoria a11y"]
+    T5 & T6 --> T7["TASK-07.4.7: Testes Integração & Docs"]
+```
+
 ---
 
 ## 🔗 Matriz de Rastreabilidade (Regras de Negócio × Backlog)
@@ -1319,10 +1409,10 @@ flowchart LR
 | Regra de Negócio | Descrição Resumida                                                                                                                                                                          | Histórias Vinculadas no Backlog                                  |
 | :--------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------- |
 |     **RN01**     | Cadastro e persistência local de múltiplas chaves PIX de recebimento                                                                                                                        | `US-02.2`, `US-02.4`, `US-03.1`, `US-05.1`, `US-05.2`, `US-05.3` |
-|     **RN02**     | Seleção obrigatória de uma chave cadastrada para emitir cobrança                                                                                                                            | `US-02.3`, `US-02.4`, `US-05.2`, `US-06.1`                       |
-|     **RN03**     | Valor monetário opcional (valor fixo quando informado; dinâmico/aberto se omitido)                                                                                                          | `US-02.1`, `US-02.3`, `US-06.1`, `US-06.2`                       |
-|     **RN04**     | Geração simultânea de QR Code e chave de cobrança (PIX Copia e Cola) ao clicar                                                                                                              | `US-02.1`, `US-02.3`, `US-06.1`, `US-06.2`                       |
-|     **RN05**     | Opções de saída: Copiar, Compartilhar (WhatsApp) e Salvar Imagem PNG localmente                                                                                                             | `US-02.1`, `US-02.5`, `US-03.3`, `US-06.3`                       |
+|     **RN02**     | Seleção obrigatória de uma chave cadastrada para emitir cobrança                                                                                                                            | `US-02.3`, `US-02.4`, `US-05.2`, `US-06.1`, `US-07.4`            |
+|     **RN03**     | Valor monetário opcional (valor fixo quando informado; dinâmico/aberto se omitido)                                                                                                          | `US-02.1`, `US-02.3`, `US-06.1`, `US-06.2`, `US-07.4`            |
+|     **RN04**     | Geração simultânea de QR Code e chave de cobrança (PIX Copia e Cola) ao clicar                                                                                                              | `US-02.1`, `US-02.3`, `US-06.1`, `US-06.2`, `US-07.4`            |
+|     **RN05**     | Opções de saída: Copiar, Compartilhar (WhatsApp) e Salvar Imagem PNG localmente                                                                                                             | `US-02.1`, `US-02.5`, `US-03.3`, `US-06.3`, `US-07.4`            |
 |     **RN06**     | Exibição destacada do botão **"Instalar"** quando o PWA ainda não está instalado                                                                                                            | `US-02.5`, `US-03.2`, `US-04.2`, `US-07.2`                       |
 |     **RN07**     | Acesso fácil à página **"Sobre"** (app gratuito/livre/open-source, autor, projeto, apoio "Manda um PIX" com QR Code dinâmico e Copia e Cola para `eu@luizca.net`, e incentivo à divulgação) | `US-04.2`, `US-04.3`, `US-04.4`, `US-07.2`                       |
 

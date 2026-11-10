@@ -47,12 +47,12 @@ sequenceDiagram
     U->>App: Clica em "Manda um PIX"
     App->>Gen: Gera chave de cobrança (payload PIX) e imagem QR Code
     Gen-->>App: Retorna QR Code + chave de cobrança
-    App-->>U: Exibe QR Code na tela e chave de cobrança
+    App-->>U: Abre caixa de diálogo modal (<dialog>) com QR Code e chave de cobrança
 
     alt Copiar chave de cobrança
         U->>App: Aciona opção "Copiar"
         App->>OS: Grava chave de cobrança na Área de Transferência
-        OS-->>U: Confirmação de cópia
+        OS-->>U: Confirmação de cópia (feedback visual e sonoro)
     else Compartilhar via WhatsApp / outros apps
         U->>App: Aciona opção "Compartilhar"
         App->>OS: Aciona compartilhamento (ex: WhatsApp)
@@ -62,6 +62,9 @@ sequenceDiagram
         App->>OS: Inicia download local do arquivo de imagem do QR Code
         OS-->>U: Imagem salva no armazenamento do dispositivo
     end
+
+    U->>App: Fecha a caixa de diálogo modal (Esc, botão Fechar ou clique no backdrop)
+    App-->>U: Retorna o foco para o formulário na tela principal
 ```
 
 ---

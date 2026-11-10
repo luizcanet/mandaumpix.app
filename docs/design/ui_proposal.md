@@ -16,9 +16,9 @@ Este documento especifica a arquitetura visual, ergonomia de interação, estrut
    - A inclusão de novas chaves PIX ([`ChaveConta`](./data_models.md)) utiliza um modal/gaveta nativo (`<dialog class="key-dialog">`) integrado à tela principal, permitindo cadastrar uma chave e retornar imediatamente à geração da cobrança.
 3. **Contraste Óptico para Leitura de QR Code**:
    - A casca superior utiliza o azul profundo da marca (`--color-brand-primary: #0b1834` e `--color-brand-primary-dark: #060d1e`) combinado ao verde de destaque (`--color-brand-accent: #00d37f`), enquanto os cartões operacionais e o palco do QR Code preservam superfície clara (`--color-surface: #ffffff`) para leitura imediata por câmeras de qualquer aplicativo bancário.
-4. **Responsividade Progressiva (Mobile-First & Desktop Split-View)**:
-   - **Mobile (`< 768px`)**: Layout em coluna única otimizado para alcance do polegar (_thumb-zone_), alternando suavemente entre o formulário gerador e o cartão do QR Code gerado.
-   - **Desktop / Tablet (`>= 768px`)**: Layout em **2 colunas (`CSS Grid`)** lado a lado (_Split-View_), mantendo o gerador à esquerda e a visualização da cobrança com QR Code à direita.
+4. **Interface Limpa e Focada com Caixa de Diálogo Modal (`<dialog class="charge-dialog">`)**:
+   - **Coluna Única Fluida**: Em qualquer dispositivo (Mobile ou Desktop), a tela principal (`.charge-page`) opera em coluna única contida e limpa (largura de 460px a 520px), contendo exclusivamente o seletor de chaves, o campo de valor e o botão CTA **"Manda um PIX"**.
+   - **Eliminação do Estado "Aguardando geração"**: Não há divisão em colunas estáticas ociosas ou cartões de espera. O resultado da cobrança só é exibido quando ela é de fato gerada, surgindo imediatamente em uma **caixa de diálogo modal nativa (`<dialog>`)** com foco exclusivo no QR Code e nas opções de distribuição (`Copiar`, `WhatsApp`, `Salvar PNG`).
 
 ---
 
@@ -43,7 +43,7 @@ flowchart TD
     Step1 -->|"Aciona '+ Nova chave'"| KeyDialog["Modal / Gaveta (<dialog class='key-dialog'>)<br/>Tipo (CPF/CNPJ/EMAIL/TELEFONE/EVP), Chave, Rótulo, Titular, Cidade"]
     EmptyState -->|"Aciona CTA"| KeyDialog
 
-    Step3 -->|"Executa generatePixCharge()"| ResultCard["Cartão de Cobrança Gerada (.charge-result)<br/>• Palco QR Code SVG de alto contraste<br/>• Código PIX Copia e Cola (BR Code EMV)<br/>• Ações: Copiar | WhatsApp | Salvar PNG"]
+    Step3 -->|"Executa generatePixCharge()"| ChargeDialog["Caixa de Diálogo Modal (<dialog class='charge-dialog'>)<br/>• Palco QR Code SVG de alto contraste<br/>• Código PIX Copia e Cola (BR Code EMV)<br/>• Ações: Copiar | WhatsApp | Salvar PNG<br/>• Fechamento por Esc, botão fechar ou backdrop"]
 ```
 
 ---
@@ -93,17 +93,19 @@ flowchart TD
 
 - Botão de largura total com gradiente verde da marca, tipografia em negrito, sombra suave e ícone `<vector-icon name="qrcode">` com o rótulo **"Manda um PIX"** (`RN04`).
 
-### 3.3. Cartão de Resultado da Cobrança (`.charge-result`)
+### 3.3. Caixa de Diálogo de Resultado da Cobrança (`<dialog class="charge-dialog">`)
 
-Exibido após o acionamento de **"Manda um PIX"** (ou sincronizado na coluna direita no modo Desktop):
+Apresentada imediatamente após o acionamento de **"Manda um PIX"** (`RN04`) sobre uma camada escurecida de backdrop (`rgba(6, 13, 30, 0.65)` com `backdrop-filter: blur(2px)`), eliminando qualquer mensagem ou coluna estática de "Aguardando geração" na tela principal:
 
-1. **Resumo da Cobrança (`.charge-result__header`)**: Exibe o rótulo da conta, o nome do recebedor e uma pílula destacando o valor fixo formatado em BRL ou o selo _"Valor Aberto"_.
-2. **Palco do QR Code (`.charge-result__qr-stage`)**: Moldura centralizada de fundo branco puro e borda `#0b1834` contendo o SVG vetorial produzido por [`generatePixCharge`](../../src/main.js).
-3. **Bloco PIX Copia e Cola (`.charge-result__brcode`)**: Caixa de código com a chave de cobrança (`brCode`) em fonte `--font-mono`, permitindo seleção integral imediata.
-4. **Grade Tripla de Ações de Saída (`.charge-result__actions` — `RN05`)**:
+1. **Barra Superior e Fechamento (`.charge-dialog__top-bar`)**: Exibe o título semântico da janela modal com ícone `<vector-icon name="check">` e o botão de fechamento com `<vector-icon name="xmark">` (`aria-label="Fechar diálogo de cobrança"`), além de fechamento nativo por tecla `Esc` ou clique externo no backdrop.
+2. **Resumo da Cobrança (`.charge-result__header`)**: Exibe o rótulo da conta, o nome do recebedor e uma pílula destacando o valor fixo formatado em BRL ou o selo _"Valor Aberto"_.
+3. **Palco do QR Code (`.charge-result__qr-stage`)**: Moldura centralizada de fundo branco puro e borda `#0b1834` contendo o SVG vetorial produzido por [`generatePixCharge`](../../src/main.js).
+4. **Bloco PIX Copia e Cola (`.charge-result__brcode`)**: Caixa de código com a chave de cobrança (`brCode`) em fonte `--font-mono`, permitindo seleção integral imediata com um clique (`user-select: all`).
+5. **Grade Tripla de Ações de Saída (`.charge-result__actions` — `RN05`)**:
    - **Copiar (`.charge-result__btn--copy`)**: Aciona `navigator.clipboard.writeText(brCode)`, alternando temporariamente o ícone `<vector-icon name="copy">` para `<vector-icon name="check">` com o texto _"Copiado!"_.
    - **Compartilhar / WhatsApp (`.charge-result__btn--share`)**: Aciona `<vector-icon name="share">` integrando `navigator.share` (Web Share API) ou fallback via URL `https://wa.me/?text=...`.
    - **Salvar PNG (`.charge-result__btn--download`)**: Aciona `<vector-icon name="download">` convertendo o QR Code via [`exportQrCodePng`](../../src/main.js) para download local (`mandaumpix-qrcode.png`).
+6. **Botão de Conclusão**: Botão inferior permitindo concluir a visualização e fechar a caixa de diálogo, retornando o foco de forma acessível para a tela principal de cobrança.
 
 ### 3.4. Página Institucional "Sobre" (`/sobre` — `.about-page`)
 
@@ -124,15 +126,15 @@ Acessível a partir do cabeçalho ou rodapé e gerenciada pelo `@modnes/router` 
 
 Todos os ícones da interface são consumidos exclusivamente por meio do Web Component compartilhado [`<vector-icon>`](../../src/presentation/components/vector-icon/vector-icon.component.js) acoplado ao sprite [`icon.svg`](../../src/presentation/components/vector-icon/icon.svg):
 
-| Região / Componente                | Custom Element (`@modnes/custom-element`) | Bloco BEM Principal | Símbolos `<vector-icon>` Utilizados                       |
-| :--------------------------------- | :---------------------------------------- | :------------------ | :-------------------------------------------------------- |
-| **Cabeçalho & Botão Instalar**     | `<app-header>`                            | `.app-header`       | `download`, `circle-info`, `home`                         |
-| **Estado Inicial Sem Chaves**      | `<pix-key-empty>`                         | `.key-empty-state`  | `key`, `plus`, `check`                                    |
-| **Seletor de Chaves de Conta**     | `<pix-key-selector>`                      | `.key-selector`     | `key`, `plus`, `trash`, `check`                           |
-| **Modal de Cadastro (`<dialog>`)** | `<pix-key-dialog>`                        | `.key-dialog`       | `key`, `check`, `xmark`, `circle-exclamation`             |
-| **Formulário Gerador de Cobrança** | `<pix-charge-form>`                       | `.charge-form`      | `qrcode`, `xmark`                                         |
-| **Cartão de Resultado & Saída**    | `<pix-charge-result>`                     | `.charge-result`    | `qrcode`, `copy`, `share`, `download`, `check`            |
-| **Página Sobre (`/sobre`)**        | `<about-page>`                            | `.about-page`       | `circle-info`, `home`, `qrcode`, `copy`, `share`, `check` |
+| Região / Componente                | Custom Element (`@modnes/custom-element`)     | Bloco BEM Principal                 | Símbolos `<vector-icon>` Utilizados                       |
+| :--------------------------------- | :-------------------------------------------- | :---------------------------------- | :-------------------------------------------------------- |
+| **Cabeçalho & Botão Instalar**     | `<app-header>`                                | `.app-header`                       | `download`, `circle-info`, `home`                         |
+| **Estado Inicial Sem Chaves**      | `<pix-key-empty>`                             | `.key-empty-state`                  | `key`, `plus`, `check`                                    |
+| **Seletor de Chaves de Conta**     | `<pix-key-selector>`                          | `.key-selector`                     | `key`, `plus`, `trash`, `check`                           |
+| **Modal de Cadastro (`<dialog>`)** | `<pix-key-dialog>`                            | `.key-dialog`                       | `key`, `check`, `xmark`, `circle-exclamation`             |
+| **Formulário Gerador de Cobrança** | `<pix-charge-form>`                           | `.charge-form`                      | `qrcode`, `xmark`                                         |
+| **Modal de Cobrança (`<dialog>`)** | `<pix-charge-dialog>` / `<pix-charge-result>` | `.charge-dialog` / `.charge-result` | `qrcode`, `copy`, `share`, `download`, `check`, `xmark`   |
+| **Página Sobre (`/sobre`)**        | `<about-page>`                                | `.about-page`                       | `circle-info`, `home`, `qrcode`, `copy`, `share`, `check` |
 
 ---
 
