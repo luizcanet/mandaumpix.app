@@ -931,6 +931,34 @@ describe("BrowserShareAdapter — TASK-03.3.1 (Clipboard API & Constantes)", () 
       expect(result.downloaded).toBe(true);
     });
 
+    it("deve priorizar rasterizeFn e ignorar dataUrl do tipo GIF ao baixar cobrança", async () => {
+      const fakeBlob = new Blob(["high-res-png"], { type: "image/png" });
+      const exportQrCodePngSpy = vi.fn().mockResolvedValue(fakeBlob);
+      const mockDocument = createMockDocumentTarget();
+      const mockUrl = createMockUrlTarget();
+      const mockWindow = createMockWindowTarget({ urlTarget: mockUrl });
+
+      const adapter = new BrowserShareAdapter({
+        documentTarget: mockDocument,
+        windowTarget: mockWindow,
+        exportQrCodePngFn: exportQrCodePngSpy,
+      });
+
+      const result = await adapter.downloadQrCodePng({
+        chave_cobranca: VALID_BR_CODE,
+        dataUrl: "data:image/gif;base64,R0lGODlhNQA1APYAAP///wAAAAAA",
+        width: 512,
+        height: 512,
+      });
+
+      expect(exportQrCodePngSpy).toHaveBeenCalledWith(VALID_BR_CODE, {
+        width: 512,
+        height: 512,
+      });
+      expect(mockUrl.createObjectURL).toHaveBeenCalledWith(fakeBlob);
+      expect(result.downloaded).toBe(true);
+    });
+
     it("deve lançar INVALID_PAYLOAD quando payload for nulo ou não contiver chave_cobranca, svg, dataUrl ou blob", async () => {
       const adapter = new BrowserShareAdapter();
 

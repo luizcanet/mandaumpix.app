@@ -5,6 +5,7 @@ import {
   normalizeQrDimensions,
   normalizeQrDownloadFileName,
 } from "../../application/use-cases/distribute-pix-charge.use-case.js";
+import { exportQrCodePng } from "../pix/pix-qr.service.js";
 
 export const BROWSER_SHARE_ADAPTER_ERROR_CODES = Object.freeze({
   CLIPBOARD_UNAVAILABLE: "CLIPBOARD_UNAVAILABLE",
@@ -307,18 +308,21 @@ export class BrowserShareAdapter {
       height: payload.height,
     });
 
+    const rasterizeFn =
+      typeof this.exportQrCodePngFn === "function"
+        ? this.exportQrCodePngFn
+        : exportQrCodePng;
+
     let blob = null;
 
     if (payload.blob instanceof Blob) {
       blob = payload.blob;
-    } else if (typeof payload.dataUrl === "string" && payload.dataUrl.trim()) {
-      blob = dataUrlToBlob(payload.dataUrl.trim());
     } else if (
-      typeof this.exportQrCodePngFn === "function" &&
+      typeof rasterizeFn === "function" &&
       (chave_cobranca || payload.svg)
     ) {
       try {
-        const rawResult = await this.exportQrCodePngFn(
+        const rawResult = await rasterizeFn(
           chave_cobranca || payload.svg,
           {
             width: dimensions.width,
@@ -347,6 +351,12 @@ export class BrowserShareAdapter {
           },
         );
       }
+    } else if (
+      typeof payload.dataUrl === "string" &&
+      payload.dataUrl.trim() &&
+      !payload.dataUrl.startsWith("data:image/gif")
+    ) {
+      blob = dataUrlToBlob(payload.dataUrl.trim());
     }
 
     if (!blob) {

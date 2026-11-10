@@ -13,6 +13,7 @@ import {
 } from "../../infrastructure/storage/indexed-db-pix-key.repository.js";
 import { createPwaInstallAdapter } from "../../infrastructure/pwa/pwa-install.adapter.js";
 import { createBrowserShareAdapter } from "../../infrastructure/share/browser-share.adapter.js";
+import { exportQrCodePng } from "../../infrastructure/pix/pix-qr.service.js";
 import {
   DEFAULT_SW_SCOPE,
   DEFAULT_SW_SCRIPT_URL,
@@ -62,6 +63,7 @@ export function createAppServices({
     createBrowserShareAdapter({
       windowTarget,
       navigatorTarget,
+      exportQrCodePngFn: overrides.exportQrCodePngFn || exportQrCodePng,
     });
 
   const pixKeyRepository =
