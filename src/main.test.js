@@ -141,6 +141,7 @@ import {
   PRECACHE_NAME,
   PixChargeDistributionError,
   PixChargeEntity,
+  PixChargeDialogComponent,
   PixChargeFormComponent,
   PixChargeResultComponent,
   PixChargeValidationError,
@@ -1092,6 +1093,11 @@ describe("main.js", () => {
     });
 
     it("should re-export charge-dialog constants and BEM selectors (TASK-07.4.1)", () => {
+      expect(PixChargeDialogComponent).toBeDefined();
+      expect(customElements.get("pix-charge-dialog")).toBe(
+        PixChargeDialogComponent,
+      );
+
       expect(CHARGE_DIALOG_CLASSES).toBeDefined();
       expect(CHARGE_DIALOG_CLASSES.ROOT).toBe("charge-dialog");
       expect(CHARGE_DIALOG_CLASSES.BACKDROP).toBe("charge-dialog-backdrop");

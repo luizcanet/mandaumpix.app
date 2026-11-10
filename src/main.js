@@ -133,6 +133,7 @@ import {
   formatCurrencyBRL,
   formatKeyMetadata,
 } from "./presentation/components/pix-charge-result/pix-charge-result.constants.js";
+import PixChargeDialogComponent from "./presentation/components/pix-charge-dialog/pix-charge-dialog.component.js";
 import {
   CHARGE_DIALOG_CLASSES,
   CHARGE_DIALOG_EVENT_NAMES,
@@ -319,6 +320,7 @@ export {
   // Componentes de Apresentação
   AboutPageComponent,
   AppHeaderComponent,
+  PixChargeDialogComponent,
   PixChargeFormComponent,
   PixChargeResultComponent,
   PixKeyDialogComponent,
