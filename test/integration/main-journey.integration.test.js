@@ -5,7 +5,7 @@ import {
   mountTestApp,
 } from "./helpers/setup-app.js";
 
-describe("Jornada Principal de Cobrança PIX (TASK-07.2.2, TASK-07.2.3, TASK-07.2.4)", () => {
+describe("Jornada Principal de Cobrança PIX (TASK-07.2.2, TASK-07.2.3, TASK-07.2.4, US-07.4)", () => {
   let context = null;
 
   afterEach(() => {
@@ -29,6 +29,8 @@ describe("Jornada Principal de Cobrança PIX (TASK-07.2.2, TASK-07.2.3, TASK-07.
         formElement,
         resultElement,
         dialogElement,
+        chargeDialogElement,
+        rootElement,
       } = context;
 
       // Validações do Estado Vazio Inicial (Empty State)
@@ -46,10 +48,19 @@ describe("Jornada Principal de Cobrança PIX (TASK-07.2.2, TASK-07.2.3, TASK-07.
       expect(ctaBtn).not.toBeNull();
       expect(ctaBtn.classList.contains("charge-cta--disabled")).toBe(true);
 
-      // Resultado aguardando cobrança
+      // Ausência de coluna estática de espera na página principal (US-07.4)
       expect(
-        resultElement.querySelector(".charge-result__waiting"),
-      ).not.toBeNull();
+        rootElement.querySelector(".charge-page__column--result"),
+      ).toBeNull();
+
+      // Diálogo modal de cobrança deve estar inicialmente fechado
+      expect(chargeDialogElement).not.toBeNull();
+      expect(chargeDialogElement.open).toBe(false);
+      const chargeNativeDialog = chargeDialogElement.querySelector(
+        "dialog.charge-dialog",
+      );
+      expect(chargeNativeDialog).not.toBeNull();
+      expect(chargeNativeDialog.hasAttribute("open")).toBe(false);
 
       // 2. Acionamento do Diálogo de Cadastro de Chave
       const openDialogCta = emptyElement.querySelector(
@@ -129,11 +140,15 @@ describe("Jornada Principal de Cobrança PIX (TASK-07.2.2, TASK-07.2.3, TASK-07.
       ctaBtn.click();
       await flushMicrotasks(100);
 
-      // 6. Verificação do Resultado da Cobrança
-      expect(resultElement.querySelector(".charge-result__waiting")).toBeNull();
-      expect(
-        resultElement.querySelector(".charge-result__badge-ready"),
-      ).not.toBeNull();
+      // 6. Verificação do Resultado da Cobrança em Caixa de Diálogo Modal (US-07.4)
+      expect(chargeDialogElement.open).toBe(true);
+      expect(chargeNativeDialog.hasAttribute("open")).toBe(true);
+
+      const dialogTitle = chargeDialogElement.querySelector(
+        ".charge-dialog__title",
+      );
+      expect(dialogTitle).not.toBeNull();
+      expect(dialogTitle.textContent).toContain("Cobrança Pronta");
 
       const accountTitle = resultElement.querySelector(
         ".charge-result__account",
@@ -151,6 +166,17 @@ describe("Jornada Principal de Cobrança PIX (TASK-07.2.2, TASK-07.2.3, TASK-07.
       const brCode = resultElement.querySelector(".charge-result__brcode");
       expect(brCode).not.toBeNull();
       expect(brCode.textContent.length).toBeGreaterThan(20);
+
+      // 7. Fechamento do diálogo via botão de fechar do cabeçalho
+      const closeBtn = chargeDialogElement.querySelector(
+        ".charge-dialog__close-btn",
+      );
+      expect(closeBtn).not.toBeNull();
+      closeBtn.click();
+      await flushMicrotasks(30);
+
+      expect(chargeDialogElement.open).toBe(false);
+      expect(chargeNativeDialog.hasAttribute("open")).toBe(false);
     });
   });
 
@@ -163,12 +189,15 @@ describe("Jornada Principal de Cobrança PIX (TASK-07.2.2, TASK-07.2.3, TASK-07.
 
       await flushMicrotasks(50);
 
-      const { formElement, resultElement, mocks } = context;
+      const { formElement, resultElement, chargeDialogElement, mocks } =
+        context;
 
       // 1. Geração de cobrança sem valor informado (Valor Aberto)
       const ctaBtn = formElement.querySelector("button.charge-cta");
       ctaBtn.click();
       await flushMicrotasks(100);
+
+      expect(chargeDialogElement.open).toBe(true);
 
       const amountBadge = resultElement.querySelector(
         ".charge-result__amount-pill",
@@ -181,7 +210,7 @@ describe("Jornada Principal de Cobrança PIX (TASK-07.2.2, TASK-07.2.3, TASK-07.
       const generatedBrCode = brCodeElement.textContent.trim();
       expect(generatedBrCode).toBeTruthy();
 
-      // 2. Ação Copiar BR Code
+      // 2. Ação Copiar BR Code (sem fechar o diálogo)
       const copyBtn = resultElement.querySelector(".charge-result__btn--copy");
       expect(copyBtn).not.toBeNull();
 
@@ -191,8 +220,9 @@ describe("Jornada Principal de Cobrança PIX (TASK-07.2.2, TASK-07.2.3, TASK-07.
       expect(mocks.clipboard.writeText).toHaveBeenCalledWith(generatedBrCode);
       expect(mocks.clipboard.text).toBe(generatedBrCode);
       expect(copyBtn.textContent).toContain("Copiado!");
+      expect(chargeDialogElement.open).toBe(true);
 
-      // 3. Ação Compartilhar (Web Share ou WhatsApp)
+      // 3. Ação Compartilhar (sem fechar o diálogo)
       const shareBtn = resultElement.querySelector(
         ".charge-result__btn--share",
       );
@@ -205,8 +235,9 @@ describe("Jornada Principal de Cobrança PIX (TASK-07.2.2, TASK-07.2.3, TASK-07.
         mocks.share.mock.calls.length > 0 ||
         mocks.windowOpen.mock.calls.length > 0;
       expect(shareCalled).toBe(true);
+      expect(chargeDialogElement.open).toBe(true);
 
-      // 4. Ação Salvar Imagem PNG
+      // 4. Ação Salvar Imagem PNG (sem fechar o diálogo)
       const downloadBtn = resultElement.querySelector(
         ".charge-result__btn--download",
       );
@@ -216,6 +247,17 @@ describe("Jornada Principal de Cobrança PIX (TASK-07.2.2, TASK-07.2.3, TASK-07.
       await flushMicrotasks(50);
 
       expect(mocks.createObjectURL).toHaveBeenCalled();
+      expect(chargeDialogElement.open).toBe(true);
+
+      // 5. Fechamento pelo botão inferior de conclusão (US-07.4)
+      const dismissBtn = chargeDialogElement.querySelector(
+        ".charge-dialog__dismiss-btn",
+      );
+      expect(dismissBtn).not.toBeNull();
+      dismissBtn.click();
+      await flushMicrotasks(30);
+
+      expect(chargeDialogElement.open).toBe(false);
     });
   });
 

@@ -9,6 +9,7 @@ import "../src/presentation/components/pix-key-selector/pix-key-selector.css";
 import "../src/presentation/components/pix-key-dialog/pix-key-dialog.css";
 import "../src/presentation/components/pix-charge-form/pix-charge-form.css";
 import "../src/presentation/components/pix-charge-result/pix-charge-result.css";
+import "../src/presentation/components/pix-charge-dialog/pix-charge-dialog.css";
 import "../src/presentation/components/vector-icon/vector-icon.component.js";
 
 /** @type { import('@storybook/html-vite').Preview } */

@@ -22,7 +22,6 @@ import {
   DEFAULT_CHARGE_RESULT_MODE_FIXED,
   DEFAULT_CHARGE_RESULT_MODE_OPEN,
   DEFAULT_CHARGE_RESULT_QR_ALT,
-  DEFAULT_CHARGE_RESULT_READY_BADGE,
   DEFAULT_CHARGE_RESULT_SHARE_LABEL,
   DEFAULT_CHARGE_RESULT_WAITING_DESCRIPTION,
   DEFAULT_CHARGE_RESULT_WAITING_TITLE,
@@ -153,10 +152,6 @@ export class PixChargeResultComponent extends CustomElement {
       return `
         <div class="${CHARGE_RESULT_CLASSES.HEADER}">
           <div class="${CHARGE_RESULT_CLASSES.HEADER_INFO}">
-            <span class="${CHARGE_RESULT_CLASSES.BADGE_READY}">
-              <vector-icon name="${CHARGE_RESULT_ICONS.CHECK}"></vector-icon>
-              ${DEFAULT_CHARGE_RESULT_READY_BADGE}
-            </span>
             <h3 class="${CHARGE_RESULT_CLASSES.ACCOUNT}">
               ${escapeHtml(accountText || DEFAULT_CHARGE_RESULT_ACCOUNT_FALLBACK)}
             </h3>

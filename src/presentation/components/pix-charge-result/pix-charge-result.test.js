@@ -23,7 +23,6 @@ import {
   DEFAULT_CHARGE_RESULT_LIVE_SHARED,
   DEFAULT_CHARGE_RESULT_MODE_FIXED,
   DEFAULT_CHARGE_RESULT_MODE_OPEN,
-  DEFAULT_CHARGE_RESULT_READY_BADGE,
   DEFAULT_CHARGE_RESULT_SHARE_LABEL,
   DEFAULT_CHARGE_RESULT_WAITING_DESCRIPTION,
   DEFAULT_CHARGE_RESULT_WAITING_TITLE,
@@ -180,7 +179,7 @@ describe("PixChargeResultComponent (TASK-06.2.3: Testes Unitários de Renderiza�
       ).toBeNull();
     });
 
-    it("deve renderizar o cabeçalho com badge de sucesso, conta e valor fixo formatado", () => {
+    it("deve renderizar o cabeçalho com conta e valor fixo formatado, sem badge-ready redundante", () => {
       const header = resultElement.querySelector(
         `.${CHARGE_RESULT_CLASSES.HEADER}`,
       );
@@ -189,13 +188,7 @@ describe("PixChargeResultComponent (TASK-06.2.3: Testes Unitários de Renderiza�
       const readyBadge = header.querySelector(
         `.${CHARGE_RESULT_CLASSES.BADGE_READY}`,
       );
-      expect(readyBadge).not.toBeNull();
-      expect(readyBadge.textContent).toContain(
-        DEFAULT_CHARGE_RESULT_READY_BADGE,
-      );
-      const readyIcon = readyBadge.querySelector("vector-icon");
-      expect(readyIcon).not.toBeNull();
-      expect(readyIcon.getAttribute("name")).toBe(CHARGE_RESULT_ICONS.CHECK);
+      expect(readyBadge).toBeNull();
 
       const accountElement = header.querySelector(
         `.${CHARGE_RESULT_CLASSES.ACCOUNT}`,

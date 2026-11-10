@@ -161,32 +161,22 @@ export function populateChargePage(chargePageElement, services = {}) {
   let emptyElement = chargePageElement.querySelector("pix-key-empty");
   let selectorElement = chargePageElement.querySelector("pix-key-selector");
   let formElement = chargePageElement.querySelector("pix-charge-form");
-  let resultElement = chargePageElement.querySelector("pix-charge-result");
+  let dialogElement = chargePageElement.querySelector("pix-charge-dialog");
 
-  if (!formElement || !resultElement) {
+  if (!formElement || !dialogElement) {
     chargePageElement.replaceChildren();
-
-    const formColumn = document.createElement("div");
-    formColumn.className = "charge-page__column charge-page__column--form";
 
     emptyElement = document.createElement("pix-key-empty");
     selectorElement = document.createElement("pix-key-selector");
     selectorElement.className = "hidden";
     selectorElement.setAttribute("hidden", "");
     formElement = document.createElement("pix-charge-form");
+    dialogElement = document.createElement("pix-charge-dialog");
 
-    formColumn.appendChild(emptyElement);
-    formColumn.appendChild(selectorElement);
-    formColumn.appendChild(formElement);
-
-    const resultColumn = document.createElement("div");
-    resultColumn.className = "charge-page__column charge-page__column--result";
-
-    resultElement = document.createElement("pix-charge-result");
-    resultColumn.appendChild(resultElement);
-
-    chargePageElement.appendChild(formColumn);
-    chargePageElement.appendChild(resultColumn);
+    chargePageElement.appendChild(emptyElement);
+    chargePageElement.appendChild(selectorElement);
+    chargePageElement.appendChild(formElement);
+    chargePageElement.appendChild(dialogElement);
   }
 
   if (formElement) {
@@ -213,6 +203,12 @@ export function populateChargePage(chargePageElement, services = {}) {
     }
   }
 
+  if (dialogElement && services.distributePixChargeUseCase) {
+    dialogElement.distributePixChargeUseCase =
+      services.distributePixChargeUseCase;
+  }
+
+  const resultElement = chargePageElement.querySelector("pix-charge-result");
   if (resultElement && services.distributePixChargeUseCase) {
     resultElement.distributePixChargeUseCase =
       services.distributePixChargeUseCase;

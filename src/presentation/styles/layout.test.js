@@ -3,21 +3,29 @@ import { resolve } from "node:path";
 import process from "node:process";
 import { describe, expect, it } from "vitest";
 
-describe("layout.css (TASK-04.1.1: Grid Responsivo e Split-View)", () => {
+describe("layout.css (TASK-07.4.5: Refatoração da Tela Principal, Coluna Única Centralizada e Remoção do Split-View)", () => {
   const cssPath = resolve(process.cwd(), "src/presentation/styles/layout.css");
   const cssContent = readFileSync(cssPath, "utf-8");
 
-  it("defines the .charge-page grid with single column mobile-first", () => {
+  it("defines the .charge-page grid with single column mobile-first and centered layout", () => {
     expect(cssContent).toMatch(/\.charge-page\s*\{[^}]*display:\s*grid/);
     expect(cssContent).toMatch(
       /\.charge-page\s*\{[^}]*grid-template-columns:\s*1fr/,
     );
+    expect(cssContent).toMatch(/\.charge-page\s*\{[^}]*max-width:\s*460px/);
+    expect(cssContent).toMatch(/\.charge-page\s*\{[^}]*margin-inline:\s*auto/);
   });
 
-  it("defines .charge-page--split for desktop 2-column split-view at min-width 768px", () => {
-    expect(cssContent).toContain("@media (min-width: 768px)");
+  it("defines .charge-page--split as a contained centered container without 2-column split-view", () => {
     expect(cssContent).toMatch(
-      /\.charge-page--split\s*\{[^}]*grid-template-columns:\s*(repeat\(2,\s*minmax\(0,\s*1fr\)\)|repeat\(auto-fit,\s*minmax\(340px,\s*1fr\)\))/,
+      /\.charge-page--split\s*\{[^}]*max-width:\s*520px/,
+    );
+    expect(cssContent).toMatch(
+      /\.charge-page--split\s*\{[^}]*margin-inline:\s*auto/,
+    );
+    // Não deve conter grid de 2 colunas
+    expect(cssContent).not.toMatch(
+      /\.charge-page--split\s*\{[^}]*grid-template-columns:\s*repeat\(2/,
     );
   });
 

@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="./src/presentation/components/pix-key-dialog/pix-key-dialog.css" />
     <link rel="stylesheet" href="./src/presentation/components/pix-charge-form/pix-charge-form.css" />
     <link rel="stylesheet" href="./src/presentation/components/pix-charge-result/pix-charge-result.css" />
+    <link rel="stylesheet" href="./src/presentation/components/pix-charge-dialog/pix-charge-dialog.css" />
     <link rel="stylesheet" href="./src/presentation/pages/about-page/about-page.css" />
     <script async src="https://ga.jspm.io/npm:es-module-shims@2.8.4/dist/es-module-shims.js" crossorigin="anonymous" integrity="sha384-0bdb7F9U10QF2R23CYCgvGdsStkMEEjDOVhWxFXpTlArSrMLKtrnsYtk21d8cBUc"></script>
     <script type="importmap">
@@ -74,12 +75,14 @@
         "./src/infrastructure/pwa/service-worker.adapter.js": "sha384-b+4apZpw/PMwZqgFZXtzyqENprbdWW/aST4rhh/TfrW7VLvyYwrtAkv9Yx7YR276",
         "./src/infrastructure/share/browser-share.adapter.js": "sha384-7Sjp01hfs3Ffr9ErJCioJwtCAhPcYRUAMtrZC5qGBfEpyPEGWTG9dYoBmXBj1eL9",
         "./src/infrastructure/storage/indexed-db-pix-key.repository.js": "sha384-djuXXh00PTK15Qx/P8GeJdOVMFC74q1CtfAkHj2wRKYl3MVjZwixhGo6lUTBeYcK",
-        "./src/main.js": "sha384-al36h99BPWyJ9zy13bgW7GA1zjOOcQ6F6+W2lcW7nPLZDJ+SF7plKsY3EKr8tBZj",
-        "./src/presentation/bootstrap/bootstrap-app.js": "sha384-DcJZd7Cd0yWYNKwfppCgh5gt0o41mXEvBtLcqUNvQCEa64ZTMEfgkdtcbNryN5T2",
+        "./src/main.js": "sha384-CyyYQPzFdmIVf93bdm4/BIlzE5VkLNMbf+o7GJaahdglqsh8qBzAlQZ6QUmYsTjp",
+        "./src/presentation/bootstrap/bootstrap-app.js": "sha384-KCMGEfE+9iUFuIda2UYRb0kMSEYbhD1QMvQIeN1YyA059mRGZpDbrIjHlZFvO08y",
         "./src/presentation/components/app-header/app-header.component.js": "sha384-oLx10DRYEw5AgUZ/PJfQg/AAFhuca8bi+L9SFHS9dBDYZ3IwIUsN+WsGvxOG2c83",
+        "./src/presentation/components/pix-charge-dialog/pix-charge-dialog.component.js": "sha384-IgNWHn599XOdKC+0MIuTYAkx3/+1p2H0CoFBdG5eS5xgQ1nAkTMKy+KUKBZDFLqX",
+        "./src/presentation/components/pix-charge-dialog/pix-charge-dialog.constants.js": "sha384-Wg6yAbi+ZWT5Zh+nUn7j0H3DLDakYuqB3zggJuQU6GX7lsg3ngmWO61FKgWGYvma",
         "./src/presentation/components/pix-charge-form/pix-charge-form.component.js": "sha384-QUmuOvQY0NJeosa3Gy2ghyGzEf6brpdkDuch2Uj2sLs97TUi1F5YOixW00/MF9bJ",
         "./src/presentation/components/pix-charge-form/pix-charge-form.constants.js": "sha384-CrqFuc+TsVeIGStp+6EybEybMDhi/ZiSvXc1Fdm9pu3GUXc8k1oyr4pAvv0Atjye",
-        "./src/presentation/components/pix-charge-result/pix-charge-result.component.js": "sha384-vFOEJ3F2Yg9FtaOm7JQFRqXHgDDFU8tF1uF5IdapY7YovsG6C7TRn6GAau3e7n8K",
+        "./src/presentation/components/pix-charge-result/pix-charge-result.component.js": "sha384-eTl1Zx1xSlVdW/Kvw3d8OF+4x/qHkGw9NIB6cnfJrEQWX6zsyWi7n/GHGy6E3Jwi",
         "./src/presentation/components/pix-charge-result/pix-charge-result.constants.js": "sha384-lHg4It52yYIaYiNB1erwXgKKK/MGWi9STSAQDTscnRIbpg6mCT2HREhVSoDNWfMS",
         "./src/presentation/components/pix-key-dialog/pix-key-dialog.component.js": "sha384-UcMrZX1veIPovdksMRb2vE0eqlpxKDMQwo/ammiLYclerkHuK/sSHluleQzig+zw",
         "./src/presentation/components/pix-key-dialog/pix-key-dialog.constants.js": "sha384-L1b2bd+eobImt5/mKMLZn/WxsMNyz5Jf3tBmRjGuV4qVQpLzuwcthsLt7yUuGxwv",
@@ -172,25 +175,6 @@
       }
     }
     </script>
-    <script>
-      (function () {
-        window.addEventListener("beforeinstallprompt", (e) => {
-          e.preventDefault();
-          window.__deferredPrompt = e;
-        });
-        window.addEventListener("appinstalled", () => {
-          window.__pwaInstalled = true;
-          window.__deferredPrompt = null;
-        });
-        const im = document.querySelector('script[type="importmap"]');
-        if (im && !document.querySelector('script[type="importmap-shim"]')) {
-          const shim = document.createElement("script");
-          shim.type = "importmap-shim";
-          shim.textContent = im.textContent;
-          im.after(shim);
-        }
-      })();
-    </script>
     <link rel="modulepreload" href="./src/application/use-cases/delete-pix-key.use-case.js" integrity="sha384-krKbDLunpr6j9ZQbbqyWfIEVfCuvjawabC2I8gFg4hf+0zMDmK+ljAUWV6lsAh9L" />
     <link rel="modulepreload" href="./src/application/use-cases/distribute-pix-charge.use-case.js" integrity="sha384-hMWAEAdms4g/ACJNXSzrLuKjXt3Wxt4lNlb7TVsWuJO/MoGLP7dtpF2kVK+qtBEl" />
     <link rel="modulepreload" href="./src/application/use-cases/generate-pix-charge.use-case.js" integrity="sha384-TjU0cI5Yel8TJg/R4BMVDc3zDTEPQqsgFoHoBMpNarmUk3T7IOMXuFQwQDMxszxK" />
@@ -205,12 +189,14 @@
     <link rel="modulepreload" href="./src/infrastructure/pwa/service-worker.adapter.js" integrity="sha384-b+4apZpw/PMwZqgFZXtzyqENprbdWW/aST4rhh/TfrW7VLvyYwrtAkv9Yx7YR276" />
     <link rel="modulepreload" href="./src/infrastructure/share/browser-share.adapter.js" integrity="sha384-7Sjp01hfs3Ffr9ErJCioJwtCAhPcYRUAMtrZC5qGBfEpyPEGWTG9dYoBmXBj1eL9" />
     <link rel="modulepreload" href="./src/infrastructure/storage/indexed-db-pix-key.repository.js" integrity="sha384-djuXXh00PTK15Qx/P8GeJdOVMFC74q1CtfAkHj2wRKYl3MVjZwixhGo6lUTBeYcK" />
-    <link rel="modulepreload" href="./src/main.js" integrity="sha384-al36h99BPWyJ9zy13bgW7GA1zjOOcQ6F6+W2lcW7nPLZDJ+SF7plKsY3EKr8tBZj" />
-    <link rel="modulepreload" href="./src/presentation/bootstrap/bootstrap-app.js" integrity="sha384-DcJZd7Cd0yWYNKwfppCgh5gt0o41mXEvBtLcqUNvQCEa64ZTMEfgkdtcbNryN5T2" />
+    <link rel="modulepreload" href="./src/main.js" integrity="sha384-CyyYQPzFdmIVf93bdm4/BIlzE5VkLNMbf+o7GJaahdglqsh8qBzAlQZ6QUmYsTjp" />
+    <link rel="modulepreload" href="./src/presentation/bootstrap/bootstrap-app.js" integrity="sha384-KCMGEfE+9iUFuIda2UYRb0kMSEYbhD1QMvQIeN1YyA059mRGZpDbrIjHlZFvO08y" />
     <link rel="modulepreload" href="./src/presentation/components/app-header/app-header.component.js" integrity="sha384-oLx10DRYEw5AgUZ/PJfQg/AAFhuca8bi+L9SFHS9dBDYZ3IwIUsN+WsGvxOG2c83" />
+    <link rel="modulepreload" href="./src/presentation/components/pix-charge-dialog/pix-charge-dialog.component.js" integrity="sha384-IgNWHn599XOdKC+0MIuTYAkx3/+1p2H0CoFBdG5eS5xgQ1nAkTMKy+KUKBZDFLqX" />
+    <link rel="modulepreload" href="./src/presentation/components/pix-charge-dialog/pix-charge-dialog.constants.js" integrity="sha384-Wg6yAbi+ZWT5Zh+nUn7j0H3DLDakYuqB3zggJuQU6GX7lsg3ngmWO61FKgWGYvma" />
     <link rel="modulepreload" href="./src/presentation/components/pix-charge-form/pix-charge-form.component.js" integrity="sha384-QUmuOvQY0NJeosa3Gy2ghyGzEf6brpdkDuch2Uj2sLs97TUi1F5YOixW00/MF9bJ" />
     <link rel="modulepreload" href="./src/presentation/components/pix-charge-form/pix-charge-form.constants.js" integrity="sha384-CrqFuc+TsVeIGStp+6EybEybMDhi/ZiSvXc1Fdm9pu3GUXc8k1oyr4pAvv0Atjye" />
-    <link rel="modulepreload" href="./src/presentation/components/pix-charge-result/pix-charge-result.component.js" integrity="sha384-vFOEJ3F2Yg9FtaOm7JQFRqXHgDDFU8tF1uF5IdapY7YovsG6C7TRn6GAau3e7n8K" />
+    <link rel="modulepreload" href="./src/presentation/components/pix-charge-result/pix-charge-result.component.js" integrity="sha384-eTl1Zx1xSlVdW/Kvw3d8OF+4x/qHkGw9NIB6cnfJrEQWX6zsyWi7n/GHGy6E3Jwi" />
     <link rel="modulepreload" href="./src/presentation/components/pix-charge-result/pix-charge-result.constants.js" integrity="sha384-lHg4It52yYIaYiNB1erwXgKKK/MGWi9STSAQDTscnRIbpg6mCT2HREhVSoDNWfMS" />
     <link rel="modulepreload" href="./src/presentation/components/pix-key-dialog/pix-key-dialog.component.js" integrity="sha384-UcMrZX1veIPovdksMRb2vE0eqlpxKDMQwo/ammiLYclerkHuK/sSHluleQzig+zw" />
     <link rel="modulepreload" href="./src/presentation/components/pix-key-dialog/pix-key-dialog.constants.js" integrity="sha384-L1b2bd+eobImt5/mKMLZn/WxsMNyz5Jf3tBmRjGuV4qVQpLzuwcthsLt7yUuGxwv" />
@@ -300,6 +286,25 @@
     <link rel="modulepreload" href="https://ga.jspm.io/npm:qrcode@1.5.4/lib/renderer/canvas.js" integrity="sha384-0Ejrzbyy4QOTIwjZDsu/fGtnvog/ISYmC80Jo0PKhtqz5fJCcPel7wUrXRktuYiH" />
     <link rel="modulepreload" href="https://ga.jspm.io/npm:qrcode@1.5.4/lib/renderer/svg-tag.js" integrity="sha384-GrO0nnTWPLIWTifdZw8hkIRaUhqH7CskmZZNJwN/vxrB1burl7FFH2IOIPWBOho/" />
     <link rel="modulepreload" href="https://ga.jspm.io/npm:qrcode@1.5.4/lib/renderer/utils.js" integrity="sha384-KiqOAF/JukOvvPO3U0XFYsMYf6wtRBR6qdUCqah+3y86e6FVNcYUuwayz06GVwh2" />
+    <script>
+      (function () {
+        window.addEventListener("beforeinstallprompt", (e) => {
+          e.preventDefault();
+          window.__deferredPrompt = e;
+        });
+        window.addEventListener("appinstalled", () => {
+          window.__pwaInstalled = true;
+          window.__deferredPrompt = null;
+        });
+        const im = document.querySelector('script[type="importmap"]');
+        if (im && !document.querySelector('script[type="importmap-shim"]')) {
+          const shim = document.createElement("script");
+          shim.type = "importmap-shim";
+          shim.textContent = im.textContent;
+          im.after(shim);
+        }
+      })();
+    </script>
     <script type="module" src="./src/main.js"></script>
   </head>
   <body>

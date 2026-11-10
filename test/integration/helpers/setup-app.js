@@ -417,6 +417,8 @@ export async function mountTestApp({
   const selectorElement = () => rootElement.querySelector("pix-key-selector");
   const formElement = () => rootElement.querySelector("pix-charge-form");
   const resultElement = () => rootElement.querySelector("pix-charge-result");
+  const chargeDialogElement = () =>
+    rootElement.querySelector("pix-charge-dialog");
 
   const cleanup = () => {
     document.body.replaceChildren();
@@ -460,6 +462,9 @@ export async function mountTestApp({
     },
     get resultElement() {
       return resultElement();
+    },
+    get chargeDialogElement() {
+      return chargeDialogElement();
     },
     repository,
     mocks: {
