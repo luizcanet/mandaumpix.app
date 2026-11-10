@@ -1,4 +1,5 @@
 import CustomElement from "@modnes/custom-element";
+import { pixKeySelectorTemplate } from "./pix-key-selector.template.js";
 import {
   DEFAULT_KEY_SELECTOR_ADD_BTN_LABEL,
   DEFAULT_KEY_SELECTOR_DELETE_TITLE,
@@ -8,28 +9,8 @@ import {
   DEFAULT_KEY_SELECTOR_TITLE_ID,
   KEY_SELECTOR_CLASSES,
   KEY_SELECTOR_EVENT_NAMES,
-  KEY_SELECTOR_ICONS,
   KEY_SELECTOR_INJECTABLES,
-  formatKeyDeleteAriaLabel,
 } from "./pix-key-selector.constants.js";
-
-/**
- * Escapa caracteres HTML para prevenir injeção de script em valores dinâmicos.
- *
- * @param {*} value
- * @returns {string}
- */
-function escapeHtml(value) {
-  if (value === null || value === undefined) {
-    return "";
-  }
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 
 /**
  * Web Component <pix-key-selector>
@@ -80,86 +61,7 @@ export class PixKeySelectorComponent extends CustomElement {
       "pixKeyRepository",
     );
 
-    this.template = () => {
-      const cardsHtml = this.#keys
-        .map((item) => {
-          const isSelected = item.id === this.#selectedKeyId;
-          const selectedClass = isSelected
-            ? ` ${KEY_SELECTOR_CLASSES.ITEM_SELECTED}`
-            : "";
-          const tabIndex = isSelected ? "0" : "-1";
-          const ariaChecked = isSelected ? "true" : "false";
-          const escapedLabel = escapeHtml(item.rotulo);
-          const escapedType = escapeHtml(item.tipo_chave);
-          const escapedValue = escapeHtml(item.valor_chave);
-          const deleteAriaLabel = escapeHtml(
-            formatKeyDeleteAriaLabel(item.rotulo),
-          );
-          const deleteTitle = escapeHtml(this.#deleteTitle);
-
-          return `
-            <div
-              role="radio"
-              aria-checked="${ariaChecked}"
-              tabindex="${tabIndex}"
-              data-key-id="${item.id}"
-              class="${KEY_SELECTOR_CLASSES.ITEM}${selectedClass}"
-            >
-              <div class="${KEY_SELECTOR_CLASSES.CARD_LEFT}">
-                <span class="${KEY_SELECTOR_CLASSES.RADIO}">
-                  ${isSelected ? `<span class="${KEY_SELECTOR_CLASSES.RADIO_DOT}"></span>` : ""}
-                </span>
-                <div class="${KEY_SELECTOR_CLASSES.META}">
-                  <div class="${KEY_SELECTOR_CLASSES.TITLE_ROW}">
-                    <span class="${KEY_SELECTOR_CLASSES.LABEL}">${escapedLabel}</span>
-                    <span class="${KEY_SELECTOR_CLASSES.TYPE_BADGE}">${escapedType}</span>
-                  </div>
-                  <div class="${KEY_SELECTOR_CLASSES.VALUE}">${escapedValue}</div>
-                </div>
-              </div>
-              <button
-                type="button"
-                class="${KEY_SELECTOR_CLASSES.DELETE_BTN}"
-                title="${deleteTitle}"
-                aria-label="${deleteAriaLabel}"
-                data-action="delete"
-                data-key-id="${item.id}"
-              >
-                <vector-icon name="${KEY_SELECTOR_ICONS.TRASH}"></vector-icon>
-              </button>
-            </div>
-          `;
-        })
-        .join("");
-
-      return `
-        <div class="${KEY_SELECTOR_CLASSES.SECTION_HEADER}">
-          <div class="${KEY_SELECTOR_CLASSES.HEADER_TITLE_GROUP}">
-            <span class="${KEY_SELECTOR_CLASSES.STEP_BADGE}">${escapeHtml(this.#stepText)}</span>
-            <h2 id="${DEFAULT_KEY_SELECTOR_TITLE_ID}" class="${KEY_SELECTOR_CLASSES.TITLE}">
-              ${escapeHtml(this.#titleText)}
-            </h2>
-          </div>
-          <button
-            type="button"
-            class="${KEY_SELECTOR_CLASSES.ADD_BTN}"
-            data-action="open-key-dialog"
-          >
-            <vector-icon name="${KEY_SELECTOR_ICONS.PLUS}"></vector-icon>
-            <span>${escapeHtml(this.#addBtnLabel)}</span>
-          </button>
-        </div>
-
-        <div
-          class="${KEY_SELECTOR_CLASSES.LIST}"
-          role="radiogroup"
-          aria-labelledby="${DEFAULT_KEY_SELECTOR_TITLE_ID}"
-          aria-label="${escapeHtml(this.#listLabel)}"
-        >
-          ${cardsHtml}
-        </div>
-      `;
-    };
+    this.template = () => pixKeySelectorTemplate(this);
   }
 
   get keys() {

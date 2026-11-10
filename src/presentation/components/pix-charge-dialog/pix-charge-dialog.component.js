@@ -1,34 +1,17 @@
 import CustomElement from "@modnes/custom-element";
 import {
-  CHARGE_DIALOG_CLASSES,
+  pixChargeDialogDismissBtnTemplate,
+  pixChargeDialogTemplate,
+  pixChargeDialogTitleTemplate,
+} from "./pix-charge-dialog.template.js";
+import {
   CHARGE_DIALOG_EVENT_NAMES,
-  CHARGE_DIALOG_ICONS,
   CHARGE_DIALOG_INJECTABLES,
   CHARGE_DIALOG_SELECTORS,
-  DEFAULT_CHARGE_DIALOG_ARIA_LABEL,
   DEFAULT_CHARGE_DIALOG_CLOSE_TITLE,
   DEFAULT_CHARGE_DIALOG_DISMISS_BTN_LABEL,
   DEFAULT_CHARGE_DIALOG_TITLE,
-  DEFAULT_CHARGE_DIALOG_TITLE_ID,
 } from "./pix-charge-dialog.constants.js";
-
-/**
- * Escapa caracteres HTML para mitigar riscos de injeção de script (XSS).
- *
- * @param {*} value
- * @returns {string}
- */
-function escapeHtml(value) {
-  if (value === null || value === undefined) {
-    return "";
-  }
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 
 /**
  * Polyfill/shim leve para HTMLDialogElement em ambientes sem suporte nativo a showModal/close (ex: jsdom).
@@ -86,6 +69,8 @@ export class PixChargeDialogComponent extends CustomElement {
       CHARGE_DIALOG_INJECTABLES.DISTRIBUTE_PIX_CHARGE_USE_CASE,
       "distributePixChargeUseCase",
     );
+
+    this.template = () => pixChargeDialogTemplate(this);
   }
 
   get charge() {
@@ -258,33 +243,7 @@ export class PixChargeDialogComponent extends CustomElement {
   }
 
   render() {
-    this.innerHTML = `
-      <dialog
-        class="${CHARGE_DIALOG_CLASSES.ROOT}"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="${DEFAULT_CHARGE_DIALOG_TITLE_ID}"
-        aria-label="${escapeHtml(DEFAULT_CHARGE_DIALOG_ARIA_LABEL)}"
-      >
-        <div class="${CHARGE_DIALOG_CLASSES.TOP_BAR}">
-          ${this.#getTitleTemplate()}
-          <button
-            type="button"
-            class="${CHARGE_DIALOG_CLASSES.CLOSE_BTN}"
-            title="${escapeHtml(this.#closeTitle)}"
-            aria-label="${escapeHtml(this.#closeTitle)}"
-          >
-            <vector-icon name="${CHARGE_DIALOG_ICONS.XMARK}"></vector-icon>
-          </button>
-        </div>
-
-        <div class="${CHARGE_DIALOG_CLASSES.BODY}">
-          <pix-charge-result></pix-charge-result>
-        </div>
-
-        ${this.#getDismissBtnTemplate()}
-      </dialog>
-    `;
+    this.innerHTML = this.template();
 
     this.#syncChargeWithChild();
     this.#syncDistributeUseCaseWithChild();
@@ -292,24 +251,11 @@ export class PixChargeDialogComponent extends CustomElement {
   }
 
   #getTitleTemplate() {
-    return `
-      <h3 id="${DEFAULT_CHARGE_DIALOG_TITLE_ID}" class="${CHARGE_DIALOG_CLASSES.TITLE}">
-        <vector-icon name="${CHARGE_DIALOG_ICONS.CHECK}"></vector-icon>
-        <span>${escapeHtml(this.#titleText)}</span>
-      </h3>
-    `;
+    return pixChargeDialogTitleTemplate(this.#titleText);
   }
 
   #getDismissBtnTemplate() {
-    return `
-      <button
-        type="button"
-        class="${CHARGE_DIALOG_CLASSES.DISMISS_BTN}"
-      >
-        <vector-icon name="${CHARGE_DIALOG_ICONS.CHECK}"></vector-icon>
-        <span>${escapeHtml(this.#dismissBtnLabel)}</span>
-      </button>
-    `;
+    return pixChargeDialogDismissBtnTemplate(this.#dismissBtnLabel);
   }
 
   #updateTextContent(selector, html, isInner = false) {

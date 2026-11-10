@@ -1,5 +1,6 @@
 import CustomElement from "@modnes/custom-element";
 import { InstallPwaUseCase } from "../../../application/use-cases/install-pwa.use-case.js";
+import { appHeaderTemplate } from "./app-header.template.js";
 
 export const DEFAULT_LOGO_SRC = "./src/assets/icons/icon.svg";
 export const DEFAULT_TITLE = "Manda um PIX";
@@ -32,40 +33,7 @@ export class AppHeaderComponent extends CustomElement {
     this.addInjectable("install-pwa-use-case", "installPwaUseCase");
     this.addInjectable("pwa-install-gateway", "pwaInstallGateway");
 
-    this.template = () => `
-      <div class="app-header__brand" role="button" tabindex="0">
-        <img
-          class="app-header__logo"
-          src="${this.logoSrc}"
-          alt="Logotipo do Manda um PIX"
-          width="42"
-          height="42"
-        />
-        <div>
-          <span class="app-header__title">${this.titleText}</span>
-          <span class="app-header__subtitle">${this.subtitleText}</span>
-        </div>
-      </div>
-      <div class="app-header__actions">
-        <button
-          type="button"
-          class="app-header__install-btn ${this.showInstallButton ? "" : "hidden"}"
-          ${this.showInstallButton ? "" : "hidden"}
-          aria-label="Instalar aplicativo"
-        >
-          <vector-icon name="download"></vector-icon>
-          <span>Instalar</span>
-        </button>
-        <a
-          href="${this.aboutHref}"
-          class="app-header__about-link"
-          aria-label="Sobre o aplicativo"
-        >
-          <vector-icon name="circle-info"></vector-icon>
-          <span>Sobre</span>
-        </a>
-      </div>
-    `;
+    this.template = () => appHeaderTemplate(this);
   }
 
   get installPwaUseCase() {

@@ -1,11 +1,11 @@
 import CustomElement from "@modnes/custom-element";
+import { pixKeyEmptyTemplate } from "./pix-key-empty.template.js";
 import {
   DEFAULT_EMPTY_STATE_ARIA_LABEL,
   DEFAULT_EMPTY_STATE_CTA,
   DEFAULT_EMPTY_STATE_DESCRIPTION,
   DEFAULT_EMPTY_STATE_TITLE,
   KEY_EMPTY_EVENT_NAMES,
-  KEY_EMPTY_ICONS,
 } from "./pix-key-empty.constants.js";
 
 /**
@@ -24,24 +24,7 @@ export class PixKeyEmptyComponent extends CustomElement {
   constructor() {
     super();
 
-    this.template = () => `
-      <div class="key-empty-state__icon">
-        <vector-icon name="${KEY_EMPTY_ICONS.KEY}"></vector-icon>
-      </div>
-      <div>
-        <h2 class="key-empty-state__title">${this.titleText}</h2>
-        <p class="key-empty-state__description">${this.descriptionText}</p>
-      </div>
-      <button
-        type="button"
-        class="charge-cta key-empty-state__cta"
-        data-action="open-key-dialog"
-        aria-label="${this.ctaText}"
-      >
-        <vector-icon name="${KEY_EMPTY_ICONS.PLUS}"></vector-icon>
-        <span>${this.ctaText}</span>
-      </button>
-    `;
+    this.template = () => pixKeyEmptyTemplate(this);
   }
 
   get titleText() {

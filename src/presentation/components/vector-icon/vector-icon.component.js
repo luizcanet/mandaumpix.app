@@ -1,4 +1,5 @@
 import CustomElement from "@modnes/custom-element";
+import { vectorIconTemplate } from "./vector-icon.template.js";
 
 export const DEFAULT_SPRITE_PATH =
   "/src/presentation/components/vector-icon/icon.svg";
@@ -30,16 +31,7 @@ class VectorIcon extends CustomElement {
 
   constructor() {
     super();
-    this.template = () => {
-      const iconName = this.name || "";
-      const href = iconName ? `${this.spritePath}#${iconName}` : "";
-
-      return `
-        <svg class="icon" focusable="false">
-          <use href="${href}" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="${href}"></use>
-        </svg>
-      `;
-    };
+    this.template = () => vectorIconTemplate(this);
   }
 
   connectedCallback() {

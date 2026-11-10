@@ -1,40 +1,15 @@
 import CustomElement from "@modnes/custom-element";
+import { pixChargeFormTemplate } from "./pix-charge-form.template.js";
 import {
   CHARGE_FORM_CLASSES,
   CHARGE_FORM_EVENT_NAMES,
-  CHARGE_FORM_ICONS,
   CHARGE_FORM_INJECTABLES,
-  CHARGE_FORM_PRESETS,
-  DEFAULT_CHARGE_FORM_CLEAR_LABEL,
   DEFAULT_CHARGE_FORM_CTA_LABEL,
-  DEFAULT_CHARGE_FORM_CURRENCY,
-  DEFAULT_CHARGE_FORM_INPUT_ID,
-  DEFAULT_CHARGE_FORM_OPTIONAL_BADGE,
-  DEFAULT_CHARGE_FORM_PLACEHOLDER,
   DEFAULT_CHARGE_FORM_STEP,
   DEFAULT_CHARGE_FORM_TITLE,
-  DEFAULT_CHARGE_FORM_TITLE_ID,
   parseChargeAmount,
   resolveCtaTooltip,
 } from "./pix-charge-form.constants.js";
-
-/**
- * Escapa caracteres HTML para prevenir injeção de script.
- *
- * @param {*} value
- * @returns {string}
- */
-function escapeHtml(value) {
-  if (value === null || value === undefined) {
-    return "";
-  }
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 
 /**
  * Web Component <pix-charge-form>
@@ -74,112 +49,7 @@ export class PixChargeFormComponent extends CustomElement {
       "pixKeyRepository",
     );
 
-    this.template = () => {
-      const parsedAmount = parseChargeAmount(this.#amount);
-      const isCtaDisabled = !this.#selectedKey;
-      const ctaTooltip = resolveCtaTooltip(!isCtaDisabled, this.#ctaText);
-      const ctaDisabledClass = isCtaDisabled
-        ? ` ${CHARGE_FORM_CLASSES.CTA_DISABLED}`
-        : "";
-      const clearBtnHiddenClass = !this.#amount
-        ? ` ${CHARGE_FORM_CLASSES.CLEAR_BTN_HIDDEN}`
-        : "";
-
-      const presetsHtml = CHARGE_FORM_PRESETS.map((preset) => {
-        const isActive =
-          preset.value === this.#amount ||
-          (preset.value === "" && !parsedAmount.isFixed);
-        const activeClass = isActive
-          ? ` ${CHARGE_FORM_CLASSES.PRESET_ACTIVE}`
-          : "";
-
-        return `
-          <button
-            type="button"
-            class="${CHARGE_FORM_CLASSES.PRESET}${activeClass}"
-            data-preset="${escapeHtml(preset.id)}"
-            data-value="${escapeHtml(preset.value)}"
-            aria-label="${escapeHtml(preset.ariaLabel)}"
-          >
-            ${escapeHtml(preset.label)}
-          </button>
-        `;
-      }).join("");
-
-      const alertHtml = this.#errorMessage
-        ? `
-          <div class="${CHARGE_FORM_CLASSES.ALERT}" role="alert" aria-live="assertive">
-            <vector-icon class="${CHARGE_FORM_CLASSES.ALERT_ICON}" name="${CHARGE_FORM_ICONS.ALERT}"></vector-icon>
-            <span class="${CHARGE_FORM_CLASSES.ALERT_TEXT}">${escapeHtml(this.#errorMessage)}</span>
-          </div>
-        `
-        : "";
-
-      return `
-        <div class="${CHARGE_FORM_CLASSES.CARD} ${CHARGE_FORM_CLASSES.AMOUNT_FIELD}">
-          <div class="${CHARGE_FORM_CLASSES.SECTION_HEADER}">
-            <div class="${CHARGE_FORM_CLASSES.HEADER_TITLE_GROUP}">
-              <span class="${CHARGE_FORM_CLASSES.STEP_BADGE}">${escapeHtml(this.#stepText)}</span>
-              <label
-                for="${DEFAULT_CHARGE_FORM_INPUT_ID}"
-                id="${DEFAULT_CHARGE_FORM_TITLE_ID}"
-                class="${CHARGE_FORM_CLASSES.TITLE}"
-              >
-                ${escapeHtml(this.#titleText)}
-              </label>
-            </div>
-            <span class="${CHARGE_FORM_CLASSES.OPTIONAL_BADGE}">
-              ${escapeHtml(DEFAULT_CHARGE_FORM_OPTIONAL_BADGE)}
-            </span>
-          </div>
-
-          <div class="${CHARGE_FORM_CLASSES.BOX}">
-            <span class="${CHARGE_FORM_CLASSES.CURRENCY}">${escapeHtml(DEFAULT_CHARGE_FORM_CURRENCY)}</span>
-            <input
-              id="${DEFAULT_CHARGE_FORM_INPUT_ID}"
-              type="text"
-              inputmode="decimal"
-              value="${escapeHtml(this.#amount)}"
-              placeholder="${escapeHtml(DEFAULT_CHARGE_FORM_PLACEHOLDER)}"
-              class="${CHARGE_FORM_CLASSES.INPUT}"
-            />
-            <button
-              type="button"
-              class="${CHARGE_FORM_CLASSES.CLEAR_BTN}${clearBtnHiddenClass}"
-              aria-label="${escapeHtml(DEFAULT_CHARGE_FORM_CLEAR_LABEL)}"
-              title="${escapeHtml(DEFAULT_CHARGE_FORM_CLEAR_LABEL)}"
-            >
-              <vector-icon name="${CHARGE_FORM_ICONS.XMARK}"></vector-icon>
-            </button>
-          </div>
-
-          <div class="${CHARGE_FORM_CLASSES.FOOTER}">
-            <span
-              class="${CHARGE_FORM_CLASSES.STATUS} ${parsedAmount.statusClass}"
-              aria-live="polite"
-            >
-              ${escapeHtml(parsedAmount.statusText)}
-            </span>
-
-            <div class="${CHARGE_FORM_CLASSES.SHORTCUTS}">
-              ${presetsHtml}
-            </div>
-          </div>
-        </div>
-
-        ${alertHtml}
-
-        <button
-          type="submit"
-          class="${CHARGE_FORM_CLASSES.CTA}${ctaDisabledClass}"
-          ${isCtaDisabled ? 'disabled aria-disabled="true"' : 'aria-disabled="false"'}
-          title="${escapeHtml(ctaTooltip)}"
-        >
-          <vector-icon name="${CHARGE_FORM_ICONS.QRCODE}"></vector-icon>
-          <span>${escapeHtml(this.#ctaText)}</span>
-        </button>
-      `;
-    };
+    this.template = () => pixChargeFormTemplate(this);
   }
 
   get amount() {

@@ -1,39 +1,17 @@
 import CustomElement from "@modnes/custom-element";
+import { pixKeyDialogTemplate } from "./pix-key-dialog.template.js";
 import {
   DEFAULT_KEY_DIALOG_CANCEL_BTN_LABEL,
   DEFAULT_KEY_DIALOG_CLOSE_TITLE,
-  DEFAULT_KEY_DIALOG_FIELD_LABELS,
   DEFAULT_KEY_DIALOG_INITIAL_TYPE,
   DEFAULT_KEY_DIALOG_SAVE_BTN_LABEL,
   DEFAULT_KEY_DIALOG_TITLE,
-  DEFAULT_KEY_DIALOG_TITLE_ID,
   KEY_DIALOG_CLASSES,
   KEY_DIALOG_EVENT_NAMES,
-  KEY_DIALOG_ICONS,
   KEY_DIALOG_INJECTABLES,
-  KEY_DIALOG_MAX_LENGTHS,
-  KEY_DIALOG_TYPES_CONFIG,
   getKeyTypeConfig,
 } from "./pix-key-dialog.constants.js";
 import { ChaveConta } from "../../../domain/entities/pix-key.entity.js";
-
-/**
- * Escapa caracteres HTML para prevenir injeção de script.
- *
- * @param {*} value
- * @returns {string}
- */
-function escapeHtml(value) {
-  if (value === null || value === undefined) {
-    return "";
-  }
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 
 /**
  * Polyfill/shim leve para HTMLDialogElement em ambientes sem suporte nativo (ex: jsdom).
@@ -95,6 +73,21 @@ export class PixKeyDialogComponent extends CustomElement {
       KEY_DIALOG_INJECTABLES.PIX_KEY_REPOSITORY,
       "pixKeyRepository",
     );
+
+    this.template = () =>
+      pixKeyDialogTemplate({
+        selectedKeyType: this.#selectedKeyType,
+        titleText: this.#titleText,
+        closeTitle: this.#closeTitle,
+        saveBtnLabel: this.#saveBtnLabel,
+        cancelBtnLabel: this.#cancelBtnLabel,
+        keyValue: this.#keyValue,
+        accountLabel: this.#accountLabel,
+        merchantName: this.#merchantName,
+        merchantCity: this.#merchantCity,
+        errorMessage: this.#errorMessage,
+        errorField: this.#errorField,
+      });
   }
 
   get savePixKeyUseCase() {
@@ -337,148 +330,9 @@ export class PixKeyDialogComponent extends CustomElement {
   }
 
   render() {
-    const activeTypeConfig = getKeyTypeConfig(this.#selectedKeyType);
     const wasOpen = this.open;
 
-    const typesHtml = KEY_DIALOG_TYPES_CONFIG.map((cfg) => {
-      const isActive = cfg.type === this.#selectedKeyType;
-      const activeClass = isActive
-        ? ` ${KEY_DIALOG_CLASSES.TYPE_BTN_ACTIVE}`
-        : "";
-      return `
-        <button
-          type="button"
-          class="${KEY_DIALOG_CLASSES.TYPE_BTN}${activeClass}"
-          data-type="${cfg.type}"
-          aria-pressed="${isActive ? "true" : "false"}"
-        >
-          ${escapeHtml(cfg.label)}
-        </button>
-      `;
-    }).join("");
-
-    const alertHtml = this.#errorMessage
-      ? `
-        <div class="${KEY_DIALOG_CLASSES.ALERT}" role="alert" aria-live="assertive">
-          <vector-icon name="${KEY_DIALOG_ICONS.CIRCLE_EXCLAMATION}" class="${KEY_DIALOG_CLASSES.ALERT_ICON}"></vector-icon>
-          <span class="${KEY_DIALOG_CLASSES.ALERT_TEXT}">${escapeHtml(this.#errorMessage)}</span>
-        </div>
-      `
-      : "";
-
-    const keyInputErrorClass =
-      this.#errorField === "valor_chave"
-        ? ` ${KEY_DIALOG_CLASSES.INPUT_ERROR}`
-        : "";
-    const nameInputErrorClass =
-      this.#errorField === "nome_recebedor"
-        ? ` ${KEY_DIALOG_CLASSES.INPUT_ERROR}`
-        : "";
-    const cityInputErrorClass =
-      this.#errorField === "cidade_recebedor"
-        ? ` ${KEY_DIALOG_CLASSES.INPUT_ERROR}`
-        : "";
-
-    this.innerHTML = `
-      <dialog class="${KEY_DIALOG_CLASSES.ROOT}" aria-labelledby="${DEFAULT_KEY_DIALOG_TITLE_ID}" role="dialog">
-        <header class="${KEY_DIALOG_CLASSES.HEADER}">
-          <h2 id="${DEFAULT_KEY_DIALOG_TITLE_ID}" class="${KEY_DIALOG_CLASSES.TITLE}">
-            ${escapeHtml(this.#titleText)}
-          </h2>
-          <button
-            type="button"
-            class="${KEY_DIALOG_CLASSES.CLOSE_BTN}"
-            title="${escapeHtml(this.#closeTitle)}"
-            aria-label="${escapeHtml(this.#closeTitle)}"
-          >
-            <vector-icon name="${KEY_DIALOG_ICONS.XMARK}"></vector-icon>
-          </button>
-        </header>
-
-        <form method="dialog" class="${KEY_DIALOG_CLASSES.FORM}">
-          <div class="${KEY_DIALOG_CLASSES.TYPES}" role="group" aria-label="Tipo de chave PIX">
-            ${typesHtml}
-          </div>
-
-          ${alertHtml}
-
-          <div class="${KEY_DIALOG_CLASSES.FIELD}">
-            <label for="key-dialog-input-key" class="${KEY_DIALOG_CLASSES.LABEL}">
-              ${escapeHtml(activeTypeConfig.fieldLabel || DEFAULT_KEY_DIALOG_FIELD_LABELS.KEY_VALUE)}
-            </label>
-            <input
-              id="key-dialog-input-key"
-              name="valor_chave"
-              type="${activeTypeConfig.typeAttr || "text"}"
-              inputmode="${activeTypeConfig.inputMode || "text"}"
-              placeholder="${escapeHtml(activeTypeConfig.placeholder)}"
-              maxlength="${activeTypeConfig.maxLength || 77}"
-              value="${escapeHtml(this.#keyValue)}"
-              class="${KEY_DIALOG_CLASSES.INPUT}${keyInputErrorClass}"
-              required
-            />
-          </div>
-
-          <div class="${KEY_DIALOG_CLASSES.FIELD}">
-            <label for="key-dialog-input-label" class="${KEY_DIALOG_CLASSES.LABEL}">
-              ${escapeHtml(DEFAULT_KEY_DIALOG_FIELD_LABELS.ACCOUNT_LABEL)}
-            </label>
-            <input
-              id="key-dialog-input-label"
-              name="rotulo"
-              type="text"
-              placeholder="${escapeHtml(DEFAULT_KEY_DIALOG_FIELD_LABELS.ACCOUNT_LABEL_PLACEHOLDER)}"
-              maxlength="${KEY_DIALOG_MAX_LENGTHS.ACCOUNT_LABEL}"
-              value="${escapeHtml(this.#accountLabel)}"
-              class="${KEY_DIALOG_CLASSES.INPUT}"
-            />
-          </div>
-
-          <div class="${KEY_DIALOG_CLASSES.ROW}">
-            <div class="${KEY_DIALOG_CLASSES.FIELD}">
-              <label for="key-dialog-input-holder" class="${KEY_DIALOG_CLASSES.LABEL}">
-                ${escapeHtml(DEFAULT_KEY_DIALOG_FIELD_LABELS.MERCHANT_NAME)}
-              </label>
-              <input
-                id="key-dialog-input-holder"
-                name="nome_recebedor"
-                type="text"
-                placeholder="${escapeHtml(DEFAULT_KEY_DIALOG_FIELD_LABELS.MERCHANT_NAME_PLACEHOLDER)}"
-                maxlength="${KEY_DIALOG_MAX_LENGTHS.MERCHANT_NAME}"
-                value="${escapeHtml(this.#merchantName)}"
-                class="${KEY_DIALOG_CLASSES.INPUT}${nameInputErrorClass}"
-                required
-              />
-            </div>
-            <div class="${KEY_DIALOG_CLASSES.FIELD}">
-              <label for="key-dialog-input-city" class="${KEY_DIALOG_CLASSES.LABEL}">
-                ${escapeHtml(DEFAULT_KEY_DIALOG_FIELD_LABELS.MERCHANT_CITY)}
-              </label>
-              <input
-                id="key-dialog-input-city"
-                name="cidade_recebedor"
-                type="text"
-                placeholder="${escapeHtml(DEFAULT_KEY_DIALOG_FIELD_LABELS.MERCHANT_CITY_PLACEHOLDER)}"
-                maxlength="${KEY_DIALOG_MAX_LENGTHS.MERCHANT_CITY}"
-                value="${escapeHtml(this.#merchantCity)}"
-                class="${KEY_DIALOG_CLASSES.INPUT}${cityInputErrorClass}"
-                required
-              />
-            </div>
-          </div>
-
-          <div class="${KEY_DIALOG_CLASSES.ACTIONS}">
-            <button type="button" class="${KEY_DIALOG_CLASSES.BTN_CANCEL}">
-              ${escapeHtml(this.#cancelBtnLabel)}
-            </button>
-            <button type="submit" class="${KEY_DIALOG_CLASSES.BTN_SAVE}">
-              <vector-icon name="${KEY_DIALOG_ICONS.CHECK}"></vector-icon>
-              <span>${escapeHtml(this.#saveBtnLabel)}</span>
-            </button>
-          </div>
-        </form>
-      </dialog>
-    `;
+    this.innerHTML = this.template();
 
     const dialog = this.querySelector("dialog");
     ensureDialogApi(dialog);

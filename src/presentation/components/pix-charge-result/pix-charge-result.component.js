@@ -1,84 +1,21 @@
 import CustomElement from "@modnes/custom-element";
+import { pixChargeResultTemplate } from "./pix-charge-result.template.js";
 import {
   CHARGE_RESULT_CLASSES,
   CHARGE_RESULT_EVENT_NAMES,
   CHARGE_RESULT_ICONS,
   COPY_FEEDBACK_DURATION_MS,
-  DEFAULT_CHARGE_RESULT_ACCOUNT_FALLBACK,
   DEFAULT_CHARGE_RESULT_ARIA_LABEL,
-  DEFAULT_CHARGE_RESULT_BRCODE_ARIA_LABEL,
-  DEFAULT_CHARGE_RESULT_BRCODE_TITLE,
-  DEFAULT_CHARGE_RESULT_BTN_COPY_ARIA_LABEL,
-  DEFAULT_CHARGE_RESULT_BTN_DOWNLOAD_ARIA_LABEL,
-  DEFAULT_CHARGE_RESULT_BTN_SHARE_ARIA_LABEL,
   DEFAULT_CHARGE_RESULT_COPIED_LABEL,
   DEFAULT_CHARGE_RESULT_COPY_LABEL,
   DEFAULT_CHARGE_RESULT_DOWNLOAD_FILENAME,
-  DEFAULT_CHARGE_RESULT_DOWNLOAD_LABEL,
   DEFAULT_CHARGE_RESULT_LIVE_COPIED,
   DEFAULT_CHARGE_RESULT_LIVE_COPY_FALLBACK,
   DEFAULT_CHARGE_RESULT_LIVE_DOWNLOADED,
   DEFAULT_CHARGE_RESULT_LIVE_SHARED,
-  DEFAULT_CHARGE_RESULT_MODE_FIXED,
-  DEFAULT_CHARGE_RESULT_MODE_OPEN,
-  DEFAULT_CHARGE_RESULT_QR_ALT,
-  DEFAULT_CHARGE_RESULT_SHARE_LABEL,
-  DEFAULT_CHARGE_RESULT_WAITING_DESCRIPTION,
-  DEFAULT_CHARGE_RESULT_WAITING_TITLE,
   DISTRIBUTE_PIX_CHARGE_INJECTABLE_TOKEN,
-  formatAccountSummary,
   formatChargeAmountBadge,
-  formatKeyMetadata,
 } from "./pix-charge-result.constants.js";
-
-/**
- * Escapa caracteres HTML para mitigar riscos de injeção de script (XSS).
- *
- * @param {*} value
- * @returns {string}
- */
-function escapeHtml(value) {
-  if (value === null || value === undefined) {
-    return "";
-  }
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-/**
- * Resolve o conteúdo gráfico do QR Code a partir de SVG ou dataUrl.
- *
- * @param {object|string|null|undefined} imagemQrcode Objeto ou string representando o QR Code
- * @returns {string} Markup HTML/SVG para inserção segura no palco
- */
-function resolveQrContent(imagemQrcode) {
-  if (!imagemQrcode) {
-    return "";
-  }
-
-  if (typeof imagemQrcode === "string") {
-    const trimmed = imagemQrcode.trim();
-    if (trimmed.startsWith("<svg") || trimmed.includes("<svg")) {
-      return trimmed;
-    }
-    return `<img src="${escapeHtml(trimmed)}" alt="${escapeHtml(DEFAULT_CHARGE_RESULT_QR_ALT)}" />`;
-  }
-
-  if (typeof imagemQrcode === "object") {
-    if (imagemQrcode.svg && typeof imagemQrcode.svg === "string") {
-      return imagemQrcode.svg.trim();
-    }
-    if (imagemQrcode.dataUrl && typeof imagemQrcode.dataUrl === "string") {
-      return `<img src="${escapeHtml(imagemQrcode.dataUrl)}" alt="${escapeHtml(DEFAULT_CHARGE_RESULT_QR_ALT)}" />`;
-    }
-  }
-
-  return "";
-}
 
 /**
  * Web Component <pix-charge-result>
@@ -109,116 +46,11 @@ export class PixChargeResultComponent extends CustomElement {
     this.#liveRegionElement.setAttribute("aria-live", "polite");
     this.#liveRegionElement.setAttribute("aria-atomic", "true");
 
-    this.template = () => {
-      if (!this.#charge) {
-        return `
-          <div class="${CHARGE_RESULT_CLASSES.WAITING}">
-            <vector-icon
-              class="${CHARGE_RESULT_CLASSES.WAITING_ICON}"
-              name="${CHARGE_RESULT_ICONS.QRCODE}"
-            ></vector-icon>
-            <h3 class="${CHARGE_RESULT_CLASSES.WAITING_TITLE}">
-              ${escapeHtml(DEFAULT_CHARGE_RESULT_WAITING_TITLE)}
-            </h3>
-            <p class="${CHARGE_RESULT_CLASSES.WAITING_DESC}">
-              ${escapeHtml(DEFAULT_CHARGE_RESULT_WAITING_DESCRIPTION)}
-            </p>
-          </div>
-        `;
-      }
-
-      const accountText = formatAccountSummary(this.#charge.chave_conta);
-      const badgeInfo = formatChargeAmountBadge(
-        this.#charge.valor_opcional,
-        this.#charge.valor_dinamico,
-      );
-      const modeText = this.#charge.valor_dinamico
-        ? DEFAULT_CHARGE_RESULT_MODE_OPEN
-        : DEFAULT_CHARGE_RESULT_MODE_FIXED;
-      const metaText = formatKeyMetadata(this.#charge.chave_conta);
-      const brCode = this.#charge.chave_cobranca || "";
-      const qrContent = resolveQrContent(this.#charge.imagem_qrcode);
-
-      const copyLabel = this.#isCopied
-        ? DEFAULT_CHARGE_RESULT_COPIED_LABEL
-        : DEFAULT_CHARGE_RESULT_COPY_LABEL;
-      const copyIcon = this.#isCopied
-        ? CHARGE_RESULT_ICONS.CHECK
-        : CHARGE_RESULT_ICONS.COPY;
-      const copyModifier = this.#isCopied
-        ? ` ${CHARGE_RESULT_CLASSES.BTN_COPIED}`
-        : "";
-
-      return `
-        <div class="${CHARGE_RESULT_CLASSES.HEADER}">
-          <div class="${CHARGE_RESULT_CLASSES.HEADER_INFO}">
-            <h3 class="${CHARGE_RESULT_CLASSES.ACCOUNT}">
-              ${escapeHtml(accountText || DEFAULT_CHARGE_RESULT_ACCOUNT_FALLBACK)}
-            </h3>
-          </div>
-          <span class="${badgeInfo.className}">
-            ${escapeHtml(badgeInfo.text)}
-          </span>
-        </div>
-
-        <div class="${CHARGE_RESULT_CLASSES.QR_STAGE}">
-          <div class="${CHARGE_RESULT_CLASSES.QR_FRAME}">
-            <div class="${CHARGE_RESULT_CLASSES.QR_SVG}">
-              ${qrContent}
-            </div>
-          </div>
-          <p class="${CHARGE_RESULT_CLASSES.META}">${escapeHtml(metaText)}</p>
-        </div>
-
-        <div class="${CHARGE_RESULT_CLASSES.BRCODE_WRAPPER}">
-          <div class="${CHARGE_RESULT_CLASSES.BRCODE_LABEL}">
-            <span class="${CHARGE_RESULT_CLASSES.BRCODE_TITLE}">
-              ${DEFAULT_CHARGE_RESULT_BRCODE_TITLE}
-            </span>
-            <span class="${CHARGE_RESULT_CLASSES.BRCODE_MODE}">
-              ${escapeHtml(modeText)}
-            </span>
-          </div>
-          <div
-            class="${CHARGE_RESULT_CLASSES.BRCODE}"
-            tabindex="0"
-            role="region"
-            aria-label="${DEFAULT_CHARGE_RESULT_BRCODE_ARIA_LABEL}"
-          >${escapeHtml(brCode)}</div>
-        </div>
-
-        <div class="${CHARGE_RESULT_CLASSES.ACTIONS}">
-          <button
-            type="button"
-            class="${CHARGE_RESULT_CLASSES.BTN} ${CHARGE_RESULT_CLASSES.BTN_COPY}${copyModifier}"
-            aria-label="${DEFAULT_CHARGE_RESULT_BTN_COPY_ARIA_LABEL}"
-          >
-            <vector-icon name="${copyIcon}"></vector-icon>
-            <span>${escapeHtml(copyLabel)}</span>
-          </button>
-
-          <button
-            type="button"
-            class="${CHARGE_RESULT_CLASSES.BTN} ${CHARGE_RESULT_CLASSES.BTN_SHARE}"
-            aria-label="${DEFAULT_CHARGE_RESULT_BTN_SHARE_ARIA_LABEL}"
-          >
-            <vector-icon name="${CHARGE_RESULT_ICONS.SHARE}"></vector-icon>
-            <span>${escapeHtml(DEFAULT_CHARGE_RESULT_SHARE_LABEL)}</span>
-          </button>
-
-          <button
-            type="button"
-            class="${CHARGE_RESULT_CLASSES.BTN} ${CHARGE_RESULT_CLASSES.BTN_DOWNLOAD}"
-            aria-label="${DEFAULT_CHARGE_RESULT_BTN_DOWNLOAD_ARIA_LABEL}"
-          >
-            <vector-icon name="${CHARGE_RESULT_ICONS.DOWNLOAD}"></vector-icon>
-            <span>${escapeHtml(DEFAULT_CHARGE_RESULT_DOWNLOAD_LABEL)}</span>
-          </button>
-
-          <slot name="actions"></slot>
-        </div>
-      `;
-    };
+    this.template = () =>
+      pixChargeResultTemplate({
+        charge: this.#charge,
+        isCopied: this.#isCopied,
+      });
   }
 
   connectedCallback() {
