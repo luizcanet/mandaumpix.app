@@ -8,7 +8,7 @@
 /**
  * Título padrão exibido no cabeçalho do diálogo modal de cobrança.
  */
-export const DEFAULT_CHARGE_DIALOG_TITLE = "Cobrança PIX Gerada";
+export const DEFAULT_CHARGE_DIALOG_TITLE = "Cobrança Pronta";
 
 /**
  * Identificador semântico do título para associação acessível (aria-labelledby).

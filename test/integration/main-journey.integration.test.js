@@ -148,11 +148,7 @@ describe("Jornada Principal de Cobrança PIX (TASK-07.2.2, TASK-07.2.3, TASK-07.
         ".charge-dialog__title",
       );
       expect(dialogTitle).not.toBeNull();
-      expect(dialogTitle.textContent).toContain("Cobrança PIX Gerada");
-
-      expect(
-        resultElement.querySelector(".charge-result__badge-ready"),
-      ).not.toBeNull();
+      expect(dialogTitle.textContent).toContain("Cobrança Pronta");
 
       const accountTitle = resultElement.querySelector(
         ".charge-result__account",

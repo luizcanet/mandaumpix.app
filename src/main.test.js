@@ -1130,7 +1130,7 @@ describe("main.js", () => {
         "generate-pix-charge-use-case",
       );
 
-      expect(DEFAULT_CHARGE_DIALOG_TITLE).toBe("Cobrança PIX Gerada");
+      expect(DEFAULT_CHARGE_DIALOG_TITLE).toBe("Cobrança Pronta");
       expect(DEFAULT_CHARGE_DIALOG_TITLE_ID).toBe("charge-dialog-title");
       expect(DEFAULT_CHARGE_DIALOG_CLOSE_TITLE).toBe(
         "Fechar diálogo de cobrança",

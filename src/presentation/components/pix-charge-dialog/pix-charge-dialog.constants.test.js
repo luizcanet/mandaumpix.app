@@ -37,7 +37,7 @@ describe("pix-charge-dialog.constants (TASK-07.4.1)", () => {
 
   describe("Valores padrão dos textos e acessibilidade W3C ARIA", () => {
     it("deve definir o título padrão da caixa de diálogo", () => {
-      expect(DEFAULT_CHARGE_DIALOG_TITLE).toBe("Cobrança PIX Gerada");
+      expect(DEFAULT_CHARGE_DIALOG_TITLE).toBe("Cobrança Pronta");
     });
 
     it("deve definir o ID semântico do cabeçalho para aria-labelledby", () => {
