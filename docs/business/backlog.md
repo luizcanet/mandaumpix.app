@@ -17,6 +17,7 @@ Este documento consolida o **Backlog do Produto e de Engenharia** do **Manda um 
 | **EP-05** | Gestão de Chaves PIX na Interface (`<pix-key-*>`)                                               | `RN01`, `RN02`, `<dialog class="key-dialog">`                          |     `3 / 3`     | ✅ Concluído    |
 | **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")                                   | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas                       |     `3 / 3`     | ✅ Concluído    |
 | **EP-07** | Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA), Deploy `stg`/`prd` e Diálogo de Cobrança | Testes de Integração, Storybook a11y, Releases, Caixa de Diálogo Modal |     `3 / 4`     | ⏳ Em Andamento |
+| **EP-08** | Proteção de Marca, Monitoramento Ativo e Procedimentos de Takedown                              | `RN08`, Certificate Transparency, UX Defensiva, TWA, Playbook Takedown |     `0 / 5`     | 📋 Planejado    |
 
 ---
 
@@ -31,6 +32,7 @@ flowchart TD
     EP05["✅ EP-05: Gestão de Chaves PIX na UI<br/>(Empty State, Seletor Radio Cards, Modal &lt;dialog&gt;)"]
     EP06["✅ EP-06: Geração e Distribuição 'Manda um PIX'<br/>(Formulário de Valor, QR Code SVG, Copiar/WhatsApp/PNG)"]
     EP07["⏳ EP-07: Testes Integrados, Catálogo Storybook Completo,<br/>Pipelines CD (stg / prd) & Caixa de Diálogo Modal (&lt;dialog&gt;)"]
+    EP08["📋 EP-08: Proteção de Marca, Monitoramento Ativo<br/>& Procedimentos de Takedown (RN08)"]
 
     EP01 --> EP02
     EP01 --> EP03
@@ -39,6 +41,7 @@ flowchart TD
     EP02 & EP03 & EP04 --> EP05
     EP05 --> EP06
     EP04 & EP06 --> EP07
+    EP04 & EP07 --> EP08
 ```
 
 ---
@@ -1404,6 +1407,169 @@ flowchart LR
 
 ---
 
+### 🛡️ Épico 08 — Proteção de Marca, Monitoramento Ativo e Procedimentos de Takedown
+
+> **Objetivo**: Proteger o aplicativo `mandaumpix.app` e seus usuários contra golpes de engenharia social, réplicas maliciosas (phishing), desvio silencioso de chaves PIX e distribuição de APKs adulterados, por meio de monitoramento automatizado de certificados/DNS, UX defensiva in-app, canais comunitários de denúncia, distribuição oficial via Trusted Web Activity (TWA) e playbook operacional de derrubada (_takedown_) multicanal (`RN08`).
+
+| ID          | Item de Backlog                                                                             | Status       | Complexidade |
+| :---------- | :------------------------------------------------------------------------------------------ | :----------- | :----------: |
+| **US-08.1** | Monitoramento Automatizado de Certificados e Typosquatting (Certificate Transparency & DNS) | 📋 Planejado |   `3 pts`    |
+| **US-08.2** | UX Defensiva: Alerta de Autenticidade Canônica e Validação de Origem no PWA                 | 📋 Planejado |   `2 pts`    |
+| **US-08.3** | Canal Comunitário de Denúncia de Fraudes, `security.txt` e Diretrizes na Página "Sobre"     | 📋 Planejado |   `2 pts`    |
+| **US-08.4** | Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links      | 📋 Planejado |   `3 pts`    |
+| **US-08.5** | Esteira de Assinatura Criptográfica de Releases e Verificação de Integridade de Builds      | 📋 Planejado |   `2 pts`    |
+
+```mermaid
+flowchart TD
+    US081["US-08.1: Monitoramento Ativo (CT & DNS)"]
+    US082["US-08.2: UX Defensiva & Origem Canônica"]
+    US083["US-08.3: Canal Denúncia & security.txt"]
+    US084["US-08.4: Publicação Oficial Play Store (TWA)"]
+    US085["US-08.5: Assinatura & Integridade Builds"]
+
+    US081 --> US083
+    US082 --> US083
+    US084 --> US085
+```
+
+#### `US-08.1` — Monitoramento Automatizado de Certificados e Typosquatting (Certificate Transparency & DNS) (`📋 Planejado` · `3 Story Points`)
+
+- **História (Narrativa Canônica)**:
+  > **Como** **Mantenedor do projeto Manda um PIX**,
+  > **Quero** uma rotina automatizada de monitoramento contínuo em logs de Certificate Transparency e permutações de DNS/Typosquatting via GitHub Actions e scripts de inspeção,
+  > **Para que** novas tentativas de subida de réplicas maliciosas sejam detectadas no momento exato da emissão do certificado SSL, permitindo disparar procedimentos de contenção antes que os golpistas consigam enganar usuários finais em massa.
+- **Regras de Negócio e Invariantes**: `RN08` ([Modelo de Domínio](./domain_model.md) e [Guia de Monitoramento e Takedown](../security/takedown_and_monitoring.md)).
+  - **INV-01 (Inspeção de Certificate Transparency)**: O script deve inspecionar as APIs públicas de CT logs (`crt.sh`) buscando emissões recentes contendo os radicais `mandaumpix` e `manda-um-pix`.
+  - **INV-02 (Filtragem de Origens Autorizadas)**: Os domínios oficiais (`mandaumpix.app`, `stg.mandaumpix.app`, `dev.mandaumpix.app`, `mandaumpix-app-*.web.app`, `mandaumpix-app-*.firebaseapp.com`) devem ser filtrados como legítimos, evitando falsos positivos.
+  - **INV-03 (Alerta Automatizado de Incidente)**: Ao identificar um domínio não reconhecido com certificado emitido há menos de 7 dias, a rotina deve gerar uma issue com o label `security-incident` e emitir notificação webhook formatada.
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Detecção de Novo Domínio Não Autorizado via CT Logs — Happy Path)**:
+    - Dado que uma nova autoridade certificadora emitiu um certificado para `mandaumpix-seguro.com`,
+    - Quando o workflow agendado de monitoramento for executado,
+    - Então o script deve registrar o domínio como suspeito,
+    - E deve gerar automaticamente uma issue de incidente de segurança no repositório com as informações de IP, ASN, emissor e link para o formulário de Takedown.
+  - **Cenário 02 (Ignorar Domínios Oficiais Conhecidos — Sem Falsos Positivos)**:
+    - Dado que o Google Trust Services renovou o certificado legítimo para `dev.mandaumpix.app`,
+    - Quando o script de monitoramento analisar a lista de certificados,
+    - Então o domínio deve ser ignorado pela lista de permissões oficial,
+    - E nenhum alerta falso deve ser disparado.
+  - **Cenário 03 (Resiliência contra Indisponibilidade Temporária de API)**:
+    - Dado que a API do `crt.sh` retorna código HTTP 503 ou timeout,
+    - Quando o script tentar realizar a consulta,
+    - Então ele deve tentar retry com backoff exponencial (até 3 tentativas) antes de falhar graciosamente sem quebrar a esteira de CI.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-08.1.1 (Script de Monitoramento de CT)**: Criar script Node.js [`scripts/security/monitor-ct-logs.js`](../../scripts/security/monitor-ct-logs.js) que consulta APIs de Certificate Transparency, filtra domínios autorizados e gera relatório JSON de certificados anômalos.
+  - [ ] **TASK-08.1.2 (Testes Unitários do Parser de CT)**: Criar suíte de testes unitários em Vitest validando a filtragem de domínios permitidos, identificação de anomalias e sanitização de dados.
+  - [ ] **TASK-08.1.3 (Workflow Agendado GitHub Actions)**: Criar workflow agendado [`.github/workflows/security-ct-monitor.yml`](../../.github/workflows/security-ct-monitor.yml) com execução cron diária e suporte a disparo manual (`workflow_dispatch`).
+  - [ ] **TASK-08.1.4 (Documentação e Integração com Webhook)**: Documentar variáveis de ambiente seguras (`SECURITY_WEBHOOK_URL`) em [`docs/configuration/environment.md`](../configuration/environment.md) e [`docs/security/takedown_and_monitoring.md`](../security/takedown_and_monitoring.md).
+
+#### `US-08.2` — UX Defensiva: Alerta de Autenticidade Canônica e Validação de Origem no PWA (`📋 Planejado` · `2 Story Points`)
+
+- **História (Narrativa Canônica)**:
+  > **Como** **Usuário do Manda um PIX**,
+  > **Quero** visualizar indicações claras e acessíveis de que estou utilizando o endereço oficial (`mandaumpix.app`) e receber um alerta visual ostensivo caso o aplicativo esteja rodando em um clone ou domínio não reconhecido,
+  > **Para que** eu nunca seja induzido a informar chaves PIX ou credenciais em um site falso hospedado por golpistas.
+- **Regras de Negócio e Invariantes**: `RN07`, `RN08` ([Modelo de Domínio](./domain_model.md) e [Guia de Monitoramento e Takedown](../security/takedown_and_monitoring.md)).
+  - **INV-01 (Validador de Origem Canônica)**: A aplicação client-side deve inspecionar `window.location.origin` contra a lista branca de origens permitidas (`mandaumpix.app`, `stg.mandaumpix.app`, `dev.mandaumpix.app` e origens locais de teste).
+  - **INV-02 (Banner Ostensivo de Alerta de Cópia Não Oficial)**: Caso a origem não pertença à lista canônica, um banner fixo no topo (`.security-warning-banner`) com contraste WCAG AAA deve ser exibido, alertando que se trata de uma cópia não oficial e fornecendo link direto para o site oficial legítimo.
+  - **INV-03 (Selo de Origem Verificada na Tela Sobre)**: Na página "Sobre" e no rodapé do app legítimo, deve ser exibido o badge "Origem Oficial: mandaumpix.app" com ícone de verificação segura e aviso da arquitetura _Zero-Credential_ ("Nunca solicitamos senhas bancárias").
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Acesso no Domínio Oficial — Exibição do Selo de Autenticidade)**:
+    - Dado que o usuário acessa `https://mandaumpix.app`,
+    - Quando a aplicação inicializa no navegador,
+    - Então nenhum banner de perigo deve ser exibido,
+    - E o rodapé e a página "Sobre" devem exibir o selo de autenticidade oficial verificado.
+  - **Cenário 02 (Execução em Domínio Desconhecido / Clone Fraudulento)**:
+    - Dado que um clone do aplicativo foi hospedado no domínio `https://manda-um-pix.online`,
+    - Quando qualquer usuário carregar a página no navegador,
+    - Então o validador de origem deve detectar a inconsistência,
+    - E deve renderizar imediatamente um banner fixo de alerta com o texto: `"Atenção: Este não é o endereço oficial do Manda um PIX. Acesse com segurança em mandaumpix.app"`.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-08.2.1 (Módulo de Validação de Origem Canônica)**: Implementar [`src/domain/security/origin-validator.js`](../../src/domain/security/origin-validator.js) contendo as regras de origens canônicas com testes unitários em [`src/domain/security/origin-validator.test.js`](../../src/domain/security/origin-validator.test.js).
+  - [ ] **TASK-08.2.2 (Web Component `<security-banner>`)**: Criar componente Web Component acessível (`role="alert"`, `aria-live="assertive"`) ativado sob origens não autorizadas com testes de renderização.
+  - [ ] **TASK-08.2.3 (Selo de Autenticidade na Página Sobre e Rodapé)**: Atualizar [`src/presentation/components/about/about.component.js`](../../src/presentation/components/about/about.component.js) e componentes de rodapé com selo de origem oficial e advertência Zero-Credential.
+  - [ ] **TASK-08.2.4 (Storybook & Acessibilidade)**: Adicionar stories no Storybook para o componente de banner de alerta e o badge de autenticidade, auditados com `@storybook/addon-a11y`.
+
+#### `US-08.3` — Canal Comunitário de Denúncia de Fraudes, `security.txt` e Diretrizes na Página "Sobre" (`📋 Planejado` · `2 Story Points`)
+
+- **História (Narrativa Canônica)**:
+  > **Como** **Usuário ou Pesquisador de Segurança**,
+  > **Quero** ter acesso rápido a um canal padronizado de denúncia de réplicas maliciosas e um arquivo canônico `security.txt` segundo a RFC 9116,
+  > **Para que** qualquer clone falso ou vulnerabilidade de segurança identificada possa ser reportada diretamente aos mantenedores do projeto para pronta resposta.
+- **Regras de Negócio e Invariantes**: `RN07`, `RN08` ([Modelo de Domínio](./domain_model.md)).
+  - **INV-01 (Conformidade RFC 9116 — `security.txt`)**: O arquivo estático `/.well-known/security.txt` deve ser servido com cabeçalhos apropriados, apontando contato oficial (`Contact: mailto:me@luizca.net`), link de política de segurança (`Policy: https://mandaumpix.app/docs/security/takedown_and_monitoring.md`) e data de expiração canônica.
+  - **INV-02 (Seção de Segurança na Página Sobre)**: A página Sobre deve disponibilizar um botão/link "Denunciar Cópia Falsa ou Golpe" que abre cliente de e-mail pré-formatado com campos para informar a URL maliciosa e prints.
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Acesso ao `security.txt` no Domínio Oficial)**:
+    - Dado que um pesquisador de segurança consulta `https://mandaumpix.app/.well-known/security.txt`,
+    - Quando o servidor responde à requisição HTTP,
+    - Então o arquivo deve conter os campos `Contact`, `Expires`, `Preferred-Languages` e `Canonical` em formato de texto puro conforme a RFC 9116.
+  - **Cenário 02 (Acionamento do Canal de Denúncia na Interface)**:
+    - Dado que o usuário navega na página "Sobre",
+    - Quando ele clica no link "Denunciar site falso",
+    - Então é disparado o link `mailto:` contendo o assunto pré-preenchido `[Denúncia de Golpe / Cópia Falsa] Manda um PIX` e instruções no corpo para envio da URL fraudulenta.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-08.3.1 (Criação do Arquivo RFC 9116 `security.txt`)**: Criar arquivo canônico [`.well-known/security.txt`](../../.well-known/security.txt) e configurar roteamento/MIME type em [`firebase.json`](../../firebase.json).
+  - [ ] **TASK-08.3.2 (Inclusão de Bloco de Segurança na Página Sobre)**: Implementar bloco de segurança e link de denúncia acessível no Web Component [`src/presentation/components/about/about.component.js`](../../src/presentation/components/about/about.component.js).
+  - [ ] **TASK-08.3.3 (Testes Unitários de Rota e Acessibilidade)**: Criar testes unitários em Vitest validando a integridade dos links e acessibilidade da página Sobre.
+
+#### `US-08.4` — Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links (`📋 Planejado` · `3 Story Points`)
+
+- **História (Narrativa Canônica)**:
+  > **Como** **Usuário Android**,
+  > **Quero** encontrar e instalar o aplicativo oficial do Manda um PIX diretamente na Google Play Store com garantia criptográfica de procedência,
+  > **Para que** golpistas não possam ocupar o nome e a marca do aplicativo com APKs maliciosos ou trojans bancários na loja oficial de aplicativos.
+- **Regras de Negócio e Invariantes**: `RN06`, `RN08` ([Modelo de Domínio](./domain_model.md) e [Guia de Infraestrutura](../deployment/infrastructure.md)).
+  - **INV-01 (Digital Asset Links Canônico)**: O arquivo estático `/.well-known/assetlinks.json` deve ser servido pelo Firebase Hosting mapeando a impressão digital SHA-256 do certificado de assinatura do Google Play ao package name oficial `app.mandaumpix.twa`.
+  - **INV-02 (Ocupação Defensiva da Loja de Aplicativos)**: A publicação oficial do PWA via TWA (Trusted Web Activity) blinda a marca na busca da Play Store, garantindo que o app utilize o mesmo domínio canônico seguro sem barra de endereços do navegador.
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Validação do Digital Asset Links pelo Android)**:
+    - Dado que o aplicativo TWA oficial é instalado no dispositivo Android,
+    - Quando o sistema operacional requisita `https://mandaumpix.app/.well-known/assetlinks.json`,
+    - Então o arquivo JSON válido é retornado com `Content-Type: application/json`,
+    - E o sistema Android valida a relação de confiança `delegate_permission/common.handle_all_urls`.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-08.4.1 (Criação de `.well-known/assetlinks.json`)**: Criar arquivo [`.well-known/assetlinks.json`](../../.well-known/assetlinks.json) com o manifesto de permissão e configurar cabeçalhos em [`firebase.json`](../../firebase.json).
+  - [ ] **TASK-08.4.2 (Configuração de Build Bubblewrap TWA)**: Configurar manifesto `twa-manifest.json` com ícones, cores de tema, package name `app.mandaumpix.twa` e versão sincronizada com `package.json`.
+  - [ ] **TASK-08.4.3 (Documentação do Processo de Publicação Play Store)**: Documentar em [`docs/deployment/pipeline.md`](../deployment/pipeline.md) o passo a passo de build do Android App Bundle (`.aab`) e upload no Google Play Console.
+
+#### `US-08.5` — Esteira de Assinatura Criptográfica de Releases e Verificação de Integridade de Builds (`📋 Planejado` · `2 Story Points`)
+
+- **História (Narrativa Canônica)**:
+  > **Como** **Usuário Técnico ou Auditor de Segurança**,
+  > **Quero** poder auditar e validar a integridade criptográfica dos artefatos estáticos (`dist/`) através de hashes SHA-256 publicados e tags Git assinadas,
+  > **Para que** eu tenha garantia matemática de que o código em execução no domínio `mandaumpix.app` corresponde exatamente ao código-fonte público inspecionado, sem modificações maliciosas na esteira de deploy.
+- **Regras de Negócio e Invariantes**: `RN08` ([Pipeline de CI/CD](../deployment/pipeline.md)).
+  - **INV-01 (Geração de `SHA256SUMS`)**: A cada execução de build de produção (`npm run build`), deve ser gerado o arquivo `dist/SHA256SUMS` contendo os hashes criptográficos de todos os arquivos estáticos compilados.
+  - **INV-02 (Verificação Automatizada em CI)**: O workflow de CI/CD deve verificar a integridade dos artefatos antes de executar o deploy para o Firebase Hosting.
+- **Critérios de Aceite (BDD / Gherkin)**:
+  - **Cenário 01 (Geração de Hashes de Release em Build de Produção — Happy Path)**:
+    - Dado que o desenvolvedor ou o workflow de CI executa `npm run build`,
+    - Quando o processo de compilação finalizar com sucesso,
+    - Então o arquivo `dist/SHA256SUMS` deve existir e conter linhas com hash SHA-256 e o caminho relativo de cada arquivo em `dist/`.
+  - **Cenário 02 (Auditoria e Validação via CLI)**:
+    - Dado que um usuário faz o download dos arquivos compilados ou inspeciona o site publicado,
+    - Quando executa o comando `sha256sum -c SHA256SUMS`,
+    - Então todos os arquivos devem ser validados com status `OK`.
+- **Tarefas de Desenvolvimento (Dev Tasks)**:
+  - [ ] **TASK-08.5.1 (Script de Geração de Checksums)**: Criar script Node.js [`scripts/generate-checksums.js`](../../scripts/generate-checksums.js) e adicionar comando `npm run build:checksums` em [`package.json`](../../package.json).
+  - [ ] **TASK-08.5.2 (Integração na Pipeline de Deploy)**: Atualizar [`.github/workflows/deploy-dev.yml`](../../.github/workflows/deploy-dev.yml) e workflows de staging/produção para publicar o arquivo de hashes nos artefatos da release.
+  - [ ] **TASK-08.5.3 (Guia de Auditoria e Verificação de Integridade)**: Documentar em [`docs/security/takedown_and_monitoring.md`](../security/takedown_and_monitoring.md) e [`docs/quality/static_analysis.md`](../quality/static_analysis.md) as instruções para verificação de hashes pelos usuários.
+
+```mermaid
+flowchart LR
+    T81["TASK-08.1.1 a 08.1.4: Script CT & Actions"]
+    T82["TASK-08.2.1 a 08.2.4: UX Defensiva & Origem"]
+    T83["TASK-08.3.1 a 08.3.3: security.txt & Denúncia"]
+    T84["TASK-08.4.1 a 08.4.3: Digital Asset Links & TWA"]
+    T85["TASK-08.5.1 a 08.5.3: Hashes SHA256 & CI Deploy"]
+
+    T81 & T82 --> T83
+    T84 --> T85
+```
+
+---
+
 ## 🔗 Matriz de Rastreabilidade (Regras de Negócio × Backlog)
 
 | Regra de Negócio | Descrição Resumida                                                                                                                                                                          | Histórias Vinculadas no Backlog                                  |
@@ -1415,6 +1581,7 @@ flowchart LR
 |     **RN05**     | Opções de saída: Copiar, Compartilhar (WhatsApp) e Salvar Imagem PNG localmente                                                                                                             | `US-02.1`, `US-02.5`, `US-03.3`, `US-06.3`, `US-07.4`            |
 |     **RN06**     | Exibição destacada do botão **"Instalar"** quando o PWA ainda não está instalado                                                                                                            | `US-02.5`, `US-03.2`, `US-04.2`, `US-07.2`                       |
 |     **RN07**     | Acesso fácil à página **"Sobre"** (app gratuito/livre/open-source, autor, projeto, apoio "Manda um PIX" com QR Code dinâmico e Copia e Cola para `eu@luizca.net`, e incentivo à divulgação) | `US-04.2`, `US-04.3`, `US-04.4`, `US-07.2`                       |
+|     **RN08**     | Verificação de autenticidade, alerta contra réplicas maliciosas, UX defensiva Zero-Credential e procedimentos de takedown                                                                   | `US-08.1`, `US-08.2`, `US-08.3`, `US-08.4`, `US-08.5`            |
 
 ---
 

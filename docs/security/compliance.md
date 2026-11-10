@@ -23,4 +23,20 @@ Como chaves PIX frequentemente correspondem a dados pessoais (CPF, número de te
 
 ---
 
-⬅️ **Anterior**: [Autenticação e Acesso](./auth_and_access.md) | ➡️ **Próximo**: [Stack Tecnológica](../technology/stack.md)
+## 🚨 Prevenção contra Phishing, Réplicas Maliciosas e Takedown
+
+Como o código-fonte é aberto sob licença `AGPL-3.0-only`, fraudadores podem clonar o aplicativo em domínios falsos buscando induzir usuários ao erro (desvio de chaves PIX ou roubo de credenciais bancárias).
+
+O projeto adota uma estratégia estruturada em 5 frentes defensivas:
+
+1. **Titularidade Marcária no INPI**: O código é aberto, mas a marca e o nome comercial são protegidos legalmente.
+2. **Monitoramento Automatizado**: Varredura contínua de novos certificados via _Certificate Transparency_ (`crt.sh`) e permutações de DNS (_Typosquatting_).
+3. **UX Defensiva**: Validação in-app de origem canônica (`mandaumpix.app`) e reforço visual do princípio _Zero-Credential_.
+4. **Procedimento de Takedown Rápido**: Protocolo operacional para bloqueio via Google Safe Browsing, notificação ao CERT.br e desativação em provedores de hospedagem/DNS.
+5. **Distribuição Canônica Android (TWA)**: Proteção via Digital Asset Links na Google Play Store.
+
+> 📖 **Para detalhamento completo dos planos de ação, fluxogramas e modelos de notificação**, consulte [Monitoramento Ativo e Procedimentos de Derrubada (Takedown)](./takedown_and_monitoring.md).
+
+---
+
+⬅️ **Anterior**: [Autenticação e Acesso](./auth_and_access.md) | ➡️ **Próximo**: [Monitoramento Ativo e Takedown](./takedown_and_monitoring.md)
