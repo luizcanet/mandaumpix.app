@@ -214,6 +214,19 @@ import {
   resolveRequiredPixKeyId,
   upgradePixKeyDatabaseSchema,
   validateAndNormalizePixKey,
+  CANONICAL_ORIGINS,
+  CANONICAL_PRODUCTION_ORIGIN,
+  OFFICIAL_DOMAIN,
+  OFFICIAL_ORIGIN_BADGE_LABEL,
+  SECURITY_ALERT_MESSAGE,
+  ZERO_CREDENTIAL_MESSAGE,
+  getCanonicalOrigins,
+  isCanonicalOrigin,
+  isLocalOrigin,
+  isOfficialOrigin,
+  isProductionOrigin,
+  normalizeOrigin,
+  validateOrigin,
 } from "./main.js";
 
 describe("main.js", () => {
@@ -378,6 +391,27 @@ describe("main.js", () => {
       expect(validateAndNormalizePixKey).toBeTypeOf("function");
       expect(normalizeMerchantName).toBeTypeOf("function");
       expect(normalizeMerchantCity).toBeTypeOf("function");
+    });
+  });
+
+  describe("domain security exports (US-08.2 / TASK-08.2.1)", () => {
+    it("should re-export canonical origin security constants and validators", () => {
+      expect(CANONICAL_PRODUCTION_ORIGIN).toBe("https://mandaumpix.app");
+      expect(OFFICIAL_DOMAIN).toBe("mandaumpix.app");
+      expect(CANONICAL_ORIGINS).toBeDefined();
+      expect(Object.isFrozen(CANONICAL_ORIGINS)).toBe(true);
+      expect(SECURITY_ALERT_MESSAGE).toBeDefined();
+      expect(ZERO_CREDENTIAL_MESSAGE).toBeDefined();
+      expect(OFFICIAL_ORIGIN_BADGE_LABEL).toBe(
+        "Origem Oficial: mandaumpix.app",
+      );
+      expect(getCanonicalOrigins).toBeTypeOf("function");
+      expect(isCanonicalOrigin).toBeTypeOf("function");
+      expect(isLocalOrigin).toBeTypeOf("function");
+      expect(isOfficialOrigin).toBeTypeOf("function");
+      expect(isProductionOrigin).toBeTypeOf("function");
+      expect(normalizeOrigin).toBeTypeOf("function");
+      expect(validateOrigin).toBeTypeOf("function");
     });
   });
 

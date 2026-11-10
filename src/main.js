@@ -237,6 +237,21 @@ import {
   normalizeTxid,
   resolveChaveConta,
 } from "./domain/entities/pix-charge.entity.js";
+import {
+  CANONICAL_ORIGINS,
+  CANONICAL_PRODUCTION_ORIGIN,
+  OFFICIAL_DOMAIN,
+  OFFICIAL_ORIGIN_BADGE_LABEL,
+  SECURITY_ALERT_MESSAGE,
+  ZERO_CREDENTIAL_MESSAGE,
+  getCanonicalOrigins,
+  isCanonicalOrigin,
+  isLocalOrigin,
+  isOfficialOrigin,
+  isProductionOrigin,
+  normalizeOrigin,
+  validateOrigin,
+} from "./domain/security/origin-validator.js";
 
 // Camada de Aplicação (Casos de Uso)
 import {
@@ -485,6 +500,20 @@ export {
   validateAndNormalizeEvp,
   validateAndNormalizePhone,
   validateAndNormalizePixKey,
+  // Segurança de Domínio e UX Defensiva (US-08.2 / RN08)
+  CANONICAL_ORIGINS,
+  CANONICAL_PRODUCTION_ORIGIN,
+  OFFICIAL_DOMAIN,
+  OFFICIAL_ORIGIN_BADGE_LABEL,
+  SECURITY_ALERT_MESSAGE,
+  ZERO_CREDENTIAL_MESSAGE,
+  getCanonicalOrigins,
+  isCanonicalOrigin,
+  isLocalOrigin,
+  isOfficialOrigin,
+  isProductionOrigin,
+  normalizeOrigin,
+  validateOrigin,
   // Casos de Uso da Aplicação
   DEFAULT_QR_IMAGE_FILENAME,
   DEFAULT_QR_IMAGE_SIZE,
