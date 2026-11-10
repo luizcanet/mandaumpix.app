@@ -1413,7 +1413,7 @@ flowchart LR
 
 | ID          | Item de Backlog                                                                             | Status       | Complexidade |
 | :---------- | :------------------------------------------------------------------------------------------ | :----------- | :----------: |
-| **US-08.1** | Monitoramento Automatizado de Certificados e Typosquatting (Certificate Transparency & DNS) | 📋 Planejado |   `3 pts`    |
+| **US-08.1** | Monitoramento Automatizado de Certificados e Typosquatting (Certificate Transparency & DNS) | ✅ Concluído |   `3 pts`    |
 | **US-08.2** | UX Defensiva: Alerta de Autenticidade Canônica e Validação de Origem no PWA                 | 📋 Planejado |   `2 pts`    |
 | **US-08.3** | Canal Comunitário de Denúncia de Fraudes, `security.txt` e Diretrizes na Página "Sobre"     | 📋 Planejado |   `2 pts`    |
 | **US-08.4** | Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links      | 📋 Planejado |   `3 pts`    |
@@ -1432,7 +1432,7 @@ flowchart TD
     US084 --> US085
 ```
 
-#### `US-08.1` — Monitoramento Automatizado de Certificados e Typosquatting (Certificate Transparency & DNS) (`📋 Planejado` · `3 Story Points`)
+#### `US-08.1` — Monitoramento Automatizado de Certificados e Typosquatting (Certificate Transparency & DNS) (`✅ Concluído` · `3 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Mantenedor do projeto Manda um PIX**,
@@ -1458,10 +1458,10 @@ flowchart TD
     - Quando o script tentar realizar a consulta,
     - Então ele deve tentar retry com backoff exponencial (até 3 tentativas) antes de falhar graciosamente sem quebrar a esteira de CI.
 - **Tarefas de Desenvolvimento (Dev Tasks)**:
-  - [ ] **TASK-08.1.1 (Script de Monitoramento de CT)**: Criar script Node.js [`scripts/security/monitor-ct-logs.js`](../../scripts/security/monitor-ct-logs.js) que consulta APIs de Certificate Transparency, filtra domínios autorizados e gera relatório JSON de certificados anômalos.
-  - [ ] **TASK-08.1.2 (Testes Unitários do Parser de CT)**: Criar suíte de testes unitários em Vitest validando a filtragem de domínios permitidos, identificação de anomalias e sanitização de dados.
-  - [ ] **TASK-08.1.3 (Workflow Agendado GitHub Actions)**: Criar workflow agendado [`.github/workflows/security-ct-monitor.yml`](../../.github/workflows/security-ct-monitor.yml) com execução cron diária e suporte a disparo manual (`workflow_dispatch`).
-  - [ ] **TASK-08.1.4 (Documentação e Integração com Webhook)**: Documentar variáveis de ambiente seguras (`SECURITY_WEBHOOK_URL`) em [`docs/configuration/environment.md`](../configuration/environment.md) e [`docs/security/takedown_and_monitoring.md`](../security/takedown_and_monitoring.md).
+  - [x] **TASK-08.1.1 (Script de Monitoramento de CT)**: Criar script Node.js [`scripts/security/monitor-ct-logs.js`](../../scripts/security/monitor-ct-logs.js) que consulta APIs de Certificate Transparency, filtra domínios autorizados e gera relatório JSON de certificados anômalos.
+  - [x] **TASK-08.1.2 (Testes Unitários do Parser de CT)**: Criar suíte de testes unitários em Vitest validando a filtragem de domínios permitidos, identificação de anomalias e sanitização de dados.
+  - [x] **TASK-08.1.3 (Workflow Agendado GitHub Actions)**: Criar workflow agendado [`.github/workflows/security-ct-monitor.yml`](../../.github/workflows/security-ct-monitor.yml) com execução cron diária e suporte a disparo manual (`workflow_dispatch`).
+  - [x] **TASK-08.1.4 (Documentação e Integração com Webhook)**: Documentar variáveis de ambiente seguras (`SECURITY_WEBHOOK_URL`) em [`docs/configuration/environment.md`](../configuration/environment.md) e [`docs/security/takedown_and_monitoring.md`](../security/takedown_and_monitoring.md).
 
 #### `US-08.2` — UX Defensiva: Alerta de Autenticidade Canônica e Validação de Origem no PWA (`📋 Planejado` · `2 Story Points`)
 
