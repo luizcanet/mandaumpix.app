@@ -24,6 +24,16 @@ import {
   CHARGE_FORM_ICONS,
   CHARGE_FORM_INJECTABLES,
   CHARGE_FORM_PRESETS,
+  CHARGE_DIALOG_CLASSES,
+  CHARGE_DIALOG_EVENT_NAMES,
+  CHARGE_DIALOG_ICONS,
+  CHARGE_DIALOG_INJECTABLES,
+  CHARGE_DIALOG_SELECTORS,
+  DEFAULT_CHARGE_DIALOG_ARIA_LABEL,
+  DEFAULT_CHARGE_DIALOG_CLOSE_TITLE,
+  DEFAULT_CHARGE_DIALOG_DISMISS_BTN_LABEL,
+  DEFAULT_CHARGE_DIALOG_TITLE,
+  DEFAULT_CHARGE_DIALOG_TITLE_ID,
   CHARGE_RESULT_CLASSES,
   CHARGE_RESULT_EVENT_NAMES,
   CHARGE_RESULT_ICONS,
@@ -1078,6 +1088,52 @@ describe("main.js", () => {
       expect(formatKeyMetadata).toBeTypeOf("function");
       expect(customElements.get("pix-charge-result")).toBe(
         PixChargeResultComponent,
+      );
+    });
+
+    it("should re-export charge-dialog constants and BEM selectors (TASK-07.4.1)", () => {
+      expect(CHARGE_DIALOG_CLASSES).toBeDefined();
+      expect(CHARGE_DIALOG_CLASSES.ROOT).toBe("charge-dialog");
+      expect(CHARGE_DIALOG_CLASSES.BACKDROP).toBe("charge-dialog-backdrop");
+      expect(CHARGE_DIALOG_CLASSES.TOP_BAR).toBe("charge-dialog__top-bar");
+      expect(CHARGE_DIALOG_CLASSES.TITLE).toBe("charge-dialog__title");
+      expect(CHARGE_DIALOG_CLASSES.CLOSE_BTN).toBe("charge-dialog__close-btn");
+      expect(CHARGE_DIALOG_CLASSES.DISMISS_BTN).toBe(
+        "charge-dialog__dismiss-btn",
+      );
+
+      expect(CHARGE_DIALOG_SELECTORS).toBeDefined();
+      expect(CHARGE_DIALOG_SELECTORS.ROOT).toBe(".charge-dialog");
+      expect(CHARGE_DIALOG_SELECTORS.BACKDROP).toBe(".charge-dialog-backdrop");
+
+      expect(CHARGE_DIALOG_EVENT_NAMES).toBeDefined();
+      expect(CHARGE_DIALOG_EVENT_NAMES.OPEN_CHARGE_DIALOG).toBe(
+        "open-charge-dialog",
+      );
+      expect(CHARGE_DIALOG_EVENT_NAMES.CLOSE_CHARGE_DIALOG).toBe(
+        "close-charge-dialog",
+      );
+
+      expect(CHARGE_DIALOG_ICONS).toBeDefined();
+      expect(CHARGE_DIALOG_ICONS.CHECK).toBe("check");
+      expect(CHARGE_DIALOG_ICONS.XMARK).toBe("xmark");
+      expect(CHARGE_DIALOG_ICONS.QRCODE).toBe("qrcode");
+
+      expect(CHARGE_DIALOG_INJECTABLES).toBeDefined();
+      expect(CHARGE_DIALOG_INJECTABLES.GENERATE_PIX_CHARGE_USE_CASE).toBe(
+        "generate-pix-charge-use-case",
+      );
+
+      expect(DEFAULT_CHARGE_DIALOG_TITLE).toBe("Cobrança PIX Gerada");
+      expect(DEFAULT_CHARGE_DIALOG_TITLE_ID).toBe("charge-dialog-title");
+      expect(DEFAULT_CHARGE_DIALOG_CLOSE_TITLE).toBe(
+        "Fechar diálogo de cobrança",
+      );
+      expect(DEFAULT_CHARGE_DIALOG_ARIA_LABEL).toBe(
+        "Resultado da cobrança PIX",
+      );
+      expect(DEFAULT_CHARGE_DIALOG_DISMISS_BTN_LABEL).toBe(
+        "Concluir e fechar diálogo",
       );
     });
 

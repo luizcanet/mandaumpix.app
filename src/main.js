@@ -133,6 +133,18 @@ import {
   formatCurrencyBRL,
   formatKeyMetadata,
 } from "./presentation/components/pix-charge-result/pix-charge-result.constants.js";
+import {
+  CHARGE_DIALOG_CLASSES,
+  CHARGE_DIALOG_EVENT_NAMES,
+  CHARGE_DIALOG_ICONS,
+  CHARGE_DIALOG_INJECTABLES,
+  CHARGE_DIALOG_SELECTORS,
+  DEFAULT_CHARGE_DIALOG_ARIA_LABEL,
+  DEFAULT_CHARGE_DIALOG_CLOSE_TITLE,
+  DEFAULT_CHARGE_DIALOG_DISMISS_BTN_LABEL,
+  DEFAULT_CHARGE_DIALOG_TITLE,
+  DEFAULT_CHARGE_DIALOG_TITLE_ID,
+} from "./presentation/components/pix-charge-dialog/pix-charge-dialog.constants.js";
 import AboutPageComponent from "./presentation/pages/about-page/about-page.component.js";
 import {
   ABOUT_AUTHOR,
@@ -404,6 +416,17 @@ export {
   formatChargeAmountBadge,
   formatCurrencyBRL,
   formatKeyMetadata,
+  // Metadados e Constantes do Diálogo Modal de Cobrança (<pix-charge-dialog> / US-07.4)
+  CHARGE_DIALOG_CLASSES,
+  CHARGE_DIALOG_EVENT_NAMES,
+  CHARGE_DIALOG_ICONS,
+  CHARGE_DIALOG_INJECTABLES,
+  CHARGE_DIALOG_SELECTORS,
+  DEFAULT_CHARGE_DIALOG_ARIA_LABEL,
+  DEFAULT_CHARGE_DIALOG_CLOSE_TITLE,
+  DEFAULT_CHARGE_DIALOG_DISMISS_BTN_LABEL,
+  DEFAULT_CHARGE_DIALOG_TITLE,
+  DEFAULT_CHARGE_DIALOG_TITLE_ID,
   // Metadados e Constantes da Página Sobre (/sobre)
   ABOUT_AUTHOR,
   ABOUT_NAVIGATION,
