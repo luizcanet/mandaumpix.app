@@ -108,6 +108,14 @@ export class AboutPageComponent extends CustomElement {
             rel="noopener noreferrer"
             aria-label="GitHub do autor: @${ABOUT_AUTHOR.githubUser}"
           >github.com/${ABOUT_AUTHOR.githubUser}</a>
+          <span class="about-page__separator" aria-hidden="true">•</span>
+          <a
+            href="${ABOUT_AUTHOR.linkedinUrl}"
+            class="about-page__link"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn do autor: @${ABOUT_AUTHOR.linkedinUser}"
+          >linkedin.com/in/${ABOUT_AUTHOR.linkedinUser}</a>
         </div>
       </div>
 

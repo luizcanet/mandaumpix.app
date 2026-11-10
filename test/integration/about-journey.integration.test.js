@@ -61,6 +61,11 @@ describe("Jornada Institucional e Navegação SPA (TASK-07.2.6 — RN07)", () =>
     );
     expect(githubAnchor).not.toBeNull();
 
+    const linkedinAnchor = authorSection.querySelector(
+      `a[href="${ABOUT_AUTHOR.linkedinUrl}"]`,
+    );
+    expect(linkedinAnchor).not.toBeNull();
+
     const projectSection = aboutPage.querySelector(".about-page__box--project");
     expect(projectSection).not.toBeNull();
     expect(projectSection.textContent).toContain(ABOUT_PROJECT.license);

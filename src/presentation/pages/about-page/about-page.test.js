@@ -102,6 +102,16 @@ describe("AboutPageComponent (TASK-04.4.2: Testes Unitários de Renderização e
       expect(githubLink.getAttribute("target")).toBe("_blank");
       expect(githubLink.getAttribute("rel")).toBe("noopener noreferrer");
       expect(githubLink.textContent).toContain(ABOUT_AUTHOR.githubUser);
+
+      const linkedinLink = authorBox.querySelector(
+        `a[href="${ABOUT_AUTHOR.linkedinUrl}"]`,
+      );
+      expect(linkedinLink).not.toBeNull();
+      expect(linkedinLink.getAttribute("target")).toBe("_blank");
+      expect(linkedinLink.getAttribute("rel")).toBe("noopener noreferrer");
+      expect(linkedinLink.textContent).toContain(
+        `linkedin.com/in/${ABOUT_AUTHOR.linkedinUser}`,
+      );
     });
 
     it("deve renderizar o Card Projeto & Licença com menção à AGPLv3 e link oficial do repositório", () => {

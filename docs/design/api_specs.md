@@ -76,6 +76,7 @@ O aplicativo deve oferecer um acesso fácil na interface principal para uma pág
     - Nome: **Luiz Henrique Canet Filho**.
     - Contato / E-mail: `me@luizca.net`.
     - Perfil GitHub: [`@luizcanet`](https://github.com/luizcanet).
+    - Perfil LinkedIn: [`https://www.linkedin.com/in/luizcanet/`](https://www.linkedin.com/in/luizcanet/).
   - **Contribuição Voluntária ("Manda um PIX")**:
     - **Mensagem Descontraída com Emojis**: Texto leve e amigável com emojis explicando que o aplicativo é gratuito, livre e de código aberto, mas que se o usuário achar que o aplicativo é útil para ele e para outras pessoas, pode contribuir para ajudar a manter o projeto com **qualquer valor**, utilizando em destaque a frase **"Manda um PIX"**.
     - **QR Code com Valor Dinâmico e Chave Copia e Cola (`eu@luizca.net`)**:

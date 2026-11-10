@@ -1827,6 +1827,13 @@ describe("main.js", () => {
       expect(authorLink.getAttribute("target")).toBe("_blank");
       expect(authorLink.getAttribute("rel")).toBe("noopener noreferrer");
 
+      const linkedinLink = aboutPage.querySelector(
+        `a[href="${ABOUT_AUTHOR.linkedinUrl}"]`,
+      );
+      expect(linkedinLink).not.toBeNull();
+      expect(linkedinLink.getAttribute("target")).toBe("_blank");
+      expect(linkedinLink.getAttribute("rel")).toBe("noopener noreferrer");
+
       const emailLink = aboutPage.querySelector(
         `a[href="mailto:${ABOUT_AUTHOR.email}"]`,
       );

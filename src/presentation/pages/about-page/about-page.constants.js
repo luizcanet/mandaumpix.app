@@ -13,6 +13,8 @@ export const ABOUT_AUTHOR = Object.freeze({
   emailUrl: "mailto:me@luizca.net",
   githubUser: "luizcanet",
   githubUrl: "https://github.com/luizcanet",
+  linkedinUser: "luizcanet",
+  linkedinUrl: "https://www.linkedin.com/in/luizcanet/",
 });
 
 /**

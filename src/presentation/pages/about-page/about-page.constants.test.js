@@ -26,6 +26,10 @@ describe("about-page.constants", () => {
       expect(ABOUT_AUTHOR.emailUrl).toBe("mailto:me@luizca.net");
       expect(ABOUT_AUTHOR.githubUser).toBe("luizcanet");
       expect(ABOUT_AUTHOR.githubUrl).toBe("https://github.com/luizcanet");
+      expect(ABOUT_AUTHOR.linkedinUser).toBe("luizcanet");
+      expect(ABOUT_AUTHOR.linkedinUrl).toBe(
+        "https://www.linkedin.com/in/luizcanet/",
+      );
       expect(ABOUT_AUTHOR.label).toContain("Autor");
     });
   });
