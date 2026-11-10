@@ -48,8 +48,10 @@ export const ABOUT_SUPPORT_PIX = Object.freeze({
   amount: null,
   isDynamic: true,
   txid: "***",
+  infoAdicional: "Doação para o Manda um PIX",
+  infoAdicionalNormalized: "Doacao para o Manda um PIX",
   brCode:
-    "00020126350014br.gov.bcb.pix0113eu@luizca.net5204000053039865802BR5925LUIZ HENRIQUE CANET FILHO6008BRASILIA62070503***63043C63",
+    "00020126650014br.gov.bcb.pix0113eu@luizca.net0226Doacao para o Manda um PIX5204000053039865802BR5925LUIZ HENRIQUE CANET FILHO6008BRASILIA62070503***63048BC9",
   message:
     "🎉 Este aplicativo é 100% gratuito, livre e de código aberto! Mas se você achar que ele é útil pra você e pra outras pessoas e quiser dar uma força pra ajudar a manter o projeto no ar com qualquer valor... é só abrir o coração: Manda um PIX! 🙌✨",
   qrAriaLabel: "QR Code PIX com valor dinâmico para eu@luizca.net",

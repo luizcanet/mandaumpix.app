@@ -483,7 +483,7 @@ flowchart TD
   - **INV-05 (Card de Contribuição Voluntária — "Manda um PIX" para `eu@luizca.net`)**:
     - Mensagem descontraída com emojis (`"☕🚀 Apoie o Projeto — Manda um PIX! 💚"`) explicando que o aplicativo é 100% gratuito e aberto, mas convidando a contribuir com **qualquer valor** para a manutenção do projeto.
     - Exibe palco do QR Code em fundo de alto contraste (`#ffffff`), gerado deterministicamente para a chave **`eu@luizca.net`** na modalidade de **valor dinâmico (aberto)** com tag EMV `54` ausente (`role="img"`, `aria-label="QR Code PIX com valor dinâmico para eu@luizca.net"`).
-    - Exibe a identificação da chave (`eu@luizca.net`) e a caixa de texto com o payload BR Code canônico: `00020126350014br.gov.bcb.pix0113eu@luizca.net5204000053039865802BR5925LUIZ HENRIQUE CANET FILHO6008BRASILIA62070503***63043C63`.
+    - Exibe a identificação da chave (`eu@luizca.net`), mensagem no PIX (`Doação para o Manda um PIX`) e a caixa de texto com o payload BR Code canônico: `00020126650014br.gov.bcb.pix0113eu@luizca.net0226Doacao para o Manda um PIX5204000053039865802BR5925LUIZ HENRIQUE CANET FILHO6008BRASILIA62070503***63048BC9`.
     - Disponibiliza botão **"Copiar Chave Copia e Cola"** (`<vector-icon name="copy">`), acionando a cópia via `navigator.clipboard.writeText` (ou `distributePixChargeUseCase.copyChargeCode`), com feedback visual imediato (ícone `<vector-icon name="check">` e rótulo `"Chave copiada!"`) e anúncio acessível em região `aria-live="polite"`.
   - **INV-06 (Card de Incentivo à Divulgação)**:
     - Convite caloroso com emojis (`"📣 Espalhe a Palavra e Divulgue! 🤝"`) para compartilhar o aplicativo com amigos, colegas, clientes e comerciantes.
@@ -509,7 +509,7 @@ flowchart TD
   - **Cenário 03 (Cópia da Chave Copia e Cola de Apoio Voluntário com Feedback Visual e Acessível)**:
     - Dado que a seção de contribuição voluntária está visível com a chave `eu@luizca.net`,
     - Quando o usuário acionar o botão `"Copiar Chave Copia e Cola"`,
-    - Então o payload BR Code `"00020126350014br.gov.bcb.pix0113eu@luizca.net5204000053039865802BR5925LUIZ HENRIQUE CANET FILHO6008BRASILIA62070503***63043C63"` deve ser gravado na área de transferência,
+    - Então o payload BR Code `"00020126650014br.gov.bcb.pix0113eu@luizca.net0226Doacao para o Manda um PIX5204000053039865802BR5925LUIZ HENRIQUE CANET FILHO6008BRASILIA62070503***63048BC9"` deve ser gravado na área de transferência,
     - E o botão deve exibir feedback temporário com ícone `<vector-icon name="check">` e texto `"Chave copiada!"`,
     - E a mensagem de confirmação deve ser anunciada na região `aria-live="polite"`.
   - **Cenário 04 (Compartilhamento e Divulgação do Aplicativo com Fallback)**:

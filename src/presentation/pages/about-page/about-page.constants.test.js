@@ -65,6 +65,12 @@ describe("about-page.constants", () => {
       expect(ABOUT_SUPPORT_PIX.amount).toBeNull();
       expect(ABOUT_SUPPORT_PIX.isDynamic).toBe(true);
       expect(ABOUT_SUPPORT_PIX.txid).toBe("***");
+      expect(ABOUT_SUPPORT_PIX.infoAdicional).toBe(
+        "Doação para o Manda um PIX",
+      );
+      expect(ABOUT_SUPPORT_PIX.infoAdicionalNormalized).toBe(
+        "Doacao para o Manda um PIX",
+      );
       expect(ABOUT_SUPPORT_PIX.title).toContain("Manda um PIX");
       expect(ABOUT_SUPPORT_PIX.message).toContain("Manda um PIX!");
       expect(ABOUT_SUPPORT_PIX.copyButtonText).toContain("eu@luizca.net");
@@ -76,7 +82,7 @@ describe("about-page.constants", () => {
 
     it("deve possuir payload BR Code EMV válido correspondente à chave eu@luizca.net", () => {
       const canonicalBrCode =
-        "00020126350014br.gov.bcb.pix0113eu@luizca.net5204000053039865802BR5925LUIZ HENRIQUE CANET FILHO6008BRASILIA62070503***63043C63";
+        "00020126650014br.gov.bcb.pix0113eu@luizca.net0226Doacao para o Manda um PIX5204000053039865802BR5925LUIZ HENRIQUE CANET FILHO6008BRASILIA62070503***63048BC9";
 
       expect(ABOUT_SUPPORT_PIX.brCode).toBe(canonicalBrCode);
 
@@ -87,6 +93,7 @@ describe("about-page.constants", () => {
       expect(parsed.merchantCity).toBe("BRASILIA");
       expect(parsed.transactionAmount).toBe(0);
       expect(parsed.txid).toBe("***");
+      expect(parsed.infoAdicional).toBe("Doacao para o Manda um PIX");
     });
   });
 

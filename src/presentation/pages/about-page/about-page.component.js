@@ -149,6 +149,8 @@ export class AboutPageComponent extends CustomElement {
           </div>
           <p class="charge-result__meta about-page__meta">
             Chave PIX (Valor Dinâmico): <strong>${ABOUT_SUPPORT_PIX.key}</strong>
+            <br />
+            Mensagem no PIX: <strong>${ABOUT_SUPPORT_PIX.infoAdicional}</strong>
           </p>
         </div>
 

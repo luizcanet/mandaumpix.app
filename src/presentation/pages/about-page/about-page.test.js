@@ -142,6 +142,7 @@ describe("AboutPageComponent (TASK-04.4.2: Testes Unitários de Renderização e
       expect(supportBox).not.toBeNull();
       expect(supportBox.textContent).toContain(ABOUT_SUPPORT_PIX.title);
       expect(supportBox.textContent).toContain("Manda um PIX!");
+      expect(supportBox.textContent).toContain(ABOUT_SUPPORT_PIX.infoAdicional);
 
       const qrSvg = supportBox.querySelector(".charge-result__qr-svg");
       expect(qrSvg).not.toBeNull();

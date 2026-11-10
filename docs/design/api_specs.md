@@ -81,8 +81,9 @@ O aplicativo deve oferecer um acesso fácil na interface principal para uma pág
     - **Mensagem Descontraída com Emojis**: Texto leve e amigável com emojis explicando que o aplicativo é gratuito, livre e de código aberto, mas que se o usuário achar que o aplicativo é útil para ele e para outras pessoas, pode contribuir para ajudar a manter o projeto com **qualquer valor**, utilizando em destaque a frase **"Manda um PIX"**.
     - **QR Code com Valor Dinâmico e Chave Copia e Cola (`eu@luizca.net`)**:
       - Chave PIX de destino: **`eu@luizca.net`**.
+      - Mensagem / Informação Adicional: **"Doação para o Manda um PIX"** (normalizada para `"Doacao para o Manda um PIX"` no payload EMV).
       - Modalidade: **Valor dinâmico / em aberto** (`transactionAmount = 0`, sem tag EMV `54`, permitindo que o apoiador defina livremente qualquer valor no aplicativo de seu banco).
-      - Payload BR Code (Chave Copia e Cola EMV®): `00020126350014br.gov.bcb.pix0113eu@luizca.net5204000053039865802BR5925LUIZ HENRIQUE CANET FILHO6008BRASILIA62070503***63043C63` (gerado deterministicamente por [`generatePixCharge`](../../src/main.js)).
+      - Payload BR Code (Chave Copia e Cola EMV®): `00020126650014br.gov.bcb.pix0113eu@luizca.net0226Doacao para o Manda um PIX5204000053039865802BR5925LUIZ HENRIQUE CANET FILHO6008BRASILIA62070503***63048BC9` (gerado deterministicamente por [`generatePixCharge`](../../src/main.js)).
       - Ação de cópia rápida da Chave copia e cola via `navigator.clipboard.writeText(brCode)`.
   - **Incentivo à Divulgação**:
     - Mensagem incentivando o usuário a divulgar e indicar o aplicativo (`https://mandaumpix.app`) para mais pessoas (amigos, colegas, prestadores de serviço e comerciantes), acompanhada de botão de compartilhamento (`navigator.share` ou fallback para WhatsApp / cópia do link).
