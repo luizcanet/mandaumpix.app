@@ -1,0 +1,134 @@
+/**
+ * Estilos do Web Component <security-banner> / .security-warning-banner
+ * Metodologia BEM com conformidade WCAG AAA (Contraste >= 7:1) e alvos de toque >= 44x44px.
+ */
+
+security-banner,
+.security-warning-banner {
+  display: block;
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: #7f1d1d;
+  color: #ffffff;
+  border-bottom: 2px solid #991b1b;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+
+security-banner[hidden],
+.security-warning-banner--hidden {
+  display: none;
+}
+
+.security-warning-banner--visible {
+  display: block;
+}
+
+.security-warning-banner__wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm, 0.75rem);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.625rem 1rem;
+  box-sizing: border-box;
+}
+
+.security-warning-banner__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.375rem;
+  color: #fef08a;
+}
+
+.security-warning-banner__content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem 0.75rem;
+  flex-grow: 1;
+}
+
+.security-warning-banner__title {
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #ffffff;
+}
+
+.security-warning-banner__message {
+  color: #ffffff;
+}
+
+.security-warning-banner__link {
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.security-warning-banner__link:hover,
+.security-warning-banner__link:focus-visible {
+  color: #fef08a;
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.security-warning-banner__dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm, 6px);
+  color: #ffffff;
+  font-size: 1.25rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.security-warning-banner__dismiss:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #fef08a;
+}
+
+.security-warning-banner__dismiss:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 640px) {
+  .security-warning-banner__wrapper {
+    align-items: flex-start;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .security-warning-banner__content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .security-warning-banner__link {
+    display: inline-block;
+    margin-top: 0.25rem;
+  }
+}

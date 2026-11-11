@@ -3,6 +3,7 @@ import {
   ABOUT_AUTHOR,
   ABOUT_NAVIGATION,
   ABOUT_PROJECT,
+  ABOUT_SECURITY,
   ABOUT_SHARE,
   ABOUT_SUPPORT_PIX,
   APP_METADATA,
@@ -149,6 +150,19 @@ import {
   PixKeyEmptyComponent,
   PixKeySelectorComponent,
   PixKeyEntity,
+  PixSecurityBannerComponent,
+  SecurityBannerComponent,
+  DEFAULT_SECURITY_BANNER_ARIA_LABEL,
+  DEFAULT_SECURITY_BANNER_DISMISS_LABEL,
+  DEFAULT_SECURITY_BANNER_LINK_LABEL,
+  DEFAULT_SECURITY_BANNER_MESSAGE,
+  DEFAULT_SECURITY_BANNER_OFFICIAL_DOMAIN,
+  DEFAULT_SECURITY_BANNER_OFFICIAL_URL,
+  DEFAULT_SECURITY_BANNER_TITLE,
+  SECURITY_BANNER_CLASSES,
+  SECURITY_BANNER_EVENTS,
+  SECURITY_BANNER_ICONS,
+  securityBannerTemplate,
   PixKeyManagementError,
   PixKeyStorageError,
   PixKeyValidationError,
@@ -214,6 +228,19 @@ import {
   resolveRequiredPixKeyId,
   upgradePixKeyDatabaseSchema,
   validateAndNormalizePixKey,
+  CANONICAL_ORIGINS,
+  CANONICAL_PRODUCTION_ORIGIN,
+  OFFICIAL_DOMAIN,
+  OFFICIAL_ORIGIN_BADGE_LABEL,
+  SECURITY_ALERT_MESSAGE,
+  ZERO_CREDENTIAL_MESSAGE,
+  getCanonicalOrigins,
+  isCanonicalOrigin,
+  isLocalOrigin,
+  isOfficialOrigin,
+  isProductionOrigin,
+  normalizeOrigin,
+  validateOrigin,
 } from "./main.js";
 
 describe("main.js", () => {
@@ -378,6 +405,27 @@ describe("main.js", () => {
       expect(validateAndNormalizePixKey).toBeTypeOf("function");
       expect(normalizeMerchantName).toBeTypeOf("function");
       expect(normalizeMerchantCity).toBeTypeOf("function");
+    });
+  });
+
+  describe("domain security exports (US-08.2 / TASK-08.2.1)", () => {
+    it("should re-export canonical origin security constants and validators", () => {
+      expect(CANONICAL_PRODUCTION_ORIGIN).toBe("https://mandaumpix.app");
+      expect(OFFICIAL_DOMAIN).toBe("mandaumpix.app");
+      expect(CANONICAL_ORIGINS).toBeDefined();
+      expect(Object.isFrozen(CANONICAL_ORIGINS)).toBe(true);
+      expect(SECURITY_ALERT_MESSAGE).toBeDefined();
+      expect(ZERO_CREDENTIAL_MESSAGE).toBeDefined();
+      expect(OFFICIAL_ORIGIN_BADGE_LABEL).toBe(
+        "Origem Oficial: mandaumpix.app",
+      );
+      expect(getCanonicalOrigins).toBeTypeOf("function");
+      expect(isCanonicalOrigin).toBeTypeOf("function");
+      expect(isLocalOrigin).toBeTypeOf("function");
+      expect(isOfficialOrigin).toBeTypeOf("function");
+      expect(isProductionOrigin).toBeTypeOf("function");
+      expect(normalizeOrigin).toBeTypeOf("function");
+      expect(validateOrigin).toBeTypeOf("function");
     });
   });
 
@@ -963,10 +1011,14 @@ describe("main.js", () => {
       expect(DEFAULT_SW_TYPE).toBe("module");
     });
 
-    it("should re-export AboutPageComponent and institutional constants (TASK-04.4.5)", () => {
+    it("should re-export AboutPageComponent and institutional constants (TASK-04.4.5, TASK-08.2.3)", () => {
       expect(AboutPageComponent).toBeDefined();
       expect(ABOUT_AUTHOR).toBeDefined();
       expect(ABOUT_PROJECT).toBeDefined();
+      expect(ABOUT_SECURITY).toBeDefined();
+      expect(ABOUT_SECURITY.officialOrigin).toBe("https://mandaumpix.app");
+      expect(ABOUT_SECURITY.officialDomain).toBe("mandaumpix.app");
+      expect(ABOUT_SECURITY.badgeLabel).toBe("Origem Oficial: mandaumpix.app");
       expect(ABOUT_SUPPORT_PIX).toBeDefined();
       expect(ABOUT_SHARE).toBeDefined();
       expect(ABOUT_NAVIGATION).toBeDefined();
@@ -1141,6 +1193,31 @@ describe("main.js", () => {
       expect(DEFAULT_CHARGE_DIALOG_DISMISS_BTN_LABEL).toBe(
         "Concluir e fechar diálogo",
       );
+    });
+
+    it("should re-export SecurityBannerComponent and defensive UX constants (TASK-08.2.2)", () => {
+      expect(SecurityBannerComponent).toBeDefined();
+      expect(PixSecurityBannerComponent).toBe(SecurityBannerComponent);
+      expect(customElements.get("security-banner")).toBe(
+        SecurityBannerComponent,
+      );
+
+      expect(DEFAULT_SECURITY_BANNER_TITLE).toBe(
+        "Atenção: Endereço Não Oficial",
+      );
+      expect(DEFAULT_SECURITY_BANNER_MESSAGE).toBeDefined();
+      expect(DEFAULT_SECURITY_BANNER_OFFICIAL_URL).toBe(
+        "https://mandaumpix.app",
+      );
+      expect(DEFAULT_SECURITY_BANNER_OFFICIAL_DOMAIN).toBe("mandaumpix.app");
+      expect(DEFAULT_SECURITY_BANNER_LINK_LABEL).toBeDefined();
+      expect(DEFAULT_SECURITY_BANNER_DISMISS_LABEL).toBeDefined();
+      expect(DEFAULT_SECURITY_BANNER_ARIA_LABEL).toBeDefined();
+      expect(SECURITY_BANNER_CLASSES).toBeDefined();
+      expect(SECURITY_BANNER_CLASSES.BLOCK).toBe("security-warning-banner");
+      expect(SECURITY_BANNER_EVENTS).toBeDefined();
+      expect(SECURITY_BANNER_ICONS).toBeDefined();
+      expect(securityBannerTemplate).toBeTypeOf("function");
     });
 
     it("should initialize PWA install adapter and use case on rootElement during bootstrapApp", () => {

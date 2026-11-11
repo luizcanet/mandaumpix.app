@@ -5,6 +5,7 @@ import {
   ABOUT_AUTHOR,
   ABOUT_NAVIGATION,
   ABOUT_PROJECT,
+  ABOUT_SECURITY,
   ABOUT_SHARE,
   ABOUT_SUPPORT_PIX,
 } from "./about-page.constants.js";
@@ -176,6 +177,38 @@ describe("AboutPageComponent (TASK-04.4.2: Testes Unitários de Renderização e
         shareBtn.querySelector('vector-icon[name="share"]'),
       ).not.toBeNull();
       expect(shareBtn.textContent).toContain(ABOUT_SHARE.buttonText);
+    });
+
+    it("deve renderizar o Card de Segurança & Autenticidade com badge oficial e aviso Zero-Credential (INV-03, RN08)", () => {
+      document.body.appendChild(aboutElement);
+
+      const securityBox = aboutElement.querySelector(
+        ".about-page__box--security",
+      );
+      expect(securityBox).not.toBeNull();
+      expect(securityBox.getAttribute("role")).toBe("region");
+      expect(securityBox.getAttribute("aria-label")).toBe(
+        ABOUT_SECURITY.zeroCredentialTitle,
+      );
+
+      const badge = securityBox.querySelector(".about-page__security-badge");
+      expect(badge).not.toBeNull();
+      expect(badge.getAttribute("aria-label")).toBe(
+        ABOUT_SECURITY.badgeAriaLabel,
+      );
+      expect(badge.textContent).toContain(ABOUT_SECURITY.badgeLabel);
+      expect(
+        badge.querySelector(
+          `vector-icon[name="${ABOUT_SECURITY.securityIcon}"]`,
+        ),
+      ).not.toBeNull();
+
+      expect(securityBox.textContent).toContain(
+        ABOUT_SECURITY.zeroCredentialNotice,
+      );
+      expect(securityBox.textContent).toContain(
+        ABOUT_SECURITY.beneficiaryNotice,
+      );
     });
   });
 

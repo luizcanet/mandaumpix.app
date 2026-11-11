@@ -29,7 +29,7 @@ describe("about-page.css (TASK-04.4.4: Estilização BEM, Acessibilidade e Respo
       expect(cssContent).toMatch(/\.about-page__version\s*\{[^}]*font-family:/);
     });
 
-    it("deve definir as caixas e modificadores (.about-page__box, .about-page__box--support, .about-page__box--share)", () => {
+    it("deve definir as caixas e modificadores (.about-page__box, .about-page__box--support, .about-page__box--share, .about-page__box--security)", () => {
       expect(cssContent).toMatch(/\.about-page__box\s*\{[^}]*display:\s*flex/);
       expect(cssContent).toMatch(
         /\.about-page__box--support\s*\{[^}]*border-color:/,
@@ -38,6 +38,13 @@ describe("about-page.css (TASK-04.4.4: Estilização BEM, Acessibilidade e Respo
         /\.about-page__box--support\s*\{[^}]*background-color:/,
       );
       expect(cssContent).toMatch(/\.about-page__box--share\s*\{/);
+      expect(cssContent).toMatch(/\.about-page__box--security\s*\{/);
+      expect(cssContent).toMatch(
+        /\.about-page__security-badge\s*\{[^}]*display:\s*inline-flex/,
+      );
+      expect(cssContent).toMatch(
+        /\.about-page__security-notice\s*\{[^}]*font-size:/,
+      );
     });
 
     it("deve definir a área do QR Code e caixa do código Copia e Cola", () => {

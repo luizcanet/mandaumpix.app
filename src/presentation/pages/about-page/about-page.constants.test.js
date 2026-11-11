@@ -4,6 +4,7 @@ import {
   ABOUT_AUTHOR,
   ABOUT_NAVIGATION,
   ABOUT_PROJECT,
+  ABOUT_SECURITY,
   ABOUT_SHARE,
   ABOUT_SUPPORT_PIX,
 } from "./about-page.constants.js";
@@ -13,9 +14,25 @@ describe("about-page.constants", () => {
     it("deve garantir que todas as estruturas exportadas sejam congeladas com Object.freeze", () => {
       expect(Object.isFrozen(ABOUT_AUTHOR)).toBe(true);
       expect(Object.isFrozen(ABOUT_PROJECT)).toBe(true);
+      expect(Object.isFrozen(ABOUT_SECURITY)).toBe(true);
       expect(Object.isFrozen(ABOUT_SUPPORT_PIX)).toBe(true);
       expect(Object.isFrozen(ABOUT_SHARE)).toBe(true);
       expect(Object.isFrozen(ABOUT_NAVIGATION)).toBe(true);
+    });
+  });
+
+  describe("ABOUT_SECURITY (INV-03 / RN08 / TASK-08.2.3)", () => {
+    it("deve conter metadados do selo de origem oficial e avisos Zero-Credential", () => {
+      expect(ABOUT_SECURITY.badgeLabel).toBe("Origem Oficial: mandaumpix.app");
+      expect(ABOUT_SECURITY.officialOrigin).toBe("https://mandaumpix.app");
+      expect(ABOUT_SECURITY.officialDomain).toBe("mandaumpix.app");
+      expect(ABOUT_SECURITY.zeroCredentialNotice).toBe(
+        "O Manda um PIX nunca solicita senhas bancárias, dados de cartão ou códigos de verificação.",
+      );
+      expect(ABOUT_SECURITY.beneficiaryNotice).toContain(
+        "Confira sempre o nome do titular exibido na tela do seu banco",
+      );
+      expect(ABOUT_SECURITY.securityIcon).toBe("check");
     });
   });
 

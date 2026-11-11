@@ -183,5 +183,24 @@ describe("index.html (TASK-04.1.4: Validação Semântica do DOM & Acessibilidad
       expect(license).not.toBeNull();
       expect(license?.textContent?.trim()).toBe("AGPL-3.0-only");
     });
+
+    it("exibe o selo de autenticidade oficial verificado e advertência Zero-Credential (INV-03 / TASK-08.2.3)", () => {
+      const security = doc.querySelector(".app-footer__security");
+      expect(security).not.toBeNull();
+      expect(security?.getAttribute("role")).toBe("status");
+
+      const badge = security?.querySelector(".app-footer__security-badge");
+      expect(badge).not.toBeNull();
+      expect(badge?.textContent).toContain("Origem Oficial: mandaumpix.app");
+      expect(badge?.querySelector('vector-icon[name="check"]')).not.toBeNull();
+
+      const zeroCredential = security?.querySelector(
+        ".app-footer__zero-credential",
+      );
+      expect(zeroCredential).not.toBeNull();
+      expect(zeroCredential?.textContent).toContain(
+        "Nunca solicitamos senhas bancárias",
+      );
+    });
   });
 });

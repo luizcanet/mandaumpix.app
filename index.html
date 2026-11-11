@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="./src/presentation/components/pix-charge-form/pix-charge-form.css" />
     <link rel="stylesheet" href="./src/presentation/components/pix-charge-result/pix-charge-result.css" />
     <link rel="stylesheet" href="./src/presentation/components/pix-charge-dialog/pix-charge-dialog.css" />
+    <link rel="stylesheet" href="./src/presentation/components/security-banner/security-banner.css" />
     <link rel="stylesheet" href="./src/presentation/pages/about-page/about-page.css" />
     <script async src="https://ga.jspm.io/npm:es-module-shims@2.8.4/dist/es-module-shims.js" crossorigin="anonymous" integrity="sha384-0bdb7F9U10QF2R23CYCgvGdsStkMEEjDOVhWxFXpTlArSrMLKtrnsYtk21d8cBUc"></script>
     <script type="importmap">
@@ -70,13 +71,14 @@
         "./src/application/use-cases/select-pix-key.use-case.js": "sha384-jLGXaxkzhfzdhfk/ZrnbxEpLwKDXND4kUFLSbQBoy6z0xCtQC5cc8rlFxbwytByO",
         "./src/domain/entities/pix-charge.entity.js": "sha384-apdRQcRsyQfyadI2Btnfu8n75qfQLV0nLNogV0lE3MtYqME1OonNK5x18PdhOLjf",
         "./src/domain/entities/pix-key.entity.js": "sha384-NWXWgFf5B31RDkjZUiEI9r0nVY+RJe0817XNX33GYk+K5bNX1M33l4vDtpP9li3Q",
+        "./src/domain/security/origin-validator.js": "sha384-8oSE4SufSJjqhFuNeJz7ju4AjMxdqQNM5jUxzMvyQBrj86+BgyKX+iKAak80cQ2t",
         "./src/infrastructure/pix/pix-qr.service.js": "sha384-TsTv0IqKL4sDYenWD/Q6XQILncajjTF1/98bIiKHtvUl3u6oL1XNKqjXpTygMGrG",
         "./src/infrastructure/pwa/pwa-install.adapter.js": "sha384-jJ46rcjkOn81TUYN6PRGOM7z4IrdODir0cg1k7zz+yY8C/onLkKv7jbn1PD8iQdw",
         "./src/infrastructure/pwa/service-worker.adapter.js": "sha384-b+4apZpw/PMwZqgFZXtzyqENprbdWW/aST4rhh/TfrW7VLvyYwrtAkv9Yx7YR276",
         "./src/infrastructure/share/browser-share.adapter.js": "sha384-3HXgneZxjwlXd5eJUZkpmLMWXyYl6ee5y9lt5xuGnK05OARnFs9hREntSzJLpyWr",
         "./src/infrastructure/storage/indexed-db-pix-key.repository.js": "sha384-djuXXh00PTK15Qx/P8GeJdOVMFC74q1CtfAkHj2wRKYl3MVjZwixhGo6lUTBeYcK",
-        "./src/main.js": "sha384-CyyYQPzFdmIVf93bdm4/BIlzE5VkLNMbf+o7GJaahdglqsh8qBzAlQZ6QUmYsTjp",
-        "./src/presentation/bootstrap/bootstrap-app.js": "sha384-KCMGEfE+9iUFuIda2UYRb0kMSEYbhD1QMvQIeN1YyA059mRGZpDbrIjHlZFvO08y",
+        "./src/main.js": "sha384-AavmPYqX4K+YnbSV7UsEwMfnKEWyTIaK5TCuM0kgTbBb9RQHAgDiFXRgJ64psFdN",
+        "./src/presentation/bootstrap/bootstrap-app.js": "sha384-ahjhKm0+3xpKnSxDUsUTaeJhV/0SjostzDto9luZIdRVzRS3D454qgGjHM3ZvHD+",
         "./src/presentation/components/app-header/app-header.component.js": "sha384-WOcjBRp0SdxMbGRaRQATydIKbG6d07TPqb3HTe9aD9zremta8B46uynqA5BrwhTY",
         "./src/presentation/components/app-header/app-header.template.js": "sha384-AHPgSJ4fpobISmmjlMcYE0pTdIcDDjEiIoNk3STpfoKY6/vPoF42+JEm9O+rWFEl",
         "./src/presentation/components/pix-charge-dialog/pix-charge-dialog.component.js": "sha384-qCm+957AYSm0ed3cXiQEfaoW5N6adAP215NRTlG6MWAswC0Qz1iFAv5Egm+x07fE",
@@ -97,12 +99,15 @@
         "./src/presentation/components/pix-key-selector/pix-key-selector.component.js": "sha384-DtCcQMFUZIDJOgaAG8NRYNzq3twyZQ4CxVsJk4bdM2NEb4XopHxaE/D+pasqCnmn",
         "./src/presentation/components/pix-key-selector/pix-key-selector.constants.js": "sha384-dN4AFbyQ9DI/ks0lcqUKCaHOFo5l63tLzi7cAtX7jPTZJvnrZozc5/82Dkip61fS",
         "./src/presentation/components/pix-key-selector/pix-key-selector.template.js": "sha384-zDNrQUIi/5JskXuE2w57zkmY6ANxxu6UJbMpoqUpUZOarJMPBmGeUqDMNaQIIMCJ",
+        "./src/presentation/components/security-banner/security-banner.component.js": "sha384-MxwqARqskeM4fnVzj7EI+HH8KKxq5uQQk2TWCo6NWigaP1gFXf2S48T6MzMB8QWt",
+        "./src/presentation/components/security-banner/security-banner.constants.js": "sha384-VSw1h2oJ4SfM2yB1bb29NsCPqgnsdJQOwU2JrmtZtIN6do1PQNiGsqi3uh3rUYKk",
+        "./src/presentation/components/security-banner/security-banner.template.js": "sha384-NBvVpDiEzJJornQrSp68TPF4W/AEA8ZmE8nPgiEicegB1Mj6qt0a4Bf3LhtGG0az",
         "./src/presentation/components/vector-icon/vector-icon.component.js": "sha384-gvPJfgpphgh7OqRZ8jZj64wU7Fn0/7pXazIZnSnICq7GYRdkZ/xUs2UQm5QaCfWl",
         "./src/presentation/components/vector-icon/vector-icon.template.js": "sha384-WAU5Jsle37rOgZIHZ2zHvgRCEsryd1dZZfPYpx56L1b46mcfFH0EVIiE2BW0xgtF",
         "./src/presentation/di/container.js": "sha384-3WsdhLhQX1MXGm+ODSVA5+2c2Wje7hnv0dsYeppLTpQQ9pQbS5timUPwxUugXuz9",
         "./src/presentation/pages/about-page/about-page.component.js": "sha384-uYDYrwjBR38HY0jOLXsq8Mg7IxYrl97kRxlPSsNfyMXDQs2o0Nt5/8gavSD84v3h",
-        "./src/presentation/pages/about-page/about-page.constants.js": "sha384-sHRGS4+L0WeCAVpTfnTBg1YEdPfZEQXwSeMXCZM/iT7fEeKNE0XAHjkKsFafCF6I",
-        "./src/presentation/pages/about-page/about-page.template.js": "sha384-sh54lZBVqcaH9sbeQvTCQjv/onWb3o5ZnugTN3WSUHA3pYTC3xoHRgR2cwVILL3Z",
+        "./src/presentation/pages/about-page/about-page.constants.js": "sha384-q4DMwSlH9B+0Rx+3Ao5FNJEQtEGaHlcQ1b/QkDz+U9/AkPS8rxY155D1PxDrzFUX",
+        "./src/presentation/pages/about-page/about-page.template.js": "sha384-63+02UdSY2Ocwk0Z6LkCEeSDtg22AqOiyfTSdu8nwJKAbQxAORGKDBzUcPgkTsmK",
         "./src/presentation/router/app-router.js": "sha384-XqzBcIVCX2Un8opuA+T3k8WhFkzlPOr18J1HuU5lCANY8rZlqfZuh92uPRz2420l",
         "https://ga.jspm.io/npm:@jspm/core@2.1.0/_/C7GZrc4O.js": "sha384-7BA1wTGX6TfnX1PVEYnKzX6AlyrTpyBK6+SCzPv/XcooYQix+LK8svULqStqIzsh",
         "https://ga.jspm.io/npm:@jspm/core@2.1.0/nodelibs/browser/buffer.js": "sha384-U3TD1RLqK9oLHfATmMNq4eS89TD8PaoauwqwUBNNdXhrybKIiWe0jY94gMzMMq2m",
@@ -193,13 +198,14 @@
     <link rel="modulepreload" href="./src/application/use-cases/select-pix-key.use-case.js" integrity="sha384-jLGXaxkzhfzdhfk/ZrnbxEpLwKDXND4kUFLSbQBoy6z0xCtQC5cc8rlFxbwytByO" />
     <link rel="modulepreload" href="./src/domain/entities/pix-charge.entity.js" integrity="sha384-apdRQcRsyQfyadI2Btnfu8n75qfQLV0nLNogV0lE3MtYqME1OonNK5x18PdhOLjf" />
     <link rel="modulepreload" href="./src/domain/entities/pix-key.entity.js" integrity="sha384-NWXWgFf5B31RDkjZUiEI9r0nVY+RJe0817XNX33GYk+K5bNX1M33l4vDtpP9li3Q" />
+    <link rel="modulepreload" href="./src/domain/security/origin-validator.js" integrity="sha384-8oSE4SufSJjqhFuNeJz7ju4AjMxdqQNM5jUxzMvyQBrj86+BgyKX+iKAak80cQ2t" />
     <link rel="modulepreload" href="./src/infrastructure/pix/pix-qr.service.js" integrity="sha384-TsTv0IqKL4sDYenWD/Q6XQILncajjTF1/98bIiKHtvUl3u6oL1XNKqjXpTygMGrG" />
     <link rel="modulepreload" href="./src/infrastructure/pwa/pwa-install.adapter.js" integrity="sha384-jJ46rcjkOn81TUYN6PRGOM7z4IrdODir0cg1k7zz+yY8C/onLkKv7jbn1PD8iQdw" />
     <link rel="modulepreload" href="./src/infrastructure/pwa/service-worker.adapter.js" integrity="sha384-b+4apZpw/PMwZqgFZXtzyqENprbdWW/aST4rhh/TfrW7VLvyYwrtAkv9Yx7YR276" />
     <link rel="modulepreload" href="./src/infrastructure/share/browser-share.adapter.js" integrity="sha384-3HXgneZxjwlXd5eJUZkpmLMWXyYl6ee5y9lt5xuGnK05OARnFs9hREntSzJLpyWr" />
     <link rel="modulepreload" href="./src/infrastructure/storage/indexed-db-pix-key.repository.js" integrity="sha384-djuXXh00PTK15Qx/P8GeJdOVMFC74q1CtfAkHj2wRKYl3MVjZwixhGo6lUTBeYcK" />
-    <link rel="modulepreload" href="./src/main.js" integrity="sha384-CyyYQPzFdmIVf93bdm4/BIlzE5VkLNMbf+o7GJaahdglqsh8qBzAlQZ6QUmYsTjp" />
-    <link rel="modulepreload" href="./src/presentation/bootstrap/bootstrap-app.js" integrity="sha384-KCMGEfE+9iUFuIda2UYRb0kMSEYbhD1QMvQIeN1YyA059mRGZpDbrIjHlZFvO08y" />
+    <link rel="modulepreload" href="./src/main.js" integrity="sha384-AavmPYqX4K+YnbSV7UsEwMfnKEWyTIaK5TCuM0kgTbBb9RQHAgDiFXRgJ64psFdN" />
+    <link rel="modulepreload" href="./src/presentation/bootstrap/bootstrap-app.js" integrity="sha384-ahjhKm0+3xpKnSxDUsUTaeJhV/0SjostzDto9luZIdRVzRS3D454qgGjHM3ZvHD+" />
     <link rel="modulepreload" href="./src/presentation/components/app-header/app-header.component.js" integrity="sha384-WOcjBRp0SdxMbGRaRQATydIKbG6d07TPqb3HTe9aD9zremta8B46uynqA5BrwhTY" />
     <link rel="modulepreload" href="./src/presentation/components/app-header/app-header.template.js" integrity="sha384-AHPgSJ4fpobISmmjlMcYE0pTdIcDDjEiIoNk3STpfoKY6/vPoF42+JEm9O+rWFEl" />
     <link rel="modulepreload" href="./src/presentation/components/pix-charge-dialog/pix-charge-dialog.component.js" integrity="sha384-qCm+957AYSm0ed3cXiQEfaoW5N6adAP215NRTlG6MWAswC0Qz1iFAv5Egm+x07fE" />
@@ -220,12 +226,15 @@
     <link rel="modulepreload" href="./src/presentation/components/pix-key-selector/pix-key-selector.component.js" integrity="sha384-DtCcQMFUZIDJOgaAG8NRYNzq3twyZQ4CxVsJk4bdM2NEb4XopHxaE/D+pasqCnmn" />
     <link rel="modulepreload" href="./src/presentation/components/pix-key-selector/pix-key-selector.constants.js" integrity="sha384-dN4AFbyQ9DI/ks0lcqUKCaHOFo5l63tLzi7cAtX7jPTZJvnrZozc5/82Dkip61fS" />
     <link rel="modulepreload" href="./src/presentation/components/pix-key-selector/pix-key-selector.template.js" integrity="sha384-zDNrQUIi/5JskXuE2w57zkmY6ANxxu6UJbMpoqUpUZOarJMPBmGeUqDMNaQIIMCJ" />
+    <link rel="modulepreload" href="./src/presentation/components/security-banner/security-banner.component.js" integrity="sha384-MxwqARqskeM4fnVzj7EI+HH8KKxq5uQQk2TWCo6NWigaP1gFXf2S48T6MzMB8QWt" />
+    <link rel="modulepreload" href="./src/presentation/components/security-banner/security-banner.constants.js" integrity="sha384-VSw1h2oJ4SfM2yB1bb29NsCPqgnsdJQOwU2JrmtZtIN6do1PQNiGsqi3uh3rUYKk" />
+    <link rel="modulepreload" href="./src/presentation/components/security-banner/security-banner.template.js" integrity="sha384-NBvVpDiEzJJornQrSp68TPF4W/AEA8ZmE8nPgiEicegB1Mj6qt0a4Bf3LhtGG0az" />
     <link rel="modulepreload" href="./src/presentation/components/vector-icon/vector-icon.component.js" integrity="sha384-gvPJfgpphgh7OqRZ8jZj64wU7Fn0/7pXazIZnSnICq7GYRdkZ/xUs2UQm5QaCfWl" />
     <link rel="modulepreload" href="./src/presentation/components/vector-icon/vector-icon.template.js" integrity="sha384-WAU5Jsle37rOgZIHZ2zHvgRCEsryd1dZZfPYpx56L1b46mcfFH0EVIiE2BW0xgtF" />
     <link rel="modulepreload" href="./src/presentation/di/container.js" integrity="sha384-3WsdhLhQX1MXGm+ODSVA5+2c2Wje7hnv0dsYeppLTpQQ9pQbS5timUPwxUugXuz9" />
     <link rel="modulepreload" href="./src/presentation/pages/about-page/about-page.component.js" integrity="sha384-uYDYrwjBR38HY0jOLXsq8Mg7IxYrl97kRxlPSsNfyMXDQs2o0Nt5/8gavSD84v3h" />
-    <link rel="modulepreload" href="./src/presentation/pages/about-page/about-page.constants.js" integrity="sha384-sHRGS4+L0WeCAVpTfnTBg1YEdPfZEQXwSeMXCZM/iT7fEeKNE0XAHjkKsFafCF6I" />
-    <link rel="modulepreload" href="./src/presentation/pages/about-page/about-page.template.js" integrity="sha384-sh54lZBVqcaH9sbeQvTCQjv/onWb3o5ZnugTN3WSUHA3pYTC3xoHRgR2cwVILL3Z" />
+    <link rel="modulepreload" href="./src/presentation/pages/about-page/about-page.constants.js" integrity="sha384-q4DMwSlH9B+0Rx+3Ao5FNJEQtEGaHlcQ1b/QkDz+U9/AkPS8rxY155D1PxDrzFUX" />
+    <link rel="modulepreload" href="./src/presentation/pages/about-page/about-page.template.js" integrity="sha384-63+02UdSY2Ocwk0Z6LkCEeSDtg22AqOiyfTSdu8nwJKAbQxAORGKDBzUcPgkTsmK" />
     <link rel="modulepreload" href="./src/presentation/router/app-router.js" integrity="sha384-XqzBcIVCX2Un8opuA+T3k8WhFkzlPOr18J1HuU5lCANY8rZlqfZuh92uPRz2420l" />
     <link rel="modulepreload" href="https://ga.jspm.io/npm:@jspm/core@2.1.0/_/C7GZrc4O.js" integrity="sha384-7BA1wTGX6TfnX1PVEYnKzX6AlyrTpyBK6+SCzPv/XcooYQix+LK8svULqStqIzsh" />
     <link rel="modulepreload" href="https://ga.jspm.io/npm:@jspm/core@2.1.0/nodelibs/browser/buffer.js" integrity="sha384-U3TD1RLqK9oLHfATmMNq4eS89TD8PaoauwqwUBNNdXhrybKIiWe0jY94gMzMMq2m" />
@@ -327,6 +336,10 @@
   </head>
   <body>
     <main id="app" class="app-root">
+      <security-banner
+        class="security-warning-banner"
+        hidden
+      ></security-banner>
       <app-header class="app-header">
         <div class="app-header__brand">
           <img
@@ -378,6 +391,18 @@
         <div class="app-footer__status">
           <span class="app-footer__dot" aria-hidden="true"></span>
           <span>100% Local &amp; Offline-Ready</span>
+        </div>
+        <div
+          class="app-footer__security"
+          role="status"
+          aria-label="Selo de Origem Oficial Verificada"
+        >
+          <span class="app-footer__security-badge">
+            <vector-icon name="check"></vector-icon>
+            <span>Origem Oficial: mandaumpix.app</span>
+          </span>
+          <span class="app-footer__security-separator" aria-hidden="true">·</span>
+          <span class="app-footer__zero-credential">Nunca solicitamos senhas bancárias</span>
         </div>
         <div class="app-footer__info">
           <a href="/sobre" class="app-footer__link">Sobre</a>

@@ -146,11 +146,28 @@ import {
   DEFAULT_CHARGE_DIALOG_TITLE,
   DEFAULT_CHARGE_DIALOG_TITLE_ID,
 } from "./presentation/components/pix-charge-dialog/pix-charge-dialog.constants.js";
+import SecurityBannerComponent, {
+  PixSecurityBannerComponent,
+} from "./presentation/components/security-banner/security-banner.component.js";
+import {
+  DEFAULT_SECURITY_BANNER_ARIA_LABEL,
+  DEFAULT_SECURITY_BANNER_DISMISS_LABEL,
+  DEFAULT_SECURITY_BANNER_LINK_LABEL,
+  DEFAULT_SECURITY_BANNER_MESSAGE,
+  DEFAULT_SECURITY_BANNER_OFFICIAL_DOMAIN,
+  DEFAULT_SECURITY_BANNER_OFFICIAL_URL,
+  DEFAULT_SECURITY_BANNER_TITLE,
+  SECURITY_BANNER_CLASSES,
+  SECURITY_BANNER_EVENTS,
+  SECURITY_BANNER_ICONS,
+} from "./presentation/components/security-banner/security-banner.constants.js";
+import { securityBannerTemplate } from "./presentation/components/security-banner/security-banner.template.js";
 import AboutPageComponent from "./presentation/pages/about-page/about-page.component.js";
 import {
   ABOUT_AUTHOR,
   ABOUT_NAVIGATION,
   ABOUT_PROJECT,
+  ABOUT_SECURITY,
   ABOUT_SHARE,
   ABOUT_SUPPORT_PIX,
 } from "./presentation/pages/about-page/about-page.constants.js";
@@ -237,6 +254,21 @@ import {
   normalizeTxid,
   resolveChaveConta,
 } from "./domain/entities/pix-charge.entity.js";
+import {
+  CANONICAL_ORIGINS,
+  CANONICAL_PRODUCTION_ORIGIN,
+  OFFICIAL_DOMAIN,
+  OFFICIAL_ORIGIN_BADGE_LABEL,
+  SECURITY_ALERT_MESSAGE,
+  ZERO_CREDENTIAL_MESSAGE,
+  getCanonicalOrigins,
+  isCanonicalOrigin,
+  isLocalOrigin,
+  isOfficialOrigin,
+  isProductionOrigin,
+  normalizeOrigin,
+  validateOrigin,
+} from "./domain/security/origin-validator.js";
 
 // Camada de Aplicação (Casos de Uso)
 import {
@@ -326,7 +358,21 @@ export {
   PixKeyDialogComponent,
   PixKeyEmptyComponent,
   PixKeySelectorComponent,
+  PixSecurityBannerComponent,
+  SecurityBannerComponent,
   VectorIconComponent,
+  // Metadados e Constantes do Banner de Segurança (<security-banner> / US-08.2)
+  DEFAULT_SECURITY_BANNER_ARIA_LABEL,
+  DEFAULT_SECURITY_BANNER_DISMISS_LABEL,
+  DEFAULT_SECURITY_BANNER_LINK_LABEL,
+  DEFAULT_SECURITY_BANNER_MESSAGE,
+  DEFAULT_SECURITY_BANNER_OFFICIAL_DOMAIN,
+  DEFAULT_SECURITY_BANNER_OFFICIAL_URL,
+  DEFAULT_SECURITY_BANNER_TITLE,
+  SECURITY_BANNER_CLASSES,
+  SECURITY_BANNER_EVENTS,
+  SECURITY_BANNER_ICONS,
+  securityBannerTemplate,
   // Metadados e Constantes do Estado Vazio de Chaves PIX (<pix-key-empty>)
   DEFAULT_EMPTY_STATE_ARIA_LABEL,
   DEFAULT_EMPTY_STATE_CTA,
@@ -433,6 +479,7 @@ export {
   ABOUT_AUTHOR,
   ABOUT_NAVIGATION,
   ABOUT_PROJECT,
+  ABOUT_SECURITY,
   ABOUT_SHARE,
   ABOUT_SUPPORT_PIX,
   // Roteamento & Navegação
@@ -485,6 +532,20 @@ export {
   validateAndNormalizeEvp,
   validateAndNormalizePhone,
   validateAndNormalizePixKey,
+  // Segurança de Domínio e UX Defensiva (US-08.2 / RN08)
+  CANONICAL_ORIGINS,
+  CANONICAL_PRODUCTION_ORIGIN,
+  OFFICIAL_DOMAIN,
+  OFFICIAL_ORIGIN_BADGE_LABEL,
+  SECURITY_ALERT_MESSAGE,
+  ZERO_CREDENTIAL_MESSAGE,
+  getCanonicalOrigins,
+  isCanonicalOrigin,
+  isLocalOrigin,
+  isOfficialOrigin,
+  isProductionOrigin,
+  normalizeOrigin,
+  validateOrigin,
   // Casos de Uso da Aplicação
   DEFAULT_QR_IMAGE_FILENAME,
   DEFAULT_QR_IMAGE_SIZE,

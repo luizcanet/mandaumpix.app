@@ -173,6 +173,47 @@
   color: var(--color-success, #059669);
 }
 
+/* Card Segurança, Selo de Autenticidade & Zero-Credential (INV-03 / RN08) */
+.about-page__box--security {
+  border-color: rgba(5, 150, 105, 0.3);
+  background-color: rgba(5, 150, 105, 0.04);
+}
+
+.about-page__security-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  width: fit-content;
+  padding: 0.375rem 0.75rem;
+  background-color: #064e3b;
+  color: #ecfdf5;
+  border: 1px solid #059669;
+  border-radius: var(--radius-pill, 9999px);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.about-page__security-badge-icon {
+  color: var(--color-brand-accent, #00d37f);
+  font-size: 0.875rem;
+}
+
+.about-page__security-text {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary, #475569);
+}
+
+.about-page__security-notice {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary, #475569);
+  opacity: 0.9;
+}
+
 /* Card Apoio Voluntário ("Manda um PIX") */
 .about-page__box--support {
   background-color: #f0fdf8;

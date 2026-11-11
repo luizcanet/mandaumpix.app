@@ -7,6 +7,7 @@ import {
   ABOUT_AUTHOR,
   ABOUT_NAVIGATION,
   ABOUT_PROJECT,
+  ABOUT_SECURITY,
   ABOUT_SHARE,
   ABOUT_SUPPORT_PIX,
 } from "./about-page.constants.js";
@@ -26,6 +27,9 @@ describe("AboutPageTemplate", () => {
     expect(html).toContain(ABOUT_SUPPORT_PIX.key);
     expect(html).toContain(ABOUT_SHARE.title);
     expect(html).toContain('<vector-icon name="copy"></vector-icon>');
+    expect(html).toContain("about-page__box--security");
+    expect(html).toContain(ABOUT_SECURITY.badgeLabel);
+    expect(html).toContain(ABOUT_SECURITY.zeroCredentialNotice);
   });
 
   it("deve renderizar estado de copiado quando isCopied for true", () => {

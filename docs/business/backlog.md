@@ -17,7 +17,7 @@ Este documento consolida o **Backlog do Produto e de Engenharia** do **Manda um 
 | **EP-05** | Gestão de Chaves PIX na Interface (`<pix-key-*>`)                                               | `RN01`, `RN02`, `<dialog class="key-dialog">`                          |     `3 / 3`     | ✅ Concluído    |
 | **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")                                   | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas                       |     `3 / 3`     | ✅ Concluído    |
 | **EP-07** | Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA), Deploy `stg`/`prd` e Diálogo de Cobrança | Testes de Integração, Storybook a11y, Releases, Caixa de Diálogo Modal |     `3 / 4`     | ⏳ Em Andamento |
-| **EP-08** | Proteção de Marca, Monitoramento Ativo e Procedimentos de Takedown                              | `RN08`, Certificate Transparency, UX Defensiva, TWA, Playbook Takedown |     `0 / 5`     | 📋 Planejado    |
+| **EP-08** | Proteção de Marca, Monitoramento Ativo e Procedimentos de Takedown                              | `RN08`, Certificate Transparency, UX Defensiva, TWA, Playbook Takedown |     `1 / 5`     | ⏳ Em Andamento |
 
 ---
 
@@ -32,7 +32,7 @@ flowchart TD
     EP05["✅ EP-05: Gestão de Chaves PIX na UI<br/>(Empty State, Seletor Radio Cards, Modal &lt;dialog&gt;)"]
     EP06["✅ EP-06: Geração e Distribuição 'Manda um PIX'<br/>(Formulário de Valor, QR Code SVG, Copiar/WhatsApp/PNG)"]
     EP07["⏳ EP-07: Testes Integrados, Catálogo Storybook Completo,<br/>Pipelines CD (stg / prd) & Caixa de Diálogo Modal (&lt;dialog&gt;)"]
-    EP08["📋 EP-08: Proteção de Marca, Monitoramento Ativo<br/>& Procedimentos de Takedown (RN08)"]
+    EP08["⏳ EP-08: Proteção de Marca, Monitoramento Ativo<br/>& Procedimentos de Takedown (RN08)"]
 
     EP01 --> EP02
     EP01 --> EP03
@@ -1411,13 +1411,13 @@ flowchart LR
 
 > **Objetivo**: Proteger o aplicativo `mandaumpix.app` e seus usuários contra golpes de engenharia social, réplicas maliciosas (phishing), desvio silencioso de chaves PIX e distribuição de APKs adulterados, por meio de monitoramento automatizado de certificados/DNS, UX defensiva in-app, canais comunitários de denúncia, distribuição oficial via Trusted Web Activity (TWA) e playbook operacional de derrubada (_takedown_) multicanal (`RN08`).
 
-| ID          | Item de Backlog                                                                             | Status       | Complexidade |
-| :---------- | :------------------------------------------------------------------------------------------ | :----------- | :----------: |
-| **US-08.1** | Monitoramento Automatizado de Certificados e Typosquatting (Certificate Transparency & DNS) | ✅ Concluído |   `3 pts`    |
-| **US-08.2** | UX Defensiva: Alerta de Autenticidade Canônica e Validação de Origem no PWA                 | 📋 Planejado |   `2 pts`    |
-| **US-08.3** | Canal Comunitário de Denúncia de Fraudes, `security.txt` e Diretrizes na Página "Sobre"     | 📋 Planejado |   `2 pts`    |
-| **US-08.4** | Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links      | 📋 Planejado |   `3 pts`    |
-| **US-08.5** | Esteira de Assinatura Criptográfica de Releases e Verificação de Integridade de Builds      | 📋 Planejado |   `2 pts`    |
+| ID          | Item de Backlog                                                                             | Status          | Complexidade |
+| :---------- | :------------------------------------------------------------------------------------------ | :-------------- | :----------: |
+| **US-08.1** | Monitoramento Automatizado de Certificados e Typosquatting (Certificate Transparency & DNS) | ✅ Concluído    |   `3 pts`    |
+| **US-08.2** | UX Defensiva: Alerta de Autenticidade Canônica e Validação de Origem no PWA                 | 🔄 Em Andamento |   `2 pts`    |
+| **US-08.3** | Canal Comunitário de Denúncia de Fraudes, `security.txt` e Diretrizes na Página "Sobre"     | 📋 Planejado    |   `2 pts`    |
+| **US-08.4** | Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links      | 📋 Planejado    |   `3 pts`    |
+| **US-08.5** | Esteira de Assinatura Criptográfica de Releases e Verificação de Integridade de Builds      | 📋 Planejado    |   `2 pts`    |
 
 ```mermaid
 flowchart TD
@@ -1463,7 +1463,7 @@ flowchart TD
   - [x] **TASK-08.1.3 (Workflow Agendado GitHub Actions)**: Criar workflow agendado [`.github/workflows/security-ct-monitor.yml`](../../.github/workflows/security-ct-monitor.yml) com execução cron diária e suporte a disparo manual (`workflow_dispatch`).
   - [x] **TASK-08.1.4 (Documentação e Integração com Webhook)**: Documentar variáveis de ambiente seguras (`SECURITY_WEBHOOK_URL`) em [`docs/configuration/environment.md`](../configuration/environment.md) e [`docs/security/takedown_and_monitoring.md`](../security/takedown_and_monitoring.md).
 
-#### `US-08.2` — UX Defensiva: Alerta de Autenticidade Canônica e Validação de Origem no PWA (`📋 Planejado` · `2 Story Points`)
+#### `US-08.2` — UX Defensiva: Alerta de Autenticidade Canônica e Validação de Origem no PWA (`🔄 Em Andamento` · `2 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Usuário do Manda um PIX**,
@@ -1485,10 +1485,10 @@ flowchart TD
     - Então o validador de origem deve detectar a inconsistência,
     - E deve renderizar imediatamente um banner fixo de alerta com o texto: `"Atenção: Este não é o endereço oficial do Manda um PIX. Acesse com segurança em mandaumpix.app"`.
 - **Tarefas de Desenvolvimento (Dev Tasks)**:
-  - [ ] **TASK-08.2.1 (Módulo de Validação de Origem Canônica)**: Implementar [`src/domain/security/origin-validator.js`](../../src/domain/security/origin-validator.js) contendo as regras de origens canônicas com testes unitários em [`src/domain/security/origin-validator.test.js`](../../src/domain/security/origin-validator.test.js).
-  - [ ] **TASK-08.2.2 (Web Component `<security-banner>`)**: Criar componente Web Component acessível (`role="alert"`, `aria-live="assertive"`) ativado sob origens não autorizadas com testes de renderização.
-  - [ ] **TASK-08.2.3 (Selo de Autenticidade na Página Sobre e Rodapé)**: Atualizar [`src/presentation/components/about/about.component.js`](../../src/presentation/components/about/about.component.js) e componentes de rodapé com selo de origem oficial e advertência Zero-Credential.
-  - [ ] **TASK-08.2.4 (Storybook & Acessibilidade)**: Adicionar stories no Storybook para o componente de banner de alerta e o badge de autenticidade, auditados com `@storybook/addon-a11y`.
+  - [x] **TASK-08.2.1 (Módulo de Validação de Origem Canônica)**: Implementar [`src/domain/security/origin-validator.js`](../../src/domain/security/origin-validator.js) contendo as regras de origens canônicas com testes unitários em [`src/domain/security/origin-validator.test.js`](../../src/domain/security/origin-validator.test.js).
+  - [x] **TASK-08.2.2 (Web Component `<security-banner>`)**: Criar componente Web Component acessível (`role="alert"`, `aria-live="assertive"`) ativado sob origens não autorizadas com testes de renderização.
+  - [x] **TASK-08.2.3 (Selo de Autenticidade na Página Sobre e Rodapé)**: Atualizar [`src/presentation/components/about/about.component.js`](../../src/presentation/components/about/about.component.js) e componentes de rodapé com selo de origem oficial e advertência Zero-Credential.
+  - [x] **TASK-08.2.4 (Storybook & Acessibilidade)**: Adicionar stories no Storybook para o componente de banner de alerta e o badge de autenticidade, auditados com `@storybook/addon-a11y`.
 
 #### `US-08.3` — Canal Comunitário de Denúncia de Fraudes, `security.txt` e Diretrizes na Página "Sobre" (`📋 Planejado` · `2 Story Points`)
 

@@ -8,6 +8,7 @@ import * as pixChargeResultStories from "./components/pix-charge-result/pix-char
 import * as pixKeyDialogStories from "./components/pix-key-dialog/pix-key-dialog.stories.js";
 import * as pixKeyEmptyStories from "./components/pix-key-empty/pix-key-empty.stories.js";
 import * as pixKeySelectorStories from "./components/pix-key-selector/pix-key-selector.stories.js";
+import * as securityBannerStories from "./components/security-banner/security-banner.stories.js";
 import * as vectorIconStories from "./components/vector-icon/vector-icon.stories.js";
 
 const STORY_MODULES = [
@@ -20,6 +21,11 @@ const STORY_MODULES = [
     name: "AppHeader",
     category: "Components/AppHeader",
     module: appHeaderStories,
+  },
+  {
+    name: "SecurityBanner",
+    category: "Components/SecurityBanner",
+    module: securityBannerStories,
   },
   {
     name: "PixKeyEmpty",
@@ -58,9 +64,9 @@ const STORY_MODULES = [
   },
 ];
 
-describe("Storybook Catalog & A11y Suite Integrity (US-07.1 / US-07.4)", () => {
-  it("deve cobrir exaustivamente todos os 9 blocos de apresentação da aplicação", () => {
-    expect(STORY_MODULES).toHaveLength(9);
+describe("Storybook Catalog & A11y Suite Integrity (US-07.1 / US-07.4, TASK-08.2.4)", () => {
+  it("deve cobrir exaustivamente todos os 10 blocos de apresentação da aplicação", () => {
+    expect(STORY_MODULES).toHaveLength(10);
   });
 
   describe.each(STORY_MODULES)(

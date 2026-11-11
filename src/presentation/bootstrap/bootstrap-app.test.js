@@ -54,6 +54,46 @@ describe("bootstrap-app.js", () => {
     root.remove();
   });
 
+  it("should mount and activate <security-banner> when running on unauthorized origin (TASK-08.2.2 / Cenário 02)", () => {
+    const root = document.createElement("main");
+    root.id = "app";
+    document.body.appendChild(root);
+
+    bootstrapApp(root, {
+      autoRegisterServiceWorker: false,
+      originTarget: "https://manda-um-pix.online",
+    });
+
+    const banner = root.querySelector("security-banner");
+    expect(banner).not.toBeNull();
+    expect(banner.hasAttribute("hidden")).toBe(false);
+    expect(banner.getAttribute("role")).toBe("alert");
+    expect(banner.getAttribute("aria-live")).toBe("assertive");
+    expect(banner.textContent).toContain(
+      "Atenção: Este não é o endereço oficial do Manda um PIX. Acesse com segurança em mandaumpix.app",
+    );
+
+    root.remove();
+  });
+
+  it("should mount <security-banner> but keep it hidden on official canonical origin (TASK-08.2.2 / Cenário 01)", () => {
+    const root = document.createElement("main");
+    root.id = "app";
+    document.body.appendChild(root);
+
+    bootstrapApp(root, {
+      autoRegisterServiceWorker: false,
+      originTarget: "https://mandaumpix.app",
+    });
+
+    const banner = root.querySelector("security-banner");
+    expect(banner).not.toBeNull();
+    expect(banner.hasAttribute("hidden")).toBe(true);
+    expect(banner.isUnauthorized).toBe(false);
+
+    root.remove();
+  });
+
   it("should register service worker when readyState is complete and autoRegister is true", () => {
     const root = document.createElement("main");
     document.body.appendChild(root);
