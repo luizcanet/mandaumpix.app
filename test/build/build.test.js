@@ -43,10 +43,12 @@ describe("Build Script (scripts/build.js)", () => {
     const distIndex = path.join(distPath, "index.html");
     const distMain = path.join(distPath, "src/main.js");
     const distSecurityTxt = path.join(distPath, ".well-known/security.txt");
+    const distAssetlinks = path.join(distPath, ".well-known/assetlinks.json");
 
     expect(fs.existsSync(distIndex)).toBe(true);
     expect(fs.existsSync(distMain)).toBe(true);
     expect(fs.existsSync(distSecurityTxt)).toBe(true);
+    expect(fs.existsSync(distAssetlinks)).toBe(true);
 
     const stats = validateDistIntegrity(distIndex);
     expect(stats.preloadCount).toBeGreaterThan(0);

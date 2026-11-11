@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.mandaumpix.twa",
+      "sha256_cert_fingerprints": [
+        "14:6D:E9:44:C8:B1:4F:08:12:34:56:78:9A:BC:DE:F0:12:34:56:78:9A:BC:DE:F0:12:34:56:78:9A:BC:DE:F0"
+      ]
+    }
+  }
+]
+

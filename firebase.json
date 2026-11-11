@@ -40,12 +40,30 @@
             "value": "public, max-age=86400, stale-while-revalidate=604800"
           }
         ]
+      },
+      {
+        "source": "/.well-known/assetlinks.json",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=86400, stale-while-revalidate=604800"
+          }
+        ]
       }
     ],
     "redirects": [
       {
         "source": "/security.txt",
         "destination": "/.well-known/security.txt",
+        "type": 301
+      },
+      {
+        "source": "/assetlinks.json",
+        "destination": "/.well-known/assetlinks.json",
         "type": 301
       }
     ],

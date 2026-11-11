@@ -1416,7 +1416,7 @@ flowchart LR
 | **US-08.1** | Monitoramento Automatizado de Certificados e Typosquatting (Certificate Transparency & DNS) | ✅ Concluído    |   `3 pts`    |
 | **US-08.2** | UX Defensiva: Alerta de Autenticidade Canônica e Validação de Origem no PWA                 | 🔄 Em Andamento |   `2 pts`    |
 | **US-08.3** | Canal Comunitário de Denúncia de Fraudes, `security.txt` e Diretrizes na Página "Sobre"     | ✅ Concluído    |   `2 pts`    |
-| **US-08.4** | Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links      | 📋 Planejado    |   `3 pts`    |
+| **US-08.4** | Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links      | 🔄 Em Andamento |   `3 pts`    |
 | **US-08.5** | Esteira de Assinatura Criptográfica de Releases e Verificação de Integridade de Builds      | 📋 Planejado    |   `2 pts`    |
 
 ```mermaid
@@ -1513,7 +1513,7 @@ flowchart TD
   - [x] **TASK-08.3.2 (Inclusão de Bloco de Segurança na Página Sobre)**: Implementar bloco de segurança e link de denúncia acessível no Web Component [`src/presentation/pages/about-page/about-page.component.js`](../../src/presentation/pages/about-page/about-page.component.js).
   - [x] **TASK-08.3.3 (Testes Unitários de Rota e Acessibilidade)**: Criar testes unitários em Vitest validando a integridade dos links e acessibilidade da página Sobre.
 
-#### `US-08.4` — Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links (`📋 Planejado` · `3 Story Points`)
+#### `US-08.4` — Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links (`🔄 Em Andamento` · `3 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Usuário Android**,
@@ -1529,7 +1529,7 @@ flowchart TD
     - Então o arquivo JSON válido é retornado com `Content-Type: application/json`,
     - E o sistema Android valida a relação de confiança `delegate_permission/common.handle_all_urls`.
 - **Tarefas de Desenvolvimento (Dev Tasks)**:
-  - [ ] **TASK-08.4.1 (Criação de `.well-known/assetlinks.json`)**: Criar arquivo [`.well-known/assetlinks.json`](../../.well-known/assetlinks.json) com o manifesto de permissão e configurar cabeçalhos em [`firebase.json`](../../firebase.json).
+  - [x] **TASK-08.4.1 (Criação de `.well-known/assetlinks.json`)**: Criar arquivo [`.well-known/assetlinks.json`](../../.well-known/assetlinks.json) com o manifesto de permissão e configurar cabeçalhos em [`firebase.json`](../../firebase.json).
   - [ ] **TASK-08.4.2 (Configuração de Build Bubblewrap TWA)**: Configurar manifesto `twa-manifest.json` com ícones, cores de tema, package name `app.mandaumpix.twa` e versão sincronizada com `package.json`.
   - [ ] **TASK-08.4.3 (Documentação do Processo de Publicação Play Store)**: Documentar em [`docs/deployment/pipeline.md`](../deployment/pipeline.md) o passo a passo de build do Android App Bundle (`.aab`) e upload no Google Play Console.
 
