@@ -1553,7 +1553,7 @@ flowchart TD
     - Então todos os arquivos devem ser validados com status `OK`.
 - **Tarefas de Desenvolvimento (Dev Tasks)**:
   - [x] **TASK-08.5.1 (Script de Geração de Checksums)**: Criar script Node.js [`scripts/generate-checksums.js`](../../scripts/generate-checksums.js) e adicionar comando `npm run build:checksums` em [`package.json`](../../package.json).
-  - [ ] **TASK-08.5.2 (Integração na Pipeline de Deploy)**: Atualizar [`.github/workflows/deploy-dev.yml`](../../.github/workflows/deploy-dev.yml) e workflows de staging/produção para publicar o arquivo de hashes nos artefatos da release.
+  - [x] **TASK-08.5.2 (Integração na Pipeline de Deploy)**: Atualizar [`.github/workflows/deploy-dev.yml`](../../.github/workflows/deploy-dev.yml) e workflows de staging/produção para publicar o arquivo de hashes nos artefatos da release.
   - [ ] **TASK-08.5.3 (Guia de Auditoria e Verificação de Integridade)**: Documentar em [`docs/security/takedown_and_monitoring.md`](../security/takedown_and_monitoring.md) e [`docs/quality/static_analysis.md`](../quality/static_analysis.md) as instruções para verificação de hashes pelos usuários.
 
 ```mermaid
