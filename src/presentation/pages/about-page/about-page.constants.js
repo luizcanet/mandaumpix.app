@@ -72,6 +72,9 @@ export const ABOUT_PROJECT = Object.freeze({
   licenseFull: "GNU Affero General Public License v3.0 (AGPL-3.0-only)",
   repositoryUrl: "https://github.com/luizcanet/mandaumpix.app",
   issuesUrl: "https://github.com/luizcanet/mandaumpix.app/issues",
+  videoUrl: "https://youtu.be/MFO3te-t0l8",
+  videoLabel: "Vídeo Promocional do Aplicativo",
+  videoAriaLabel: "Assistir ao vídeo promocional do Manda um PIX no YouTube",
   summary:
     "Manda um PIX é um aplicativo web progressivo (PWA) gratuito, livre e de código aberto que facilita a geração de cobranças via PIX sem a necessidade de ficar abrindo aplicativos de banco, com execução e armazenamento 100% locais no navegador.",
 });

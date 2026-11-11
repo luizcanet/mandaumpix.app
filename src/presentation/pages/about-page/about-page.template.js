@@ -122,6 +122,18 @@ export function aboutPageTemplate({
             ${ABOUT_PROJECT.repositoryUrl}
           </a>
         </div>
+        <div class="about-page__video-link-wrapper">
+          <a
+            href="${ABOUT_PROJECT.videoUrl}"
+            class="about-page__link about-page__link--video"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="${ABOUT_PROJECT.videoAriaLabel}"
+          >
+            <span aria-hidden="true">🎬</span>
+            <span>${ABOUT_PROJECT.videoLabel}</span>
+          </a>
+        </div>
       </div>
 
       <!-- CARD 3: AUTENTICIDADE, ZERO-CREDENTIAL E CANAL DE DENÚNCIA (RN08 / RFC 9116) -->

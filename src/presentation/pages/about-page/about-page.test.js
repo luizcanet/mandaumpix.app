@@ -115,7 +115,7 @@ describe("AboutPageComponent (TASK-04.4.2: Testes Unitários de Renderização e
       );
     });
 
-    it("deve renderizar o Card Projeto & Licença com menção à AGPLv3 e link oficial do repositório", () => {
+    it("deve renderizar o Card Projeto & Licença com menção à AGPLv3, link oficial do repositório e vídeo promocional", () => {
       document.body.appendChild(aboutElement);
 
       const projectBox = aboutElement.querySelector(
@@ -132,6 +132,17 @@ describe("AboutPageComponent (TASK-04.4.2: Testes Unitários de Renderização e
       expect(repoLink.getAttribute("target")).toBe("_blank");
       expect(repoLink.getAttribute("rel")).toBe("noopener noreferrer");
       expect(repoLink.textContent.trim()).toBe(ABOUT_PROJECT.repositoryUrl);
+
+      const videoLink = projectBox.querySelector(
+        `a[href="${ABOUT_PROJECT.videoUrl}"]`,
+      );
+      expect(videoLink).not.toBeNull();
+      expect(videoLink.getAttribute("target")).toBe("_blank");
+      expect(videoLink.getAttribute("rel")).toBe("noopener noreferrer");
+      expect(videoLink.getAttribute("aria-label")).toBe(
+        ABOUT_PROJECT.videoAriaLabel,
+      );
+      expect(videoLink.textContent).toContain(ABOUT_PROJECT.videoLabel);
     });
 
     it("deve renderizar o Card Apoio Voluntário com título descontraído, QR Code e Chave Copia e Cola", () => {

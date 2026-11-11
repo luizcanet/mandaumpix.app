@@ -52,6 +52,10 @@ describe("about-page.css (TASK-04.4.4: Estilização BEM, Acessibilidade e Respo
       expect(cssContent).toMatch(
         /\.about-page__security-txt-link\s*\{[^}]*display:\s*inline-flex/,
       );
+      expect(cssContent).toMatch(
+        /\.about-page__video-link-wrapper\s*\{[^}]*display:\s*flex/,
+      );
+      expect(cssContent).toMatch(/\.about-page__link--video\s*\{/);
     });
 
     it("deve definir a área do QR Code e caixa do código Copia e Cola", () => {

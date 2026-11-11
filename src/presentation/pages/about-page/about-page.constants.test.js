@@ -84,6 +84,11 @@ describe("about-page.constants", () => {
       expect(ABOUT_PROJECT.issuesUrl).toBe(
         "https://github.com/luizcanet/mandaumpix.app/issues",
       );
+      expect(ABOUT_PROJECT.videoUrl).toBe("https://youtu.be/MFO3te-t0l8");
+      expect(ABOUT_PROJECT.videoLabel).toBe("Vídeo Promocional do Aplicativo");
+      expect(ABOUT_PROJECT.videoAriaLabel).toContain(
+        "Assistir ao vídeo promocional",
+      );
       expect(ABOUT_PROJECT.summary).toContain(
         "gratuito, livre e de código aberto",
       );

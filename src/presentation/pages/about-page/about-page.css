@@ -173,6 +173,21 @@
   color: var(--color-success, #059669);
 }
 
+.about-page__video-link-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.about-page__link--video {
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  color: var(--color-focus, #2563eb);
+}
+
+.about-page__link--video:hover {
+  color: var(--color-brand-accent-hover, #00b36b);
+}
+
 /* Card Segurança, Selo de Autenticidade & Zero-Credential (INV-03 / RN08) */
 .about-page__box--security {
   border-color: rgba(5, 150, 105, 0.3);

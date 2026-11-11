@@ -23,6 +23,8 @@ describe("AboutPageTemplate", () => {
     const html = aboutPageTemplate();
     expect(html).toContain(ABOUT_NAVIGATION.title);
     expect(html).toContain(ABOUT_PROJECT.versionLabel);
+    expect(html).toContain(ABOUT_PROJECT.videoUrl);
+    expect(html).toContain(ABOUT_PROJECT.videoLabel);
     expect(html).toContain(ABOUT_AUTHOR.name);
     expect(html).toContain(ABOUT_SUPPORT_PIX.key);
     expect(html).toContain(ABOUT_SHARE.title);

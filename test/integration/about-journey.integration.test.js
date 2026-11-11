@@ -76,6 +76,12 @@ describe("Jornada Institucional e Navegação SPA (TASK-07.2.6 — RN07)", () =>
     );
     expect(repoAnchor).not.toBeNull();
 
+    const videoAnchor = projectSection.querySelector(
+      `a[href="${ABOUT_PROJECT.videoUrl}"]`,
+    );
+    expect(videoAnchor).not.toBeNull();
+    expect(videoAnchor.textContent).toContain(ABOUT_PROJECT.videoLabel);
+
     // 3.1 Validação do Card de Segurança, Canal de Denúncia e RFC 9116 security.txt (INV-01, INV-02)
     const securitySection = aboutPage.querySelector(
       ".about-page__box--security",

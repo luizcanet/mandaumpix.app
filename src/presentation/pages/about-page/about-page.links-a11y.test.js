@@ -113,7 +113,7 @@ describe("AboutPage — Integridade de Links e Acessibilidade WCAG 2.2 AA (TASK-
       );
     });
 
-    it("deve validar a integridade dos links institucionais do autor e do repositório", () => {
+    it("deve validar a integridade dos links institucionais do autor, do repositório e do vídeo promocional", () => {
       document.body.appendChild(aboutElement);
 
       const emailLink = aboutElement.querySelector(
@@ -136,6 +136,17 @@ describe("AboutPage — Integridade de Links e Acessibilidade WCAG 2.2 AA (TASK-
         `a[href="${ABOUT_PROJECT.repositoryUrl}"]`,
       );
       expect(repoLink).not.toBeNull();
+
+      const videoLink = aboutElement.querySelector(
+        `a[href="${ABOUT_PROJECT.videoUrl}"]`,
+      );
+      expect(videoLink).not.toBeNull();
+      expect(videoLink.getAttribute("target")).toBe("_blank");
+      expect(videoLink.getAttribute("rel")).toContain("noopener");
+      expect(videoLink.getAttribute("rel")).toContain("noreferrer");
+      expect(videoLink.getAttribute("aria-label")).toBe(
+        ABOUT_PROJECT.videoAriaLabel,
+      );
     });
   });
 
