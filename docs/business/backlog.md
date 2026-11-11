@@ -1530,7 +1530,7 @@ flowchart TD
     - E o sistema Android valida a relação de confiança `delegate_permission/common.handle_all_urls`.
 - **Tarefas de Desenvolvimento (Dev Tasks)**:
   - [x] **TASK-08.4.1 (Criação de `.well-known/assetlinks.json`)**: Criar arquivo [`.well-known/assetlinks.json`](../../.well-known/assetlinks.json) com o manifesto de permissão e configurar cabeçalhos em [`firebase.json`](../../firebase.json).
-  - [ ] **TASK-08.4.2 (Configuração de Build Bubblewrap TWA)**: Configurar manifesto `twa-manifest.json` com ícones, cores de tema, package name `app.mandaumpix.twa` e versão sincronizada com `package.json`.
+  - [x] **TASK-08.4.2 (Configuração de Build Bubblewrap TWA)**: Configurar manifesto `twa-manifest.json` com ícones, cores de tema, package name `app.mandaumpix.twa` e versão sincronizada com `package.json`.
   - [ ] **TASK-08.4.3 (Documentação do Processo de Publicação Play Store)**: Documentar em [`docs/deployment/pipeline.md`](../deployment/pipeline.md) o passo a passo de build do Android App Bundle (`.aab`) e upload no Google Play Console.
 
 #### `US-08.5` — Esteira de Assinatura Criptográfica de Releases e Verificação de Integridade de Builds (`📋 Planejado` · `2 Story Points`)

@@ -1,0 +1,42 @@
+{
+  "packageId": "app.mandaumpix.twa",
+  "host": "mandaumpix.app",
+  "name": "Manda um PIX",
+  "launcherName": "Manda um PIX",
+  "display": "standalone",
+  "themeColor": "#0b1834",
+  "navigationColor": "#060d1e",
+  "navigationColorDark": "#060d1e",
+  "navigationDividerColor": "#00000000",
+  "navigationDividerColorDark": "#00000000",
+  "backgroundColor": "#060d1e",
+  "enableNotifications": false,
+  "startUrl": "/",
+  "iconUrl": "https://mandaumpix.app/src/assets/icons/icon-512.png",
+  "maskableIconUrl": "https://mandaumpix.app/src/assets/icons/icon-maskable-512.png",
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "mandaumpix"
+  },
+  "splashScreenFadeOutDuration": 300,
+  "enableSiteSettingsShortcut": true,
+  "shortName": "Manda um PIX",
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://mandaumpix.app/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": false
+    },
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  }
+}
+
