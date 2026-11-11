@@ -1,0 +1,2510 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Protótipo navegável interativo da proposta de UI do aplicativo Manda um PIX (mandaumpix.app)."
+    />
+    <meta name="theme-color" content="#0b1834" />
+    <title>Protótipo Navegável de UI — Manda um PIX</title>
+    <style>
+      :root {
+        /* Paleta oficial Manda um PIX (src/presentation/styles/tokens.css) */
+        --color-brand-primary: #0b1834;
+        --color-brand-primary-dark: #060d1e;
+        --color-brand-accent: #00d37f;
+        --color-brand-accent-hover: #00b36b;
+
+        /* Superfícies e fundos */
+        --color-surface: #ffffff;
+        --color-surface-muted: #f8fafc;
+        --color-surface-elevated: #f1f5f9;
+
+        /* Texto */
+        --color-text-primary: #0f172a;
+        --color-text-secondary: #475569;
+        --color-text-inverse: #f8fafc;
+
+        /* Estados semânticos */
+        --color-success: #059669;
+        --color-warning: #d97706;
+        --color-danger: #e11d48;
+        --color-focus: #2563eb;
+
+        /* Bordas */
+        --color-border: #e2e8f0;
+        --color-border-strong: #cbd5e1;
+
+        /* Tipografia */
+        --font-sans:
+          system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        --font-mono:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+        /* Espaçamento */
+        --space-2xs: 0.25rem;
+        --space-xs: 0.5rem;
+        --space-sm: 0.75rem;
+        --space-md: 1rem;
+        --space-lg: 1.5rem;
+        --space-xl: 2rem;
+
+        /* Raios de borda */
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --radius-lg: 16px;
+        --radius-pill: 9999px;
+
+        /* Sombras */
+        --shadow-sm: 0 1px 3px rgba(11, 24, 52, 0.08);
+        --shadow-md: 0 4px 12px rgba(11, 24, 52, 0.12);
+        --shadow-lg: 0 20px 40px rgba(6, 13, 30, 0.28);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: var(--space-md);
+        font-family: var(--font-sans);
+        background-color: #091326;
+        color: var(--color-text-primary);
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      /* ==========================================================================
+         BARRA DO SIMULADOR DE PROTÓTIPO (.proto-toolbar)
+         ========================================================================== */
+      .proto-toolbar {
+        max-width: 960px;
+        margin: 0 auto var(--space-md);
+        background-color: #112244;
+        border: 1px solid #243b67;
+        border-radius: var(--radius-lg);
+        padding: var(--space-md);
+        color: var(--color-text-inverse);
+        box-shadow: var(--shadow-md);
+      }
+
+      .proto-toolbar__top {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-sm);
+        padding-bottom: var(--space-sm);
+        margin-bottom: var(--space-sm);
+        border-bottom: 1px solid #1e335c;
+      }
+
+      .proto-toolbar__title {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+      }
+
+      .proto-toolbar__badge {
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.15rem 0.6rem;
+        border-radius: var(--radius-pill);
+        background-color: rgba(0, 211, 127, 0.15);
+        color: var(--color-brand-accent);
+        border: 1px solid rgba(0, 211, 127, 0.35);
+      }
+
+      .proto-toolbar__subtitle {
+        margin: 0.25rem 0 0;
+        font-size: 0.8125rem;
+        color: #94a3b8;
+      }
+
+      .proto-toolbar__controls,
+      .proto-toolbar__nav {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-xs);
+      }
+
+      .proto-toolbar__label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #94a3b8;
+        margin-right: 0.25rem;
+      }
+
+      .proto-btn {
+        appearance: none;
+        border: 1px solid #2d477a;
+        background-color: #0b1834;
+        color: #e2e8f0;
+        font-family: inherit;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.45rem 0.75rem;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+
+      .proto-btn:hover {
+        background-color: #162a52;
+        border-color: #3e5f9e;
+      }
+
+      .proto-btn--active {
+        background-color: var(--color-brand-accent);
+        color: var(--color-brand-primary-dark);
+        border-color: var(--color-brand-accent);
+        font-weight: 800;
+      }
+
+      .proto-btn__highlight {
+        color: var(--color-brand-accent);
+        font-weight: 700;
+      }
+
+      /* ==========================================================================
+         MOLDURA DO DISPOSITIVO / VIEWPORT (.device-viewport)
+         ========================================================================== */
+      .device-stage {
+        display: flex;
+        justify-content: center;
+      }
+
+      .device-viewport {
+        width: 100%;
+        max-width: 420px;
+        background-color: var(--color-surface-muted);
+        border: 6px solid #1e293b;
+        border-radius: 28px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        position: relative;
+        transition: max-width 0.25s ease;
+      }
+
+      .device-viewport--desktop {
+        max-width: 960px;
+      }
+
+      /* ==========================================================================
+         CABEÇALHO GLOBAL (.app-header)
+         ========================================================================== */
+      .app-header {
+        background: radial-gradient(
+          circle at 50% 0%,
+          #122c58 0%,
+          var(--color-brand-primary) 65%,
+          var(--color-brand-primary-dark) 100%
+        );
+        color: var(--color-text-inverse);
+        padding: var(--space-md) var(--space-lg);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-sm);
+      }
+
+      .app-header__brand {
+        appearance: none;
+        background: none;
+        border: none;
+        padding: 0;
+        color: inherit;
+        font-family: inherit;
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .app-header__logo {
+        width: 42px;
+        height: 42px;
+        border-radius: var(--radius-md);
+        flex-shrink: 0;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .app-header__title {
+        display: block;
+        font-size: 1.05rem;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        color: #ffffff;
+      }
+
+      .app-header__subtitle {
+        display: block;
+        font-size: 0.75rem;
+        color: #cbd5e1;
+        margin-top: 2px;
+      }
+
+      .app-header__actions {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+        flex-shrink: 0;
+      }
+
+      .app-header__install-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        min-height: 36px;
+        padding: 0.375rem 0.85rem;
+        border-radius: var(--radius-pill);
+        border: none;
+        background-color: var(--color-brand-accent);
+        color: var(--color-brand-primary-dark);
+        font-family: inherit;
+        font-size: 0.75rem;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 211, 127, 0.3);
+        transition: background-color 0.15s ease;
+      }
+
+      .app-header__install-btn:hover {
+        background-color: var(--color-brand-accent-hover);
+      }
+
+      .app-header__about-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        min-height: 36px;
+        padding: 0.375rem 0.75rem;
+        border-radius: var(--radius-pill);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background-color: rgba(255, 255, 255, 0.1);
+        color: var(--color-text-inverse);
+        font-family: inherit;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+      }
+
+      .app-header__about-link:hover {
+        background-color: rgba(255, 255, 255, 0.18);
+      }
+
+      /* ==========================================================================
+         ÍCONES VETORIAIS (.icon)
+         ========================================================================== */
+      .icon {
+        width: 1em;
+        height: 1em;
+        fill: currentColor;
+        display: inline-block;
+        vertical-align: middle;
+        flex-shrink: 0;
+      }
+
+      /* ==========================================================================
+         CORPO PRINCIPAL E LAYOUT (.app-main / .charge-page)
+         ========================================================================== */
+      .app-main {
+        padding: var(--space-md);
+        min-height: 520px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+      }
+
+      .charge-page {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+        max-width: 460px;
+        margin: 0 auto;
+        width: 100%;
+        align-items: start;
+      }
+
+      .charge-page--split {
+        max-width: 520px;
+      }
+
+      .charge-form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+
+      .card {
+        background-color: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-md);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-xs);
+        margin-bottom: var(--space-sm);
+      }
+
+      .section-header__title-group {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+      }
+
+      .step-badge {
+        width: 24px;
+        height: 24px;
+        border-radius: var(--radius-pill);
+        background-color: var(--color-brand-primary);
+        color: var(--color-brand-accent);
+        font-size: 0.75rem;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .section-header__title {
+        margin: 0;
+        font-size: 0.875rem;
+        font-weight: 800;
+        color: var(--color-text-primary);
+      }
+
+      /* ==========================================================================
+         SELETOR DE CHAVES (.key-selector)
+         ========================================================================== */
+      .key-selector__add-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: var(--radius-pill);
+        border: 1px solid #a7f3d0;
+        background-color: #ecfdf5;
+        color: var(--color-success);
+        font-family: inherit;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .key-selector__add-btn:hover {
+        background-color: #d1fae5;
+      }
+
+      .key-selector__list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xs);
+      }
+
+      .key-selector__card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-sm);
+        min-height: 54px;
+        padding: 0.65rem 0.85rem;
+        border-radius: var(--radius-md);
+        border: 1.5px solid var(--color-border-strong);
+        background-color: var(--color-surface-muted);
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+
+      .key-selector__card:hover {
+        background-color: var(--color-surface);
+      }
+
+      .key-selector__card--selected {
+        border-color: var(--color-brand-accent);
+        background-color: #f0fdf8;
+        box-shadow: 0 0 0 2px rgba(0, 211, 127, 0.2);
+      }
+
+      .key-selector__card-left {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        min-width: 0;
+      }
+
+      .key-selector__radio {
+        width: 18px;
+        height: 18px;
+        border-radius: var(--radius-pill);
+        border: 2px solid #94a3b8;
+        background-color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .key-selector__card--selected .key-selector__radio {
+        border-color: var(--color-success);
+        background-color: var(--color-brand-accent);
+      }
+
+      .key-selector__radio-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: var(--radius-pill);
+        background-color: var(--color-brand-primary-dark);
+      }
+
+      .key-selector__meta {
+        min-width: 0;
+      }
+
+      .key-selector__title-row {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .key-selector__label {
+        font-size: 0.8125rem;
+        font-weight: 800;
+        color: var(--color-text-primary);
+      }
+
+      .key-selector__type-badge {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        font-weight: 700;
+        padding: 0.1rem 0.4rem;
+        border-radius: 4px;
+        background-color: var(--color-brand-primary);
+        color: var(--color-brand-accent);
+      }
+
+      .key-selector__value {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--color-text-secondary);
+        margin-top: 2px;
+      }
+
+      .key-selector__delete-btn {
+        appearance: none;
+        border: none;
+        background: transparent;
+        color: #94a3b8;
+        padding: 0.4rem;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+      }
+
+      .key-selector__delete-btn:hover {
+        color: var(--color-danger);
+        background-color: #ffe4e6;
+      }
+
+      /* ==========================================================================
+         CAMPO DE VALOR (.amount-field)
+         ========================================================================== */
+      .amount-field__box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: var(--color-surface-muted);
+        border: 2px solid var(--color-border-strong);
+        border-radius: var(--radius-md);
+        padding: 0.6rem 0.85rem;
+        transition: border-color 0.15s ease;
+      }
+
+      .amount-field__box:focus-within {
+        border-color: var(--color-focus);
+        background-color: var(--color-surface);
+      }
+
+      .amount-field__currency {
+        font-size: 1.125rem;
+        font-weight: 800;
+        color: var(--color-text-secondary);
+        margin-right: var(--space-xs);
+      }
+
+      .amount-field__input {
+        width: 100%;
+        border: none;
+        background: transparent;
+        font-family: var(--font-sans);
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--color-text-primary);
+        text-align: right;
+        outline: none;
+      }
+
+      .amount-field__clear-btn {
+        appearance: none;
+        border: none;
+        background: transparent;
+        color: var(--color-text-secondary);
+        padding: 0.35rem;
+        margin-left: var(--space-xs);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+      }
+
+      .amount-field__clear-btn:hover {
+        background-color: #e2e8f0;
+        color: var(--color-text-primary);
+      }
+
+      .amount-field__footer {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-xs);
+        margin-top: var(--space-sm);
+      }
+
+      .amount-field__status {
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.25rem 0.65rem;
+        border-radius: var(--radius-pill);
+      }
+
+      .amount-field__status--fixed {
+        background-color: #ecfdf5;
+        color: var(--color-success);
+        border: 1px solid #a7f3d0;
+      }
+
+      .amount-field__status--open {
+        background-color: #fffbeb;
+        color: var(--color-warning);
+        border: 1px solid #fde68a;
+      }
+
+      .amount-field__shortcuts {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .amount-field__Preset {
+        appearance: none;
+        border: 1px solid var(--color-border);
+        background-color: var(--color-surface-elevated);
+        color: var(--color-text-secondary);
+        font-family: inherit;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.3rem 0.55rem;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+      }
+
+      .amount-field__Preset:hover {
+        background-color: #e2e8f0;
+        color: var(--color-text-primary);
+      }
+
+      /* ==========================================================================
+         CTA PRINCIPAL "MANDA UM PIX" (.charge-cta)
+         ========================================================================== */
+      .charge-cta {
+        width: 100%;
+        min-height: 52px;
+        padding: 0.9rem var(--space-lg);
+        border: none;
+        border-radius: var(--radius-lg);
+        background: linear-gradient(
+          135deg,
+          var(--color-brand-accent) 0%,
+          var(--color-brand-accent-hover) 100%
+        );
+        color: var(--color-brand-primary-dark);
+        font-family: inherit;
+        font-size: 1rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-xs);
+        cursor: pointer;
+        box-shadow: 0 6px 20px rgba(0, 211, 127, 0.32);
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+
+      .charge-cta:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 24px rgba(0, 211, 127, 0.44);
+      }
+
+      /* ==========================================================================
+         CARTÃO DE RESULTADO (.charge-result)
+         ========================================================================== */
+      .charge-result {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+
+      .charge-result__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: var(--space-sm);
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      .charge-result__badge-ready {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: var(--color-success);
+      }
+
+      .charge-result__account {
+        margin: 0.15rem 0 0;
+        font-size: 0.875rem;
+        font-weight: 800;
+        color: var(--color-text-primary);
+      }
+
+      .charge-result__amount-pill {
+        padding: 0.3rem 0.75rem;
+        border-radius: var(--radius-pill);
+        font-size: 0.875rem;
+        font-weight: 800;
+        background-color: var(--color-brand-primary);
+        color: var(--color-brand-accent);
+      }
+
+      .charge-result__amount-pill--open {
+        background-color: #fef3c7;
+        color: var(--color-warning);
+      }
+
+      .charge-result__qr-stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--color-surface-muted);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-md);
+      }
+
+      .charge-result__qr-frame {
+        background-color: #ffffff;
+        padding: var(--space-sm);
+        border-radius: var(--radius-lg);
+        border: 2px solid var(--color-brand-primary);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .charge-result__qr-svg {
+        width: 168px;
+        height: 168px;
+        display: block;
+      }
+
+      .charge-result__meta {
+        margin: var(--space-xs) 0 0;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--color-text-secondary);
+      }
+
+      .charge-result__brcode-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--color-text-secondary);
+        margin-bottom: 0.35rem;
+      }
+
+      .charge-result__brcode {
+        background-color: var(--color-surface-elevated);
+        border: 1px solid var(--color-border-strong);
+        border-radius: var(--radius-md);
+        padding: 0.65rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--color-text-primary);
+        word-break: break-all;
+        line-height: 1.45;
+        user-select: all;
+      }
+
+      .charge-result__actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-xs);
+      }
+
+      .charge-result__btn {
+        min-height: 48px;
+        padding: 0.6rem 0.5rem;
+        border-radius: var(--radius-md);
+        font-family: inherit;
+        font-size: 0.75rem;
+        font-weight: 800;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+        cursor: pointer;
+        border: none;
+        transition: opacity 0.15s ease;
+      }
+
+      .charge-result__btn:hover {
+        opacity: 0.92;
+      }
+
+      .charge-result__btn--copy {
+        background-color: var(--color-brand-primary);
+        color: #ffffff;
+      }
+
+      .charge-result__btn--share {
+        background-color: var(--color-success);
+        color: #ffffff;
+      }
+
+      .charge-result__btn--download {
+        background-color: var(--color-surface-elevated);
+        color: var(--color-text-primary);
+        border: 1px solid var(--color-border-strong);
+      }
+
+      .charge-result__toast {
+        background-color: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        color: var(--color-success);
+        padding: 0.55rem 0.75rem;
+        border-radius: var(--radius-md);
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+      }
+
+      .charge-result__back-btn {
+        width: 100%;
+        min-height: 42px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--color-border-strong);
+        background-color: transparent;
+        color: var(--color-text-secondary);
+        font-family: inherit;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .charge-result__back-btn:hover {
+        background-color: var(--color-surface-elevated);
+        color: var(--color-text-primary);
+      }
+
+      /* ==========================================================================
+         MODAIS NATIVOS (<dialog class="key-dialog"> e <dialog class="charge-dialog">)
+         ========================================================================== */
+      .charge-dialog-backdrop,
+      .key-dialog-backdrop {
+        position: absolute;
+        inset: 0;
+        background-color: rgba(6, 13, 30, 0.65);
+        backdrop-filter: blur(2px);
+        z-index: 30;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-md);
+        overflow-y: auto;
+      }
+
+      .charge-dialog {
+        width: 100%;
+        max-width: 440px;
+        background-color: var(--color-surface);
+        border: 1px solid var(--color-border-strong);
+        border-radius: var(--radius-lg);
+        padding: var(--space-md);
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .charge-dialog__top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: var(--space-xs);
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      .charge-dialog__title {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: var(--color-text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .charge-dialog__close-btn {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        border-radius: var(--radius-sm);
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        padding: 0;
+      }
+
+      .charge-dialog__close-btn:hover {
+        background-color: var(--color-surface-muted);
+        color: var(--color-text-primary);
+      }
+
+      .key-dialog {
+        width: 100%;
+        max-width: 380px;
+        background-color: var(--color-surface);
+        border: 1px solid var(--color-border-strong);
+        border-radius: var(--radius-lg);
+        padding: var(--space-md);
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+
+      .key-dialog__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: var(--space-xs);
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      .key-dialog__title {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 800;
+      }
+
+      .key-dialog__types {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.25rem;
+      }
+
+      .key-dialog__type-btn {
+        padding: 0.4rem 0.25rem;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--color-border-strong);
+        background-color: var(--color-surface-muted);
+        color: var(--color-text-secondary);
+        font-family: inherit;
+        font-size: 0.72rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .key-dialog__type-btn--active {
+        background-color: var(--color-brand-primary);
+        color: var(--color-brand-accent);
+        border-color: var(--color-brand-primary);
+      }
+
+      .key-dialog__field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .key-dialog__label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--color-text-primary);
+      }
+
+      .key-dialog__input {
+        min-height: 40px;
+        padding: 0.45rem 0.65rem;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--color-border-strong);
+        background-color: var(--color-surface-muted);
+        font-family: inherit;
+        font-size: 0.8125rem;
+        color: var(--color-text-primary);
+      }
+
+      .key-dialog__row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-xs);
+      }
+
+      .key-dialog__actions {
+        display: flex;
+        gap: var(--space-xs);
+        padding-top: var(--space-xs);
+      }
+
+      .key-dialog__btn-cancel {
+        flex: 1;
+        min-height: 42px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--color-border-strong);
+        background-color: var(--color-surface);
+        color: var(--color-text-secondary);
+        font-family: inherit;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .key-dialog__btn-save {
+        flex: 2;
+        min-height: 42px;
+        border-radius: var(--radius-md);
+        border: none;
+        background-color: var(--color-brand-primary);
+        color: var(--color-brand-accent);
+        font-family: inherit;
+        font-size: 0.75rem;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        cursor: pointer;
+      }
+
+      /* ==========================================================================
+         EMPTY STATE (.key-empty-state) E PÁGINA SOBRE (.about-page)
+         ========================================================================== */
+      .key-empty-state {
+        text-align: center;
+        padding: var(--space-xl) var(--space-md);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-md);
+      }
+
+      .key-empty-state__icon {
+        width: 56px;
+        height: 56px;
+        border-radius: var(--radius-lg);
+        background-color: var(--color-brand-primary);
+        color: var(--color-brand-accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+      }
+
+      .about-page {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+
+      .about-page__box {
+        background-color: var(--color-surface-muted);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: var(--space-sm);
+      }
+
+      .app-footer {
+        margin-top: var(--space-md);
+        padding-top: var(--space-sm);
+        border-top: 1px solid var(--color-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: var(--color-text-secondary);
+      }
+
+      .app-footer__status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-weight: 600;
+      }
+
+      .app-footer__dot {
+        width: 8px;
+        height: 8px;
+        border-radius: var(--radius-pill);
+        background-color: var(--color-brand-accent);
+      }
+
+      .app-footer__link {
+        appearance: none;
+        background: none;
+        border: none;
+        color: var(--color-brand-primary);
+        font-family: inherit;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sprite SVG Oficial (src/presentation/components/vector-icon/icon.svg) -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="hidden">
+      <symbol id="icon-logo" viewBox="0 0 512 512">
+        <defs>
+          <linearGradient id="bg-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0b1834" />
+            <stop offset="100%" stop-color="#060d1e" />
+          </linearGradient>
+          <linearGradient
+            id="pix-grad"
+            x1="92.16"
+            y1="92.16"
+            x2="-92.16"
+            y2="-92.16"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0%" stop-color="#2575fc" />
+            <stop offset="50%" stop-color="#00d2ff" />
+            <stop offset="100%" stop-color="#00e699" />
+          </linearGradient>
+        </defs>
+        <rect
+          x="16"
+          y="16"
+          width="480"
+          height="480"
+          rx="108"
+          fill="url(#bg-grad)"
+          stroke="#284b82"
+          stroke-width="6"
+        />
+        <g fill="url(#pix-grad)">
+          <g transform="translate(256 256) rotate(45)">
+            <path
+              d="M -80.64 -92.16 H 80.64 A 11.52 11.52 0 0 1 92.16 -80.64 V -58.88 A 11.52 11.52 0 0 1 80.64 -47.36 H -39.17 A 8.19 8.19 0 0 0 -47.36 -39.17 V 80.64 A 11.52 11.52 0 0 1 -58.88 92.16 H -80.64 A 11.52 11.52 0 0 1 -92.16 80.64 V -80.64 A 11.52 11.52 0 0 1 -80.64 -92.16 Z"
+            />
+            <path
+              d="M -10.88 -22.4 H 80.64 A 11.52 11.52 0 0 1 92.16 -10.88 V 10.88 A 11.52 11.52 0 0 1 80.64 22.4 H 30.59 A 8.19 8.19 0 0 0 22.4 30.59 V 80.64 A 11.52 11.52 0 0 1 10.88 92.16 H -10.88 A 11.52 11.52 0 0 1 -22.4 80.64 V -10.88 A 11.52 11.52 0 0 1 -10.88 -22.4 Z"
+            />
+            <rect x="47.36" y="47.36" width="44.80" height="44.80" rx="11.52" />
+          </g>
+        </g>
+      </symbol>
+      <symbol id="qrcode" viewBox="0 0 448 512">
+        <path
+          d="M0 80C0 53.5 21.5 32 48 32l96 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48l-96 0c-26.5 0-48-21.5-48-48L0 80zM64 96l0 64 64 0 0-64L64 96zM0 336c0-26.5 21.5-48 48-48l96 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48l-96 0c-26.5 0-48-21.5-48-48l0-96zm64 16l0 64 64 0 0-64-64 0zM304 32l96 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48l-96 0c-26.5 0-48-21.5-48-48l0-96c0-26.5 21.5-48 48-48zm80 64l-64 0 0 64 64 0 0-64zM256 304c0-8.8 7.2-16 16-16l64 0c8.8 0 16 7.2 16 16s7.2 16 16 16l32 0c8.8 0 16-7.2 16-16s7.2-16 16-16s16 7.2 16 16l0 96c0 8.8-7.2 16-16 16l-64 0c-8.8 0-16-7.2-16-16s-7.2-16-16-16s-16 7.2-16 16l0 64c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-160zM368 480a16 16 0 1 1 0-32 16 16 0 1 1 0 32zm64 0a16 16 0 1 1 0-32 16 16 0 1 1 0 32z"
+        />
+      </symbol>
+      <symbol id="copy" viewBox="0 0 448 512">
+        <path
+          d="M208 0L332.1 0c12.7 0 24.9 5.1 33.9 14.1l67.9 67.9c9 9 14.1 21.2 14.1 33.9L448 336c0 26.5-21.5 48-48 48l-192 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48zM48 128l80 0 0 64-64 0 0 256 192 0 0-32 64 0 0 48c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 176c0-26.5 21.5-48 48-48z"
+        />
+      </symbol>
+      <symbol id="share" viewBox="0 0 448 512">
+        <path
+          d="M352 224c53 0 96-43 96-96s-43-96-96-96s-96 43-96 96c0 4 .2 8 .7 11.9l-94.1 47C145.4 170.2 121.9 160 96 160c-53 0-96 43-96 96s43 96 96 96c25.9 0 49.4-10.2 66.6-26.9l94.1 47c-.5 3.9-.7 7.8-.7 11.9c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-25.9 0-49.4 10.2-66.6 26.9l-94.1-47c.5-3.9 .7-7.8 .7-11.9s-.2-8-.7-11.9l94.1-47C302.6 213.8 326.1 224 352 224z"
+        />
+      </symbol>
+      <symbol id="download" viewBox="0 0 512 512">
+        <path
+          d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"
+        />
+      </symbol>
+      <symbol id="check" viewBox="0 0 448 512">
+        <path
+          d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"
+        />
+      </symbol>
+      <symbol id="xmark" viewBox="0 0 384 512">
+        <path
+          d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
+        />
+      </symbol>
+      <symbol id="plus" viewBox="0 0 448 512">
+        <path
+          d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"
+        />
+      </symbol>
+      <symbol id="trash" viewBox="0 0 448 512">
+        <path
+          d="M135.2 17.7L128 32 32 32C14.3 32 0 46.3 0 64S14.3 96 32 96l384 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0-7.2-14.3C307.4 6.8 296.3 0 284.2 0L163.8 0c-12.1 0-23.2 6.8-28.6 17.7zM416 128L32 128 53.2 467c1.6 25.3 22.6 45 47.9 45l245.8 0c25.3 0 46.3-19.7 47.9-45L416 128z"
+        />
+      </symbol>
+      <symbol id="key" viewBox="0 0 512 512">
+        <path
+          d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17l0 80c0 13.3 10.7 24 24 24l80 0c13.3 0 24-10.7 24-24l0-40 40 0c13.3 0 24-10.7 24-24l0-40 40 0c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z"
+        />
+      </symbol>
+      <symbol id="home" viewBox="0 0 576 512">
+        <path
+          d="M575.8 255.5c0 18-15 32.1-32 32.1l-32 0 .7 160.2c0 2.7-.2 5.4-.5 8.1l0 16.2c0 22.1-17.9 40-40 40l-16 0c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1L416 512l-24 0c-22.1 0-40-17.9-40-40l0-24 0-64c0-17.7-14.3-32-32-32l-64 0c-17.7 0-32 14.3-32 32l0 64 0 24c0 22.1-17.9 40-40 40l-24 0-31.9 0c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2l-16 0c-22.1 0-40-17.9-40-40l0-112c0-.9 0-1.9 .1-2.8l0-69.7-32 0c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z"
+        />
+      </symbol>
+      <symbol id="circle-info" viewBox="0 0 512 512">
+        <path
+          d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"
+        />
+      </symbol>
+    </svg>
+
+    <!-- BARRA DE CONTROLE DO PROTÓTIPO NAVEGÁVEL -->
+    <aside class="proto-toolbar" aria-label="Controles do protótipo de UI">
+      <div class="proto-toolbar__top">
+        <div>
+          <h1 class="proto-toolbar__title">
+            <span>📱 Protótipo Navegável — Manda um PIX</span>
+            <span class="proto-toolbar__badge">docs/design/ui_proposal.md</span>
+          </h1>
+          <p class="proto-toolbar__subtitle">
+            Navegue pelas telas, abra o modal &lt;dialog&gt; de chaves, alterne
+            entre Mobile e Desktop Split-View e simule a geração de cobrança.
+          </p>
+        </div>
+
+        <div class="proto-toolbar__controls">
+          <button
+            type="button"
+            onclick="toggleViewportMode()"
+            class="proto-btn"
+          >
+            Viewport:
+            <span id="vp-mode-label" class="proto-btn__highlight"
+              >Mobile (420px)</span
+            >
+          </button>
+          <button
+            type="button"
+            onclick="toggleInstallButtonState()"
+            class="proto-btn"
+          >
+            Botão "Instalar":
+            <span id="pwa-install-label" class="proto-btn__highlight"
+              >Visível</span
+            >
+          </button>
+        </div>
+      </div>
+
+      <div class="proto-toolbar__nav">
+        <span class="proto-toolbar__label">Telas e Estados:</span>
+        <button
+          type="button"
+          id="tab-home"
+          onclick="navigateRoute('home')"
+          class="proto-btn proto-btn--active"
+        >
+          1. Gerar Cobrança (/)
+        </button>
+        <button
+          type="button"
+          id="tab-dialog"
+          onclick="openKeyModal()"
+          class="proto-btn"
+        >
+          2. Modal &lt;dialog&gt; Nova Chave
+        </button>
+        <button
+          type="button"
+          id="tab-result"
+          onclick="openChargeModal()"
+          class="proto-btn"
+        >
+          3. Diálogo &lt;dialog&gt; Cobrança
+        </button>
+        <button
+          type="button"
+          id="tab-empty"
+          onclick="navigateRoute('empty')"
+          class="proto-btn"
+        >
+          4. Sem Chaves (1º Uso)
+        </button>
+        <button
+          type="button"
+          id="tab-about"
+          onclick="navigateRoute('about')"
+          class="proto-btn"
+        >
+          5. Página Sobre (/sobre)
+        </button>
+      </div>
+    </aside>
+
+    <!-- SIMULADOR DO APLICATIVO -->
+    <div class="device-stage">
+      <div id="device-viewport" class="device-viewport">
+        <!-- CABEÇALHO GLOBAL (.app-header) -->
+        <header class="app-header">
+          <button
+            type="button"
+            onclick="navigateRoute('home')"
+            class="app-header__brand"
+          >
+            <svg class="app-header__logo" aria-hidden="true">
+              <use href="#icon-logo"></use>
+            </svg>
+            <span>
+              <span class="app-header__title">Manda um PIX</span>
+              <span class="app-header__subtitle"
+                >Cobrança rápida sem abrir o banco</span
+              >
+            </span>
+          </button>
+
+          <div class="app-header__actions">
+            <button
+              type="button"
+              id="btn-header-install"
+              onclick="toggleInstallButtonState()"
+              class="app-header__install-btn"
+              title="Instalar aplicativo no dispositivo"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use href="#download"></use>
+              </svg>
+              <span>Instalar</span>
+            </button>
+
+            <button
+              type="button"
+              onclick="navigateRoute('about')"
+              class="app-header__about-link"
+              title="Sobre o aplicativo, autor e projeto"
+            >
+              <svg
+                class="icon"
+                style="color: var(--color-brand-accent)"
+                aria-hidden="true"
+              >
+                <use href="#circle-info"></use>
+              </svg>
+              <span>Sobre</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- CONTEÚDO PRINCIPAL (.app-main) -->
+        <main class="app-main">
+          <!-- ROTA "/" — TELA PRINCIPAL DE COBRANÇA (.charge-page) -->
+          <div id="view-charge-page" class="charge-page">
+            <!-- FORMULÁRIO GERADOR (.charge-form) -->
+            <section
+              id="panel-charge-form"
+              class="charge-form"
+              aria-label="Gerador de cobrança PIX"
+            >
+              <!-- Passo 1: Seleção de Chave PIX -->
+              <div class="card key-selector">
+                <div class="section-header">
+                  <div class="section-header__title-group">
+                    <span class="step-badge">1</span>
+                    <h2 class="section-header__title">
+                      Chave para recebimento
+                    </h2>
+                  </div>
+                  <button
+                    type="button"
+                    onclick="openKeyModal()"
+                    class="key-selector__add-btn"
+                  >
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#plus"></use>
+                    </svg>
+                    <span>Nova chave</span>
+                  </button>
+                </div>
+
+                <div
+                  id="key-selector-list"
+                  class="key-selector__list"
+                  role="radiogroup"
+                  aria-label="Chaves PIX cadastradas"
+                ></div>
+              </div>
+
+              <!-- Passo 2: Valor da Cobrança (Opcional) -->
+              <div class="card amount-field">
+                <div class="section-header">
+                  <div class="section-header__title-group">
+                    <span class="step-badge">2</span>
+                    <label for="charge-amount" class="section-header__title"
+                      >Valor da cobrança</label
+                    >
+                  </div>
+                  <span
+                    style="
+                      font-size: 0.75rem;
+                      color: var(--color-text-secondary);
+                      font-weight: 600;
+                    "
+                    >Opcional</span
+                  >
+                </div>
+
+                <div class="amount-field__box">
+                  <span class="amount-field__currency">R$</span>
+                  <input
+                    id="charge-amount"
+                    type="text"
+                    inputmode="decimal"
+                    value="45,90"
+                    placeholder="0,00 (Valor aberto)"
+                    oninput="updateAmountValue(this.value)"
+                    class="amount-field__input"
+                  />
+                  <button
+                    type="button"
+                    onclick="setPresetAmount('')"
+                    title="Limpar e manter valor aberto"
+                    class="amount-field__clear-btn"
+                  >
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#xmark"></use>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="amount-field__footer">
+                  <span
+                    id="amount-status-pill"
+                    class="amount-field__status amount-field__status--fixed"
+                  >
+                    Valor fixo: R$ 45,90
+                  </span>
+
+                  <div class="amount-field__shortcuts">
+                    <button
+                      type="button"
+                      onclick="setPresetAmount('')"
+                      class="amount-field__Preset"
+                    >
+                      Aberto
+                    </button>
+                    <button
+                      type="button"
+                      onclick="setPresetAmount('25,00')"
+                      class="amount-field__Preset"
+                    >
+                      R$ 25
+                    </button>
+                    <button
+                      type="button"
+                      onclick="setPresetAmount('50,00')"
+                      class="amount-field__Preset"
+                    >
+                      R$ 50
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Passo 3: Botão "Manda um PIX" -->
+              <button
+                type="button"
+                onclick="handleGenerateCharge()"
+                class="charge-cta"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#qrcode"></use>
+                </svg>
+                <span>Manda um PIX</span>
+              </button>
+            </section>
+          </div>
+
+          <!-- ESTADO DE PRIMEIRO USO / SEM CHAVES (.key-empty-state) -->
+          <section
+            id="view-empty-state"
+            class="card key-empty-state hidden"
+            aria-label="Primeiro acesso sem chaves"
+          >
+            <div class="key-empty-state__icon">
+              <svg class="icon" aria-hidden="true"><use href="#key"></use></svg>
+            </div>
+            <div>
+              <h2 style="margin: 0; font-size: 1rem; font-weight: 800">
+                Cadastre sua primeira chave PIX
+              </h2>
+              <p
+                style="
+                  margin: 0.5rem auto 0;
+                  max-width: 300px;
+                  font-size: 0.8125rem;
+                  color: var(--color-text-secondary);
+                  line-height: 1.5;
+                "
+              >
+                Para gerar cobranças instantâneas sem abrir o aplicativo do
+                banco, cadastre uma chave de recebimento. Seus dados ficam
+                salvos <strong>100% localmente</strong> neste aparelho.
+              </p>
+            </div>
+            <button
+              type="button"
+              onclick="openKeyModal()"
+              class="charge-cta"
+              style="max-width: 320px"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use href="#plus"></use>
+              </svg>
+              <span>Adicionar Minha Primeira Chave</span>
+            </button>
+          </section>
+
+          <!-- ROTA "/sobre" — PÁGINA INSTITUCIONAL (.about-page) -->
+          <section
+            id="view-about-page"
+            class="card about-page hidden"
+            aria-label="Sobre o aplicativo"
+          >
+            <div class="section-header">
+              <div class="section-header__title-group">
+                <svg
+                  style="width: 32px; height: 32px; border-radius: 8px"
+                  aria-hidden="true"
+                >
+                  <use href="#icon-logo"></use>
+                </svg>
+                <div>
+                  <h2 class="section-header__title">Sobre o Manda um PIX</h2>
+                  <span
+                    style="
+                      font-family: var(--font-mono);
+                      font-size: 0.72rem;
+                      color: var(--color-success);
+                    "
+                    >mandaumpix.app • 1.0.0</span
+                  >
+                </div>
+              </div>
+              <button
+                type="button"
+                onclick="navigateRoute('home')"
+                class="amount-field__Preset"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#home"></use>
+                </svg>
+                <span>Início</span>
+              </button>
+            </div>
+
+            <p
+              style="
+                margin: 0;
+                font-size: 0.8125rem;
+                color: var(--color-text-secondary);
+                line-height: 1.5;
+              "
+            >
+              <strong>Manda um PIX</strong> é um aplicativo web progressivo
+              (PWA) <strong>gratuito, livre e de código aberto</strong> que
+              facilita a geração de cobranças via PIX sem a necessidade de ficar
+              abrindo aplicativos de banco, com execução e armazenamento 100%
+              locais no navegador.
+            </p>
+
+            <div class="about-page__box">
+              <div
+                style="
+                  font-size: 0.72rem;
+                  font-weight: 800;
+                  text-transform: uppercase;
+                  color: var(--color-brand-primary);
+                "
+              >
+                👤 Autor
+              </div>
+              <div
+                style="font-size: 0.875rem; font-weight: 800; margin-top: 4px"
+              >
+                Luiz Henrique Canet Filho
+              </div>
+              <div
+                style="
+                  font-family: var(--font-mono);
+                  font-size: 0.75rem;
+                  color: var(--color-focus);
+                  margin-top: 2px;
+                "
+              >
+                me@luizca.net • github.com/luizcanet • linkedin.com/in/luizcanet
+              </div>
+            </div>
+
+            <div class="about-page__box">
+              <div
+                style="
+                  font-size: 0.72rem;
+                  font-weight: 800;
+                  text-transform: uppercase;
+                  color: var(--color-brand-primary);
+                "
+              >
+                📦 Projeto &amp; Licença Livre
+              </div>
+              <p
+                style="
+                  margin: 4px 0;
+                  font-size: 0.75rem;
+                  color: var(--color-text-secondary);
+                "
+              >
+                Distribuído sob a licença
+                <strong
+                  >GNU Affero General Public License v3.0
+                  (AGPL-3.0-only)</strong
+                >.
+              </p>
+              <div
+                style="
+                  font-family: var(--font-mono);
+                  font-size: 0.72rem;
+                  color: var(--color-success);
+                "
+              >
+                https://github.com/luizcanet/mandaumpix.app
+              </div>
+            </div>
+
+            <!-- SEÇÃO DE CONTRIBUIÇÃO VOLUNTÁRIA ("MANDA UM PIX" -> eu@luizca.net) -->
+            <div
+              class="about-page__box"
+              style="
+                background-color: #f0fdf8;
+                border-color: var(--color-brand-accent);
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-xs);
+              "
+            >
+              <div
+                style="
+                  font-size: 0.8125rem;
+                  font-weight: 800;
+                  color: var(--color-brand-primary);
+                "
+              >
+                ☕🚀 Apoie o Projeto — Manda um PIX! 💚
+              </div>
+              <p
+                style="
+                  margin: 0;
+                  font-size: 0.78rem;
+                  color: var(--color-text-secondary);
+                  line-height: 1.5;
+                "
+              >
+                🎉 Este aplicativo é
+                <strong>100% gratuito, livre e de código aberto</strong>! Mas se
+                você achar que ele é útil pra você e pra outras pessoas e quiser
+                dar uma força pra ajudar a manter o projeto no ar com
+                <strong>qualquer valor</strong>... é só abrir o coração:
+                <strong>Manda um PIX!</strong> 🙌✨
+              </p>
+
+              <div
+                class="charge-result__qr-stage"
+                style="background-color: #ffffff; padding: var(--space-sm)"
+              >
+                <div class="charge-result__qr-frame">
+                  <svg
+                    class="charge-result__qr-svg"
+                    style="width: 140px; height: 140px"
+                    viewBox="0 0 120 120"
+                    role="img"
+                    aria-label="QR Code PIX com valor dinâmico para eu@luizca.net"
+                  >
+                    <rect width="120" height="120" fill="#ffffff" />
+                    <path
+                      fill="#0b1834"
+                      d="M8,8 h28 v28 h-28 z M12,12 v20 h20 v-20 z M16,16 h12 v12 h-12 z"
+                    />
+                    <path
+                      fill="#0b1834"
+                      d="M84,8 h28 v28 h-28 z M88,12 v20 h20 v-20 z M92,16 h12 v12 h-12 z"
+                    />
+                    <path
+                      fill="#0b1834"
+                      d="M8,84 h28 v28 h-28 z M12,88 v20 h20 v-20 z M16,92 h12 v12 h-12 z"
+                    />
+                    <path
+                      fill="#0b1834"
+                      d="M44,8 h4 v8 h-4 z M52,12 h8 v4 h-8 z M64,8 h4 v12 h-4 z M40,24 h12 v4 h-12 z M56,24 h8 v8 h-8 z M72,28 h4 v8 h-4 z M8,44 h8 v4 h-8 z M24,40 h8 v8 h-8 z M36,44 h12 v4 h-12 z M68,44 h12 v4 h-12 z M88,44 h8 v8 h-8 z M104,40 h8 v12 h-8 z M12,56 h12 v4 h-12 z M32,56 h8 v8 h-8 z M72,56 h8 v8 h-8 z M88,60 h16 v4 h-16 z M8,68 h8 v8 h-8 z M24,72 h12 v4 h-12 z M44,72 h8 v8 h-8 z M84,72 h8 v8 h-8 z M100,68 h12 v8 h-12 z M44,88 h8 v12 h-8 z M60,84 h8 v8 h-8 z M76,88 h12 v4 h-12 z M96,84 h16 v8 h-16 z M44,104 h16 v8 h-16 z M68,96 h8 v16 h-8 z M84,100 h12 v12 h-12 z"
+                    />
+                    <rect
+                      x="46"
+                      y="46"
+                      width="28"
+                      height="28"
+                      rx="6"
+                      fill="#0b1834"
+                      stroke="#ffffff"
+                      stroke-width="2"
+                    />
+                    <circle cx="60" cy="60" r="6" fill="#00d37f" />
+                  </svg>
+                </div>
+                <p class="charge-result__meta">
+                  Chave PIX (Valor Dinâmico): <strong>eu@luizca.net</strong>
+                  <br />
+                  Mensagem no PIX: <strong>Doação para o Manda um PIX</strong>
+                </p>
+              </div>
+
+              <div>
+                <div class="charge-result__brcode-label">
+                  <span>Chave Copia e Cola (eu@luizca.net)</span>
+                  <span
+                    style="
+                      font-family: var(--font-mono);
+                      color: var(--color-success);
+                    "
+                    >Valor Dinâmico</span
+                  >
+                </div>
+                <div id="about-support-brcode" class="charge-result__brcode">
+                  00020126650014br.gov.bcb.pix0113eu@luizca.net0226Doacao para o
+                  Manda um PIX5204000053039865802BR5925LUIZ HENRIQUE CANET
+                  FILHO6008BRASILIA62070503***63048BC9
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onclick="copySupportBrCode()"
+                class="charge-result__btn charge-result__btn--copy"
+                style="flex-direction: row; width: 100%; min-height: 42px"
+              >
+                <svg
+                  class="icon"
+                  style="color: var(--color-brand-accent)"
+                  aria-hidden="true"
+                >
+                  <use href="#copy"></use>
+                </svg>
+                <span id="btn-copy-support-text"
+                  >Copiar Chave Copia e Cola (eu@luizca.net)</span
+                >
+              </button>
+            </div>
+
+            <!-- SEÇÃO DE INCENTIVO À DIVULGAÇÃO -->
+            <div
+              class="about-page__box"
+              style="
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-xs);
+              "
+            >
+              <div
+                style="
+                  font-size: 0.8125rem;
+                  font-weight: 800;
+                  color: var(--color-brand-primary);
+                "
+              >
+                📣 Espalhe a Palavra e Divulgue! 🤝
+              </div>
+              <p
+                style="
+                  margin: 0;
+                  font-size: 0.78rem;
+                  color: var(--color-text-secondary);
+                  line-height: 1.5;
+                "
+              >
+                Gostou do <strong>Manda um PIX</strong>? Ajude mais pessoas a
+                conhecerem o aplicativo! Indique e compartilhe o
+                <strong>mandaumpix.app</strong> com amigos, colegas, clientes e
+                comerciantes para facilitar o dia a dia de todo mundo! 🚀📲
+              </p>
+              <button
+                type="button"
+                onclick="shareAppFromAbout()"
+                class="charge-result__btn charge-result__btn--share"
+                style="flex-direction: row; width: 100%; min-height: 42px"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#share"></use>
+                </svg>
+                <span id="btn-share-app-text"
+                  >Compartilhar e Divulgar o Aplicativo</span
+                >
+              </button>
+            </div>
+          </section>
+
+          <!-- MODAL NATIVO SOBREPOSTO (<dialog class="key-dialog">) -->
+          <div
+            id="modal-key-backdrop"
+            class="key-dialog-backdrop hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-key-title"
+          >
+            <div class="key-dialog">
+              <div class="key-dialog__header">
+                <h3 id="modal-key-title" class="key-dialog__title">
+                  Cadastrar Chave PIX (&lt;dialog&gt;)
+                </h3>
+                <button
+                  type="button"
+                  onclick="closeKeyModal()"
+                  class="amount-field__clear-btn"
+                  aria-label="Fechar modal"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#xmark"></use>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="key-dialog__field">
+                <span class="key-dialog__label">Tipo de chave</span>
+                <div class="key-dialog__types">
+                  <button
+                    type="button"
+                    data-type="CPF"
+                    onclick="selectModalKeyType('CPF', '000.000.000-00')"
+                    class="key-dialog__type-btn key-dialog__type-btn--active"
+                  >
+                    CPF
+                  </button>
+                  <button
+                    type="button"
+                    data-type="CNPJ"
+                    onclick="selectModalKeyType('CNPJ', '00.000.000/0001-00')"
+                    class="key-dialog__type-btn"
+                  >
+                    CNPJ
+                  </button>
+                  <button
+                    type="button"
+                    data-type="EMAIL"
+                    onclick="selectModalKeyType('EMAIL', 'nome@dominio.com.br')"
+                    class="key-dialog__type-btn"
+                  >
+                    E-mail
+                  </button>
+                  <button
+                    type="button"
+                    data-type="TELEFONE"
+                    onclick="selectModalKeyType('TELEFONE', '+5511999999999')"
+                    class="key-dialog__type-btn"
+                  >
+                    Celular
+                  </button>
+                  <button
+                    type="button"
+                    data-type="EVP"
+                    onclick="selectModalKeyType('EVP', 'Chave aleatória UUID')"
+                    class="key-dialog__type-btn"
+                  >
+                    EVP
+                  </button>
+                </div>
+              </div>
+
+              <div class="key-dialog__field">
+                <label for="modal-input-key" class="key-dialog__label"
+                  >Chave PIX *</label
+                >
+                <input
+                  id="modal-input-key"
+                  type="text"
+                  placeholder="000.000.000-00"
+                  class="key-dialog__input"
+                  style="font-family: var(--font-mono)"
+                />
+              </div>
+
+              <div class="key-dialog__field">
+                <label for="modal-input-label" class="key-dialog__label"
+                  >Apelido da conta (Rótulo)</label
+                >
+                <input
+                  id="modal-input-label"
+                  type="text"
+                  placeholder="Ex: Nubank Pessoal, Inter PJ..."
+                  class="key-dialog__input"
+                />
+              </div>
+
+              <div class="key-dialog__row">
+                <div class="key-dialog__field">
+                  <label for="modal-input-holder" class="key-dialog__label"
+                    >Nome do titular</label
+                  >
+                  <input
+                    id="modal-input-holder"
+                    type="text"
+                    maxlength="25"
+                    value="Luiz Canet"
+                    class="key-dialog__input"
+                  />
+                </div>
+                <div class="key-dialog__field">
+                  <label for="modal-input-city" class="key-dialog__label"
+                    >Cidade</label
+                  >
+                  <input
+                    id="modal-input-city"
+                    type="text"
+                    maxlength="15"
+                    value="Brasilia"
+                    class="key-dialog__input"
+                  />
+                </div>
+              </div>
+
+              <div class="key-dialog__actions">
+                <button
+                  type="button"
+                  onclick="closeKeyModal()"
+                  class="key-dialog__btn-cancel"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onclick="saveKeyFromModal()"
+                  class="key-dialog__btn-save"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#check"></use>
+                  </svg>
+                  <span>Salvar Chave</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODAL NATIVO SOBREPOSTO DE RESULTADO (<dialog class="charge-dialog">) -->
+          <div
+            id="modal-charge-backdrop"
+            class="charge-dialog-backdrop hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="charge-dialog-title"
+            onclick="if (event.target === this) closeChargeModal();"
+          >
+            <div class="charge-dialog">
+              <div class="charge-dialog__top-bar">
+                <h3 id="charge-dialog-title" class="charge-dialog__title">
+                  <svg
+                    class="icon"
+                    style="color: var(--color-success)"
+                    aria-hidden="true"
+                  >
+                    <use href="#check"></use>
+                  </svg>
+                  <span>Cobrança Pronta</span>
+                </h3>
+                <button
+                  type="button"
+                  onclick="closeChargeModal()"
+                  class="charge-dialog__close-btn"
+                  aria-label="Fechar diálogo de cobrança"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#xmark"></use>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- CORPO DO RESULTADO (.charge-result) -->
+              <div
+                id="panel-charge-result"
+                class="charge-result"
+                aria-label="Resultado da cobrança PIX"
+              >
+                <div class="charge-result__header">
+                  <div>
+                    <h3
+                      id="result-account-title"
+                      class="charge-result__account"
+                    >
+                      Nubank Pessoal • Luiz Canet
+                    </h3>
+                  </div>
+                  <span
+                    id="result-amount-badge"
+                    class="charge-result__amount-pill"
+                  >
+                    R$ 45,90
+                  </span>
+                </div>
+
+                <div class="charge-result__qr-stage">
+                  <div class="charge-result__qr-frame">
+                    <svg
+                      class="charge-result__qr-svg"
+                      viewBox="0 0 120 120"
+                      role="img"
+                      aria-label="QR Code PIX"
+                    >
+                      <rect width="120" height="120" fill="#ffffff" />
+                      <path
+                        fill="#0b1834"
+                        d="M8,8 h28 v28 h-28 z M12,12 v20 h20 v-20 z M16,16 h12 v12 h-12 z"
+                      />
+                      <path
+                        fill="#0b1834"
+                        d="M84,8 h28 v28 h-28 z M88,12 v20 h20 v-20 z M92,16 h12 v12 h-12 z"
+                      />
+                      <path
+                        fill="#0b1834"
+                        d="M8,84 h28 v28 h-28 z M12,88 v20 h20 v-20 z M16,92 h12 v12 h-12 z"
+                      />
+                      <path
+                        fill="#0b1834"
+                        d="M44,8 h4 v8 h-4 z M52,12 h8 v4 h-8 z M64,8 h4 v12 h-4 z M40,24 h12 v4 h-12 z M56,24 h8 v8 h-8 z M72,28 h4 v8 h-4 z M8,44 h8 v4 h-8 z M24,40 h8 v8 h-8 z M36,44 h12 v4 h-12 z M68,44 h12 v4 h-12 z M88,44 h8 v8 h-8 z M104,40 h8 v12 h-8 z M12,56 h12 v4 h-12 z M32,56 h8 v8 h-8 z M72,56 h8 v8 h-8 z M88,60 h16 v4 h-16 z M8,68 h8 v8 h-8 z M24,72 h12 v4 h-12 z M44,72 h8 v8 h-8 z M84,72 h8 v8 h-8 z M100,68 h12 v8 h-12 z M44,88 h8 v12 h-8 z M60,84 h8 v8 h-8 z M76,88 h12 v4 h-12 z M96,84 h16 v8 h-16 z M44,104 h16 v8 h-16 z M68,96 h8 v16 h-8 z M84,100 h12 v12 h-12 z"
+                      />
+                      <rect
+                        x="46"
+                        y="46"
+                        width="28"
+                        height="28"
+                        rx="6"
+                        fill="#0b1834"
+                        stroke="#ffffff"
+                        stroke-width="2"
+                      />
+                      <circle cx="60" cy="60" r="6" fill="#00d37f" />
+                    </svg>
+                  </div>
+                  <p id="result-key-subtitle" class="charge-result__meta">
+                    Chave CPF: •••.456.789-•• (Brasilia)
+                  </p>
+                </div>
+
+                <div>
+                  <div class="charge-result__brcode-label">
+                    <span>Chave de Cobrança (PIX Copia e Cola)</span>
+                    <span
+                      style="
+                        font-family: var(--font-mono);
+                        color: var(--color-success);
+                      "
+                      >BR Code EMV®</span
+                    >
+                  </div>
+                  <div id="result-brcode-box" class="charge-result__brcode">
+                    00020126360014br.gov.bcb.pix011412345678909520400005303986540545.905802BR5910Luiz
+                    Canet6008Brasilia62070503***6304E2A1
+                  </div>
+                </div>
+
+                <div class="charge-result__actions">
+                  <button
+                    type="button"
+                    onclick="copyBrCode()"
+                    class="charge-result__btn charge-result__btn--copy"
+                  >
+                    <svg
+                      class="icon"
+                      style="color: var(--color-brand-accent)"
+                      aria-hidden="true"
+                    >
+                      <use href="#copy"></use>
+                    </svg>
+                    <span id="btn-copy-text">Copiar</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onclick="shareCharge()"
+                    class="charge-result__btn charge-result__btn--share"
+                  >
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#share"></use>
+                    </svg>
+                    <span>WhatsApp</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onclick="saveQrPng()"
+                    class="charge-result__btn charge-result__btn--download"
+                  >
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#download"></use>
+                    </svg>
+                    <span>Salvar PNG</span>
+                  </button>
+                </div>
+
+                <div
+                  id="result-toast"
+                  class="charge-result__toast hidden"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#check"></use>
+                  </svg>
+                  <span id="result-toast-msg">Código PIX copiado!</span>
+                </div>
+
+                <button
+                  type="button"
+                  id="btn-dialog-close"
+                  onclick="closeChargeModal()"
+                  class="charge-result__back-btn"
+                >
+                  Concluir e fechar diálogo
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- RODAPÉ MINIMALISTA (.app-footer) -->
+          <footer class="app-footer">
+            <span class="app-footer__status">
+              <span class="app-footer__dot"></span>
+              <span>100% Local &amp; Offline-Ready</span>
+            </span>
+            <button
+              type="button"
+              onclick="navigateRoute('about')"
+              class="app-footer__link"
+            >
+              Sobre • AGPL-3.0
+            </button>
+          </footer>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      const appState = {
+        route: "home",
+        desktopMode: false,
+        installVisible: true,
+        modalKeyType: "CPF",
+        selectedKeyId: "k1",
+        amount: "45,90",
+        keys: [
+          {
+            id: "k1",
+            rotulo: "Nubank Pessoal",
+            tipo_chave: "CPF",
+            valor_chave: "•••.456.789-••",
+            raw: "12345678909",
+            nome_recebedor: "Luiz Canet",
+            cidade_recebedor: "Brasilia",
+          },
+          {
+            id: "k2",
+            rotulo: "Inter PJ / Consultoria",
+            tipo_chave: "EMAIL",
+            valor_chave: "me@luizca.net",
+            raw: "me@luizca.net",
+            nome_recebedor: "Luiz Canet",
+            cidade_recebedor: "Brasilia",
+          },
+        ],
+      };
+
+      function renderKeyCards() {
+        const listEl = document.getElementById("key-selector-list");
+        listEl.innerHTML = appState.keys
+          .map((item) => {
+            const selected = item.id === appState.selectedKeyId;
+            return `
+              <div
+                onclick="selectKey('${item.id}')"
+                role="radio"
+                aria-checked="${selected}"
+                tabindex="0"
+                class="key-selector__card ${selected ? "key-selector__card--selected" : ""}"
+              >
+                <div class="key-selector__card-left">
+                  <span class="key-selector__radio">
+                    ${selected ? '<span class="key-selector__radio-dot"></span>' : ""}
+                  </span>
+                  <div class="key-selector__meta">
+                    <div class="key-selector__title-row">
+                      <span class="key-selector__label">${item.rotulo}</span>
+                      <span class="key-selector__type-badge">${item.tipo_chave}</span>
+                    </div>
+                    <div class="key-selector__value">${item.valor_chave}</div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onclick="removeKey(event, '${item.id}')"
+                  title="Remover chave"
+                  class="key-selector__delete-btn"
+                >
+                  <svg class="icon" aria-hidden="true"><use href="#trash"></use></svg>
+                </button>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      function selectKey(id) {
+        appState.selectedKeyId = id;
+        renderKeyCards();
+        updateResultCard();
+      }
+
+      function removeKey(event, id) {
+        event.stopPropagation();
+        if (appState.keys.length <= 1) {
+          navigateRoute("empty");
+          return;
+        }
+        appState.keys = appState.keys.filter((k) => k.id !== id);
+        if (appState.selectedKeyId === id) {
+          appState.selectedKeyId = appState.keys[0].id;
+        }
+        renderKeyCards();
+        updateResultCard();
+      }
+
+      function updateAmountValue(val) {
+        appState.amount = val.trim();
+        const statusEl = document.getElementById("amount-status-pill");
+        const numeric = parseFloat(
+          appState.amount.replace(/\./g, "").replace(",", "."),
+        );
+
+        if (!appState.amount || isNaN(numeric) || numeric <= 0) {
+          statusEl.textContent = "Valor aberto (pagador define)";
+          statusEl.className =
+            "amount-field__status amount-field__status--open";
+        } else {
+          statusEl.textContent = `Valor fixo: R$ ${appState.amount}`;
+          statusEl.className =
+            "amount-field__status amount-field__status--fixed";
+        }
+        updateResultCard();
+      }
+
+      function setPresetAmount(val) {
+        const input = document.getElementById("charge-amount");
+        input.value = val;
+        updateAmountValue(val);
+      }
+
+      function updateResultCard() {
+        const key =
+          appState.keys.find((k) => k.id === appState.selectedKeyId) ||
+          appState.keys[0];
+        if (!key) return;
+
+        document.getElementById("result-account-title").textContent =
+          `${key.rotulo} • ${key.nome_recebedor}`;
+        document.getElementById("result-key-subtitle").textContent =
+          `Chave ${key.tipo_chave}: ${key.valor_chave} (${key.cidade_recebedor})`;
+
+        const amountBadge = document.getElementById("result-amount-badge");
+        const numeric = parseFloat(
+          (appState.amount || "").replace(/\./g, "").replace(",", "."),
+        );
+
+        if (!appState.amount || isNaN(numeric) || numeric <= 0) {
+          amountBadge.textContent = "Valor Aberto";
+          amountBadge.className =
+            "charge-result__amount-pill charge-result__amount-pill--open";
+        } else {
+          amountBadge.textContent = `R$ ${appState.amount}`;
+          amountBadge.className = "charge-result__amount-pill";
+        }
+
+        const tag54 =
+          !appState.amount || isNaN(numeric) || numeric <= 0
+            ? ""
+            : `54${String(numeric.toFixed(2).length).padStart(2, "0")}${numeric.toFixed(2)}`;
+
+        document.getElementById("result-brcode-box").textContent =
+          `00020126360014br.gov.bcb.pix0114${key.raw}520400005303986${tag54}5802BR5910${key.nome_recebedor}6008${key.cidade_recebedor}62070503***6304E2A1`;
+      }
+
+      function handleGenerateCharge() {
+        updateResultCard();
+        openChargeModal();
+      }
+
+      function openChargeModal() {
+        document
+          .getElementById("modal-charge-backdrop")
+          .classList.remove("hidden");
+        setActiveTab("tab-result");
+      }
+
+      function closeChargeModal() {
+        document
+          .getElementById("modal-charge-backdrop")
+          .classList.add("hidden");
+        setActiveTab("tab-home");
+      }
+
+      function openKeyModal() {
+        document
+          .getElementById("modal-key-backdrop")
+          .classList.remove("hidden");
+        setActiveTab("tab-dialog");
+      }
+
+      function closeKeyModal() {
+        document.getElementById("modal-key-backdrop").classList.add("hidden");
+        setActiveTab(`tab-${appState.route}`);
+      }
+
+      function selectModalKeyType(type, placeholder) {
+        appState.modalKeyType = type;
+        document.getElementById("modal-input-key").placeholder = placeholder;
+        document.querySelectorAll(".key-dialog__type-btn").forEach((btn) => {
+          if (btn.dataset.type === type) {
+            btn.className = "key-dialog__type-btn key-dialog__type-btn--active";
+          } else {
+            btn.className = "key-dialog__type-btn";
+          }
+        });
+      }
+
+      function saveKeyFromModal() {
+        const val =
+          document.getElementById("modal-input-key").value.trim() ||
+          "chave@pix.com.br";
+        const label =
+          document.getElementById("modal-input-label").value.trim() ||
+          "Nova Conta PIX";
+        const holder =
+          document.getElementById("modal-input-holder").value.trim() ||
+          "Luiz Canet";
+        const city =
+          document.getElementById("modal-input-city").value.trim() ||
+          "Brasilia";
+        const newId = "k" + Date.now();
+
+        appState.keys.push({
+          id: newId,
+          rotulo: label,
+          tipo_chave: appState.modalKeyType,
+          valor_chave: val,
+          raw: val,
+          nome_recebedor: holder,
+          cidade_recebedor: city,
+        });
+        appState.selectedKeyId = newId;
+        document.getElementById("modal-input-key").value = "";
+        document.getElementById("modal-input-label").value = "";
+        closeKeyModal();
+        renderKeyCards();
+        navigateRoute("home");
+      }
+
+      function showActionToast(msg) {
+        const toast = document.getElementById("result-toast");
+        document.getElementById("result-toast-msg").textContent = msg;
+        toast.classList.remove("hidden");
+        setTimeout(() => toast.classList.add("hidden"), 2500);
+      }
+
+      function copyBrCode() {
+        const text = document
+          .getElementById("result-brcode-box")
+          .textContent.trim();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).catch(() => {});
+        }
+        document.getElementById("btn-copy-text").textContent = "Copiado!";
+        showActionToast(
+          "Chave de cobrança copiada para a área de transferência!",
+        );
+        setTimeout(() => {
+          document.getElementById("btn-copy-text").textContent = "Copiar";
+        }, 1800);
+      }
+
+      function shareCharge() {
+        showActionToast(
+          "Abrindo compartilhamento nativo (WhatsApp / Web Share API)...",
+        );
+      }
+
+      function saveQrPng() {
+        showActionToast(
+          "Arquivo mandaumpix-qrcode.png salvo no armazenamento local!",
+        );
+      }
+
+      function copySupportBrCode() {
+        const text = document
+          .getElementById("about-support-brcode")
+          .textContent.replace(/\s+/g, "");
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).catch(() => {});
+        }
+        const btnText = document.getElementById("btn-copy-support-text");
+        btnText.textContent = "Chave Copia e Cola copiada! Valeu pelo apoio 💚";
+        setTimeout(() => {
+          btnText.textContent = "Copiar Chave Copia e Cola (eu@luizca.net)";
+        }, 2200);
+      }
+
+      function shareAppFromAbout() {
+        const shareUrl = "https://mandaumpix.app";
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(shareUrl).catch(() => {});
+        }
+        const btnText = document.getElementById("btn-share-app-text");
+        btnText.textContent =
+          "Link mandaumpix.app pronto para compartilhar! 🚀";
+        setTimeout(() => {
+          btnText.textContent = "Compartilhar e Divulgar o Aplicativo";
+        }, 2200);
+      }
+
+      function toggleInstallButtonState() {
+        appState.installVisible = !appState.installVisible;
+        const btn = document.getElementById("btn-header-install");
+        const label = document.getElementById("pwa-install-label");
+        if (appState.installVisible) {
+          btn.classList.remove("hidden");
+          label.textContent = "Visível";
+        } else {
+          btn.classList.add("hidden");
+          label.textContent = "Instalado (Oculto)";
+        }
+      }
+
+      function toggleViewportMode() {
+        appState.desktopMode = !appState.desktopMode;
+        const vp = document.getElementById("device-viewport");
+        const label = document.getElementById("vp-mode-label");
+        if (appState.desktopMode) {
+          vp.classList.add("device-viewport--desktop");
+          label.textContent = "Desktop (960px)";
+        } else {
+          vp.classList.remove("device-viewport--desktop");
+          label.textContent = "Mobile (420px)";
+        }
+        syncLayout();
+      }
+
+      function setActiveTab(tabId) {
+        [
+          "tab-home",
+          "tab-dialog",
+          "tab-result",
+          "tab-empty",
+          "tab-about",
+        ].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.className =
+              id === tabId ? "proto-btn proto-btn--active" : "proto-btn";
+          }
+        });
+      }
+
+      function navigateRoute(route) {
+        appState.route = route;
+        document.getElementById("modal-key-backdrop").classList.add("hidden");
+        document
+          .getElementById("modal-charge-backdrop")
+          .classList.add("hidden");
+        setActiveTab(`tab-${route}`);
+        syncLayout();
+        if (route === "result") {
+          openChargeModal();
+        }
+      }
+
+      function syncLayout() {
+        const chargePage = document.getElementById("view-charge-page");
+        const emptyView = document.getElementById("view-empty-state");
+        const aboutView = document.getElementById("view-about-page");
+
+        chargePage.classList.add("hidden");
+        emptyView.classList.add("hidden");
+        aboutView.classList.add("hidden");
+
+        if (appState.route === "home" || appState.route === "result") {
+          chargePage.classList.remove("hidden");
+        } else if (appState.route === "empty") {
+          emptyView.classList.remove("hidden");
+        } else if (appState.route === "about") {
+          aboutView.classList.remove("hidden");
+        }
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          closeKeyModal();
+          closeChargeModal();
+        }
+      });
+
+      renderKeyCards();
+      updateResultCard();
+      syncLayout();
+    </script>
+  </body>
+</html>

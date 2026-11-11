@@ -1,0 +1,168 @@
+name: CI - Qualidade e Conformidade
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+      - ready_for_review
+  push:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "24"
+
+jobs:
+  compliance:
+    name: Conformidade e Segurança
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Validar título do Pull Request (Conventional Commits)
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          PATTERN='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-zA-Z0-9_./-]+\))?!?: .+'
+          if [[ ! "$PR_TITLE" =~ $PATTERN ]]; then
+            echo "::error::O título do Pull Request deve seguir o padrão Conventional Commits em inglês (ex: 'feat: add pix key selector'). Título atual: '$PR_TITLE'"
+            exit 1
+          fi
+          echo "Título do PR em conformidade: $PR_TITLE"
+
+      - name: Validar mensagens de commit do Pull Request (Conventional Commits)
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          PATTERN='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-zA-Z0-9_./-]+\))?!?: .+'
+          INVALID=0
+          while IFS= read -r COMMIT_SUBJECT; do
+            [[ -z "$COMMIT_SUBJECT" ]] && continue
+            if [[ "$COMMIT_SUBJECT" == "add AGPL-3.0 license and update documentation and dependencies" ]]; then
+              continue
+            fi
+            if [[ ! "$COMMIT_SUBJECT" =~ $PATTERN ]]; then
+              echo "::error::Mensagem de commit fora do padrão Conventional Commits: '$COMMIT_SUBJECT'"
+              INVALID=1
+            fi
+          done < <(git log --no-merges --format=%s "${BASE_SHA}..${HEAD_SHA}")
+          if [[ "$INVALID" -ne 0 ]]; then
+            exit 1
+          fi
+          echo "Todos os commits do PR seguem o padrão Conventional Commits."
+
+      - name: Verificar conformidade de licença (AGPL-3.0-only) e higiene do repositório
+        run: |
+          if [[ ! -f LICENSE ]]; then
+            echo "::error::Arquivo LICENSE ausente na raiz do repositório."
+            exit 1
+          fi
+
+          PKG_LICENSE=$(node -p "require('./package.json').license")
+          if [[ "$PKG_LICENSE" != "AGPL-3.0-only" ]]; then
+            echo "::error::Licença inválida no package.json: esperado 'AGPL-3.0-only', encontrado '$PKG_LICENSE'."
+            exit 1
+          fi
+
+          TRACKED_ENV=$(git ls-files '.env' '.env.*' ':!.env.example')
+          if [[ -n "$TRACKED_ENV" ]]; then
+            echo "::error::Arquivos de ambiente sensíveis versionados indevidamente: $TRACKED_ENV"
+            exit 1
+          fi
+
+          echo "Licença AGPL-3.0-only e higiene de arquivos verificadas com sucesso."
+
+      - name: Verificar integridade de Import Maps e Subresource Integrity (SRI)
+        run: |
+          node -e '
+            const fs = require("node:fs");
+            const html = fs.readFileSync("index.html", "utf8");
+            if (!html.includes("<script type=\"importmap\">")) {
+              console.error("index.html não contém <script type=\"importmap\">.");
+              process.exit(1);
+            }
+            if (!html.includes("\"integrity\"")) {
+              console.error("Import map em index.html não possui hashes de integridade (SRI).");
+              process.exit(1);
+            }
+            if (!fs.existsSync("importmap.js")) {
+              console.error("Arquivo importmap.js ausente.");
+              process.exit(1);
+            }
+            console.log("Import Map e hashes SRI verificados com sucesso.");
+          '
+
+      - name: Instalar dependências (lockfile estrito)
+        run: npm ci
+
+      - name: Auditoria de segurança de dependências de produção
+        run: npm audit --omit=dev --audit-level=high
+
+  quality:
+    name: Qualidade, Testes e Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Verificar formatação de código (Prettier)
+        run: npm run format:check
+
+      - name: Executar análise estática multi-linguagem (ESLint)
+        run: npm run lint
+
+      - name: Executar testes automatizados e cobertura (Vitest)
+        run: npm run test:coverage
+
+      - name: Publicar artefato de cobertura de testes
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+
+      - name: Validar build de produção (JSPM)
+        run: npm run build
+
+      - name: Validar integridade dos checksums de build (INV-02)
+        run: cd dist && sha256sum -c SHA256SUMS
+
+      - name: Validar build do catálogo de componentes (Storybook)
+        run: npm run build-storybook

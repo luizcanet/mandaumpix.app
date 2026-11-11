@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "default": "mandaumpix-app-dev",
+    "development": "mandaumpix-app-dev",
+    "dev": "mandaumpix-app-dev",
+    "staging": "mandaumpix-app-stg",
+    "stg": "mandaumpix-app-stg",
+    "production": "mandaumpix-app-prd",
+    "prd": "mandaumpix-app-prd"
+  }
+}
+

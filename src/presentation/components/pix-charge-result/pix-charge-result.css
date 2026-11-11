@@ -1,0 +1,343 @@
+/* ==========================================================================
+   ESTILOS DO PALCO DE RESULTADO DA COBRANÇA (pix-charge-result.css)
+   Manda um PIX — Bloco BEM .charge-result (TASK-06.2.5)
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   BLOCO PRINCIPAL (.charge-result)
+   Contêiner do resultado da cobrança (passo final: QR Code + Copia e Cola)
+   ----------------------------------------------------------------------------- */
+.charge-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 1rem);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* -----------------------------------------------------------------------------
+   ESTADO INICIAL / AGUARDANDO EMISSÃO (.charge-result--empty / .charge-result__waiting)
+   Exibido antes da geração da primeira cobrança pelo usuário
+   ----------------------------------------------------------------------------- */
+.charge-result--empty {
+  justify-content: center;
+  align-items: center;
+}
+
+.charge-result__waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-xl, 2rem) var(--space-md, 1rem);
+  gap: var(--space-xs, 0.5rem);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.charge-result__waiting-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-pill, 9999px);
+  background-color: var(--color-surface-muted, #f8fafc);
+  color: var(--color-brand-primary, #0b1834);
+  font-size: 2rem;
+  margin-bottom: var(--space-2xs, 0.25rem);
+}
+
+.charge-result__waiting-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--color-text-primary, #0f172a);
+  letter-spacing: -0.01em;
+}
+
+.charge-result__waiting-desc {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary, #475569);
+  line-height: 1.5;
+  max-width: 320px;
+}
+
+/* -----------------------------------------------------------------------------
+   CABEÇALHO DA COBRANÇA GERADA (.charge-result__header)
+   Resumo contendo selo de prontidão, identificador da conta e valor
+   ----------------------------------------------------------------------------- */
+.charge-result__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs, 0.5rem);
+  padding-bottom: var(--space-sm, 0.75rem);
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+}
+
+.charge-result__header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.charge-result__badge-ready {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-success, #059669);
+}
+
+.charge-result__account {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--color-text-primary, #0f172a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Pílula de Valor (.charge-result__amount-pill) */
+.charge-result__amount-pill {
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-pill, 9999px);
+  font-size: 0.875rem;
+  font-weight: 800;
+  background-color: var(--color-brand-primary, #0b1834);
+  color: var(--color-brand-accent, #00d37f);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.charge-result__amount-pill--open {
+  background-color: #fef3c7;
+  color: var(--color-warning, #d97706);
+}
+
+/* -----------------------------------------------------------------------------
+   PALCO DO QR CODE (.charge-result__qr-stage)
+   Moldura centralizada de alto contraste óptico para leitura por câmeras bancárias
+   ----------------------------------------------------------------------------- */
+.charge-result__qr-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-surface-muted, #f8fafc);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--space-md, 1rem);
+  gap: var(--space-xs, 0.5rem);
+}
+
+/* Moldura estritamente branca (#ffffff) com borda (#0b1834) */
+.charge-result__qr-frame {
+  background-color: #ffffff;
+  padding: var(--space-sm, 0.75rem);
+  border-radius: var(--radius-lg, 12px);
+  border: 2px solid var(--color-brand-primary, #0b1834);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(11, 24, 52, 0.08));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.charge-result__qr-svg {
+  width: 168px;
+  height: 168px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.charge-result__qr-svg svg,
+.charge-result__qr-svg img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.charge-result__meta {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, #475569);
+  text-align: center;
+  overflow-wrap: break-word;
+}
+
+/* -----------------------------------------------------------------------------
+   BLOCO PIX COPIA E COLA (.charge-result__brcode-wrapper)
+   Exibição monoespaçada do código EMV BR Code com seleção total
+   ----------------------------------------------------------------------------- */
+.charge-result__brcode-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.charge-result__brcode-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-secondary, #475569);
+}
+
+.charge-result__brcode-mode {
+  font-family: var(--font-mono, monospace);
+  color: var(--color-success, #059669);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.charge-result__brcode {
+  background-color: var(--color-surface-elevated, #ffffff);
+  border: 1px solid var(--color-border-strong, #cbd5e1);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.65rem 0.85rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--color-text-primary, #0f172a);
+  word-break: break-all;
+  line-height: 1.45;
+  /* eslint-disable-next-line css/use-baseline */
+  user-select: all;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.charge-result__brcode:focus-visible {
+  border-color: var(--color-focus, #00d37f);
+  box-shadow: 0 0 0 2px var(--color-focus, #00d37f);
+}
+
+/* -----------------------------------------------------------------------------
+   SLOT E BOTÕES DE AÇÕES (.charge-result__actions e .charge-result__btn)
+   Grade tripla com botões de distribuição de alta acessibilidade (US-06.3 / RN05)
+   ----------------------------------------------------------------------------- */
+.charge-result__actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-xs, 0.5rem);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.charge-result__btn {
+  min-height: 48px;
+  min-width: 44px;
+  padding: 0.6rem 0.5rem;
+  border-radius: var(--radius-md, 8px);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  outline: none;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.15s ease;
+  box-sizing: border-box;
+}
+
+.charge-result__btn:hover {
+  opacity: 0.92;
+}
+
+.charge-result__btn:focus-visible {
+  outline: none;
+  border-color: var(--color-focus, #00d37f);
+  box-shadow: 0 0 0 2px var(--color-focus, #00d37f);
+}
+
+/* Variação Copiar (.charge-result__btn--copy) */
+.charge-result__btn--copy {
+  background-color: var(--color-brand-primary, #0b1834);
+  color: #ffffff;
+  border-color: var(--color-brand-primary, #0b1834);
+}
+
+.charge-result__btn--copy vector-icon {
+  color: var(--color-brand-accent, #00d37f);
+}
+
+/* Variação Copiado (.charge-result__btn--copied) */
+.charge-result__btn--copied {
+  background-color: var(--color-success, #059669);
+  color: #ffffff;
+  border-color: var(--color-success, #059669);
+}
+
+.charge-result__btn--copied vector-icon {
+  color: #ffffff;
+}
+
+/* Variação Compartilhar / WhatsApp (.charge-result__btn--share) */
+.charge-result__btn--share {
+  background-color: var(--color-success, #059669);
+  color: #ffffff;
+  border-color: var(--color-success, #059669);
+}
+
+/* Variação Salvar PNG (.charge-result__btn--download) */
+.charge-result__btn--download {
+  background-color: var(--color-surface-elevated, #ffffff);
+  color: var(--color-text-primary, #0f172a);
+  border: 1px solid var(--color-border-strong, #cbd5e1);
+}
+
+/* -----------------------------------------------------------------------------
+   REGIÃO LIVE ACESSÍVEL (.charge-result__live-region)
+   Oculta visualmente mas legível para leitores de tela
+   ----------------------------------------------------------------------------- */
+.charge-result__live-region {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   DARK MODE & ADAPTAÇÕES DE TEMA
+   Preservação estrita do fundo branco na moldura do QR Code
+   ----------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  .charge-result__qr-frame {
+    background-color: #ffffff;
+    border-color: #0b1834;
+  }
+
+  .charge-result__btn--download {
+    background-color: var(--color-surface, #1e293b);
+    color: var(--color-text-primary, #f8fafc);
+    border-color: var(--color-border-strong, #334155);
+  }
+}

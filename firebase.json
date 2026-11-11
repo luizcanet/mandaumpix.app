@@ -1,0 +1,90 @@
+{
+  "hosting": {
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "!**/.well-known/**",
+      "**/node_modules/**",
+      "docs/**",
+      "src/**/*.test.js",
+      "src/**/*.stories.js",
+      "eslint.config.js",
+      "vitest.config.js",
+      "package.json",
+      "README.md"
+    ],
+    "headers": [
+      {
+        "source": "/sw.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "Service-Worker-Allowed",
+            "value": "/"
+          }
+        ]
+      },
+      {
+        "source": "/.well-known/security.txt",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=86400, stale-while-revalidate=604800"
+          }
+        ]
+      },
+      {
+        "source": "/.well-known/assetlinks.json",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=86400, stale-while-revalidate=604800"
+          }
+        ]
+      },
+      {
+        "source": "/SHA256SUMS",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600, stale-while-revalidate=86400"
+          }
+        ]
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/security.txt",
+        "destination": "/.well-known/security.txt",
+        "type": 301
+      },
+      {
+        "source": "/assetlinks.json",
+        "destination": "/.well-known/assetlinks.json",
+        "type": 301
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "!/storybook/**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
