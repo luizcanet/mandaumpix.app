@@ -17,7 +17,7 @@ Este documento consolida o **Backlog do Produto e de Engenharia** do **Manda um 
 | **EP-05** | Gestão de Chaves PIX na Interface (`<pix-key-*>`)                                               | `RN01`, `RN02`, `<dialog class="key-dialog">`                          |     `3 / 3`     | ✅ Concluído    |
 | **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")                                   | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas                       |     `3 / 3`     | ✅ Concluído    |
 | **EP-07** | Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA), Deploy `stg`/`prd` e Diálogo de Cobrança | Testes de Integração, Storybook a11y, Releases, Caixa de Diálogo Modal |     `3 / 4`     | ⏳ Em Andamento |
-| **EP-08** | Proteção de Marca, Monitoramento Ativo e Procedimentos de Takedown                              | `RN08`, Certificate Transparency, UX Defensiva, TWA, Playbook Takedown |     `1 / 5`     | ⏳ Em Andamento |
+| **EP-08** | Proteção de Marca, Monitoramento Ativo e Procedimentos de Takedown                              | `RN08`, Certificate Transparency, UX Defensiva, TWA, Playbook Takedown |     `2 / 5`     | ⏳ Em Andamento |
 
 ---
 
@@ -1415,7 +1415,7 @@ flowchart LR
 | :---------- | :------------------------------------------------------------------------------------------ | :-------------- | :----------: |
 | **US-08.1** | Monitoramento Automatizado de Certificados e Typosquatting (Certificate Transparency & DNS) | ✅ Concluído    |   `3 pts`    |
 | **US-08.2** | UX Defensiva: Alerta de Autenticidade Canônica e Validação de Origem no PWA                 | 🔄 Em Andamento |   `2 pts`    |
-| **US-08.3** | Canal Comunitário de Denúncia de Fraudes, `security.txt` e Diretrizes na Página "Sobre"     | 🔄 Em Andamento |   `2 pts`    |
+| **US-08.3** | Canal Comunitário de Denúncia de Fraudes, `security.txt` e Diretrizes na Página "Sobre"     | ✅ Concluído    |   `2 pts`    |
 | **US-08.4** | Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links      | 📋 Planejado    |   `3 pts`    |
 | **US-08.5** | Esteira de Assinatura Criptográfica de Releases e Verificação de Integridade de Builds      | 📋 Planejado    |   `2 pts`    |
 
@@ -1490,7 +1490,7 @@ flowchart TD
   - [x] **TASK-08.2.3 (Selo de Autenticidade na Página Sobre e Rodapé)**: Atualizar [`src/presentation/components/about/about.component.js`](../../src/presentation/components/about/about.component.js) e componentes de rodapé com selo de origem oficial e advertência Zero-Credential.
   - [x] **TASK-08.2.4 (Storybook & Acessibilidade)**: Adicionar stories no Storybook para o componente de banner de alerta e o badge de autenticidade, auditados com `@storybook/addon-a11y`.
 
-#### `US-08.3` — Canal Comunitário de Denúncia de Fraudes, `security.txt` e Diretrizes na Página "Sobre" (`🔄 Em Andamento` · `2 Story Points`)
+#### `US-08.3` — Canal Comunitário de Denúncia de Fraudes, `security.txt` e Diretrizes na Página "Sobre" (`✅ Concluído` · `2 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Usuário ou Pesquisador de Segurança**,
@@ -1511,7 +1511,7 @@ flowchart TD
 - **Tarefas de Desenvolvimento (Dev Tasks)**:
   - [x] **TASK-08.3.1 (Criação do Arquivo RFC 9116 `security.txt`)**: Criar arquivo canônico [`.well-known/security.txt`](../../.well-known/security.txt) e configurar roteamento/MIME type em [`firebase.json`](../../firebase.json).
   - [x] **TASK-08.3.2 (Inclusão de Bloco de Segurança na Página Sobre)**: Implementar bloco de segurança e link de denúncia acessível no Web Component [`src/presentation/pages/about-page/about-page.component.js`](../../src/presentation/pages/about-page/about-page.component.js).
-  - [ ] **TASK-08.3.3 (Testes Unitários de Rota e Acessibilidade)**: Criar testes unitários em Vitest validando a integridade dos links e acessibilidade da página Sobre.
+  - [x] **TASK-08.3.3 (Testes Unitários de Rota e Acessibilidade)**: Criar testes unitários em Vitest validando a integridade dos links e acessibilidade da página Sobre.
 
 #### `US-08.4` — Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links (`📋 Planejado` · `3 Story Points`)
 

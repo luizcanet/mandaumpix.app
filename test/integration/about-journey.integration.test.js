@@ -7,6 +7,7 @@ import {
 import {
   ABOUT_AUTHOR,
   ABOUT_PROJECT,
+  ABOUT_SECURITY,
   ABOUT_SUPPORT_PIX,
 } from "../../src/presentation/pages/about-page/about-page.constants.js";
 
@@ -74,6 +75,32 @@ describe("Jornada Institucional e Navegação SPA (TASK-07.2.6 — RN07)", () =>
       `a[href="${ABOUT_PROJECT.repositoryUrl}"]`,
     );
     expect(repoAnchor).not.toBeNull();
+
+    // 3.1 Validação do Card de Segurança, Canal de Denúncia e RFC 9116 security.txt (INV-01, INV-02)
+    const securitySection = aboutPage.querySelector(
+      ".about-page__box--security",
+    );
+    expect(securitySection).not.toBeNull();
+    expect(securitySection.textContent).toContain(
+      ABOUT_SECURITY.zeroCredentialNotice,
+    );
+
+    const reportLink = securitySection.querySelector(
+      '[data-action="report-fraud"]',
+    );
+    expect(reportLink).not.toBeNull();
+    expect(reportLink.textContent.trim()).toBe(ABOUT_SECURITY.reportButtonText);
+    expect(reportLink.getAttribute("href")).toBe(
+      ABOUT_SECURITY.reportMailtoUrl,
+    );
+
+    const securityTxtLink = securitySection.querySelector(
+      ".about-page__security-txt-link",
+    );
+    expect(securityTxtLink).not.toBeNull();
+    expect(securityTxtLink.getAttribute("href")).toBe(
+      ABOUT_SECURITY.securityTxtHref,
+    );
 
     // 4. Validação da Seção de Apoio Voluntário ("Manda um PIX")
     const supportSection = aboutPage.querySelector(".about-page__box--support");
