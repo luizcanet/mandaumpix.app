@@ -73,7 +73,7 @@ describe("about-page.constants", () => {
       expect(ABOUT_PROJECT.name).toBe("Manda um PIX");
       expect(ABOUT_PROJECT.domain).toBe("mandaumpix.app");
       expect(ABOUT_PROJECT.version).toBe("1.0.0");
-      expect(ABOUT_PROJECT.versionLabel).toBe("mandaumpix.app • v1.0.0");
+      expect(ABOUT_PROJECT.versionLabel).toBe("mandaumpix.app • 1.0.0");
       expect(ABOUT_PROJECT.license).toBe("AGPL-3.0-only");
       expect(ABOUT_PROJECT.licenseName).toContain(
         "GNU Affero General Public License",

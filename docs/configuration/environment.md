@@ -20,7 +20,7 @@ O domínio `mandaumpix.app` está registrado no **Name.com** (que também fornec
 
 ## 📋 Variáveis de Ambiente e Segredos de CI/CD
 
-No estado atual do repositório (`v1.0.0`), a aplicação cliente **não exige variáveis de ambiente nem segredos de servidor em tempo de execução** para funcionar no navegador, visto que é um PWA executado integralmente no cliente e não realiza autenticação com APIs bancárias privadas.
+No estado atual do repositório (`1.0.0`), a aplicação cliente **não exige variáveis de ambiente nem segredos de servidor em tempo de execução** para funcionar no navegador, visto que é um PWA executado integralmente no cliente e não realiza autenticação com APIs bancárias privadas.
 
 Para a esteira de Entrega Contínua (CD) no **GitHub Actions** ([`.github/workflows/deploy-dev.yml`](../../.github/workflows/deploy-dev.yml)), são utilizados os seguintes segredos de repositório/ambiente no GitHub:
 

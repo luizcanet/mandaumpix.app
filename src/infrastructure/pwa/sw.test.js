@@ -162,8 +162,8 @@ describe("Service Worker (sw.js) & Offline Strategies", () => {
           .fn()
           .mockResolvedValue([
             "mandaumpix-v0.9.0-precache",
-            "mandaumpix-v1.0.0-precache",
-            "mandaumpix-v1.0.0-runtime",
+            "mandaumpix-1.0.0-precache",
+            "mandaumpix-1.0.0-runtime",
           ]),
         delete: vi.fn().mockResolvedValue(true),
       };
@@ -178,8 +178,8 @@ describe("Service Worker (sw.js) & Offline Strategies", () => {
 
       await handleActivateEvent(mockEvent, {
         activeCacheNames: [
-          "mandaumpix-v1.0.0-precache",
-          "mandaumpix-v1.0.0-runtime",
+          "mandaumpix-1.0.0-precache",
+          "mandaumpix-1.0.0-runtime",
         ],
         cacheStorage: mockCacheStorage,
         swScope: mockSwScope,
@@ -190,10 +190,10 @@ describe("Service Worker (sw.js) & Offline Strategies", () => {
         "mandaumpix-v0.9.0-precache",
       );
       expect(mockCacheStorage.delete).not.toHaveBeenCalledWith(
-        "mandaumpix-v1.0.0-precache",
+        "mandaumpix-1.0.0-precache",
       );
       expect(mockCacheStorage.delete).not.toHaveBeenCalledWith(
-        "mandaumpix-v1.0.0-runtime",
+        "mandaumpix-1.0.0-runtime",
       );
       expect(mockEvent.waitUntil).toHaveBeenCalled();
     });

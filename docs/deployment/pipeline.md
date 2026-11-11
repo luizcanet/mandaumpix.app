@@ -111,6 +111,202 @@ O workflow é disparado automaticamente em eventos de `pull_request` (`opened`, 
 
 ---
 
+## 📱 Publicação Oficial na Google Play Store via Trusted Web Activity (TWA) (`US-08.4`)
+
+Como parte da estratégia defensiva de proteção da marca e integridade do software (`RN06`, `RN08`), o **Manda um PIX** disponibiliza empacotamento oficial para a **Google Play Store** utilizando a tecnologia **Trusted Web Activity (TWA)** via **Bubblewrap CLI** da Google Chrome Labs.
+
+Essa abordagem oferece três benefícios fundamentais:
+
+1. **Ocupação Defensiva da Loja**: Previne que golpistas registrem aplicativos fraudulentos, réplicas maliciosas ou trojans bancários utilizando a marca oficial `mandaumpix.app` na Google Play.
+2. **Vinculação Criptográfica Bi-Direcional (Digital Asset Links)**: Garante que apenas o aplicativo Android oficial assinado com as chaves legítimas possa executar sem a barra de endereços do navegador (Custom Tab), abrindo o domínio canônico seguro `https://mandaumpix.app` em modo nativo / standalone.
+3. **Distribuição Sem Overhead de Código**: Todo o código executado permanece 100% web, baseado nos módulos ES nativos hospedados no Firebase Hosting, beneficiando-se instantaneamente de atualizações de segurança e melhorias contínuas sem necessidade de novo ciclo de aprovação na loja para alterações puramente web.
+
+```mermaid
+flowchart TD
+    subgraph Repo["📦 Repositório mandaumpix.app"]
+        TwaManifest["twa-manifest.json<br/>(Configuração TWA / Versão)"]
+        Assetlinks["/.well-known/assetlinks.json<br/>(Digital Asset Links)"]
+        Keystore["android.keystore<br/>(Chave de Assinatura)"]
+    end
+
+    subgraph Build["⚙️ Esteira de Build TWA (Bubblewrap)"]
+        Bubblewrap["Bubblewrap CLI (@bubblewrap/cli)<br/>npx @bubblewrap/cli build"]
+        AAB["📦 Android App Bundle (.aab)<br/>app.mandaumpix.twa"]
+    end
+
+    subgraph PlayStore["🏬 Google Play Console"]
+        Console["Upload do .aab<br/>(Faixa de Produção / Teste Fechado)"]
+        AppSigning["Google Play App Signing<br/>(Certificado de Assinatura SHA-256)"]
+    end
+
+    subgraph Device["📱 Dispositivo Android do Usuário"]
+        PlayInstall["Instalação via Play Store"]
+        DalCheck["Android OS verifica<br/>/.well-known/assetlinks.json"]
+        NativeRun["Execução Standalone TWA<br/>(Barra de URLs oculta no domínio oficial)"]
+    end
+
+    TwaManifest & Keystore --> Bubblewrap
+    Bubblewrap --> AAB
+    AAB --> Console
+    Console --> AppSigning
+    AppSigning -.->|"Fingerprint SHA-256"| Assetlinks
+    Console --> PlayInstall
+    PlayInstall --> DalCheck
+    Assetlinks -.->|"Confirma relação de confiança"| DalCheck
+    DalCheck --> NativeRun
+```
+
+### 1. Arquivos de Configuração Envolvidos
+
+| Arquivo                        | Localização no Repositório                                         | Responsabilidade                                                                                                                                                                   |
+| :----------------------------- | :----------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Manifesto TWA**              | [`twa-manifest.json`](../../twa-manifest.json)                     | Metadados do Bubblewrap: package name `app.mandaumpix.twa`, versão sincronizada com [`package.json`](../../package.json), cores de tema, ícones de 512px e parâmetros da keystore. |
+| **Digital Asset Links**        | [`.well-known/assetlinks.json`](../../.well-known/assetlinks.json) | Declaração pública de permissão (`delegate_permission/common.handle_all_urls`) mapeando o SHA-256 da assinatura do Android ao domínio canônico `https://mandaumpix.app`.           |
+| **Configuração de Cabeçalhos** | [`firebase.json`](../../firebase.json)                             | Garante que o arquivo `assetlinks.json` seja servido com `Content-Type: application/json` e cache estático adequado pelo Firebase Hosting.                                         |
+| **Web App Manifest**           | [`manifest.json`](../../manifest.json)                             | Manifesto PWA padrão W3C que fornece as diretivas visuais de `display: standalone`, temas e ícones de inicialização.                                                               |
+
+---
+
+### 2. Pré-requisitos de Ambiente
+
+Para compilar o Android App Bundle localmente ou em esteiras de automação, são necessárias as seguintes ferramentas instaladas e configuradas no ambiente:
+
+1. **Node.js**: versão `20.x` LTS ou superior e `npm`.
+2. **Java Development Kit (JDK)**: versão `17` LTS (ou superior) com a variável de ambiente `JAVA_HOME` configurada.
+3. **Android SDK Command-Line Tools**: componentes `platforms;android-34`, `build-tools;34.0.0` e variável `ANDROID_HOME` configurada.
+4. **Bubblewrap CLI**: executado diretamente via `npx @bubblewrap/cli` ou instalado globalmente com `npm install -g @bubblewrap/cli`.
+
+---
+
+### 3. Passo a Passo de Compilação do Android App Bundle (`.aab`)
+
+#### Passo 1: Geração da Chave de Assinatura (Upload Keystore)
+
+Caso ainda não possua uma keystore de upload oficial gerada, crie-a utilizando a ferramenta `keytool` do JDK:
+
+```bash
+keytool -genkeypair \
+  -v \
+  -keystore android.keystore \
+  -alias mandaumpix \
+  -keyalg RSA \
+  -keysize 2048 \
+  -validity 10000 \
+  -storetype PKCS12
+```
+
+> ⚠️ **Atenção**: Armazene o arquivo `android.keystore` e suas credenciais em local seguro (gestor de segredos ou cofre criptografado). **Nunca versioná-lo em commits públicos do repositório**.
+
+#### Passo 2: Extração da Impressão Digital SHA-256 da Chave
+
+Extraia a impressão digital SHA-256 do certificado para registrar no Digital Asset Links:
+
+```bash
+keytool -list -v -keystore android.keystore -alias mandaumpix
+```
+
+Localize a linha contendo `SHA256:` (formato `XX:XX:XX:...:XX`) e assegure-se de que ela esteja adicionada à lista `sha256_cert_fingerprints` em [`.well-known/assetlinks.json`](../../.well-known/assetlinks.json).
+
+#### Passo 3: Validação da Sincronização de Versão
+
+Antes da compilação, execute a suíte de testes do manifesto para garantir conformidade entre [`twa-manifest.json`](../../twa-manifest.json) e [`package.json`](../../package.json):
+
+```bash
+npx vitest run test/security/twa-manifest.test.js
+```
+
+#### Passo 4: Compilação com Bubblewrap CLI
+
+Execute a geração e build do projeto Android com o Bubblewrap a partir da raiz do repositório:
+
+```bash
+npx @bubblewrap/cli build
+```
+
+O comando irá:
+
+1. Validar os metadados em [`twa-manifest.json`](../../twa-manifest.json).
+2. Baixar e configurar as dependências Android Gradle (usando AndroidX e Custom Tabs).
+3. Gerar o pacote otimizado **Android App Bundle** assinado em:
+   ```text
+   ./app-release-bundle.aab
+   ```
+4. Gerar também o arquivo APK assinado para testes locais (`./app-release-signed.apk`).
+
+#### Passo 5: Teste Local em Dispositivo ou Emulador Android
+
+Conecte um dispositivo Android via USB (com depuração USB ativada) ou inicie um emulador Android e instale o pacote de teste:
+
+```bash
+npx @bubblewrap/cli install
+```
+
+Verifique se o aplicativo abre sem a barra superior de URL do navegador. Se a barra for exibida, significa que a validação de Digital Asset Links falhou no dispositivo (verifique a conectividade de rede e a correspondência do SHA-256 em `https://mandaumpix.app/.well-known/assetlinks.json`).
+
+---
+
+### 4. Passo a Passo de Upload e Publicação no Google Play Console
+
+#### Passo 1: Criação da Aplicação no Google Play Console
+
+1. Acesse o [Google Play Console](https://play.google.com/console) com a conta oficial de desenvolvedor.
+2. Clique em **Criar app** e preencha:
+   - **Nome do app**: `Manda um PIX`
+   - **Idioma padrão**: `Português (Brasil) - pt-BR`
+   - **Tipo de aplicativo**: `App`
+   - **Preço**: `Gratuito`
+   - Aceite as declarações de conformidade e leis de exportação dos EUA.
+
+#### Passo 2: Configuração do Google Play App Signing
+
+1. Acesse **Configuração** > **Integridade do app** (_App Integrity_).
+2. Selecione a opção recomendada do Google: **Usar o serviço de assinatura de apps do Google Play** (_Google Play App Signing_).
+3. Após habilitado, copie a **Impressão digital do certificado de assinatura do app** (_App signing certificate SHA-256 fingerprint_).
+4. Adicione esta impressão digital ao array `sha256_cert_fingerprints` em [`.well-known/assetlinks.json`](../../.well-known/assetlinks.json) e publique a atualização via Firebase Hosting.
+   > ℹ️ **Importante**: O Google Play assina os APKs distribuídos aos usuários finais com uma chave gerada em nuvem pelo próprio Play Console. Portanto, o arquivo `assetlinks.json` deve conter **ambos** os hashes SHA-256: o da chave de upload local (usado em testes e durante a verificação inicial) e o da chave definitiva de assinatura do Google Play.
+
+#### Passo 3: Envio do Android App Bundle (`.aab`)
+
+1. No menu lateral, acesse **Produção** (ou **Teste interno** / **Teste fechado** para homologação).
+2. Crie uma nova versão (_Create new release_).
+3. Faça o upload do arquivo `app-release-bundle.aab`.
+4. Preencha as notas de lançamento (Release Notes) em português, alinhadas ao [`docs/CHANGELOG.md`](../CHANGELOG.md).
+5. Salve e revise a versão.
+
+#### Passo 4: Ficha da Loja e Políticas de Privacidade
+
+1. **Ficha principal da loja**:
+   - Descrição curta: `Aplicativo web progressivo gratuito que facilita a geração de cobranças via PIX.`
+   - Descrição completa: destacar a natureza livre, open-source (GNU AGPL v3.0), Zero-Backend, sem coleta de dados e sem solicitação de credenciais financeiras.
+   - Ícones e capturas de tela: utilizar os assets oficiais de [`src/assets/icons/`](../../src/assets/icons/) em alta resolução.
+2. **Conteúdo do app**:
+   - **Política de Privacidade**: URL oficial `https://mandaumpix.app/docs/security/compliance.md` ou seção de segurança na página Sobre `https://mandaumpix.app/sobre`.
+   - **Acesso a apps**: todas as funcionalidades estão disponíveis sem restrições ou credenciais.
+   - **Classificação de conteúdo**: Livre (L / Todos).
+   - **Segurança dos dados**: declarar explicitamente que o app **não coleta, não armazena em servidores remotos e não compartilha dados de usuários** (Arquitetura Local-First / Zero-Backend).
+
+---
+
+### 5. Auditoria e Validação do Digital Asset Links
+
+Para auditar e confirmar que a relação entre o domínio canônico e a aplicação Android foi registrada com sucesso, utilize a API oficial de verificação do Google:
+
+```bash
+curl -s "https://digitalassetlinks.googleapis.com/v1/statements:check?source.web.site=https://mandaumpix.app&relation=delegate_permission/common.handle_all_urls&target.android_app.package_name=app.mandaumpix.twa&target.android_app.certificate.sha256_fingerprint=SEU_SHA256_AQUI"
+```
+
+A resposta deve conter:
+
+```json
+{
+  "linked": true
+}
+```
+
+Essa resposta positiva confirma que o ecossistema Android reconhece a aplicação como proprietária legítima do domínio `mandaumpix.app`, garantindo experiência nativa segura e imunidade contra tentativas de spoofing de origem.
+
+---
+
 ## 🛠️ Scripts de Automação Disponíveis ([`package.json`](../../package.json))
 
 | Script                    | Comando Executado                                                  | Status Atual                                                                                   |
