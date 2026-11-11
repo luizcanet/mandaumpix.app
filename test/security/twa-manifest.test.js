@@ -70,4 +70,3 @@ describe("Bubblewrap TWA Manifest Configuration (TASK-08.4.2)", () => {
     expect(twaConfig.signingKey.alias).toBe("mandaumpix");
   });
 });
-

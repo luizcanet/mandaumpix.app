@@ -17,7 +17,7 @@ Este documento consolida o **Backlog do Produto e de Engenharia** do **Manda um 
 | **EP-05** | Gestão de Chaves PIX na Interface (`<pix-key-*>`)                                               | `RN01`, `RN02`, `<dialog class="key-dialog">`                          |     `3 / 3`     | ✅ Concluído    |
 | **EP-06** | Geração, Exibição e Distribuição de Cobrança ("Manda um PIX")                                   | `RN02`, `RN03`, `RN04`, `RN05`, QR Code & Saídas                       |     `3 / 3`     | ✅ Concluído    |
 | **EP-07** | Qualidade Ponta a Ponta, Acessibilidade (WCAG 2.2 AA), Deploy `stg`/`prd` e Diálogo de Cobrança | Testes de Integração, Storybook a11y, Releases, Caixa de Diálogo Modal |     `3 / 4`     | ⏳ Em Andamento |
-| **EP-08** | Proteção de Marca, Monitoramento Ativo e Procedimentos de Takedown                              | `RN08`, Certificate Transparency, UX Defensiva, TWA, Playbook Takedown |     `2 / 5`     | ⏳ Em Andamento |
+| **EP-08** | Proteção de Marca, Monitoramento Ativo e Procedimentos de Takedown                              | `RN08`, Certificate Transparency, UX Defensiva, TWA, Playbook Takedown |     `3 / 5`     | ⏳ Em Andamento |
 
 ---
 
@@ -1416,7 +1416,7 @@ flowchart LR
 | **US-08.1** | Monitoramento Automatizado de Certificados e Typosquatting (Certificate Transparency & DNS) | ✅ Concluído    |   `3 pts`    |
 | **US-08.2** | UX Defensiva: Alerta de Autenticidade Canônica e Validação de Origem no PWA                 | 🔄 Em Andamento |   `2 pts`    |
 | **US-08.3** | Canal Comunitário de Denúncia de Fraudes, `security.txt` e Diretrizes na Página "Sobre"     | ✅ Concluído    |   `2 pts`    |
-| **US-08.4** | Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links      | 🔄 Em Andamento |   `3 pts`    |
+| **US-08.4** | Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links      | ✅ Concluído    |   `3 pts`    |
 | **US-08.5** | Esteira de Assinatura Criptográfica de Releases e Verificação de Integridade de Builds      | 📋 Planejado    |   `2 pts`    |
 
 ```mermaid
@@ -1513,7 +1513,7 @@ flowchart TD
   - [x] **TASK-08.3.2 (Inclusão de Bloco de Segurança na Página Sobre)**: Implementar bloco de segurança e link de denúncia acessível no Web Component [`src/presentation/pages/about-page/about-page.component.js`](../../src/presentation/pages/about-page/about-page.component.js).
   - [x] **TASK-08.3.3 (Testes Unitários de Rota e Acessibilidade)**: Criar testes unitários em Vitest validando a integridade dos links e acessibilidade da página Sobre.
 
-#### `US-08.4` — Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links (`🔄 Em Andamento` · `3 Story Points`)
+#### `US-08.4` — Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links (`✅ Concluído` · `3 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Usuário Android**,
@@ -1531,7 +1531,7 @@ flowchart TD
 - **Tarefas de Desenvolvimento (Dev Tasks)**:
   - [x] **TASK-08.4.1 (Criação de `.well-known/assetlinks.json`)**: Criar arquivo [`.well-known/assetlinks.json`](../../.well-known/assetlinks.json) com o manifesto de permissão e configurar cabeçalhos em [`firebase.json`](../../firebase.json).
   - [x] **TASK-08.4.2 (Configuração de Build Bubblewrap TWA)**: Configurar manifesto `twa-manifest.json` com ícones, cores de tema, package name `app.mandaumpix.twa` e versão sincronizada com `package.json`.
-  - [ ] **TASK-08.4.3 (Documentação do Processo de Publicação Play Store)**: Documentar em [`docs/deployment/pipeline.md`](../deployment/pipeline.md) o passo a passo de build do Android App Bundle (`.aab`) e upload no Google Play Console.
+  - [x] **TASK-08.4.3 (Documentação do Processo de Publicação Play Store)**: Documentar em [`docs/deployment/pipeline.md`](../deployment/pipeline.md) o passo a passo de build do Android App Bundle (`.aab`) e upload no Google Play Console.
 
 #### `US-08.5` — Esteira de Assinatura Criptográfica de Releases e Verificação de Integridade de Builds (`📋 Planejado` · `2 Story Points`)
 
