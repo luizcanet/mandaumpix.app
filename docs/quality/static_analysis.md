@@ -46,4 +46,31 @@ npx eslint docs/ README.md
 
 ---
 
+## 🔒 Verificação de Integridade Criptográfica e Checksums de Build (US-08.5)
+
+Além da análise estática de código-fonte via ESLint e formatação via Prettier, o projeto implementa uma esteira de integridade criptográfica contínua para validar os artefatos estáticos compilados em `dist/`:
+
+1. **Subresource Integrity (SRI) no Import Map**:
+   - O comando de build valida que todas as dependências locais importadas em [`index.html`](../../index.html) possuem hashes SHA-384 (`integrity="sha384-..."`) devidamente calculados e conferidos contra os arquivos reais compilados ([`scripts/build.js`](../../scripts/build.js)).
+
+2. **Geração Determinística de Checksums (`dist/SHA256SUMS`)**:
+   - O script [`scripts/generate-checksums.js`](../../scripts/generate-checksums.js) (disponível via `npm run build:checksums`) calcula hashes SHA-256 para todos os artefatos estáticos compilados, ordenando-os deterministicamente no formato compatível com GNU coreutils `sha256sum`.
+   - Executado automaticamente durante o `npm run build` (**INV-01**).
+
+3. **Verificação de Integridade via Linha de Comando**:
+
+   ```bash
+   # Gerar ou regenerar o manifesto de hashes
+   npm run build:checksums
+
+   # Validar integridade matemática de todos os arquivos em dist/
+   cd dist && sha256sum -c SHA256SUMS
+   ```
+
+4. **Garantia de Qualidade em CI/CD (INV-02)**:
+   - Toda compilação nos workflows de CI ([`ci.yml`](../../.github/workflows/ci.yml)) e CD ([`deploy-dev.yml`](../../.github/workflows/deploy-dev.yml), [`deploy-stg.yml`](../../.github/workflows/deploy-stg.yml), [`deploy-prd.yml`](../../.github/workflows/deploy-prd.yml)) executa `cd dist && sha256sum -c SHA256SUMS` como gate bloqueante antes de qualquer publicação no Firebase Hosting.
+   - Orientações detalhadas de auditoria pública estão documentadas em [Monitoramento Ativo e Procedimentos de Derrubada](../security/takedown_and_monitoring.md#plano-de-acao-6-auditoria-criptografica-de-releases-e-integridade-de-builds-us-085).
+
+---
+
 ⬅️ **Anterior**: [Estratégia de Testes](./testing_strategy.md) | 🏠 **Voltar ao Índice**: [Documentação do Sistema](../README.md)

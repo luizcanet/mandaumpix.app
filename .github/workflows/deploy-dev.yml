@@ -53,6 +53,19 @@ jobs:
       - name: Gerar build do Storybook (dist/storybook)
         run: npm run build-storybook -- -o dist/storybook
 
+      - name: Regenerar checksums dos artefatos (dist/SHA256SUMS)
+        run: npm run build:checksums
+
+      - name: Verificar integridade criptográfica dos artefatos compilados (INV-02)
+        run: cd dist && sha256sum -c SHA256SUMS
+
+      - name: Publicar checksums como artefato de pipeline
+        uses: actions/upload-artifact@v4
+        with:
+          name: sha256sums-dev
+          path: dist/SHA256SUMS
+          retention-days: 30
+
       - name: Deploy no Firebase Hosting (Development)
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:

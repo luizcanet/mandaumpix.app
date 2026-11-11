@@ -72,7 +72,9 @@ Configurado em [`.github/workflows/deploy-dev.yml`](../../.github/workflows/depl
 
 - **Job `deploy` (`Build e Deploy (Development)`)**:
   - Vinculado ao GitHub Environment `development` (`https://dev.mandaumpix.app`).
-  - Executa `npm ci`, validação de formatação (`npm run format:check`), análise estática (`npm run lint`), suíte de testes (`npm test`), empacotamento de produção (`npm run build` gerando `dist/`) e build do catálogo de componentes (`npm run build-storybook -- -o dist/storybook`, acessível em `https://dev.mandaumpix.app/storybook`).
+  - Executa `npm ci`, validação de formatação (`npm run format:check`), análise estática (`npm run lint`), suíte de testes (`npm test`), empacotamento de produção (`npm run build` gerando `dist/`), build do catálogo de componentes (`npm run build-storybook -- -o dist/storybook`, acessível em `https://dev.mandaumpix.app/storybook`) e regeneração dos checksums dos artefatos (`npm run build:checksums`).
+  - **Validação de Integridade Criptográfica (INV-02)**: Executa `cd dist && sha256sum -c SHA256SUMS` garantindo que todos os arquivos estáticos compilados correspondem aos hashes calculados antes de qualquer publicação.
+  - **Publicação de Artefato**: Publica `dist/SHA256SUMS` como artefato de pipeline no GitHub Actions (`sha256sums-dev`, retenção de 30 dias).
   - Publica os ativos no canal `live` do projeto `mandaumpix-app-dev` utilizando `FirebaseExtended/action-hosting-deploy@v0` autenticado via secret `FIREBASE_SERVICE_ACCOUNT_DEV`.
 
 ### 🧪 Implantação Automatizada em Staging (`CD - Deploy Staging`)
@@ -81,16 +83,20 @@ Configurado em [`.github/workflows/deploy-stg.yml`](../../.github/workflows/depl
 
 - **Job `deploy` (`Build e Deploy (Staging)`)**:
   - Vinculado ao GitHub Environment `staging` (`https://stg.mandaumpix.app`).
-  - Executa a esteira estrita de qualidade: `npm ci`, validação de formatação (`npm run format:check`), análise estática (`npm run lint`), suíte de testes automatizados (`npm test`), empacotamento de produção (`npm run build` gerando `dist/`) e compilação do catálogo de componentes (`npm run build-storybook -- -o dist/storybook`, acessível em `https://stg.mandaumpix.app/storybook`).
+  - Executa a esteira estrita de qualidade: `npm ci`, validação de formatação (`npm run format:check`), análise estática (`npm run lint`), suíte de testes automatizados (`npm test`), empacotamento de produção (`npm run build` gerando `dist/`), compilação do catálogo de componentes (`npm run build-storybook -- -o dist/storybook`, acessível em `https://stg.mandaumpix.app/storybook`) e regeneração dos checksums (`npm run build:checksums`).
+  - **Validação de Integridade Criptográfica (INV-02)**: Executa `cd dist && sha256sum -c SHA256SUMS` para garantia matemática pré-deploy.
+  - **Publicação de Artefato**: Publica `dist/SHA256SUMS` como artefato de pipeline no GitHub Actions (`sha256sums-stg`, retenção de 30 dias).
   - Publica os ativos no canal `live` do projeto `mandaumpix-app-stg` utilizando `FirebaseExtended/action-hosting-deploy@v0` autenticado via secret `FIREBASE_SERVICE_ACCOUNT_STG`.
 
 ### 🚀 Implantação Automatizada em Production (`CD - Deploy Production`)
 
-Configurado em [`.github/workflows/deploy-prd.yml`](../../.github/workflows/deploy-prd.yml), o workflow possui como gatilho exclusivo a publicação oficial de uma release no GitHub (`release: types: [published]`):
+Configurado em [`.github/workflows/deploy-prd.yml`](../../.github/workflows/deploy-prd.yml), o workflow possui como gatilho a publicação oficial de uma release no GitHub (`release: types: [published]`) ou execução manual (`workflow_dispatch`):
 
 - **Job `deploy` (`Build e Deploy (Production)`)**:
   - Vinculado ao GitHub Environment `production` (`https://mandaumpix.app`).
-  - Executa a esteira estrita de qualidade: `npm ci`, validação de formatação (`npm run format:check`), análise estática (`npm run lint`), suíte de testes automatizados (`npm test`) e empacotamento otimizado de produção (`npm run build` gerando `dist/` sem inclusão de assets de documentação).
+  - Executa a esteira estrita de qualidade: `npm ci`, validação de formatação (`npm run format:check`), análise estática (`npm run lint`), suíte de testes automatizados (`npm test`) e empacotamento otimizado de produção (`npm run build` gerando `dist/` com `dist/SHA256SUMS`).
+  - **Validação de Integridade Criptográfica (INV-02)**: Executa verificação estrita via `cd dist && sha256sum -c SHA256SUMS`.
+  - **Publicação de Artefato e Release Asset**: Publica `dist/SHA256SUMS` como artefato de pipeline no GitHub Actions (`sha256sums-prd`, retenção de 90 dias) e anexa diretamente o arquivo aos artefatos da release oficial do GitHub via `gh release upload`.
   - Publica os ativos no canal `live` do projeto `mandaumpix-app-prd` utilizando `FirebaseExtended/action-hosting-deploy@v0` autenticado via secret `FIREBASE_SERVICE_ACCOUNT_PRD`.
 
 ### 🛡️ Verificações Executadas no Workflow (`CI - Qualidade e Conformidade`)
@@ -107,7 +113,7 @@ O workflow é disparado automaticamente em eventos de `pull_request` (`opened`, 
    - **Formatação (`npm run format:check`)**: Verifica a aderência de código e documentação ao **Prettier v3** ([`.prettierrc`](../../.prettierrc) e [`.prettierignore`](../../.prettierignore)).
    - **Análise Estática (`npm run lint`)**: Executa o **ESLint v10** em arquivos JavaScript, JSON, JSONC, JSON5, Markdown e CSS ([`eslint.config.js`](../../eslint.config.js)).
    - **Testes e Cobertura (`npm run test:coverage`)**: Executa a suíte de testes unitários com **Vitest** e **JSDOM**, gerando e publicando o artefato de cobertura V8 (`coverage-report`).
-   - **Validação de Builds (`npm run build` e `npm run build-storybook`)**: Garante que o pacote de produção (`dist/`) e o catálogo estático de componentes (`storybook-static/`) compilam sem erros.
+   - **Validação de Builds e Integridade (`npm run build`, `cd dist && sha256sum -c SHA256SUMS`, `npm run build-storybook`)**: Garante que o pacote de produção (`dist/`) compila com hashes verificados matematicamente e que o catálogo estático de componentes compila sem erros.
 
 ---
 

@@ -4,9 +4,10 @@ on:
   release:
     types:
       - published
+  workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   deployments: write
 
 concurrency:
@@ -48,6 +49,22 @@ jobs:
 
       - name: Gerar build de produção (JSPM)
         run: npm run build
+
+      - name: Verificar integridade criptográfica dos artefatos compilados (INV-02)
+        run: cd dist && sha256sum -c SHA256SUMS
+
+      - name: Publicar checksums como artefato de pipeline
+        uses: actions/upload-artifact@v4
+        with:
+          name: sha256sums-prd
+          path: dist/SHA256SUMS
+          retention-days: 90
+
+      - name: Anexar SHA256SUMS aos artefatos da Release no GitHub
+        if: github.event_name == 'release'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ github.event.release.tag_name }} dist/SHA256SUMS --clobber
 
       - name: Deploy no Firebase Hosting (Production)
         uses: FirebaseExtended/action-hosting-deploy@v0

@@ -7,6 +7,7 @@ import {
   validateDistIntegrity,
   build,
 } from "../../scripts/build.js";
+import { verifyChecksums } from "../../scripts/generate-checksums.js";
 
 describe("Build Script (scripts/build.js)", () => {
   it("should correctly calculate SHA-384 integrity hash in sha384- base64 format", () => {
@@ -44,14 +45,20 @@ describe("Build Script (scripts/build.js)", () => {
     const distMain = path.join(distPath, "src/main.js");
     const distSecurityTxt = path.join(distPath, ".well-known/security.txt");
     const distAssetlinks = path.join(distPath, ".well-known/assetlinks.json");
+    const distChecksums = path.join(distPath, "SHA256SUMS");
 
     expect(fs.existsSync(distIndex)).toBe(true);
     expect(fs.existsSync(distMain)).toBe(true);
     expect(fs.existsSync(distSecurityTxt)).toBe(true);
     expect(fs.existsSync(distAssetlinks)).toBe(true);
+    expect(fs.existsSync(distChecksums)).toBe(true);
 
     const stats = validateDistIntegrity(distIndex);
     expect(stats.preloadCount).toBeGreaterThan(0);
     expect(stats.verifiedIntegrities).toBeGreaterThan(0);
+
+    const checksumVerification = verifyChecksums(distChecksums, distPath);
+    expect(checksumVerification.valid).toBe(true);
+    expect(checksumVerification.verifiedCount).toBeGreaterThan(0);
   });
 });

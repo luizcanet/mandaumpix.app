@@ -158,5 +158,8 @@ jobs:
       - name: Validar build de produção (JSPM)
         run: npm run build
 
+      - name: Validar integridade dos checksums de build (INV-02)
+        run: cd dist && sha256sum -c SHA256SUMS
+
       - name: Validar build do catálogo de componentes (Storybook)
         run: npm run build-storybook
