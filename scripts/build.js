@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { generateChecksums } from "./generate-checksums.js";
 
 const ROOT_DIR = process.cwd();
 const DIST_DIR = path.resolve(ROOT_DIR, "dist");
@@ -185,10 +186,14 @@ export function build() {
   // Validate integrity of the dist output
   const stats = validateDistIntegrity(path.join(DIST_DIR, "index.html"));
 
+  // Generate SHA-256 checksums file for release integrity verification (US-08.5 / INV-01)
+  const checksumsStats = generateChecksums(DIST_DIR);
+
   console.log(
     `✅ Build production package created successfully in "dist/":\n` +
       `   - Verified ${stats.preloadCount} modulepreload links with SRI\n` +
       `   - Verified ${stats.verifiedIntegrities} importmap integrity entries\n` +
+      `   - Generated SHA256SUMS with ${checksumsStats.fileCount} static assets\n` +
       `   - Excluded test and story files from distribution`,
   );
 }

@@ -1414,10 +1414,10 @@ flowchart LR
 | ID          | Item de Backlog                                                                             | Status          | Complexidade |
 | :---------- | :------------------------------------------------------------------------------------------ | :-------------- | :----------: |
 | **US-08.1** | Monitoramento Automatizado de Certificados e Typosquatting (Certificate Transparency & DNS) | ✅ Concluído    |   `3 pts`    |
-| **US-08.2** | UX Defensiva: Alerta de Autenticidade Canônica e Validação de Origem no PWA                 | 🔄 Em Andamento |   `2 pts`    |
+| **US-08.2** | UX Defensiva: Alerta de Autenticidade Canônica e Validação de Origem no PWA                 | ✅ Concluído    |   `2 pts`    |
 | **US-08.3** | Canal Comunitário de Denúncia de Fraudes, `security.txt` e Diretrizes na Página "Sobre"     | ✅ Concluído    |   `2 pts`    |
 | **US-08.4** | Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links      | ✅ Concluído    |   `3 pts`    |
-| **US-08.5** | Esteira de Assinatura Criptográfica de Releases e Verificação de Integridade de Builds      | 📋 Planejado    |   `2 pts`    |
+| **US-08.5** | Esteira de Assinatura Criptográfica de Releases e Verificação de Integridade de Builds      | 🔄 Em Andamento |   `2 pts`    |
 
 ```mermaid
 flowchart TD
@@ -1533,7 +1533,7 @@ flowchart TD
   - [x] **TASK-08.4.2 (Configuração de Build Bubblewrap TWA)**: Configurar manifesto `twa-manifest.json` com ícones, cores de tema, package name `app.mandaumpix.twa` e versão sincronizada com `package.json`.
   - [x] **TASK-08.4.3 (Documentação do Processo de Publicação Play Store)**: Documentar em [`docs/deployment/pipeline.md`](../deployment/pipeline.md) o passo a passo de build do Android App Bundle (`.aab`) e upload no Google Play Console.
 
-#### `US-08.5` — Esteira de Assinatura Criptográfica de Releases e Verificação de Integridade de Builds (`📋 Planejado` · `2 Story Points`)
+#### `US-08.5` — Esteira de Assinatura Criptográfica de Releases e Verificação de Integridade de Builds (`🔄 Em Andamento` · `2 Story Points`)
 
 - **História (Narrativa Canônica)**:
   > **Como** **Usuário Técnico ou Auditor de Segurança**,
@@ -1552,7 +1552,7 @@ flowchart TD
     - Quando executa o comando `sha256sum -c SHA256SUMS`,
     - Então todos os arquivos devem ser validados com status `OK`.
 - **Tarefas de Desenvolvimento (Dev Tasks)**:
-  - [ ] **TASK-08.5.1 (Script de Geração de Checksums)**: Criar script Node.js [`scripts/generate-checksums.js`](../../scripts/generate-checksums.js) e adicionar comando `npm run build:checksums` em [`package.json`](../../package.json).
+  - [x] **TASK-08.5.1 (Script de Geração de Checksums)**: Criar script Node.js [`scripts/generate-checksums.js`](../../scripts/generate-checksums.js) e adicionar comando `npm run build:checksums` em [`package.json`](../../package.json).
   - [ ] **TASK-08.5.2 (Integração na Pipeline de Deploy)**: Atualizar [`.github/workflows/deploy-dev.yml`](../../.github/workflows/deploy-dev.yml) e workflows de staging/produção para publicar o arquivo de hashes nos artefatos da release.
   - [ ] **TASK-08.5.3 (Guia de Auditoria e Verificação de Integridade)**: Documentar em [`docs/security/takedown_and_monitoring.md`](../security/takedown_and_monitoring.md) e [`docs/quality/static_analysis.md`](../quality/static_analysis.md) as instruções para verificação de hashes pelos usuários.
 
