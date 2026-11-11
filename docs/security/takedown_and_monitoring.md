@@ -238,10 +238,87 @@ Para garantir agilidade sem perda de tempo na redação dos chamados, os templat
 
 ---
 
+## 🔐 Plano de Ação 6: Auditoria Criptográfica de Releases e Integridade de Builds (US-08.5)
+
+Para combater adulterações silenciosas no código em trânsito ou na esteira de implantação (_supply-chain attacks_), o **Manda um PIX** disponibiliza verificação matemática pública de integridade criptográfica de todos os artefatos estáticos compilados em produção (`dist/`):
+
+```mermaid
+flowchart LR
+    Source["💻 Código-Fonte Aberto<br/>(Git Tag Assinada)"] --> Build["⚙️ Build Automatizado<br/>(JSPM + SRI + SHA256SUMS)"]
+    Build --> Verify["🛡️ Verificação CI (INV-02)<br/>(sha256sum -c SHA256SUMS)"]
+    Verify --> Deploy["🚀 Firebase Hosting<br/>(mandaumpix.app/SHA256SUMS)"]
+    Deploy --> Audit["🔍 Auditor / Usuário Técnico<br/>(Auditoria via CLI sha256sum)"]
+```
+
+### 1. Disponibilidade dos Hashes de Release (`SHA256SUMS`)
+
+O manifesto [`dist/SHA256SUMS`](../../scripts/generate-checksums.js) é gerado de forma determinística e publicado em três canais oficiais independentes:
+
+1. **No Domínio Oficial Canônico**: Acessível publicamente via HTTP em [`https://mandaumpix.app/SHA256SUMS`](https://mandaumpix.app/SHA256SUMS) (e nos ambientes de homologação `https://stg.mandaumpix.app/SHA256SUMS` e `https://dev.mandaumpix.app/SHA256SUMS`).
+2. **Nos Artefatos Oficiais de Release no GitHub**: Anexado diretamente como asset oficial da release em [github.com/luizcanet/mandaumpix.app/releases](https://github.com/luizcanet/mandaumpix.app/releases).
+3. **Nas Execuções de CI/CD (GitHub Actions Artifacts)**: Retido como artefato auditável (`sha256sums-prd`, `sha256sums-stg`, `sha256sums-dev`).
+
+### 2. Guia de Verificação e Auditoria Passo a Passo
+
+Usuários técnicos, auditores e equipes de segurança podem atestar de forma independente que os arquivos servidos pelo domínio correspondem rigorosamente ao código-fonte inspecionado:
+
+#### Método A: Validação Local a partir do Código-Fonte Compilado
+
+```bash
+# 1. Clonar o repositório oficial e posicionar na versão desejada
+git clone https://github.com/luizcanet/mandaumpix.app.git
+cd mandaumpix.app
+git checkout v1.0.0 # Substitua pela tag ou release auditada
+
+# 2. Instalar dependências estritas e gerar o pacote de produção
+npm ci
+npm run build
+
+# 3. Validar a integridade de todos os artefatos compilados
+cd dist
+sha256sum -c SHA256SUMS
+```
+
+> **Resultado Esperado**: Todos os arquivos estáticos (`index.html`, `manifest.json`, `sw.js`, `.well-known/*`, `src/**/*.js`) devem retornar com o status `OK`.
+
+#### Método B: Auditoria Direta dos Ativos Servidos em Produção
+
+```bash
+# 1. Criar diretório temporário para auditoria
+mkdir -p /tmp/mandaumpix-audit && cd /tmp/mandaumpix-audit
+
+# 2. Baixar o arquivo de hashes publicado no domínio oficial
+curl -fsSL https://mandaumpix.app/SHA256SUMS -o SHA256SUMS
+
+# 3. Baixar os arquivos estáticos principais para auditoria
+curl -fsSL https://mandaumpix.app/index.html -o index.html
+curl -fsSL https://mandaumpix.app/manifest.json -o manifest.json
+curl -fsSL https://mandaumpix.app/sw.js -o sw.js
+mkdir -p .well-known src
+curl -fsSL https://mandaumpix.app/.well-known/security.txt -o .well-known/security.txt
+curl -fsSL https://mandaumpix.app/src/main.js -o src/main.js
+
+# 4. Validar os arquivos baixados contra o catálogo de hashes
+sha256sum -c SHA256SUMS --ignore-missing
+```
+
+#### Método C: Validação de Assinatura Criptográfica das Tags Git
+
+As releases oficiais são publicadas com tags Git assinadas criptograficamente:
+
+```bash
+# Verificar a assinatura criptográfica da tag de release
+git tag -v v1.0.0
+```
+
+---
+
 ## 🔗 Rastreabilidade e Documentos Relacionados
 
 - 📖 **[Arquitetura de Segurança e Autenticação](./auth_and_access.md)** — Princípio Zero-Credential e proteção no dispositivo.
 - 🔒 **[Conformidade e Proteção de Dados](./compliance.md)** — LGPD, integridade de payload EMV e HTTPS canônico.
+- 🚀 **[Pipeline de Verificação e Implantação](../deployment/pipeline.md)** — Esteira de CI/CD e verificação automatizada `INV-01` e `INV-02`.
+- 🔍 **[Análise Estática e Qualidade](../quality/static_analysis.md)** — Análise estática, SRI e integridade de checksums.
 - 📋 **[Backlog do Produto (Épico 08)](../business/backlog.md)** — Histórias de usuário e tarefas de implementação de segurança defensiva.
 - 💼 **[Modelo de Domínio](../business/domain_model.md)** — Termos da linguagem ubíqua e regra `RN08`.
 
