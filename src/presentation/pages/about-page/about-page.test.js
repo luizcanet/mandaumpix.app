@@ -210,6 +210,52 @@ describe("AboutPageComponent (TASK-04.4.2: Testes Unitários de Renderização e
         ABOUT_SECURITY.beneficiaryNotice,
       );
     });
+
+    it("deve renderizar canal comunitário de denúncia de fraudes com link mailto e security.txt (INV-02 / RFC 9116)", () => {
+      document.body.appendChild(aboutElement);
+
+      const reportBtn = aboutElement.querySelector(
+        '[data-action="report-fraud"]',
+      );
+      expect(reportBtn).not.toBeNull();
+      expect(reportBtn.textContent.trim()).toBe(
+        ABOUT_SECURITY.reportButtonText,
+      );
+      expect(reportBtn.getAttribute("href")).toBe(
+        ABOUT_SECURITY.reportMailtoUrl,
+      );
+      expect(reportBtn.getAttribute("aria-label")).toBe(
+        ABOUT_SECURITY.reportAriaLabel,
+      );
+
+      const securityTxtLink = aboutElement.querySelector(
+        ".about-page__security-txt-link",
+      );
+      expect(securityTxtLink).not.toBeNull();
+      expect(securityTxtLink.getAttribute("href")).toBe(
+        ABOUT_SECURITY.securityTxtHref,
+      );
+    });
+
+    it("deve disparar evento 'fraud-report-clicked' ao acionar o canal de denúncia", () => {
+      document.body.appendChild(aboutElement);
+
+      const reportListener = vi.fn();
+      aboutElement.addEventListener("fraud-report-clicked", reportListener);
+
+      const reportBtn = aboutElement.querySelector(
+        '[data-action="report-fraud"]',
+      );
+      reportBtn.click();
+
+      expect(reportListener).toHaveBeenCalledTimes(1);
+      expect(reportListener.mock.calls[0][0].detail.mailtoUrl).toBe(
+        ABOUT_SECURITY.reportMailtoUrl,
+      );
+      expect(reportListener.mock.calls[0][0].detail.subject).toBe(
+        ABOUT_SECURITY.reportSubject,
+      );
+    });
   });
 
   describe("Interação e Navegação SPA (Botão 'Início')", () => {

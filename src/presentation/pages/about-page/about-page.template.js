@@ -124,7 +124,7 @@ export function aboutPageTemplate({
         </div>
       </div>
 
-      <!-- CARD 3: AUTENTICIDADE E ARQUITETURA ZERO-CREDENTIAL (INV-03 / RN08) -->
+      <!-- CARD 3: AUTENTICIDADE, ZERO-CREDENTIAL E CANAL DE DENÚNCIA (RN08 / RFC 9116) -->
       <div
         class="about-page__box about-page__box--security"
         role="region"
@@ -148,6 +148,36 @@ export function aboutPageTemplate({
         <p class="about-page__security-notice">
           ${ABOUT_SECURITY.beneficiaryNotice}
         </p>
+
+        <div class="about-page__report-section">
+          <div class="about-page__report-header">
+            <span class="about-page__report-title">${ABOUT_SECURITY.reportTitle}</span>
+          </div>
+          <p class="about-page__report-desc">
+            ${ABOUT_SECURITY.reportDescription}
+          </p>
+          <div class="about-page__report-actions">
+            <a
+              href="${ABOUT_SECURITY.reportMailtoUrl}"
+              class="about-page__report-btn"
+              data-action="report-fraud"
+              aria-label="${ABOUT_SECURITY.reportAriaLabel}"
+            >
+              <vector-icon name="triangle-exclamation" class="about-page__report-btn-icon"></vector-icon>
+              <span>${ABOUT_SECURITY.reportButtonText}</span>
+            </a>
+            <a
+              href="${ABOUT_SECURITY.securityTxtHref}"
+              class="about-page__security-txt-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Consultar arquivo RFC 9116 security.txt"
+            >
+              <vector-icon name="circle-info" class="about-page__security-txt-icon"></vector-icon>
+              <span>${ABOUT_SECURITY.securityTxtLabel}</span>
+            </a>
+          </div>
+        </div>
       </div>
 
       <!-- CARD 4: APOIO VOLUNTÁRIO ("MANDA UM PIX") -->

@@ -45,6 +45,13 @@ describe("about-page.css (TASK-04.4.4: Estilização BEM, Acessibilidade e Respo
       expect(cssContent).toMatch(
         /\.about-page__security-notice\s*\{[^}]*font-size:/,
       );
+      expect(cssContent).toMatch(/\.about-page__report-section\s*\{/);
+      expect(cssContent).toMatch(
+        /\.about-page__report-btn\s*\{[^}]*display:\s*inline-flex/,
+      );
+      expect(cssContent).toMatch(
+        /\.about-page__security-txt-link\s*\{[^}]*display:\s*inline-flex/,
+      );
     });
 
     it("deve definir a área do QR Code e caixa do código Copia e Cola", () => {
@@ -98,6 +105,12 @@ describe("about-page.css (TASK-04.4.4: Estilização BEM, Acessibilidade e Respo
       expect(cssContent).toMatch(
         /\.about-page__link\s*\{[^}]*min-height:\s*44px/,
       );
+      expect(cssContent).toMatch(
+        /\.about-page__report-btn\s*\{[^}]*min-height:\s*44px/,
+      );
+      expect(cssContent).toMatch(
+        /\.about-page__security-txt-link\s*\{[^}]*min-height:\s*44px/,
+      );
     });
 
     it("deve definir anéis de foco visíveis com focus-visible nos botões e links", () => {
@@ -105,6 +118,10 @@ describe("about-page.css (TASK-04.4.4: Estilização BEM, Acessibilidade e Respo
       expect(cssContent).toContain(".about-page__copy-btn:focus-visible");
       expect(cssContent).toContain(".about-page__share-btn:focus-visible");
       expect(cssContent).toContain(".about-page__link:focus-visible");
+      expect(cssContent).toContain(".about-page__report-btn:focus-visible");
+      expect(cssContent).toContain(
+        ".about-page__security-txt-link:focus-visible",
+      );
     });
   });
 

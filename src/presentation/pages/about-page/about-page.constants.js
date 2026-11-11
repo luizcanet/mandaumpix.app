@@ -12,6 +12,7 @@ import {
 
 /**
  * Metadados e avisos de segurança, autenticidade canônica e arquitetura Zero-Credential (INV-03 / RN08).
+ * Canal comunitário de denúncia de fraudes e conformidade RFC 9116 (INV-02 / TASK-08.3.2).
  */
 export const ABOUT_SECURITY = Object.freeze({
   badgeLabel: OFFICIAL_ORIGIN_BADGE_LABEL,
@@ -23,6 +24,24 @@ export const ABOUT_SECURITY = Object.freeze({
     "Confira sempre o nome do titular exibido na tela do seu banco antes de efetuar qualquer pagamento via PIX.",
   badgeAriaLabel: "Selo de autenticidade de origem oficial verificada",
   securityIcon: "check",
+  reportTitle: "Canal Comunitário de Denúncia de Fraudes",
+  reportDescription:
+    "Identificou um clone falso, tentativa de golpe ou adulteração de chaves? Reporte diretamente aos mantenedores para pronta resposta e abertura imediata de procedimento de derrubada (takedown).",
+  reportButtonText: "Denunciar site falso",
+  reportAriaLabel: "Denunciar cópia falsa ou golpe por e-mail",
+  reportEmail: "me@luizca.net",
+  reportSubject: "[Denúncia de Golpe / Cópia Falsa] Manda um PIX",
+  reportBodyTemplate:
+    "Olá, equipe do Manda um PIX,\n\nGostaria de denunciar uma suspeita de cópia falsa, golpe ou site fraudulento:\n\n- URL suspeita/maliciosa: \n- Onde você encontrou o link: \n- Detalhes do ocorrido / evidências: \n- Chave PIX ou dados solicitados indevidamente (se houver): \n\n(Por favor, anexe capturas de tela/prints caso disponíveis)",
+  reportMailtoUrl:
+    "mailto:me@luizca.net?subject=" +
+    encodeURIComponent("[Denúncia de Golpe / Cópia Falsa] Manda um PIX") +
+    "&body=" +
+    encodeURIComponent(
+      "Olá, equipe do Manda um PIX,\n\nGostaria de denunciar uma suspeita de cópia falsa, golpe ou site fraudulento:\n\n- URL suspeita/maliciosa: \n- Onde você encontrou o link: \n- Detalhes do ocorrido / evidências: \n- Chave PIX ou dados solicitados indevidamente (se houver): \n\n(Por favor, anexe capturas de tela/prints caso disponíveis)",
+    ),
+  securityTxtLabel: "security.txt (RFC 9116)",
+  securityTxtHref: "/.well-known/security.txt",
 });
 
 /**

@@ -121,3 +121,18 @@ export const AuthenticityBadgeAndSecurity = {
     }
   },
 };
+
+/**
+ * Visualização focada no Canal de Denúncia de Fraudes e link RFC 9116 security.txt (INV-02, TASK-08.3.2).
+ */
+export const FraudReportAndSecurityTxt = {
+  name: "Canal de Denúncia de Fraudes & RFC 9116 security.txt",
+  play: async ({ canvasElement }) => {
+    const reportBtn = canvasElement.querySelector(
+      '[data-action="report-fraud"]',
+    );
+    if (reportBtn) {
+      reportBtn.focus();
+    }
+  },
+};

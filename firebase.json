@@ -4,6 +4,7 @@
     "ignore": [
       "firebase.json",
       "**/.*",
+      "!**/.well-known/**",
       "**/node_modules/**",
       "docs/**",
       "src/**/*.test.js",
@@ -26,6 +27,26 @@
             "value": "/"
           }
         ]
+      },
+      {
+        "source": "/.well-known/security.txt",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain; charset=utf-8"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=86400, stale-while-revalidate=604800"
+          }
+        ]
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/security.txt",
+        "destination": "/.well-known/security.txt",
+        "type": 301
       }
     ],
     "rewrites": [

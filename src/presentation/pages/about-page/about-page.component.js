@@ -7,6 +7,7 @@ import {
 import {
   ABOUT_NAVIGATION,
   ABOUT_PROJECT,
+  ABOUT_SECURITY,
   ABOUT_SHARE,
   ABOUT_SUPPORT_PIX,
 } from "./about-page.constants.js";
@@ -94,6 +95,12 @@ export class AboutPageComponent extends CustomElement {
 
     const shareBtn = this.querySelector('[data-action="share-app"]');
     shareBtn?.addEventListener("click", this.handleShareClick.bind(this));
+
+    const reportBtn = this.querySelector('[data-action="report-fraud"]');
+    reportBtn?.addEventListener(
+      "click",
+      this.handleReportFraudClick.bind(this),
+    );
   }
 
   syncAttributes() {
@@ -155,6 +162,19 @@ export class AboutPageComponent extends CustomElement {
     this.dispatchEvent(
       new CustomEvent("navigate-home", {
         detail: { path: this.homeHref },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  }
+
+  handleReportFraudClick() {
+    this.dispatchEvent(
+      new CustomEvent("fraud-report-clicked", {
+        detail: {
+          mailtoUrl: ABOUT_SECURITY.reportMailtoUrl,
+          subject: ABOUT_SECURITY.reportSubject,
+        },
         bubbles: true,
         composed: true,
       }),

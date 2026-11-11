@@ -168,6 +168,12 @@ export function build() {
   // Copy src folder (excluding tests and stories)
   copyDirectoryFiltered(path.join(ROOT_DIR, "src"), path.join(DIST_DIR, "src"));
 
+  // Copy .well-known directory if present
+  const wellKnownDir = path.join(ROOT_DIR, ".well-known");
+  if (fs.existsSync(wellKnownDir)) {
+    copyDirectoryFiltered(wellKnownDir, path.join(DIST_DIR, ".well-known"));
+  }
+
   // Restore storybook if it existed
   if (tempStorybookDir && fs.existsSync(tempStorybookDir)) {
     fs.cpSync(tempStorybookDir, path.join(DIST_DIR, "storybook"), {
