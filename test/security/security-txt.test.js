@@ -92,4 +92,3 @@ describe("RFC 9116 security.txt & Firebase Hosting Configuration (TASK-08.3.1)",
     });
   });
 });
-

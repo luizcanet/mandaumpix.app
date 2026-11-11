@@ -1510,7 +1510,7 @@ flowchart TD
     - Então é disparado o link `mailto:` contendo o assunto pré-preenchido `[Denúncia de Golpe / Cópia Falsa] Manda um PIX` e instruções no corpo para envio da URL fraudulenta.
 - **Tarefas de Desenvolvimento (Dev Tasks)**:
   - [x] **TASK-08.3.1 (Criação do Arquivo RFC 9116 `security.txt`)**: Criar arquivo canônico [`.well-known/security.txt`](../../.well-known/security.txt) e configurar roteamento/MIME type em [`firebase.json`](../../firebase.json).
-  - [ ] **TASK-08.3.2 (Inclusão de Bloco de Segurança na Página Sobre)**: Implementar bloco de segurança e link de denúncia acessível no Web Component [`src/presentation/components/about/about.component.js`](../../src/presentation/components/about/about.component.js).
+  - [x] **TASK-08.3.2 (Inclusão de Bloco de Segurança na Página Sobre)**: Implementar bloco de segurança e link de denúncia acessível no Web Component [`src/presentation/pages/about-page/about-page.component.js`](../../src/presentation/pages/about-page/about-page.component.js).
   - [ ] **TASK-08.3.3 (Testes Unitários de Rota e Acessibilidade)**: Criar testes unitários em Vitest validando a integridade dos links e acessibilidade da página Sobre.
 
 #### `US-08.4` — Publicação Oficial na Google Play via Trusted Web Activity (TWA) e Digital Asset Links (`📋 Planejado` · `3 Story Points`)

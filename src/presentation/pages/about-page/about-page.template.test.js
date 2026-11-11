@@ -30,6 +30,14 @@ describe("AboutPageTemplate", () => {
     expect(html).toContain("about-page__box--security");
     expect(html).toContain(ABOUT_SECURITY.badgeLabel);
     expect(html).toContain(ABOUT_SECURITY.zeroCredentialNotice);
+    expect(html).toContain(ABOUT_SECURITY.reportButtonText);
+    expect(html).toContain('data-action="report-fraud"');
+    expect(html).toContain(ABOUT_SECURITY.securityTxtHref);
+    expect(html).toContain('<vector-icon name="triangle-exclamation"');
+    expect(html).toContain(ABOUT_SECURITY.reportButtonText);
+    expect(html).toContain('data-action="report-fraud"');
+    expect(html).toContain(ABOUT_SECURITY.securityTxtHref);
+    expect(html).toContain('<vector-icon name="triangle-exclamation"');
   });
 
   it("deve renderizar estado de copiado quando isCopied for true", () => {

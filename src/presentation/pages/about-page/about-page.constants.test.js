@@ -21,7 +21,7 @@ describe("about-page.constants", () => {
     });
   });
 
-  describe("ABOUT_SECURITY (INV-03 / RN08 / TASK-08.2.3)", () => {
+  describe("ABOUT_SECURITY (INV-03 / RN08 / TASK-08.2.3 / TASK-08.3.2)", () => {
     it("deve conter metadados do selo de origem oficial e avisos Zero-Credential", () => {
       expect(ABOUT_SECURITY.badgeLabel).toBe("Origem Oficial: mandaumpix.app");
       expect(ABOUT_SECURITY.officialOrigin).toBe("https://mandaumpix.app");
@@ -33,6 +33,23 @@ describe("about-page.constants", () => {
         "Confira sempre o nome do titular exibido na tela do seu banco",
       );
       expect(ABOUT_SECURITY.securityIcon).toBe("check");
+    });
+
+    it("deve conter dados canônicos para o canal comunitário de denúncia de fraudes (INV-02 / RFC 9116)", () => {
+      expect(ABOUT_SECURITY.reportTitle).toBe(
+        "Canal Comunitário de Denúncia de Fraudes",
+      );
+      expect(ABOUT_SECURITY.reportButtonText).toBe("Denunciar site falso");
+      expect(ABOUT_SECURITY.reportEmail).toBe("me@luizca.net");
+      expect(ABOUT_SECURITY.reportSubject).toBe(
+        "[Denúncia de Golpe / Cópia Falsa] Manda um PIX",
+      );
+      expect(ABOUT_SECURITY.reportMailtoUrl).toContain("mailto:me@luizca.net");
+      expect(ABOUT_SECURITY.reportMailtoUrl).toContain(
+        encodeURIComponent("[Denúncia de Golpe / Cópia Falsa] Manda um PIX"),
+      );
+      expect(ABOUT_SECURITY.securityTxtHref).toBe("/.well-known/security.txt");
+      expect(ABOUT_SECURITY.securityTxtLabel).toContain("security.txt");
     });
   });
 
