@@ -75,4 +75,3 @@ describe("Release Checksums Pipeline & Firebase Hosting Configuration (TASK-08.5
     });
   });
 });
-
