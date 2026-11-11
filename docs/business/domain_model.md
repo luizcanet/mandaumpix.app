@@ -65,7 +65,7 @@ Este documento estabelece o vocabulário padronizado (**Linguagem Ubíqua**) e a
 - O aplicativo deve apresentar na interface um acesso fácil e direto a uma página que fale sobre o aplicativo (**Página "Sobre"**).
 - A página deve conter informações claras sobre:
   1. **O Aplicativo e Natureza Livre**: Descrição e propósito do **Manda um PIX** (`mandaumpix.app`), deixando explícito que o aplicativo é **gratuito, livre e de código aberto** (_Free, Libre and Open Source Software_), funcionando como PWA 100% local sem exigir abertura de aplicativos bancários.
-  2. **O Projeto**: Versão (`v1.0.0`), licenciamento sob **GNU AGPL v3.0 (`AGPL-3.0-only`)** e links do repositório oficial ([`github.com/luizcanet/mandaumpix.app`](https://github.com/luizcanet/mandaumpix.app)).
+  2. **O Projeto**: Versão (`1.0.0`), licenciamento sob **GNU AGPL v3.0 (`AGPL-3.0-only`)** e links do repositório oficial ([`github.com/luizcanet/mandaumpix.app`](https://github.com/luizcanet/mandaumpix.app)).
   3. **O Autor**: Identificação e contato do criador e mantenedor do projeto, **Luiz Henrique Canet Filho** (`<me@luizca.net>`).
   4. **Contribuição Voluntária ("Manda um PIX")**: Caso o usuário ache que o aplicativo é útil para ele e para outras pessoas, deve ser convidado — de maneira **descontraída, utilizando emojis** e a frase **"Manda um PIX"** — a contribuir com **qualquer valor** para ajudar a manter o projeto, apresentando na própria página um **QR Code com valor dinâmico (aberto)** e a **Chave copia e cola** para **`eu@luizca.net`**.
   5. **Incentivo à Divulgação**: Deve incentivar o usuário a **divulgar e compartilhar o aplicativo para mais pessoas**, ajudando a comunidade a conhecer e utilizar a ferramenta.

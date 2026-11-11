@@ -66,7 +66,7 @@ export const ABOUT_PROJECT = Object.freeze({
   name: "Manda um PIX",
   domain: "mandaumpix.app",
   version: "1.0.0",
-  versionLabel: "mandaumpix.app • v1.0.0",
+  versionLabel: "mandaumpix.app • 1.0.0",
   license: "AGPL-3.0-only",
   licenseName: "GNU Affero General Public License v3.0",
   licenseFull: "GNU Affero General Public License v3.0 (AGPL-3.0-only)",

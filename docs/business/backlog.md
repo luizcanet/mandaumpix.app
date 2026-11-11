@@ -260,10 +260,10 @@ flowchart TD
   > **Para que** eu consiga abrir a aplicação e gerar cobranças PIX mesmo quando estiver em locais sem conexão de internet ou com sinal instável (`RN01`, `RN04`, `RN05`).
 - **Regras de Negócio e Invariantes**:
   - **INV-01 (Autonomia Offline Total — `RN01`, `RN04`, `RN05`)**: Como o Manda um PIX é um PWA 100% client-side, toda a lógica de negócio (geração do payload BR Code, renderização de QR Code, persistência em IndexedDB, cópia para clipboard e download PNG) deve funcionar perfeitamente sem qualquer requisição de rede ativa após a primeira carga.
-  - **INV-02 (Estratégia de Cache da App Shell e Ativos Estáticos)**: O Service Worker (`sw.js`) deve realizar o pré-carregamento (_pre-caching_) no evento `install` dos recursos essenciais da aplicação (`/`, `/index.html`, `/manifest.json`, `/src/main.js`, ícones SVG/PNG e módulos essenciais do runtime) em um cache versionado (`mandaumpix-v1.0.0-precache`), ativando-se imediatamente com `self.skipWaiting()`.
+  - **INV-02 (Estratégia de Cache da App Shell e Ativos Estáticos)**: O Service Worker (`sw.js`) deve realizar o pré-carregamento (_pre-caching_) no evento `install` dos recursos essenciais da aplicação (`/`, `/index.html`, `/manifest.json`, `/src/main.js`, ícones SVG/PNG e módulos essenciais do runtime) em um cache versionado (`mandaumpix-1.0.0-precache`), ativando-se imediatamente com `self.skipWaiting()`.
   - **INV-03 (Interceptação de Requisições & Estratégia de Runtime Caching)**:
     - Para navegações de página (`navigate` / HTML): adotar estratégia **Network-First** com fallback transparente para o cache da App Shell (`index.html`) em caso de falha de rede/offline.
-    - Para ativos estáticos da aplicação e dependências do CDN JSPM (`ga.jspm.io`): adotar estratégia **Stale-While-Revalidate** ou **Cache-First**, persistindo recursos resolvidos em `mandaumpix-v1.0.0-runtime` para garantir disponibilidade offline imediata.
+    - Para ativos estáticos da aplicação e dependências do CDN JSPM (`ga.jspm.io`): adotar estratégia **Stale-While-Revalidate** ou **Cache-First**, persistindo recursos resolvidos em `mandaumpix-1.0.0-runtime` para garantir disponibilidade offline imediata.
   - **INV-04 (Ciclo de Vida e Limpeza de Versões Obsoletas)**: No evento `activate`, o Service Worker deve identificar e expurgar todos os caches legados que não pertençam à versão ativa e assumir imediatamente o controle das abas abertas chamando `self.clients.claim()`.
   - **INV-05 (Isolamento do Próprio Script `sw.js`)**: O arquivo `sw.js` nunca deve ser armazenado em cache pelo próprio Service Worker e deve ser servido pelo servidor estático ([`firebase.json`](../../firebase.json)) com cabeçalho `Cache-Control: no-cache, no-store, must-revalidate` para viabilizar atualizações transparentes.
   - **INV-06 (Adaptador de Registro e Resiliência em Ambientes sem Suporte)**: O registro do Service Worker deve ser gerenciado por um adaptador desacoplado ([`src/infrastructure/pwa/service-worker.adapter.js`](../../src/infrastructure/pwa/service-worker.adapter.js)), injetando `navigator.serviceWorker` de forma testável, registrando `./sw.js` com escopo `./` após o evento `window.load` e monitorando reativamente o status de conectividade (`navigator.onLine`, eventos `online`/`offline`) via `@modnes/data-controller`. Se o ambiente não suportar Service Worker (ex.: navegadores antigos ou `iframe` restrito), o sistema deve operar normalmente em modo fallback online sem lançar exceções não tratadas.
@@ -271,7 +271,7 @@ flowchart TD
   - **Cenário 01 (Pré-cache da App Shell na Instalação do Service Worker)**:
     - Dado que o navegador suporta Service Worker e o usuário acessa o aplicativo pela primeira vez,
     - Quando o evento `install` de `sw.js` for disparado,
-    - Então o Service Worker deve abrir o cache versionado `mandaumpix-v1.0.0-precache`, realizar o pré-carregamento dos ativos fundamentais da App Shell e invocar `self.skipWaiting()`.
+    - Então o Service Worker deve abrir o cache versionado `mandaumpix-1.0.0-precache`, realizar o pré-carregamento dos ativos fundamentais da App Shell e invocar `self.skipWaiting()`.
   - **Cenário 02 (Funcionamento Offline Transparente via Interceptação de Rede)**:
     - Dado que o Service Worker está ativado e a conexão com a internet é perdida (`offline`),
     - Quando o usuário carregar ou recarregar a URL raiz `/` ou qualquer rota SPA,
@@ -480,7 +480,7 @@ flowchart TD
   > **Para que** eu compreenda a transparência e privacidade da solução, possa apoiar a continuidade do projeto com qualquer quantia e compartilhe a ferramenta com mais pessoas.
 - **Regras de Negócio e Invariantes**: `RN07` ([Modelo de Domínio](./domain_model.md), [Especificações e Contratos](../design/api_specs.md) e [Proposta de Interface](../design/ui_proposal.md)).
   - **INV-01 (Componente Canônico e Rota SPA — `RN07`)**: Implementado como Web Component `<about-page>` estendendo `CustomElement` (`@modnes/custom-element`) sob o bloco BEM `.about-page`, associado à rota canônica `/sobre` e renderizado dentro do contêiner `#router-outlet`.
-  - **INV-02 (Seção Institucional "Sobre o Aplicativo" e Retorno à Rota Raiz)**: Apresenta cabeçalho com o logotipo oficial do Manda um PIX, título `"Sobre o Manda um PIX"`, versão `"mandaumpix.app • v1.0.0"`, botão de ação **"Início"** (`<vector-icon name="home">`) para retornar à rota `/` via `Router.goTo("/")`, e texto explicativo enfatizando que o aplicativo é **gratuito, livre e de código aberto** com execução e armazenamento 100% locais no dispositivo.
+  - **INV-02 (Seção Institucional "Sobre o Aplicativo" e Retorno à Rota Raiz)**: Apresenta cabeçalho com o logotipo oficial do Manda um PIX, título `"Sobre o Manda um PIX"`, versão `"mandaumpix.app • 1.0.0"`, botão de ação **"Início"** (`<vector-icon name="home">`) para retornar à rota `/` via `Router.goTo("/")`, e texto explicativo enfatizando que o aplicativo é **gratuito, livre e de código aberto** com execução e armazenamento 100% locais no dispositivo.
   - **INV-03 (Card "Sobre o Autor")**: Exibe bloco estruturado identificando **Luiz Henrique Canet Filho**, e-mail de contato funcional com link `mailto:me@luizca.net`, link externo para o perfil no GitHub ([`github.com/luizcanet`](https://github.com/luizcanet)) e perfil no LinkedIn ([`linkedin.com/in/luizcanet`](https://www.linkedin.com/in/luizcanet/)) com `target="_blank"` e `rel="noopener noreferrer"`.
   - **INV-04 (Card "Sobre o Projeto & Licença Livre")**: Exibe bloco estruturado informando o domínio oficial `mandaumpix.app`, termos de licenciamento sob a **GNU Affero General Public License v3.0 (`AGPL-3.0-only`)** e link oficial do repositório/issues ([`github.com/luizcanet/mandaumpix.app`](https://github.com/luizcanet/mandaumpix.app)).
   - **INV-05 (Card de Contribuição Voluntária — "Manda um PIX" para `eu@luizca.net`)**:
@@ -501,7 +501,7 @@ flowchart TD
   - **Cenário 01 (Renderização Completa da Página Institucional — Happy Path)**:
     - Dado que o usuário navega para a rota `"/sobre"`,
     - Quando o componente `<about-page>` for montado no `#router-outlet`,
-    - Então deve renderizar o cabeçalho institucional com versão `"mandaumpix.app • v1.0.0"` e o botão `"Início"`,
+    - Então deve renderizar o cabeçalho institucional com versão `"mandaumpix.app • 1.0.0"` e o botão `"Início"`,
     - E deve exibir os cards de Autor (**Luiz Henrique Canet Filho**), Projeto/Licença (**AGPL-3.0-only**), Contribuição Voluntária (**"Manda um PIX"** para `eu@luizca.net`) e Divulgação,
     - E o `document.title` deve ser atualizado para `"Sobre o aplicativo — Manda um PIX"`.
   - **Cenário 02 (Retorno para a Tela Inicial via Botão "Início")**:
@@ -1273,7 +1273,7 @@ flowchart LR
     - Os jobs devem declarar explicitamente os ambientes `staging` (URL: `https://stg.mandaumpix.app`) e `production` (URL: `https://mandaumpix.app`), mantendo registro histórico e links diretos para auditoria no painel de Deployments do repositório GitHub.
 - **Critérios de Aceite (BDD / Gherkin)**:
   - **Cenário 01 (Deploy Automatizado em Staging via Push em Branch de Release — Happy Path)**:
-    - Dado que uma release candidate é finalizada e enviada com `git push origin release/v1.0.0`,
+    - Dado que uma release candidate é finalizada e enviada com `git push origin release/1.0.0`,
     - Quando o GitHub Actions receber o evento de push na branch `release/*`,
     - Então o workflow `CD - Deploy Staging` (`.github/workflows/deploy-stg.yml`) deve ser iniciado automaticamente,
     - E deve executar com sucesso os testes (`npm test`), linter (`npm run lint`), formatação (`npm run format:check`), build da aplicação (`npm run build`) e build do Storybook (`npm run build-storybook -- -o dist/storybook`),
