@@ -434,6 +434,27 @@ export class PixChargeFormComponent extends CustomElement {
           }
         },
       );
+
+      if (typeof this.#pixKeyRepository.getState === "function") {
+        const initialState = this.#pixKeyRepository.getState();
+        if (initialState?.selectedKey) {
+          this.selectedKey = initialState.selectedKey;
+        }
+      }
+
+      if (
+        !this.selectedKey &&
+        typeof this.#pixKeyRepository.getSelectedKey === "function"
+      ) {
+        this.#pixKeyRepository
+          .getSelectedKey()
+          .then((key) => {
+            if (key && !this.selectedKey) {
+              this.selectedKey = key;
+            }
+          })
+          .catch(() => {});
+      }
     }
   }
 

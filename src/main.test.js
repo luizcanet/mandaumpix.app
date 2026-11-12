@@ -250,7 +250,7 @@ describe("main.js", () => {
       expect(APP_METADATA).toEqual({
         name: "Manda um PIX",
         packageName: "mandaumpix.app",
-        version: "1.0.0",
+        version: "1.0.1",
         license: "AGPL-3.0-only",
       });
     });
@@ -953,9 +953,9 @@ describe("main.js", () => {
         SERVICE_WORKER_ADAPTER_ERROR_CODES.SERVICE_WORKER_UNSUPPORTED,
       ).toBe("SERVICE_WORKER_UNSUPPORTED");
       expect(ServiceWorkerAdapterError).toBeDefined();
-      expect(CACHE_VERSION).toBe("1.0.0");
-      expect(PRECACHE_NAME).toBe("mandaumpix-1.0.0-precache");
-      expect(RUNTIME_CACHE_NAME).toBe("mandaumpix-1.0.0-runtime");
+      expect(CACHE_VERSION).toBe("1.0.1");
+      expect(PRECACHE_NAME).toBe("mandaumpix-1.0.1-precache");
+      expect(RUNTIME_CACHE_NAME).toBe("mandaumpix-1.0.1-runtime");
       expect(DEFAULT_SW_SCRIPT_URL).toBe("./sw.js");
       expect(DEFAULT_SW_SCOPE).toBe("./");
       expect(isOnline).toBeTypeOf("function");
