@@ -1,4 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
+import { IndexedDbPixKeyRepository } from "../../src/infrastructure/storage/indexed-db-pix-key.repository.js";
+import { bootstrapApp } from "../../src/presentation/bootstrap/bootstrap-app.js";
 import {
   SAMPLE_PIX_KEYS,
   flushMicrotasks,
@@ -262,6 +264,66 @@ describe("Jornada Principal de Cobrança PIX (TASK-07.2.2, TASK-07.2.3, TASK-07.
   });
 
   describe("TASK-07.2.4: Gestão e Chaveamento de Múltiplas Contas PIX", () => {
+    it("deve carregar a página inicial com o botão 'Manda um PIX' habilitado após reload quando já houver chave persistida no IndexedDB", async () => {
+      // 1. Monta o app e salva uma chave
+      context = await mountTestApp({
+        initialPath: "/",
+        initialKeys: [SAMPLE_PIX_KEYS.CPF],
+      });
+
+      // 2. Simula o reload: novo repositório apontando para o mesmo IndexedDB persistido, sem cache em memória
+      const memoryIdb = window.indexedDB;
+      const reloadedRepo = new IndexedDbPixKeyRepository({
+        indexedDb: memoryIdb,
+        dbName: context.repository.dbName,
+      });
+
+      document.body.replaceChildren();
+      const rootElement = document.createElement("main");
+      rootElement.id = "app";
+      rootElement.innerHTML = `
+        <div id="router-outlet">
+          <div class="charge-page"></div>
+        </div>
+      `;
+      document.body.appendChild(rootElement);
+
+      bootstrapApp(rootElement, {
+        pixKeyRepository: reloadedRepo,
+      });
+
+      await flushMicrotasks(50);
+
+      const formElement = rootElement.querySelector("pix-charge-form");
+      expect(formElement.disabled).toBe(false);
+      expect(formElement.selectedKey).not.toBeNull();
+      const ctaBtn = formElement.querySelector("button.charge-cta");
+      expect(ctaBtn.disabled).toBe(false);
+      expect(ctaBtn.classList.contains("charge-cta--disabled")).toBe(false);
+    });
+
+    it("deve carregar a página inicial com o botão 'Manda um PIX' habilitado quando já houver chave cadastrada e selecionada", async () => {
+      context = await mountTestApp({
+        initialPath: "/",
+        initialKeys: [SAMPLE_PIX_KEYS.CPF],
+      });
+
+      await flushMicrotasks(50);
+
+      const { selectorElement, formElement } = context;
+
+      expect(selectorElement.classList.contains("hidden")).toBe(false);
+      expect(formElement.disabled).toBe(false);
+      expect(formElement.selectedKey).not.toBeNull();
+      expect(formElement.selectedKey.id).toBe(SAMPLE_PIX_KEYS.CPF.id);
+
+      const ctaBtn = formElement.querySelector("button.charge-cta");
+      expect(ctaBtn).not.toBeNull();
+      expect(ctaBtn.disabled).toBe(false);
+      expect(ctaBtn.classList.contains("charge-cta--disabled")).toBe(false);
+      expect(ctaBtn.getAttribute("aria-disabled")).toBe("false");
+    });
+
     it("deve alternar entre chaves cadastradas e retornar ao empty state na exclusão da última", async () => {
       // Começa com 1 chave existente (CPF)
       context = await mountTestApp({

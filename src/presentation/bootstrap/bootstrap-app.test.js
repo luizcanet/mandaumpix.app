@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import Router from "@modnes/router";
 import { bootstrapApp, populateChargePage } from "./bootstrap-app.js";
+import "../components/pix-charge-form/pix-charge-form.component.js";
 
 describe("bootstrap-app.js", () => {
   it("should return null if rootElement is not provided", () => {
@@ -188,6 +189,50 @@ describe("bootstrap-app.js", () => {
 
       expect(selectorEl.classList.contains("hidden")).toBe(false);
       expect(selectorEl.hasAttribute("hidden")).toBe(false);
+    });
+
+    it("should synchronize formElement.selectedKey and enable charge button when keys exist", async () => {
+      const chargePage = document.createElement("div");
+      chargePage.className = "charge-page";
+      document.body.appendChild(chargePage);
+
+      const registeredKeys = [
+        { id: "key-1", tipo_chave: "email", valor_chave: "test@example.com" },
+      ];
+
+      const mockRepo = {
+        subscribe: vi.fn(),
+        getState: vi.fn().mockReturnValue({
+          items: registeredKeys,
+          selectedKeyId: "key-1",
+          selectedKey: registeredKeys[0],
+        }),
+      };
+      const mockListUseCase = {
+        execute: vi.fn().mockResolvedValue({
+          items: registeredKeys,
+          selectedKeyId: "key-1",
+          selectedKey: registeredKeys[0],
+        }),
+      };
+
+      populateChargePage(chargePage, {
+        pixKeyRepository: mockRepo,
+        listPixKeysUseCase: mockListUseCase,
+      });
+
+      await new Promise((r) => setTimeout(r, 0));
+
+      const formEl = chargePage.querySelector("pix-charge-form");
+      expect(formEl).not.toBeNull();
+      expect(formEl.selectedKey).toEqual(registeredKeys[0]);
+      expect(formEl.disabled).toBe(false);
+      const ctaBtn = formEl.querySelector("button.charge-cta");
+      expect(ctaBtn).not.toBeNull();
+      expect(ctaBtn.disabled).toBe(false);
+      expect(ctaBtn.classList.contains("charge-cta--disabled")).toBe(false);
+
+      chargePage.remove();
     });
 
     it("should reactively toggle visibility when repository subscriber receives updates", () => {

@@ -371,6 +371,21 @@ export class PixKeySelectorComponent extends CustomElement {
           this.#keys = [...result.items];
           this.#selectedKeyId = result.selectedKeyId || null;
           this.render();
+
+          const activeKey =
+            this.#keys.find((item) => item.id === this.#selectedKeyId) ||
+            result.selectedKey ||
+            null;
+
+          if (activeKey) {
+            this.dispatchEvent(
+              new CustomEvent(KEY_SELECTOR_EVENT_NAMES.SELECT_KEY, {
+                bubbles: true,
+                composed: true,
+                detail: { id: activeKey.id, key: activeKey },
+              }),
+            );
+          }
         }
       } catch {
         // Handled gracefully

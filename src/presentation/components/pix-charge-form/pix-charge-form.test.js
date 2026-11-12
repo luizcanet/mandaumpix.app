@@ -553,5 +553,30 @@ describe("PixChargeFormComponent (TASK-06.1.3: Testes Unitários de Renderizaç�
       expect(formElement.selectedKey).toEqual(mockKey);
       expect(formElement.disabled).toBe(false);
     });
+
+    it("deve carregar a chave selecionada imediatamente se o repositório já possuir chave selecionada no carregamento", async () => {
+      const mockRepo = {
+        subscribe: vi.fn(),
+        getState: vi.fn().mockReturnValue({
+          items: [mockKey],
+          selectedKeyId: mockKey.id,
+          selectedKey: mockKey,
+        }),
+        getSelectedKey: vi.fn().mockResolvedValue(mockKey),
+      };
+      formElement.pixKeyRepository = mockRepo;
+      document.body.appendChild(formElement);
+      await Promise.resolve();
+
+      expect(formElement.selectedKey).toEqual(mockKey);
+      expect(formElement.disabled).toBe(false);
+      const ctaBtn = formElement.querySelector(
+        `button.${CHARGE_FORM_CLASSES.CTA}`,
+      );
+      expect(ctaBtn.disabled).toBe(false);
+      expect(ctaBtn.classList.contains(CHARGE_FORM_CLASSES.CTA_DISABLED)).toBe(
+        false,
+      );
+    });
   });
 });

@@ -233,6 +233,18 @@ export function populateChargePage(chargePageElement, services = {}) {
       services.distributePixChargeUseCase;
   }
 
+  const syncSelectedKey = (selectedKey) => {
+    if (formElement && selectedKey) {
+      formElement.selectedKey = selectedKey;
+    }
+  };
+
+  chargePageElement.addEventListener("select-key", (event) => {
+    if (event.detail?.key) {
+      syncSelectedKey(event.detail.key);
+    }
+  });
+
   const syncVisibility = (items = []) => {
     const hasKeys = Array.isArray(items) && items.length > 0;
     if (emptyElement) {
@@ -257,17 +269,26 @@ export function populateChargePage(chargePageElement, services = {}) {
     if (typeof services.pixKeyRepository.subscribe === "function") {
       services.pixKeyRepository.subscribe((state = {}) => {
         syncVisibility(state.items);
+        if (state.selectedKey) {
+          syncSelectedKey(state.selectedKey);
+        }
       });
     }
     if (typeof services.pixKeyRepository.getState === "function") {
       const currentState = services.pixKeyRepository.getState();
       syncVisibility(currentState?.items);
+      if (currentState?.selectedKey) {
+        syncSelectedKey(currentState.selectedKey);
+      }
     }
     if (services.listPixKeysUseCase) {
       services.listPixKeysUseCase
         .execute()
         .then((result) => {
           syncVisibility(result?.items);
+          if (result?.selectedKey) {
+            syncSelectedKey(result.selectedKey);
+          }
         })
         .catch(() => {});
     }
