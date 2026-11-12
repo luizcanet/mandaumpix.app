@@ -3,7 +3,7 @@ import DataController from "@modnes/data-controller";
 export const DEFAULT_SW_SCRIPT_URL = "./sw.js";
 export const DEFAULT_SW_SCOPE = "./";
 export const DEFAULT_SW_TYPE = "module";
-export const CACHE_VERSION = "1.0.0";
+export const CACHE_VERSION = "1.0.1";
 export const PRECACHE_NAME = `mandaumpix-${CACHE_VERSION}-precache`;
 export const RUNTIME_CACHE_NAME = `mandaumpix-${CACHE_VERSION}-runtime`;
 

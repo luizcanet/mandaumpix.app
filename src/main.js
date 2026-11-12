@@ -330,7 +330,7 @@ import {
 export const APP_METADATA = Object.freeze({
   name: "Manda um PIX",
   packageName: "mandaumpix.app",
-  version: "1.0.0",
+  version: "1.0.1",
   license: "AGPL-3.0-only",
 });
 

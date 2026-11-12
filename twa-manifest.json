@@ -14,8 +14,8 @@
   "startUrl": "/",
   "iconUrl": "https://mandaumpix.app/src/assets/icons/icon-512.png",
   "maskableIconUrl": "https://mandaumpix.app/src/assets/icons/icon-maskable-512.png",
-  "appVersionName": "1.0.0",
-  "appVersionCode": 1,
+  "appVersionName": "1.0.1",
+  "appVersionCode": 2,
   "signingKey": {
     "path": "./android.keystore",
     "alias": "mandaumpix"

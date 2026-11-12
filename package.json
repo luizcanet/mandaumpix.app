@@ -1,6 +1,6 @@
 {
   "name": "mandaumpix.app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Aplicativo web progressivo (PWA) gratuito que facilita a geração de cobranças via PIX.",
   "homepage": "https://github.com/luizcanet/mandaumpix.app#readme",
   "bugs": {
