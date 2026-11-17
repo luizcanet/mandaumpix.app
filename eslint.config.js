@@ -13,6 +13,11 @@ export default defineConfig([
       "coverage/**",
       "storybook-static/**",
       "package-lock.json",
+      "app/**",
+      "build/**",
+      ".gradle/**",
+      "gradle/**",
+      ".vscode/**",
     ],
   },
   {

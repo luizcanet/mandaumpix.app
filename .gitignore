@@ -151,3 +151,23 @@ storybook-static/
 
 # Turbo Repo
 .turbo
+
+# Android TWA & Signing Keys
+*.keystore
+*.keystore.b64
+*.jks
+*.aab
+*.apk
+/.gradle/
+/.vscode/
+/app/
+/build/
+/build.gradle
+/gradle/
+/gradle.properties
+/gradlew
+/gradlew.bat
+/manifest-checksum.txt
+/settings.gradle
+/store_icon.png
+/local.properties

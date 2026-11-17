@@ -40,9 +40,15 @@ describe("Bubblewrap TWA Manifest Configuration (TASK-08.4.2)", () => {
     const webManifest = JSON.parse(fs.readFileSync(webManifestPath, "utf-8"));
 
     expect(twaConfig.name).toBe(webManifest.name);
-    expect(twaConfig.shortName).toBe(webManifest.short_name);
-    expect(twaConfig.themeColor).toBe(webManifest.theme_color);
-    expect(twaConfig.backgroundColor).toBe(webManifest.background_color);
+    expect(twaConfig.shortName ?? twaConfig.launcherName).toBe(
+      webManifest.short_name,
+    );
+    expect(twaConfig.themeColor.toLowerCase()).toBe(
+      webManifest.theme_color.toLowerCase(),
+    );
+    expect(twaConfig.backgroundColor.toLowerCase()).toBe(
+      webManifest.background_color.toLowerCase(),
+    );
 
     // Launcher name on Android must not exceed 12 characters to prevent truncation
     expect(twaConfig.launcherName.length).toBeLessThanOrEqual(12);

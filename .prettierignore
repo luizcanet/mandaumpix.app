@@ -4,6 +4,12 @@ coverage/
 storybook-static/
 jspm_packages/
 node_modules/
+/app/
+/build/
+/.gradle/
+/gradle/
+/.vscode/
+*.keystore.b64
 
 # Lockfiles and JSPM auto-generated import maps
 package-lock.json
